@@ -29,7 +29,20 @@ import {{ c.name }}_splash from "@image/characters/{{ c.name }}_splash"
 
 const template = "https://homdgcat.wiki/homdgcat-res/Avatar/UI_AvatarIcon_#.png"
 
-const getName = name => template.replace("#", name)
+const correctedName = {
+    "Lyney": "Liney",
+    "Skirk": "SkirkNew",
+    "Xianyun": "Liuyun",
+    "YumemizukiMizuki": "Mizuki",
+    "Lynette": "Linette",
+    "Ororon": "Olorun"
+}
+
+const getName = name => {
+    if(correctedName[name]) name = correctedName[name];
+    return template.replace("#", name);
+}
+
 // const getHash = hash => newTemplate.replace("#", hash)
 // const getPath = path => newerTemplate.replace("#", path)
 
