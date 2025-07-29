@@ -1,4 +1,4 @@
-# Mona Wasm
+# Myyes Wasm
 wasm module for mona front-end
 
 ## build

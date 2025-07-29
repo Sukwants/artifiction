@@ -37,7 +37,7 @@
             <el-col :xs="24" :sm="12" class="mb16">
                 <use-case-item text="MONA" :icon="IconFa6BrandsGithub"
                                :description="t('intro.opensourceMonaDescription')"
-                               @click="newPage('https://github.com/wormtql/genshin_artifact')"
+                               @click="newPage('https://github.com/Sukwants/genshin_artifact')"
                 ></use-case-item>
 
             </el-col>
@@ -49,44 +49,15 @@
             </el-col>
         </el-row>
 
-        <h2>{{ t("intro.feedback") }}</h2>
+        <h2>{{ t("intro.moreMaster") }}</h2>
         <el-row :gutter="16">
-            <el-col :xs="24" :sm="8" class="mb16">
-                <use-case-item :text="t('intro.fbGithubIssue')" :icon="IconFa6BrandsGithub"
-                               :description="t('intro.fbIssueDescription')"
-                               @click="newPage('https://github.com/wormtql/genshin_artifact/issues')"
+            <el-col :xs="24" :sm="12" class="mb16">
+                <use-case-item text="MONA" :icon="https://pond.ink/images/avatar.png"
+                               @click="newPage('https://pond.ink/')"
                 ></use-case-item>
-            </el-col>
-            <el-col :xs="24" :sm="8" class="mb16">
-                <use-case-item :text="t('intro.fbQQ')" :icon="IconFa6BrandsQQ"
-                               :description="t('intro.fbQQDescription')"
-                               @click="newPage('https://qm.qq.com/cgi-bin/qm/qr?k=yQaJgPzRmBgEXXk1uiqNbq7CIrq-0biW&jump_from=webapi')"
-                ></use-case-item>
-            </el-col>
-            <el-col :xs="24" :sm="8" class="mb16">
-                <use-case-item :text="t('intro.fbNGA')" :icon="IconFa6SolidComment"
-                               :description="t('intro.fbNGADescription')"
-                               @click="newPage('https://nga.178.com/read.php?tid=31180859')"
-                ></use-case-item>
+
             </el-col>
         </el-row>
-
-        <h2>请莫娜吃饭</h2>
-        <el-card style="margin-bottom: 16px" shadow="never">
-            <el-alert
-                :closable="false"
-                title="才...才不是因为交不起服务器费呢。"
-            ></el-alert>
-            <!-- 暂未开通 -->
-            <div class="pay">
-                <span>微信支付：</span>
-                <img src="./wechat.png">
-            </div>
-            <div class="pay">
-                <span>支付宝：</span>
-                <img src="./alipay.png">
-            </div>
-        </el-card>
     </div>
 </template>
 

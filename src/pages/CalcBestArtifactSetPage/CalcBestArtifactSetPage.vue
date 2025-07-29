@@ -112,7 +112,7 @@ async function doCalculation() {
     const loading = ElLoading.service({
         lock: true,
         fullscreen: true,
-        text: "莫娜占卜中"
+        text: "叶师傅开锁中"
     })
 
     const result = await wasmCalcBestArtifactSet(calcBestArtifactSetInterface.value, 120000)

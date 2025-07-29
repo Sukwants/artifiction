@@ -74,6 +74,16 @@ const items: LinkItem[] = [
             { title: "开黑啦语音社区", link: "https://kaihei.co/QQ6zQ4", primary: false, icon: IconEpChatRound },
             { title: "MEW文字社区", link: "https://mew.fun/n/mimi", primary: false, icon: IconEpConnection }
         ]
+    },
+    {
+        name: "HHOJ",
+        tags: [
+            "OJ"
+        ],
+        description: "HHOJ!",
+        url: [
+            { title: "HHOJ", link: "https://hhoj.pond.ink/", primary: false, icon: IconEpConnection },
+        ]
     }
 ]
 
