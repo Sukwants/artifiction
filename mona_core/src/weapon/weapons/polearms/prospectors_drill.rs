@@ -42,7 +42,7 @@ impl WeaponTrait for ProspectorsDrill {
         #[cfg(not(target_family = "wasm"))]
         name_locale: locale!(
             zh_cn: "勘探钻机",
-            en: "Prospector’s Drill"
+            en: "Prospector's Drill"
         )
     };
 

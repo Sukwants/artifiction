@@ -8,11 +8,11 @@ use crate::weapon::weapon_trait::WeaponTrait;
 use crate::weapon::{WeaponConfig, WeaponName};
 use crate::weapon::weapon_effect::WeaponEffect;
 
-pub struct Trawler;
+pub struct EndOfTheLine;
 
-impl WeaponTrait for Trawler {
+impl WeaponTrait for EndOfTheLine {
     const META_DATA: WeaponStaticData = WeaponStaticData {
-        name: WeaponName::Trawler,
+        name: WeaponName::EndOfTheLine,
         internal_name: "Bow_Fin",
         weapon_type: WeaponType::Bow,
         weapon_sub_stat: Some(WeaponSubStatFamily::Recharge100),
@@ -26,7 +26,7 @@ impl WeaponTrait for Trawler {
         #[cfg(not(target_family = "wasm"))]
         name_locale: crate::common::i18n::locale!(
             zh_cn: "竭泽",
-            en: "Trawler"
+            en: "End of the Line"
         )
     };
 

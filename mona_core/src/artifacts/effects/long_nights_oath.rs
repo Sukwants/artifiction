@@ -36,7 +36,7 @@ impl ArtifactTrait for LongNightsOath {
         name_mona: "LongNightsOath",
         name_locale: locale!(
             zh_cn: "长夜之誓",
-            en: "Long Night’s Oath"
+            en: "Long Night's Oath"
         ),
         flower: Some(locale!(
             zh_cn: "执灯人的誓词",
@@ -67,7 +67,7 @@ impl ArtifactTrait for LongNightsOath {
         effect3: None,
         effect4: Some(locale!(
             zh_cn: "装备者的下落攻击/重击/元素战技命中敌人后，获得1/2/2层「永照的流辉」，由下落攻击、重击或元素战技产生的该效果分别每1秒至多触发一次。永照的流辉：下落攻击造成的伤害提升15%，持续6秒，至多叠加5层，每层持续时间独立计算。",
-            en: "After the equipping character’s Plunging Attack/Charged Attack/Elemental Skill hits an opponent, they will gain 1/2/2 stack(s) of “Radiance Everlasting.” Plunging Attacks, Charged Attacks, or Elemental Skills can each trigger this effect once every 1s. Radiance Everlasting: Plunging Attacks deal 15% increased DMG for 6s. Max 5 stacks. Each stack’s duration is counted independently."
+            en: "After the equipping character's Plunging Attack/Charged Attack/Elemental Skill hits an opponent, they will gain 1/2/2 stack(s) of “Radiance Everlasting.” Plunging Attacks, Charged Attacks, or Elemental Skills can each trigger this effect once every 1s. Radiance Everlasting: Plunging Attacks deal 15% increased DMG for 6s. Max 5 stacks. Each stack's duration is counted independently."
         )),
         effect5: None,
         internal_id: 15039,

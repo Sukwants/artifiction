@@ -11,12 +11,12 @@ use crate::weapon::weapon_base_atk::WeaponBaseATKFamily;
 use crate::weapon::weapon_common_data::WeaponCommonData;
 use crate::weapon::weapon_sub_stat::WeaponSubStatFamily;
 
-pub struct JadeFallsSplendorEffect {
+pub struct JadefallsSplendorEffect {
     pub rate: f64,
     pub element: Element,
 }
 
-impl<A: Attribute> WeaponEffect<A> for JadeFallsSplendorEffect {
+impl<A: Attribute> WeaponEffect<A> for JadefallsSplendorEffect {
     fn apply(&self, data: &WeaponCommonData, attribute: &mut A) {
         let bonus_name = AttributeName::bonus_name_by_element(self.element);
         let refine = data.refine as f64;
@@ -38,11 +38,11 @@ impl<A: Attribute> WeaponEffect<A> for JadeFallsSplendorEffect {
     }
 }
 
-pub struct JadeFallsSplendor;
+pub struct JadefallsSplendor;
 
-impl WeaponTrait for JadeFallsSplendor {
+impl WeaponTrait for JadefallsSplendor {
     const META_DATA: WeaponStaticData = WeaponStaticData {
-        name: WeaponName::JadeFallsSplendor,
+        name: WeaponName::JadefallsSplendor,
         internal_name: "Catalyst_Morax",
         weapon_type: WeaponType::Catalyst,
         weapon_sub_stat: Some(WeaponSubStatFamily::HP108),
@@ -56,7 +56,7 @@ impl WeaponTrait for JadeFallsSplendor {
         #[cfg(not(target_family = "wasm"))]
         name_locale: locale!(
             zh_cn: "碧落之珑",
-            en: "Jadefall’s Splendor",
+            en: "Jadefall's Splendor",
         )
     };
 
@@ -67,11 +67,11 @@ impl WeaponTrait for JadeFallsSplendor {
 
     fn get_effect<A: Attribute>(character: &CharacterCommonData, config: &WeaponConfig) -> Option<Box<dyn WeaponEffect<A>>> {
         let rate = match *config {
-            WeaponConfig::JadeFallsSplendor { rate } => rate,
+            WeaponConfig::JadefallsSplendor { rate } => rate,
             _ => 0.0
         };
 
-        Some(Box::new(JadeFallsSplendorEffect {
+        Some(Box::new(JadefallsSplendorEffect {
             rate,
             element: character.static_data.element
         }))

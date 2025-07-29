@@ -28,9 +28,10 @@ export default {
         // badge: getImage("{{ t.character_icon_name }}"),
         // {%- else if t.badge_type == "character" -%}
         // badge: getIcon("{{ t.icon_hash }}"),
-        // {%- else -%} #}
+        // {%- else -%}
+        // badge: {{ t.name }}_image,
+        // {%- endif %} #}
         badge: {{ t.name }}_image,
-        // {# {%- endif %} #}
         config: [
             {% for config in t.config %}
             {{ config|e("none") }},

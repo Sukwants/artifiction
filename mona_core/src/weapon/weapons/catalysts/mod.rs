@@ -28,7 +28,7 @@ pub use fruit_of_fulfillment::FruitOfFulfillment;
 pub use wandering_evenstar::WanderingEvenstar;
 pub use a_thousand_floating_dreams::AThousandFloatingDreams;
 pub use tulaytullah_s_remembrance::TulaytullahsRemembrance;
-pub use jadefalls_splendor::JadeFallsSplendor;
+pub use jadefalls_splendor::JadefallsSplendor;
 pub use sacrificial_jade::SacrificialJade;
 pub use flowing_purity::FlowingPurity;
 pub use ballad_of_the_boundless_blue::BalladOfTheBoundlessBlue;
