@@ -36,6 +36,7 @@ pub enum WeaponConfig {
     SturdyBone { rate: f64 },
     PeakPatrolSong { stack: f64, rate: f64 },
     CalamityOfEshu { rate: f64 },
+    SymphonistOfScents { offfield_rate: f64, healing_rate: f64 },
     Azurelight { after_skill: bool, zero_energy: bool },
 
     // claymore
