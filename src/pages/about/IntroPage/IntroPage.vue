@@ -71,7 +71,7 @@ import IconFa6SolidRuler from "~icons/fa6-solid/ruler"
 import IconFa6SolidComment from "~icons/fa6-solid/comment"
 import IconFa6BrandsGithub from "~icons/fa6-brands/github"
 import IconFa6BrandsQQ from "~icons/fa6-brands/qq"
-import IconPondInk from "https://pond.ink/images/avatar.png"
+import IconPondInk from "@/assets/PondInk.png"
 
 import UseCaseItem from "./UseCaseItem.vue"
 import {useRouter} from "vue-router"
