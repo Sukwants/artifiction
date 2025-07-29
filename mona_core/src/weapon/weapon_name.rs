@@ -60,6 +60,7 @@ pub enum WeaponName {
     SturdyBone,
     PeakPatrolSong,
     CalamityOfEshu,
+    SymphonistOfScents,
     Azurelight,
 
     // claymore
