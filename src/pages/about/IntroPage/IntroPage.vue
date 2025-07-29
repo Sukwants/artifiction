@@ -52,7 +52,7 @@
         <h2>{{ t("intro.moreMaster") }}</h2>
         <el-row :gutter="16">
             <el-col :xs="24" :sm="12" class="mb16">
-                <use-case-item text="MONA" :icon="IconPondInk"
+                <use-case-item text="Pond Ink" :icon="IconFa6BrandsGithub"
                                @click="newPage('https://pond.ink/')"
                 ></use-case-item>
 
