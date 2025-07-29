@@ -48,7 +48,7 @@ impl WeaponTrait for StarcallersWatch {
         #[cfg(not(target_family = "wasm"))]
         name_locale: locale!(
             zh_cn: "祭星者之望",
-            en: "Starcaller’s Watch"
+            en: "Starcaller's Watch"
         ),
     };
 

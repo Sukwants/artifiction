@@ -41,7 +41,7 @@ impl WeaponTrait for UltimateOverlordsMegaMagicSword {
         #[cfg(not(target_family = "wasm"))]
         name_locale: locale!(
             zh_cn: "「究极霸王超级魔剑」",
-            en: "\"Ultimate Overlord’s Mega Magic Sword\""
+            en: "\"Ultimate Overlord's Mega Magic Sword\""
         )
     };
 

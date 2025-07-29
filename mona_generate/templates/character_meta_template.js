@@ -5,7 +5,7 @@ import {{ c.name }}_avatar from "@image/characters/{{ c.name }}_avatar"
 import {{ c.name }}_splash from "@image/characters/{{ c.name }}_splash"
 {% endfor %}
 
-// const template = "https://upload-bbs.mihoyo.com/game_record/genshin/character_icon/UI_AvatarIcon_#.png?x-oss-process=image/crop,w_200,h_200,y_5,g_north"
+// {# const template = "https://upload-bbs.mihoyo.com/game_record/genshin/character_icon/UI_AvatarIcon_#.png?x-oss-process=image/crop,w_200,h_200,y_5,g_north"
 // const template = "https://upload-bbs.mihoyo.com/game_record/genshin/character_icon/UI_AvatarIcon_#.png?x-oss-process=image/crop,w_200,h_200,y_5,g_north"
 // const newTemplate = "https://act-webstatic.mihoyo.com/hk4e/e20200928calculate/item_icon_u9b0pg/#.png?x-oss-process=image/crop,w_200,h_200,y_5,g_north"
 // const newerTemplate = "https://act-webstatic.mihoyo.com/hk4e/e20200928calculate/item_icon/#.png?x-oss-process=image/crop,w_200,h_200,y_5,g_north"
@@ -27,24 +27,24 @@ import {{ c.name }}_splash from "@image/characters/{{ c.name }}_splash"
 //     "Dahlia": "6851f37b/9e5b1c5805948358c656e702e5eecae2",
 // }
 
-const template = "https://homdgcat.wiki/homdgcat-res/Avatar/UI_AvatarIcon_#.png"
+// const template = "https://homdgcat.wiki/homdgcat-res/Avatar/UI_AvatarIcon_#.png"
 
-const correctedName = {
-    "Lyney": "Liney",
-    "Skirk": "SkirkNew",
-    "Xianyun": "Liuyun",
-    "YumemizukiMizuki": "Mizuki",
-    "Lynette": "Linette",
-    "Ororon": "Olorun"
-}
+// const correctedName = {
+//     "Lyney": "Liney",
+//     "Skirk": "SkirkNew",
+//     "Xianyun": "Liuyun",
+//     "YumemizukiMizuki": "Mizuki",
+//     "Lynette": "Linette",
+//     "Ororon": "Olorun"
+// }
 
-const getName = name => {
-    if(correctedName[name]) name = correctedName[name];
-    return template.replace("#", name);
-}
+// const getName = name => {
+//     if(correctedName[name]) name = correctedName[name];
+//     return template.replace("#", name);
+// }
 
 // const getHash = hash => newTemplate.replace("#", hash)
-// const getPath = path => newerTemplate.replace("#", path)
+// const getPath = path => newerTemplate.replace("#", path) #}
 
 export default {
     {% for c in characters %}
@@ -56,12 +56,12 @@ export default {
         star: {{ c.star }},
         // card: {{ c.name }}_card,
         // avatar: {{ c.name }}_avatar,
-        // {% if c.icon_hash == "" -%}
+        // {# {% if c.icon_hash == "" -%}
         // avatar: avatarPathMap["{{ c.name }}"] ? getPath(avatarPathMap["{{ c.name }}"]) : getName("{{ c.internal_name }}"),
         // {% else -%}
         // avatar: getHash("{{ c.icon_hash }}"),
-        // {%- endif %}
-        avatar: {{ c.name }}_avatar, // getName("{{ c.internal_name }}"),
+        // {%- endif %} #}
+        avatar: {{ c.name }}_avatar,
         splash: {{ c.name }}_splash,
         skillName1: {{ c.skill1_name_index }},
         skillName2: {{ c.skill2_name_index }},

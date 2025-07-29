@@ -43,7 +43,7 @@ impl WeaponTrait for TheDockhandsAssistant {
         #[cfg(not(target_family = "wasm"))]
         name_locale: locale!(
             zh_cn: "船坞长剑",
-            en: "The Dockhand’s Assistant"
+            en: "The Dockhand's Assistant"
         )
     };
 

@@ -43,7 +43,7 @@ impl WeaponTrait for SurfsUp {
         #[cfg(not(target_family = "wasm"))]
         name_locale: locale!(
             zh_cn: "冲浪时光",
-            en: "Surf’s Up"
+            en: "Surf's Up"
         ),
     };
 

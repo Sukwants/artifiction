@@ -39,7 +39,7 @@ impl BuffMeta for BuffFaruzanQ {
         name: BuffName::FaruzanQ,
         name_locale: crate::common::i18n::locale!(
             zh_cn: "法露珊 - 「抟风秘道」",
-            en: "Faruzan-「The Wind’s Secret Ways」",
+            en: "Faruzan-「The Wind's Secret Ways」",
         ),
         image: BuffImage::Avatar(CharacterName::Faruzan),
         genre: BuffGenre::Character,

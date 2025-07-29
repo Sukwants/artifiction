@@ -36,7 +36,7 @@ impl ArtifactTrait for VourukashasGlow {
     const META_DATA: ArtifactMetaData = ArtifactMetaData {
         name: ArtifactSetName::VourukashasGlow,
         name_mona: "VourukashasGlow",
-        name_locale: locale!(zh_cn: "花海甘露之光", en: "Vourukasha’s Glow"),
+        name_locale: locale!(zh_cn: "花海甘露之光", en: "Vourukasha's Glow"),
         flower: Some(locale!(zh_cn: "灵光源起之蕊", en: "Stamen of Khvarena's Origin")),
         feather: Some(locale!(zh_cn: "琦色灵彩之羽", en: "Vibrant Pinion")),
         sand: Some(locale!(zh_cn: "久远花落之时", en: "Ancient Abscission")),

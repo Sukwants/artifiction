@@ -61,7 +61,7 @@ impl WeaponTrait for AstralVulturesCrimsonPlumage {
         #[cfg(not(target_family = "wasm"))]
         name_locale: locale!(
             zh_cn: "星鹫赤羽",
-            en: "Astral Vulture’s Crimson Plumage"
+            en: "Astral Vulture's Crimson Plumage"
         ),
     };
 

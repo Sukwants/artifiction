@@ -135,11 +135,11 @@ impl CharacterTrait for Candace {
         ),
         skill_name2: locale!(
             zh_cn: "圣仪·苍鹭庇卫",
-            en: "Sacred Rite: Heron’s Sanctum",
+            en: "Sacred Rite: Heron's Sanctum",
         ),
         skill_name3: locale!(
             zh_cn: "圣仪·灰鸰衒潮",
-            en: "Sacred Rite: Wagtail’s Tide",
+            en: "Sacred Rite: Wagtail's Tide",
         ),
         name_locale: locale!(
             zh_cn: "坎蒂丝",

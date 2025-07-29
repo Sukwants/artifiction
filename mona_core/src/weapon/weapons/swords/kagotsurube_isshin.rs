@@ -10,21 +10,21 @@ use crate::weapon::{WeaponConfig, WeaponName};
 use crate::weapon::weapon_base_atk::WeaponBaseATKFamily;
 use crate::weapon::weapon_sub_stat::WeaponSubStatFamily;
 
-pub struct CursedBladeEffect {
+pub struct KagotsurubeIsshinEffect {
     rate: f64
 }
 
-impl<A: Attribute> WeaponEffect<A> for CursedBladeEffect {
+impl<A: Attribute> WeaponEffect<A> for KagotsurubeIsshinEffect {
     fn apply(&self, data: &WeaponCommonData, attribute: &mut A) {
         attribute.add_atk_percentage("笼钓瓶一心被动", 0.15 * self.rate);
     }
 }
 
-pub struct CursedBlade;
+pub struct KagotsurubeIsshin;
 
-impl WeaponTrait for CursedBlade {
+impl WeaponTrait for KagotsurubeIsshin {
     const META_DATA: WeaponStaticData = WeaponStaticData {
-        name: WeaponName::CursedBlade,
+        name: WeaponName::KagotsurubeIsshin,
         internal_name: "Sword_Youtou",
         weapon_type: WeaponType::Sword,
         weapon_sub_stat: Some(WeaponSubStatFamily::ATK90),
@@ -49,11 +49,11 @@ impl WeaponTrait for CursedBlade {
 
     fn get_effect<A: Attribute>(character: &CharacterCommonData, config: &WeaponConfig) -> Option<Box<dyn WeaponEffect<A>>> {
         let rate = match *config {
-            WeaponConfig::CursedBlade { rate } => rate,
+            WeaponConfig::KagotsurubeIsshin { rate } => rate,
             _ => 0.0
         };
 
-        Some(Box::new(CursedBladeEffect {
+        Some(Box::new(KagotsurubeIsshinEffect {
             rate
         }))
     }
