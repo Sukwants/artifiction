@@ -40,6 +40,7 @@ pub use silvershower_heartstrings::SilvershowerHeartstrings;
 pub use chain_breaker::ChainBreaker;
 pub use flower_wreathed_feathers::FlowerWreathedFeathers;
 pub use astral_vultures_crimson_plumage::AstralVulturesCrimsonPlumage;
+pub use sequence_of_solitude::SequenceOfSolitude;
 
 pub mod polar_star;
 pub mod thundering_pulse;
@@ -80,6 +81,7 @@ pub mod song_of_stillness;
 pub mod range_gauge;
 pub mod cloudforged;
 pub mod silvershower_heartstrings;
-mod chain_breaker;
-mod flower_wreathed_feathers;
-mod astral_vultures_crimson_plumage;
+pub mod chain_breaker;
+pub mod flower_wreathed_feathers;
+pub mod astral_vultures_crimson_plumage;
+pub mod sequence_of_solitude;
