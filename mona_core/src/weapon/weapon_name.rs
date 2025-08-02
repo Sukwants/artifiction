@@ -230,4 +230,5 @@ pub enum WeaponName {
     ChainBreaker,
     FlowerWreathedFeathers,
     AstralVulturesCrimsonPlumage,
+    SequenceOfSolitude,
 }

@@ -113,6 +113,9 @@ pub enum AttributeName {
     EnhanceAggravate,
     EnhanceSpread,
 
+    // EnhanceLunarCharged,
+    // EnhanceLunarBloom,
+
     HPRatioBase,
     HPRatioNormalAttack,
     HPRatioChargedAttack,
