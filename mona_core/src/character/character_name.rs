@@ -127,4 +127,5 @@ pub enum CharacterName {
     Iansan,
     Varesa,
     Ifa,
+    Dahlia,
 }

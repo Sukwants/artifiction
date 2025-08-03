@@ -11,6 +11,7 @@ pub mod neuvillette;
 pub mod furina;
 pub mod sigewinne;
 pub mod mualani;
+pub mod dahlia;
 
 pub use barbara::Barbara;
 pub use mona::Mona;
@@ -25,3 +26,4 @@ pub use neuvillette::Neuvillette;
 pub use furina::Furina;
 pub use sigewinne::Sigewinne;
 pub use mualani::Mualani;
+pub use dahlia::Dahlia;

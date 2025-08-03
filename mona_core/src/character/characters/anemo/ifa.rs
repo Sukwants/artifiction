@@ -202,6 +202,8 @@ impl CharacterTrait for Ifa {
 
             builder.add_em_ratio("技能倍率", ratio);
             builder.add_extra_damage("技能倍率", fixed);
+
+            return builder.heal(&context.attribute);
         } else {
             let ratio = match s {
                 A1 => IFA_SKILL.a_dmg1[s1],
@@ -216,17 +218,18 @@ impl CharacterTrait for Ifa {
                 Q2 => IFA_SKILL.q_dmg2[s3],
                 _ => 0.0
             };
-            builder.add_atk_ratio("技能倍率", ratio);
-        }
 
-        builder.damage(
-            &context.attribute,
-            &context.enemy,
-            s.get_element(),
-            s.get_skill_type(),
-            context.character_common_data.level,
-            fumo,
-        )
+            builder.add_atk_ratio("技能倍率", ratio);
+
+            builder.damage(
+                &context.attribute,
+                &context.enemy,
+                s.get_element(),
+                s.get_skill_type(),
+                context.character_common_data.level,
+                fumo,
+            )
+        }
     }
 
     fn new_effect<A: Attribute>(common_data: &CharacterCommonData, config: &CharacterConfig) -> Option<Box<dyn ChangeAttribute<A>>> {

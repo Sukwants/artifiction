@@ -114,4 +114,5 @@ pub enum TargetFunctionName {
     YumemizukiMizukiDefault,
     VaresaDefault,
     IfaDefault,
+    DahliaDefault,
 }

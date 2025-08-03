@@ -10,6 +10,7 @@ pub mod neuvillette_default;
 pub mod furina_default;
 pub mod sigewinne_default;
 pub mod mualani_default;
+pub mod dahlia_default;
 
 pub use barbara_default::BarbaraDefaultTargetFunction;
 pub use mona_default::MonaDefaultTargetFunction;
@@ -23,3 +24,4 @@ pub use neuvillette_default::NeuvilletteDefaultTargetFunction;
 pub use furina_default::FurinaDefaultTargetFunction;
 pub use sigewinne_default::SigewinneDefaultTargetFunction;
 pub use mualani_default::MualaniDefaultTargetFunction;
+pub use dahlia_default::DahliaDefaultTargetFunction;
