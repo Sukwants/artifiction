@@ -167,7 +167,7 @@ impl CharacterTrait for Nilou {
         weapon_type: WeaponType::Sword,
         star: 5,
         skill_name1: locale!(
-            zh_cn: "普通攻击·弦月舞步",
+            zh_cn: "弦月舞步",
             en: "Normal Attack: Dance of Samser",
         ),
         skill_name2: locale!(

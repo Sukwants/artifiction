@@ -70,7 +70,7 @@ pub const VENTI_STATIC_DATA: CharacterStaticData = CharacterStaticData {
     weapon_type: WeaponType::Bow,
     star: 5,
     skill_name1: locale!(
-        zh_cn: "普通攻击·神代射术",
+        zh_cn: "神代射术",
         en: "Normal Attack: Divine Marksmanship",
     ),
     skill_name2: locale!(

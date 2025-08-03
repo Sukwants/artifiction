@@ -90,7 +90,7 @@ pub const TARTAGLIA_STATIC_DATA: CharacterStaticData = CharacterStaticData {
     weapon_type: WeaponType::Bow,
     star: 5,
     skill_name1: locale!(
-        zh_cn: "普通攻击·断雨",
+        zh_cn: "断雨",
         en: "Normal Attack: Cutting Torrent",
     ),
     skill_name2: locale!(

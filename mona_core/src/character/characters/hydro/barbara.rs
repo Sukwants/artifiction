@@ -65,7 +65,7 @@ pub const BARBARA_STATIC_DATA: CharacterStaticData = CharacterStaticData {
     weapon_type: WeaponType::Catalyst,
     star: 4,
     skill_name1: locale!(
-        zh_cn: "普通攻击·水之浅唱",
+        zh_cn: "水之浅唱",
         en: "Normal Attack: Whisper of Water",
     ),
     skill_name2: locale!(

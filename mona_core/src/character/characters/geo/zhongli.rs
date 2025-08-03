@@ -68,7 +68,7 @@ pub const ZHONGLI_STATIC_DATA: CharacterStaticData = CharacterStaticData {
     weapon_type: WeaponType::Polearm,
     star: 5,
     skill_name1: locale!(
-        zh_cn: "普通攻击·岩雨",
+        zh_cn: "岩雨",
         en: "Normal Attack: Rain of Stone",
     ),
     skill_name2: locale!(

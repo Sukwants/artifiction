@@ -64,7 +64,7 @@ pub const RAZOR_STATIC_DATA: CharacterStaticData = CharacterStaticData {
     weapon_type: WeaponType::Claymore,
     star: 4,
     skill_name1: locale!(
-        zh_cn: "普通攻击·钢脊",
+        zh_cn: "钢脊",
         en: "Normal Attack: Steel Fang",
     ),
     skill_name2: locale!(

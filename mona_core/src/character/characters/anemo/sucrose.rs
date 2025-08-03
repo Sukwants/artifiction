@@ -58,7 +58,7 @@ pub const SUCROSE_STATIC_DATA: CharacterStaticData = CharacterStaticData {
     weapon_type: WeaponType::Catalyst,
     star: 4,
     skill_name1: locale!(
-        zh_cn: "普通攻击·简式风灵作成",
+        zh_cn: "简式风灵作成",
         en: "Normal Attack: Wind Spirit Creation",
     ),
     skill_name2: locale!(

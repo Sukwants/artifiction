@@ -63,7 +63,7 @@ pub const AMBER_STATIC_DATA: CharacterStaticData = CharacterStaticData {
     weapon_type: WeaponType::Bow,
     star: 4,
     skill_name1: locale!(
-        zh_cn: "普通攻击·神射手",
+        zh_cn: "神射手",
         en: "Normal Attack: Sharpshooter",
     ),
     skill_name2: locale!(

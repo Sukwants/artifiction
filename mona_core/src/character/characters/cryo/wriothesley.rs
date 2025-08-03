@@ -108,7 +108,7 @@ impl CharacterTrait for Wriothesley {
         weapon_type: WeaponType::Catalyst,
         star: 5,
         skill_name1: locale!(
-            zh_cn: "普通攻击·迅烈倾霜拳",
+            zh_cn: "迅烈倾霜拳",
             en: "Normal Attack: Forceful Fists of Frost"
         ),
         skill_name2: locale!(

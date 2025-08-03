@@ -99,7 +99,7 @@ impl CharacterTrait for Layla {
         weapon_type: WeaponType::Sword,
         star: 4,
         skill_name1: locale!(
-            zh_cn: "普通攻击·熠辉轨度剑",
+            zh_cn: "熠辉轨度剑",
             en: "Normal Attack: Sword of the Radiant Path",
         ),
         skill_name2: locale!(

@@ -143,7 +143,7 @@ impl CharacterTrait for Cyno {
         weapon_type: WeaponType::Polearm,
         star: 5,
         skill_name1: locale!(
-            zh_cn: "普通攻击·七圣枪术",
+            zh_cn: "七圣枪术",
             en: "Normal Attack: Invoker's Spear",
         ),
         skill_name2: locale!(

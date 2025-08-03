@@ -167,7 +167,7 @@ impl CharacterTrait for Xianyun {
         weapon_type: WeaponType::Catalyst,
         star: 5,
         skill_name1: locale!(
-            zh_cn: "普通攻击·清风散花词",
+            zh_cn: "清风散花词",
             en: "Normal Attack: Word of Wind and Flower"
         ),
         skill_name2: locale!(

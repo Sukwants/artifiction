@@ -70,7 +70,7 @@ pub const THOMA_STATIC_DATA: CharacterStaticData = CharacterStaticData {
     weapon_type: WeaponType::Polearm,
     star: 4,
     skill_name1: locale!(
-        zh_cn: "普通攻击·迅破枪势",
+        zh_cn: "迅破枪势",
         en: "Normal Attack: Swiftshatter Spear",
     ),
     skill_name2: locale!(

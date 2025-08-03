@@ -129,7 +129,7 @@ impl CharacterTrait for Neuvillette {
         weapon_type: WeaponType::Catalyst,
         star: 5,
         skill_name1: locale!(
-            zh_cn: "普通攻击·如水从平",
+            zh_cn: "如水从平",
             en: "Normal Attack: As Water Seeks Equilibrium"
         ),
         skill_name2: locale!(

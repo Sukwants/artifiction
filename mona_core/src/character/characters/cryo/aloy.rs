@@ -72,7 +72,7 @@ pub const ALOY_STATIC_DATA: CharacterStaticData = CharacterStaticData {
     weapon_type: WeaponType::Bow,
     star: 5,
     skill_name1: locale!(
-        zh_cn: "普通攻击·快速射击",
+        zh_cn: "快速射击",
         en: "Normal Attack: Rapid Fire",
     ),
     skill_name2: locale!(

@@ -121,7 +121,7 @@ impl CharacterTrait for Mualani {
         weapon_type: WeaponType::Catalyst,
         star: 5,
         skill_name1: locale!(
-            zh_cn: "普通攻击·降温处理",
+            zh_cn: "降温处理",
             en: "Normal Attack: Cooling Treatment"
         ),
         skill_name2: locale!(

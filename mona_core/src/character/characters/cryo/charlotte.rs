@@ -131,7 +131,7 @@ impl CharacterTrait for Charlotte {
         weapon_type: WeaponType::Catalyst,
         star: 4,
         skill_name1: locale!(
-            zh_cn: "普通攻击·冷色摄影律",
+            zh_cn: "冷色摄影律",
             en: "Normal Attack: Cool-Color Capture",
         ),
         skill_name2: locale!(

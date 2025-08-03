@@ -66,7 +66,7 @@ pub const XIANGLING_STATIC_DATA: CharacterStaticData = CharacterStaticData {
     weapon_type: WeaponType::Polearm,
     star: 4,
     skill_name1: locale!(
-        zh_cn: "普通攻击·白案功夫",
+        zh_cn: "白案功夫",
         en: "Normal Attack: Dough-Fu",
     ),
     skill_name2: locale!(

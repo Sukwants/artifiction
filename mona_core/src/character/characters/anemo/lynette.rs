@@ -148,7 +148,7 @@ impl CharacterTrait for Lynette {
         weapon_type: WeaponType::Sword,
         star: 4,
         skill_name1: locale!(
-            zh_cn: "普通攻击·迅捷礼刺剑",
+            zh_cn: "迅捷礼刺剑",
             en: "Normal Attack: Rapid Ritesword",
         ),
         skill_name2: locale!(

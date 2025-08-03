@@ -130,7 +130,7 @@ impl CharacterTrait for Candace {
         weapon_type: WeaponType::Polearm,
         star: 4,
         skill_name1: locale!(
-            zh_cn: "普通攻击·流耀枪术·守势",
+            zh_cn: "流耀枪术·守势",
             en: "Normal Attack: Gleaming Spear – Guardian Stance",
         ),
         skill_name2: locale!(

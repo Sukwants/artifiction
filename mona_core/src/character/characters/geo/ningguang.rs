@@ -54,7 +54,7 @@ pub const NINGGUANG_STATIC_DATA: CharacterStaticData = CharacterStaticData {
     weapon_type: WeaponType::Catalyst,
     star: 4,
     skill_name1: locale!(
-        zh_cn: "普通攻击·千金掷",
+        zh_cn: "千金掷",
         en: "Normal Attack: Sparkling Scatter",
     ),
     skill_name2: locale!(

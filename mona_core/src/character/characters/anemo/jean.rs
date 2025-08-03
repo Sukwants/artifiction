@@ -67,7 +67,7 @@ pub const JEAN_STATIC_DATA: CharacterStaticData = CharacterStaticData {
     weapon_type: WeaponType::Sword,
     star: 5,
     skill_name1: locale!(
-        zh_cn: "普通攻击·西风剑术",
+        zh_cn: "西风剑术",
         en: "Normal Attack: Favonius Bladework",
     ),
     skill_name2: locale!(

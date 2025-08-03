@@ -128,7 +128,7 @@ impl CharacterTrait for ShikanoinHeizou {
         weapon_type: WeaponType::Catalyst,
         star: 4,
         skill_name1: locale!(
-            zh_cn: "普通攻击·不动流格斗术",
+            zh_cn: "不动流格斗术",
             en: "Normal Attack: Fudou Style Martial Arts",
         ),
         skill_name2: locale!(

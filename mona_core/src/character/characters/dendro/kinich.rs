@@ -111,7 +111,7 @@ impl CharacterTrait for Kinich {
         weapon_type: WeaponType::Claymore,
         star: 5,
         skill_name1: locale!(
-            zh_cn: "普通攻击·夜阳斗技",
+            zh_cn: "夜阳斗技",
             en: "Normal Attack: Nightsun Style"
         ),
         skill_name2: locale!(

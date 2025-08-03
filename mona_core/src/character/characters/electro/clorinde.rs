@@ -157,7 +157,7 @@ impl CharacterTrait for Clorinde {
         weapon_type: WeaponType::Sword,
         star: 5,
         skill_name1: locale!(
-            zh_cn: "普通攻击·逐影之誓",
+            zh_cn: "逐影之誓",
             en: "Normal Attack: Oath of Hunting Shadows",
         ),
         skill_name2: locale!(

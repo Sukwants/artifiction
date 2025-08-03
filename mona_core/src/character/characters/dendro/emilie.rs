@@ -119,7 +119,7 @@ impl CharacterTrait for Emilie {
         weapon_type: WeaponType::Polearm,
         star: 5,
         skill_name1: locale!(
-            zh_cn: "普通攻击·逐影枪术·改",
+            zh_cn: "逐影枪术·改",
             en: "Normal Attack: Shadow-Hunting Spear (Custom)"
         ),
         skill_name2: locale!(

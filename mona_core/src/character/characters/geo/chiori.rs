@@ -123,7 +123,7 @@ impl CharacterTrait for Chiori {
         weapon_type: WeaponType::Sword,
         star: 5,
         skill_name1: locale!(
-            zh_cn: "普通攻击·心织刀流",
+            zh_cn: "心织刀流",
             en: "Normal Attack: Weaving Blade"
         ),
         skill_name2: locale!(

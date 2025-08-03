@@ -153,7 +153,7 @@ impl CharacterTrait for Sigewinne {
         weapon_type: WeaponType::Bow,
         star: 5,
         skill_name1: locale!(
-            zh_cn: "普通攻击·靶向治疗",
+            zh_cn: "靶向治疗",
             en: "Normal Attack: Targeted Treatment"
         ),
         skill_name2: locale!(

@@ -120,7 +120,7 @@ impl CharacterTrait for Baizhu {
         sub_stat: CharacterSubStatFamily::HP288,
         weapon_type: WeaponType::Catalyst,
         star: 5,
-        skill_name1: locale!(zh_cn: "普通攻击·金匮针解", en: "Normal Attack: The Classics of Acupuncture"),
+        skill_name1: locale!(zh_cn: "金匮针解", en: "Normal Attack: The Classics of Acupuncture"),
         skill_name2: locale!(zh_cn: "太素诊要", en: "Universal Diagnosis"),
         skill_name3: locale!(zh_cn: "愈气全形论", en: "Holistic Revivification"),
     };

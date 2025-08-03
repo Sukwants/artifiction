@@ -108,7 +108,7 @@ impl CharacterTrait for Wanderer {
         weapon_type: WeaponType::Catalyst,
         star: 5,
         skill_name1: locale!(
-            zh_cn: "普通攻击·行幡鸣弦",
+            zh_cn: "行幡鸣弦",
             en: "Normal Attack: Yuuban Meigen",
         ),
         skill_name2: locale!(

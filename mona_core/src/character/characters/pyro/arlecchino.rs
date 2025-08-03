@@ -145,7 +145,7 @@ impl CharacterTrait for Arlecchino {
         weapon_type: WeaponType::Polearm,
         star: 5,
         skill_name1: locale!(
-            zh_cn: "普通攻击·斩首之邀",
+            zh_cn: "斩首之邀",
             en: "Normal Attack: Invitation to a Beheading"
         ),
         skill_name2: locale!(

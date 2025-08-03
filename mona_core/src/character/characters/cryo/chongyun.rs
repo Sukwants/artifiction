@@ -57,7 +57,7 @@ pub const CHONGYUN_STATIC_DATA: CharacterStaticData = CharacterStaticData {
     weapon_type: WeaponType::Claymore,
     star: 4,
     skill_name1: locale!(
-        zh_cn: "普通攻击·灭邪四式",
+        zh_cn: "灭邪四式",
         en: "Normal Attack: Demonbane",
     ),
     skill_name2: locale!(

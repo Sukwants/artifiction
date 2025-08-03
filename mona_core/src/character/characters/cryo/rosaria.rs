@@ -67,7 +67,7 @@ pub const ROSARIA_STATIC_DATA: CharacterStaticData = CharacterStaticData {
     weapon_type: WeaponType::Polearm,
     star: 4,
     skill_name1: locale!(
-        zh_cn: "普通攻击·教会枪术",
+        zh_cn: "教会枪术",
         en: "Normal Attack: Spear of the Church",
     ),
     skill_name2: locale!(

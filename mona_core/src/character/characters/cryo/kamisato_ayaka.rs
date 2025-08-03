@@ -60,7 +60,7 @@ pub const KAMISATO_AYAKA_STATIC_DATA: CharacterStaticData = CharacterStaticData 
     weapon_type: WeaponType::Sword,
     star: 5,
     skill_name1: locale!(
-        zh_cn: "普通攻击·神里流·倾",
+        zh_cn: "神里流·倾",
         en: "Normal Attack: Kamisato Art - Kabuki",
     ),
     skill_name2: locale!(

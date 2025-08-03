@@ -101,7 +101,7 @@ impl CharacterTrait for Ororon {
         weapon_type: WeaponType::Bow,
         star: 4,
         skill_name1: locale!(
-            zh_cn: "普通攻击·宿灵闪箭",
+            zh_cn: "宿灵闪箭",
             en: "Normal Attack: Spiritvessel Snapshot"
         ),
         skill_name2: locale!(

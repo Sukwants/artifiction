@@ -63,7 +63,7 @@ pub const ESCOFFIER_STATIC_DATA: CharacterStaticData = CharacterStaticData {
     weapon_type: WeaponType::Polearm,
     star: 5,
     skill_name1: locale!(
-        zh_cn: "普通攻击·后厨手艺",
+        zh_cn: "后厨手艺",
         en: "Normal Attack: Kitchen Skills",
         ja: "通常攻撃・料理技術",
     ),

@@ -78,7 +78,7 @@ pub const SAYU_STATIC_DATA: CharacterStaticData = CharacterStaticData {
     weapon_type: WeaponType::Claymore,
     star: 4,
     skill_name1: locale!(
-        zh_cn: "普通攻击·忍刀·终末番",
+        zh_cn: "忍刀·终末番",
         en: "Normal Attack: Shuumatsuban Ninja Blade",
     ),
     skill_name2: locale!(

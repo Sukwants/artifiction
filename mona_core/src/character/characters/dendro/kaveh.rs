@@ -124,7 +124,7 @@ impl CharacterTrait for Kaveh {
         sub_stat: CharacterSubStatFamily::ElementalMastery96,
         weapon_type: WeaponType::Claymore,
         star: 4,
-        skill_name1: locale!(zh_cn: "普通攻击·旋规设矩", en: "Normal Attack: Schematic Setup"),
+        skill_name1: locale!(zh_cn: "旋规设矩", en: "Normal Attack: Schematic Setup"),
         skill_name2: locale!(zh_cn: "画则巧施", en: "Artistic Ingenuity"),
         skill_name3: locale!(zh_cn: "繁绘隅穹", en: "Painted Dome"),
     };

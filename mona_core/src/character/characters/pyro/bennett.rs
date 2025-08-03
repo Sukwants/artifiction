@@ -75,7 +75,7 @@ pub const BENNETT_STATIC_DATA: CharacterStaticData = CharacterStaticData {
     weapon_type: WeaponType::Sword,
     star: 4,
     skill_name1: locale!(
-        zh_cn: "普通攻击·好运剑",
+        zh_cn: "好运剑",
         en: "Normal Attack: Strike of Fortune",
     ),
     skill_name2: locale!(

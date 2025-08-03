@@ -196,7 +196,7 @@ impl CharacterTrait for Xilonen {
         weapon_type: WeaponType::Sword,
         star: 5,
         skill_name1: locale!(
-            zh_cn: "普通攻击·锐锋攫猎",
+            zh_cn: "锐锋攫猎",
             en: "Normal Attack: Ehecatl's Roar"
         ),
         skill_name2: locale!(

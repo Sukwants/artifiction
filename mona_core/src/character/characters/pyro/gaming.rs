@@ -126,7 +126,7 @@ impl CharacterTrait for Gaming {
         weapon_type: WeaponType::Claymore,
         star: 4,
         skill_name1: locale!(
-            zh_cn: "普通攻击·刃爪悬星",
+            zh_cn: "刃爪悬星",
             en: "Normal Attack: Stellar Rend"
         ),
         skill_name2: locale!(

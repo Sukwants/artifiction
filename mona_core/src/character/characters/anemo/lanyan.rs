@@ -114,7 +114,7 @@ impl CharacterTrait for Lanyan {
         weapon_type: WeaponType::Catalyst,
         star: 4,
         skill_name1: locale!(
-            zh_cn: "普通攻击·玄鸾画水",
+            zh_cn: "玄鸾画水",
             en: "Normal Attack: Black Pheasant Strides on Water"
         ),
         skill_name2: locale!(

@@ -78,7 +78,7 @@ pub const EULA_STATIC_DATA: CharacterStaticData = CharacterStaticData {
     weapon_type: WeaponType::Claymore,
     star: 5,
     skill_name1: locale!(
-        zh_cn: "普通攻击·西风剑术·宗室",
+        zh_cn: "西风剑术·宗室",
         en: "Normal Attack: Favonius Bladework - Edel",
     ),
     skill_name2: locale!(

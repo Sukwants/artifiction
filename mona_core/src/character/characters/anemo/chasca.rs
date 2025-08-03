@@ -130,7 +130,7 @@ impl CharacterTrait for Chasca {
         weapon_type: WeaponType::Bow,
         star: 5,
         skill_name1: locale!(
-            zh_cn: "普通攻击·迷羽流击",
+            zh_cn: "迷羽流击",
             en: "Normal Attack: Phantom Feather Flurry"
         ),
         skill_name2: locale!(

@@ -135,7 +135,7 @@ impl CharacterTrait for Lyney {
         weapon_type: WeaponType::Bow,
         star: 5,
         skill_name1: locale!(
-            zh_cn: "普通攻击·迫牌易位式",
+            zh_cn: "迫牌易位式",
             en: "Normal Attack: Card Force Translocation"
         ),
         skill_name2: locale!(

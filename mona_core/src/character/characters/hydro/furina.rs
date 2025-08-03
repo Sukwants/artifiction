@@ -144,7 +144,7 @@ impl CharacterTrait for Furina {
         weapon_type: WeaponType::Sword,
         star: 5,
         skill_name1: locale!(
-            zh_cn: "普通攻击·独舞之邀",
+            zh_cn: "独舞之邀",
             en: "Normal Attack: Soloist's Solicitation"
         ),
         skill_name2: locale!(

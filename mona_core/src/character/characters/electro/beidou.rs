@@ -69,7 +69,7 @@ const BEIDOU_STATIC_DATA: CharacterStaticData = CharacterStaticData {
     weapon_type: WeaponType::Claymore,
     star: 4,
     skill_name1: locale!(
-        zh_cn: "普通攻击·征涛",
+        zh_cn: "征涛",
         en: "Normal Attack: Oceanborne",
     ),
     skill_name2: locale!(

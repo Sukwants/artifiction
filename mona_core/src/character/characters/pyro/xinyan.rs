@@ -75,7 +75,7 @@ pub const XINYAN_STATIC_DATA: CharacterStaticData = CharacterStaticData {
     weapon_type: WeaponType::Claymore,
     star: 4,
     skill_name1: locale!(
-        zh_cn: "普通攻击·炎舞",
+        zh_cn: "炎舞",
         en: "Normal Attack: Dance on Fire",
     ),
     skill_name2: locale!(

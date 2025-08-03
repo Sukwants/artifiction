@@ -64,7 +64,7 @@ pub const YOIMIYA_STATIC_DATA: CharacterStaticData = CharacterStaticData {
     weapon_type: WeaponType::Bow,
     star: 5,
     skill_name1: locale!(
-        zh_cn: "普通攻击·烟火打扬",
+        zh_cn: "烟火打扬",
         en: "Normal Attack: Firework Flare-Up",
     ),
     skill_name2: locale!(

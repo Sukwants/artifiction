@@ -106,7 +106,7 @@ impl CharacterTrait for YaeMiko {
         weapon_type: WeaponType::Catalyst,
         star: 5,
         skill_name1: locale!(
-            zh_cn: "普通攻击·狐灵食罪式",
+            zh_cn: "狐灵食罪式",
             en: "Normal Attack: Spiritfox Sin-Eater",
         ),
         skill_name2: locale!(

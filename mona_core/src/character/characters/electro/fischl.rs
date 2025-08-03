@@ -61,7 +61,7 @@ pub const FISCHL_STATIC_DATA: CharacterStaticData = CharacterStaticData {
     weapon_type: WeaponType::Bow,
     star: 4,
     skill_name1: locale!(
-        zh_cn: "普通攻击·罪灭之矢",
+        zh_cn: "罪灭之矢",
         en: "Normal Attack: Bolts of Downfall",
     ),
     skill_name2: locale!(

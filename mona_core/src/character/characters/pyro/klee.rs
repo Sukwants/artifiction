@@ -56,7 +56,7 @@ pub const KLEE_STATIC_DATA: CharacterStaticData = CharacterStaticData {
     weapon_type: WeaponType::Catalyst,
     star: 5,
     skill_name1: locale!(
-        zh_cn: "普通攻击·砰砰",
+        zh_cn: "砰砰",
         en: "Normal Attack: Kaboom!",
     ),
     skill_name2: locale!(

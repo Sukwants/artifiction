@@ -59,7 +59,7 @@ pub const MONA_STATIC_DATA: CharacterStaticData = CharacterStaticData {
     weapon_type: WeaponType::Catalyst,
     star: 5,
     skill_name1: locale!(
-        zh_cn: "普通攻击·因果点破",
+        zh_cn: "因果点破",
         en: "Normal Attack: Ripple of Fate",
     ),
     skill_name2: locale!(

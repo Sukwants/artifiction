@@ -64,7 +64,7 @@ const ALBEDO_STATIC_DATA: CharacterStaticData = CharacterStaticData {
     weapon_type: WeaponType::Sword,
     star: 5,
     skill_name1: locale!(
-        zh_cn: "普通攻击·西风剑术·白",
+        zh_cn: "西风剑术·白",
         en: "Normal Attack: Favonius Bladework - Weiss",
     ),
     skill_name2: locale!(

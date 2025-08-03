@@ -66,7 +66,7 @@ pub const XIAO_STATIC_DATA: CharacterStaticData = CharacterStaticData {
     weapon_type: WeaponType::Polearm,
     star: 5,
     skill_name1: locale!(
-        zh_cn: "普通攻击·卷积微尘",
+        zh_cn: "卷积微尘",
         en: "Normal Attack: Whirlwind Thrust",
     ),
     skill_name2: locale!(

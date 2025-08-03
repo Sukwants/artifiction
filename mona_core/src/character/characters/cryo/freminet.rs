@@ -160,7 +160,7 @@ impl CharacterTrait for Freminet {
         weapon_type: WeaponType::Claymore,
         star: 4,
         skill_name1: locale!(
-            zh_cn: "普通攻击·洑流剑",
+            zh_cn: "洑流剑",
             en: "Normal Attack: Flowing Eddies"
         ),
         skill_name2: locale!(

@@ -69,7 +69,7 @@ pub const GANYU_STATIC_DATA: CharacterStaticData = CharacterStaticData {
     weapon_type: WeaponType::Bow,
     star: 5,
     skill_name1: locale!(
-        zh_cn: "普通攻击·流天射术",
+        zh_cn: "流天射术",
         en: "Normal Attack: Liutian Archery",
     ),
     skill_name2: locale!(

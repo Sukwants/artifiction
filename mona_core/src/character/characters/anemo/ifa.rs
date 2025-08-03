@@ -168,7 +168,7 @@ impl CharacterTrait for Ifa {
         skill2: skill_map!(
             IfaDamageEnum
             E locale!(zh_cn: "秘药弹伤害", en: "Tonicshot DMG")
-            EHeal locale!(zh_cn: "七秘药弹命中治疗量", en: "Tonicshot Healing On Hit")
+            EHeal locale!(zh_cn: "秘药弹命中治疗量", en: "Tonicshot Healing On Hit")
         ),
         skill3: skill_map!(
             IfaDamageEnum

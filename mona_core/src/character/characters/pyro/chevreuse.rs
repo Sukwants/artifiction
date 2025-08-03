@@ -146,7 +146,7 @@ impl CharacterTrait for Chevreuse {
         weapon_type: WeaponType::Polearm,
         star: 4,
         skill_name1: locale!(
-            zh_cn: "普通攻击·线列枪刺·改",
+            zh_cn: "线列枪刺·改",
             en: "Normal Attack: Line Bayonet Thrust EX"
         ),
         skill_name2: locale!(

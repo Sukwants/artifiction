@@ -190,7 +190,7 @@ impl CharacterTrait for Mavuika {
         weapon_type: WeaponType::Claymore,
         star: 5,
         skill_name1: locale!(
-            zh_cn: "普通攻击·以火织命",
+            zh_cn: "以火织命",
             en: "Normal Attack: Flames Weave Life"
         ),
         skill_name2: locale!(

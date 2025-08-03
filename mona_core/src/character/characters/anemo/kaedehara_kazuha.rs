@@ -68,7 +68,7 @@ pub const KAEDEHARA_KAZUHA_STATIC_DATA: CharacterStaticData = CharacterStaticDat
     weapon_type: WeaponType::Sword,
     star: 5,
     skill_name1: locale!(
-        zh_cn: "普通攻击·我流剑术",
+        zh_cn: "我流剑术",
         en: "Normal Attack: Garyuu Bladework",
     ),
     skill_name2: locale!(

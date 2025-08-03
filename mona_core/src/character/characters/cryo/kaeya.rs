@@ -58,7 +58,7 @@ pub const KAEYA_STATIC_DATA: CharacterStaticData = CharacterStaticData {
     weapon_type: WeaponType::Sword,
     star: 4,
     skill_name1: locale!(
-        zh_cn: "普通攻击·仪典剑术",
+        zh_cn: "仪典剑术",
         en: "Normal Attack: Ceremonial Bladework",
     ),
     skill_name2: locale!(

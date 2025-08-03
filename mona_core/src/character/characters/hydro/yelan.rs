@@ -143,7 +143,7 @@ impl CharacterTrait for Yelan {
         weapon_type: WeaponType::Bow,
         star: 5,
         skill_name1: locale!(
-            zh_cn: "普通攻击·潜形隐曜弓",
+            zh_cn: "潜形隐曜弓",
             en: "Normal Attack: Stealthy Bowshot",
         ),
         skill_name2: locale!(

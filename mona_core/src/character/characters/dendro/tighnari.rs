@@ -138,7 +138,7 @@ impl CharacterTrait for Tighnari {
         weapon_type: WeaponType::Bow,
         star: 5,
         skill_name1: locale!(
-            zh_cn: "普通攻击·藏蕴破障",
+            zh_cn: "藏蕴破障",
             en: "Normal Attack: Khanda Barrier-Buster",
         ),
         skill_name2: locale!(

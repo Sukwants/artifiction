@@ -115,7 +115,7 @@ impl CharacterTrait for Kachina {
         weapon_type: WeaponType::Polearm,
         star: 4,
         skill_name1: locale!(
-            zh_cn: "普通攻击·嵴之啮咬",
+            zh_cn: "嵴之啮咬",
             en: "Normal Attack: Cragbiter"
         ),
         skill_name2: locale!(

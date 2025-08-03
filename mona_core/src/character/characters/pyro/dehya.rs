@@ -72,7 +72,7 @@ const DEHYA_STATIC_DATA: CharacterStaticData = CharacterStaticData {
     weapon_type: WeaponType::Claymore,
     star: 5,
     skill_name1: locale!(
-        zh_cn: "普通攻击·拂金剑斗术",
+        zh_cn: "拂金剑斗术",
         en: "Normal Attack: Sandstorm Assault",
     ),
     skill_name2: locale!(

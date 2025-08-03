@@ -78,7 +78,7 @@ pub const QIQI_STATIC_DATA: CharacterStaticData = CharacterStaticData {
     weapon_type: WeaponType::Sword,
     star: 5,
     skill_name1: locale!(
-        zh_cn: "普通攻击·云来古剑法",
+        zh_cn: "云来古剑法",
         en: "Normal Attack: Ancient Sword Art",
     ),
     skill_name2: locale!(

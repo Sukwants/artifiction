@@ -151,7 +151,7 @@ impl CharacterTrait for KukiShinobu {
         weapon_type: WeaponType::Sword,
         star: 4,
         skill_name1: locale!(
-            zh_cn: "普通攻击·忍流飞刃斩",
+            zh_cn: "忍流飞刃斩",
             en: "Normal Attack: Shinobu's Shadowsword",
         ),
         skill_name2: locale!(

@@ -116,7 +116,7 @@ pub const MIKA_STATIC_DATA: CharacterStaticData = CharacterStaticData {
     weapon_type: WeaponType::Polearm,
     star: 4,
     skill_name1: locale!(
-        zh_cn: "普通攻击·西风枪术·镝传",
+        zh_cn: "西风枪术·镝传",
         en: "Normal Attack: Spear of Favonius – Arrow's Passage",
     ),
     skill_name2: locale!(

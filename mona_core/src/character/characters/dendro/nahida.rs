@@ -107,7 +107,7 @@ impl CharacterTrait for Nahida {
         weapon_type: WeaponType::Catalyst,
         star: 5,
         skill_name1: locale!(
-            zh_cn: "普通攻击·行相",
+            zh_cn: "行相",
             en: "Normal Attack: Akara",
         ),
         skill_name2: locale!(

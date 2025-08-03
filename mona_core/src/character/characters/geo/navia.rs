@@ -122,7 +122,7 @@ impl CharacterTrait for Navia {
         weapon_type: WeaponType::Claymore,
         star: 5,
         skill_name1: locale!(
-            zh_cn: "普通攻击·直率的辞绝",
+            zh_cn: "直率的辞绝",
             en: "Normal Attack: Blunt Refusal"
         ),
         skill_name2: locale!(

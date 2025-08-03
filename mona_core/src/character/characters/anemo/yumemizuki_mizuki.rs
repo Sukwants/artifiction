@@ -111,7 +111,7 @@ impl CharacterTrait for YumemizukiMizuki {
         weapon_type: WeaponType::Catalyst,
         star: 5,
         skill_name1: locale!(
-            zh_cn: "普通攻击·梦我梦心",
+            zh_cn: "梦我梦心",
             en: "Normal Attack: Pure Heart, Pure Dreams"
         ),
         skill_name2: locale!(

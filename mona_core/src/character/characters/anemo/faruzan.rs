@@ -112,7 +112,7 @@ impl CharacterTrait for Faruzan {
         weapon_type: WeaponType::Bow,
         star: 4,
         skill_name1: locale!(
-            zh_cn: "普通攻击·迴身箭术",
+            zh_cn: "迴身箭术",
             en: "Normal Attack: Turnaround Shooter",
         ),
         skill_name2: locale!(

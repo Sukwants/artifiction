@@ -131,7 +131,7 @@ impl CharacterTrait for Yaoyao {
         weapon_type: WeaponType::Polearm,
         star: 4,
         skill_name1: locale!(
-            zh_cn: "普通攻击·颠扑连环枪",
+            zh_cn: "颠扑连环枪",
             en: "Normal Attack: Toss 'N' Turn Spear",
         ),
         skill_name2: locale!(

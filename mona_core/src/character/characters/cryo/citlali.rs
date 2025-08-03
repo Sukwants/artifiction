@@ -129,7 +129,7 @@ impl CharacterTrait for Citlali {
         weapon_type: WeaponType::Catalyst,
         star: 5,
         skill_name1: locale!(
-            zh_cn: "普通攻击·宿灵捕影",
+            zh_cn: "宿灵捕影",
             en: "Normal Attack: Shadow-Stealing Spirit Vessel"
         ),
         skill_name2: locale!(

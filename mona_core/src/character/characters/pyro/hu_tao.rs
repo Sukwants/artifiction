@@ -73,7 +73,7 @@ pub const HU_TAO_STATIC_DATA: CharacterStaticData = CharacterStaticData {
     weapon_type: WeaponType::Polearm,
     star: 5,
     skill_name1: locale!(
-        zh_cn: "普通攻击·往生秘传枪法",
+        zh_cn: "往生秘传枪法",
         en: "Normal Attack: Secret Spear of Wangsheng",
     ),
     skill_name2: locale!(

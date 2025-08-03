@@ -69,7 +69,7 @@ pub const DIONA_STATIC_DATA: CharacterStaticData = CharacterStaticData {
     weapon_type: WeaponType::Bow,
     star: 4,
     skill_name1: locale!(
-        zh_cn: "普通攻击·猎人射术",
+        zh_cn: "猎人射术",
         en: "Normal Attack: Kätzlein Style",
     ),
     skill_name2: locale!(

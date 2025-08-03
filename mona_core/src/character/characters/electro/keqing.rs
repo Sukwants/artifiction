@@ -68,7 +68,7 @@ pub const KEQING_STATIC_DATA: CharacterStaticData = CharacterStaticData {
     weapon_type: WeaponType::Sword,
     star: 5,
     skill_name1: locale!(
-        zh_cn: "普通攻击·云来剑法",
+        zh_cn: "云来剑法",
         en: "Normal Attack: Yunlai Swordsmanship",
     ),
     skill_name2: locale!(

@@ -121,7 +121,7 @@ impl CharacterTrait for Kirara {
         sub_stat: CharacterSubStatFamily::HP240,
         weapon_type: WeaponType::Sword,
         star: 4,
-        skill_name1: locale!(zh_cn: "普通攻击·箱纸切削术", en: "Normal Attack: Boxcutter"),
+        skill_name1: locale!(zh_cn: "箱纸切削术", en: "Normal Attack: Boxcutter"),
         skill_name2: locale!(zh_cn: "呜喵町飞足", en: "Meow-teor Kick"),
         skill_name3: locale!(zh_cn: "秘法·惊喜特派", en: "Secret Art: Surprise Dispatch")
     };

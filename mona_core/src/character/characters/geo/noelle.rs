@@ -72,7 +72,7 @@ pub const NOELLE_STATIC_DATA: CharacterStaticData = CharacterStaticData {
     weapon_type: WeaponType::Claymore,
     star: 4,
     skill_name1: locale!(
-        zh_cn: "普通攻击·西风剑术·女仆",
+        zh_cn: "西风剑术·女仆",
         en: "Normal Attack: Favonius Bladework - Maid",
     ),
     skill_name2: locale!(

@@ -64,7 +64,7 @@ pub const YANFEI_STATIC_DATA: CharacterStaticData = CharacterStaticData {
     weapon_type: WeaponType::Catalyst,
     star: 4,
     skill_name1: locale!(
-        zh_cn: "普通攻击·火漆制印",
+        zh_cn: "火漆制印",
         en: "Normal Attack: Seal of Approval",
     ),
     skill_name2: locale!(

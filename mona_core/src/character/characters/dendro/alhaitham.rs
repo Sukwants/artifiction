@@ -136,7 +136,7 @@ impl CharacterTrait for Alhaitham {
         weapon_type: WeaponType::Sword,
         star: 5,
         skill_name1: locale!(
-            zh_cn: "普通攻击·溯因反绎法",
+            zh_cn: "溯因反绎法",
             en: "Normal Attack: Abductive Reasoning",
         ),
         skill_name2: locale!(

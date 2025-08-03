@@ -72,7 +72,7 @@ const YUNJIN_STATIC_DATA: CharacterStaticData = CharacterStaticData {
     weapon_type: WeaponType::Polearm,
     star: 4,
     skill_name1: locale!(
-        zh_cn: "普通攻击·拂云出手",
+        zh_cn: "拂云出手",
         en: "Normal Attack: Cloud-Grazing Strike",
     ),
     skill_name2: locale!(

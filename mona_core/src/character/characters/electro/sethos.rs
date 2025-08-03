@@ -115,7 +115,7 @@ impl CharacterTrait for Sethos {
         weapon_type: WeaponType::Bow,
         star: 4,
         skill_name1: locale!(
-            zh_cn: "普通攻击·王家苇箭术",
+            zh_cn: "王家苇箭术",
             en: "Normal Attack: Royal Reed Archery"
         ),
         skill_name2: locale!(

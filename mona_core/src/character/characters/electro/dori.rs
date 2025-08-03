@@ -107,7 +107,7 @@ impl CharacterTrait for Dori {
         weapon_type: WeaponType::Claymore,
         star: 4,
         skill_name1: locale!(
-            zh_cn: "普通攻击·妙显剑舞·改",
+            zh_cn: "妙显剑舞·改",
             en: "Normal Attack: Marvelous Sword-Dance (Modified)",
         ),
         skill_name2: locale!(

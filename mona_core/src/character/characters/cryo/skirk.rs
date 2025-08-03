@@ -85,7 +85,7 @@ pub const SKIRK_STATIC_DATA: CharacterStaticData = CharacterStaticData {
     sub_stat: CharacterSubStatFamily::CriticalDamage384,
     weapon_type: WeaponType::Sword,
     star: 5,
-    skill_name1: locale!(zh_cn: "普通攻击·极恶技·断", en: "Normal Attack: Havoc: Sunder"),
+    skill_name1: locale!(zh_cn: "极恶技·断", en: "Normal Attack: Havoc: Sunder"),
     skill_name2: locale!(zh_cn: "极恶技·闪", en: "Havoc: Warp"),
     skill_name3: locale!(zh_cn: "极恶技·灭", en: "Havoc: Ruin"),
     name_locale: locale!(zh_cn: "丝柯克", en: "Skirk")
