@@ -76,7 +76,6 @@ declare module '@vue/runtime-core' {
     IEpCheck: typeof import('~icons/ep/check')['default']
     IEpCpu: typeof import('~icons/ep/cpu')['default']
     IEpHelpFilled: typeof import('~icons/ep/help-filled')['default']
-    IEpHistogram: typeof import('~icons/ep/histogram')['default']
     IEpHomeFilled: typeof import('~icons/ep/home-filled')['default']
     IEpLink: typeof import('~icons/ep/link')['default']
     IEpMedal: typeof import('~icons/ep/medal')['default']

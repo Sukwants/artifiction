@@ -52,7 +52,7 @@
         <h2>{{ t("intro.moreMaster") }}</h2>
         <el-row :gutter="16">
             <el-col :xs="24" :sm="12" class="mb16">
-                <use-case-item text="Pond Ink" :icon="IconFa6BrandsGithub"
+                <use-case-item text="Pond Ink" :icon="IconFa6SolidLeaf"
                                @click="newPage('https://pond.ink/')"
                 ></use-case-item>
 
@@ -71,7 +71,7 @@ import IconFa6SolidRuler from "~icons/fa6-solid/ruler"
 import IconFa6SolidComment from "~icons/fa6-solid/comment"
 import IconFa6BrandsGithub from "~icons/fa6-brands/github"
 import IconFa6BrandsQQ from "~icons/fa6-brands/qq"
-import IconPondInk from "@/assets/PondInk.png"
+import IconFa6SolidLeaf from "~icons/fa6-solid/leaf"
 
 import UseCaseItem from "./UseCaseItem.vue"
 import {useRouter} from "vue-router"
