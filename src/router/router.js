@@ -124,7 +124,7 @@ const routes = [
         component: NewArtifactPlanPage,
         meta: {
             keepAlive: true,
-            title: "莫娜计算器",
+            title: "师傅计算器",
         }
     },
     {

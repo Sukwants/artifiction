@@ -1,22 +1,11 @@
 <template>
     <div>
         <div class="footer">
-            <span class="footer-item">©{{ year }} 莫娜占卜铺</span>
+            <span class="footer-item">©{{ year }} 叶师傅开锁铺</span>
             <span class="footer-item">#{{ revision }} {{ date }}</span>
 <!--            <span class="footer-item">{{ date }}</span>-->
-            <span class="footer-item"><a target="_blank" href="https://github.com/wormtql/genshin_artifact">Github</a></span>
+            <span class="footer-item"><a target="_blank" href="https://github.com/Sukwants/genshin_artifact">Github</a></span>
 
-        </div>
-        <div
-            style="text-align: center"
-        >
-            <a
-                v-if="needBeian"
-                target="_blank"
-                href="https://beian.miit.gov.cn"
-                class="fs-14"
-                style="font-size: 0.8rem"
-            >浙ICP备2021004987号-2</a>
         </div>
     </div>
 

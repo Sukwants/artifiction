@@ -1,4 +1,4 @@
-# Mona's Divination Shop
+# Myyes's Divination Shop
 Genshin Impact artifacts automatic combination, the website is [here](https://www.mona-uranai.com)  
 This README is also available in:  
 [中文](./README.md)

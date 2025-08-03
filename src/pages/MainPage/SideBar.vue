@@ -65,10 +65,10 @@
                     <el-icon><i-ep-medal /></el-icon>
                     {{ t("nav.bestSet") }}
                 </el-menu-item>
-                <el-menu-item index="/character">
+                <!-- <el-menu-item index="/character">
                     <el-icon><i-ep-histogram /></el-icon>
                     {{ t("nav.monaDB") }}
-                </el-menu-item>
+                </el-menu-item> -->
             </el-menu-item-group>
 
             <el-menu-item-group>

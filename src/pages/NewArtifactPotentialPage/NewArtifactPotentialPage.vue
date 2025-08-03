@@ -266,7 +266,7 @@ function handleClickStart() {
     // console.log(pfInterface)
 
     const loading = ElLoading.service({
-        text: "莫娜占卜中",
+        text: "叶师傅开锁中",
         lock: true,
         fullscreen: true
     })

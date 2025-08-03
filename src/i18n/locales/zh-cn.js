@@ -1,9 +1,10 @@
 export default {
-    webName: "莫娜占卜铺",
+    webName: "叶师傅开锁铺",
     intro: {
         opensource: "开源地址",
-        opensourceMonaDescription: "- 前端<br>- 莫娜DSL<br>- DSL Book等",
+        opensourceMonaDescription: "- 前端<br>- 叶师傅开锁铺DSL<br>- DSL Book等",
         opensourceYasDescription: "- YAS导出器",
+        moreMaster: "发现更多师傅",
 
         useCase1: "伤害计算器/单人配装",
         useCase1Description: "- 通过计算机进行单人圣遗物自动搭配，以得到最高输出等内容。<br>- 响应式计算器，所见即所得。",
@@ -13,14 +14,6 @@ export default {
         useCase3Description: "快速计算圣遗物潜力。潜力即圣遗物满级后能够获得的平均得分，能够一定程度上衡量圣遗物的价值",
         useCase4: "圣遗物导出",
         useCase4Description: "快速导出圣遗物",
-
-        feedback: "反馈",
-        fbGithubIssue: "Github Issue",
-        fbIssueDescription: "在Github仓库提出Issue",
-        fbQQ: "QQ群",
-        fbQQDescription: "在QQ群反馈或是水群（群号：1035783390）",
-        fbNGA: "NGA讨论帖",
-        fbNGADescription: "在NGA进行反馈"
     },
     nav: {
         nav: "导航",
@@ -34,7 +27,7 @@ export default {
         calculate: "计算器",
         teamOptimize: "多人优化",
         potential: "圣遗物潜力",
-        monaDB: "莫娜数据库",
+        monaDB: "师傅数据库",
         other: "附加功能",
         playground: "Playground",
         about: "关于本站",
@@ -172,7 +165,7 @@ export default {
         show16: "只显示16级以上",
         copied: "复制成功",
         creating: "创建中",
-        createDesc: "莫娜正在创建分享链接",
+        createDesc: "正在创建分享链接",
         wrongFormat: "格式不正确",
         importing: "导入中",
         msg1: "添加计算预设以使用该功能",

@@ -305,7 +305,7 @@ function handleClickStart() {
     const artifacts = filteredArtifactsWasm.value
 
     const loading = ElLoading.service({
-        text: "莫娜占卜中（可能需要数分钟）",
+        text: "叶师傅开锁中（可能需要数分钟）",
         lock: true,
         fullscreen: true
     })

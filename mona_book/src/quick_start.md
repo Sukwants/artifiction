@@ -3,13 +3,13 @@
 ## 扫描圣遗物
 你可以通过两种方法扫描圣遗物 
 
-### 1. 下载圣遗物扫描软件，并将其导入至莫娜占卜铺
+### 1. 下载圣遗物扫描软件，并将其导入至叶师傅开锁铺
 扫描软件推荐使用 [Yas](https://github.com/wormtql/yas/releases)  
 另外可以使用 [Amenoma](https://github.com/daydreaming666/Amenoma/releases)
 
 ![img.png](./assets/img.png)
 
-### 2. 直接使用PC网页版莫娜的扫描功能
+### 2. 直接使用PC网页版叶师傅开锁铺的扫描功能
 该按钮需要使用椰羊控制器，其本质为本地启动Yas扫描，并通过websocket与网站进行通信。
 
 请直接跟随页内指引进行操作。
