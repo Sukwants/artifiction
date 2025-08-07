@@ -92,16 +92,18 @@ pub const SKIRK_STATIC_DATA: CharacterStaticData = CharacterStaticData {
 };
 
 pub struct SkirkEffect {
-    pub death_crossing_stacks: usize,
-    pub team_has_hydro_cryo: bool,
+    // pub death_crossing_stacks: usize,
+    // pub team_has_hydro_cryo: bool,
 }
 
 impl<A: Attribute> ChangeAttribute<A> for SkirkEffect {
     fn change_attribute(&self, attribute: &mut A) {
+        /* 什么玩意儿这是
         // Passive 1: Mutual Weapons Mentorship - 队伍中拥有水或冰元素角色时，元素战技等级+1
         if self.team_has_hydro_cryo {
             attribute.set_value_by(AttributeName::BonusElementalSkill, "丝柯克天赋：诸武相授", 0.15);
         }
+        */
         
         // Passive 3: Return to Oblivion (万流归寂) - 死河渡断层数提供七相一闪模式和元素爆发的伤害加成
         // 这个效果在damage_internal中根据技能类型单独处理，不在这里直接加属性
@@ -193,22 +195,22 @@ impl CharacterTrait for Skirk {
 
     #[cfg(not(target_family = "wasm"))]
     const CONFIG_DATA: Option<&'static [ItemConfig]> = Some(&[
-        ItemConfig {
-            name: "death_crossing_stacks",
-            title: locale!(
-                zh_cn: "死河渡断层数",
-                en: "Death's Crossing Stacks"
-            ),
-            config: ItemConfigType::Int { min: 0, max: 3, default: 0 }
-        },
-        ItemConfig {
-            name: "team_has_hydro_cryo",
-            title: locale!(
-                zh_cn: "队伍满足诸武相授条件",
-                en: "Team Has Hydro & Cryo"
-            ),
-            config: ItemConfigType::Bool { default: false }
-        }
+        // ItemConfig {
+        //     name: "death_crossing_stacks",
+        //     title: locale!(
+        //         zh_cn: "死河渡断层数",
+        //         en: "Death's Crossing Stacks"
+        //     ),
+        //     config: ItemConfigType::Int { min: 0, max: 3, default: 0 }
+        // },
+        // ItemConfig {
+        //     name: "team_has_hydro_cryo",
+        //     title: locale!(
+        //         zh_cn: "队伍满足诸武相授条件",
+        //         en: "Team Has Hydro & Cryo"
+        //     ),
+        //     config: ItemConfigType::Bool { default: false }
+        // }
     ]);
 
     #[cfg(not(target_family = "wasm"))]
@@ -350,14 +352,14 @@ impl CharacterTrait for Skirk {
     }
 
     fn new_effect<A: Attribute>(common_data: &CharacterCommonData, config: &CharacterConfig) -> Option<Box<dyn ChangeAttribute<A>>> {
-        let (death_crossing_stacks, team_has_hydro_cryo) = match config {
-            CharacterConfig::Skirk { death_crossing_stacks, team_has_hydro_cryo } => (*death_crossing_stacks, *team_has_hydro_cryo),
-            _ => (0, false),
-        };
+        // let (death_crossing_stacks, team_has_hydro_cryo) = match config {
+        //     CharacterConfig::Skirk { death_crossing_stacks, team_has_hydro_cryo } => (*death_crossing_stacks, *team_has_hydro_cryo),
+        //     _ => (0, false),
+        // };
 
         Some(Box::new(SkirkEffect {
-            death_crossing_stacks,
-            team_has_hydro_cryo,
+            // death_crossing_stacks,
+            // team_has_hydro_cryo,
         }))
     }
 

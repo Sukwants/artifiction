@@ -48,7 +48,7 @@ pub enum CharacterConfig {
     YumemizukiMizuki { talent2_rate: f64 },
     Iansan { talent1_rate: f64 },
     Varesa { talent1_rate: f64, talent2_stack: f64, passion: bool },
-    Skirk { death_crossing_stacks: usize, team_has_hydro_cryo: bool },
+    // Skirk { death_crossing_stacks: usize, team_has_hydro_cryo: bool },
     Escoffier { hydro_cryo_count: usize, after_burst: bool },
     Ifa { nightsoul_total: usize },
     NoConfig,
