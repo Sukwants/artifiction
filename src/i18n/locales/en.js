@@ -266,6 +266,7 @@ export default {
         melt: "Melt",
         vaporize: "Vaporize",
         heal: "Regeneration",
+        shield: "Absorption",
         spread: "Spread",
         aggravate: "Aggravate",
         bloom: "Bloom",

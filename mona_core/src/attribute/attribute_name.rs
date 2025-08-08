@@ -118,6 +118,9 @@ pub enum AttributeName {
     IncreaseLunarCharged, // 天赋「月兆祝赐」给出的月曜反应基础提升
     IncreaseLunarBloom,
 
+    ExtraIncreaseLunarCharged, // 月曜反应额外提升，（大概）应由 add_edge 给出
+    ExtraIncreaseLunarBloom,
+
     HPRatioBase,
     HPRatioNormalAttack,
     HPRatioChargedAttack,

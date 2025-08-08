@@ -56,6 +56,8 @@ export default {
 
             if (this.analysisFromWasm.is_heal) {
                 return this.t("dmg.heal")
+            } else if (this.analysisFromWasm.is_shield) {
+                return this.t("dmg.shield")
             } else {
                 return this.t("dmg", this.element)
             }

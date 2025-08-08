@@ -32,7 +32,7 @@ pub const INEFFA_STATIC_DATA: CharacterStaticData = CharacterStaticData {
     def: [64,167,222,333,372,428,480,537,576,633,673,730,770,828],
     sub_stat: CharacterSubStatFamily::CriticalRate192,
     weapon_type: WeaponType::Catalyst,
-    star: 4,
+    star: 5,
     skill_name1: locale!(
         zh_cn: "除尘旋刃",
         en: "Cyclonic Duster",
