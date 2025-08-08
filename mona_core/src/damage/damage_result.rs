@@ -9,6 +9,7 @@ pub struct DamageResult {
     pub non_critical: f64,
     pub expectation: f64,
 
+    pub is_lunar: bool,
     pub is_heal: bool,
     pub is_shield: bool
 }
@@ -21,6 +22,7 @@ impl Mul<f64> for DamageResult {
             critical: self.critical * rhs,
             non_critical: self.non_critical * rhs,
             expectation: self.expectation * rhs,
+            is_lunar: self.is_lunar,
             is_shield: false,
             is_heal: false
         }
@@ -35,6 +37,7 @@ pub struct SimpleDamageResult {
     pub vaporize: Option<DamageResult>,
     pub spread: Option<DamageResult>,
     pub aggravate: Option<DamageResult>,
+    pub is_lunar: bool,
     pub is_heal: bool,
     pub is_shield: bool,
 }

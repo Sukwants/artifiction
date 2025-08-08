@@ -32,11 +32,6 @@ pub struct ComplicatedDamageBuilder {
     pub ratio_def: EntryType,
     pub ratio_hp: EntryType,
     pub ratio_em: EntryType,
-
-    pub extra_ratio_atk: EntryType,
-    pub extra_ratio_def: EntryType,
-    pub extra_ratio_hp: EntryType,
-    pub extra_ratio_em: EntryType,
 }
 
 impl DamageBuilder for ComplicatedDamageBuilder {
@@ -61,22 +56,6 @@ impl DamageBuilder for ComplicatedDamageBuilder {
 
     fn add_hp_ratio(&mut self, key: &str, value: f64) {
         *self.ratio_hp.0.entry(String::from(key)).or_insert(0.0) += value;
-    }
-
-    fn add_em_extra_ratio(&mut self, key: &str, value: f64) {
-        *self.extra_ratio_em.0.entry(String::from(key)).or_insert(0.0) += value;
-    }
-    
-    fn add_atk_extra_ratio(&mut self, key: &str, value: f64) {
-        *self.extra_ratio_atk.0.entry(String::from(key)).or_insert(0.0) += value;
-    }
-
-    fn add_def_extra_ratio(&mut self, key: &str, value: f64) {
-        *self.extra_ratio_def.0.entry(String::from(key)).or_insert(0.0) += value;
-    }
-
-    fn add_hp_extra_ratio(&mut self, key: &str, value: f64) {
-        *self.extra_ratio_hp.0.entry(String::from(key)).or_insert(0.0) += value;
     }
 
     fn add_extra_em(&mut self, key: &str, value: f64) {
@@ -215,6 +194,7 @@ impl DamageBuilder for ComplicatedDamageBuilder {
             expectation: base_damage * (1.0 + bonus) * (1.0 + critical * critical_damage),
             critical: base_damage * (1.0 + bonus) * (1.0 + critical_damage),
             non_critical: base_damage * (1.0 + bonus),
+            is_lunar: false,
             is_heal: false,
             is_shield: false
         } * (defensive_ratio * resistance_ratio);
@@ -242,6 +222,7 @@ impl DamageBuilder for ComplicatedDamageBuilder {
                 critical: spread_base_damage * (1.0 + bonus) * (1.0 + critical_damage),
                 non_critical: spread_base_damage * (1.0 + bonus),
                 expectation: spread_base_damage * (1.0 + bonus) * (1.0 + critical_damage * critical),
+                is_lunar: false,
                 is_heal: false,
                 is_shield: false
             } * (defensive_ratio * resistance_ratio);
@@ -260,6 +241,7 @@ impl DamageBuilder for ComplicatedDamageBuilder {
                 critical: aggravate_base_damage * (1.0 + bonus) * (1.0 + critical_damage),
                 non_critical: aggravate_base_damage * (1.0 + bonus),
                 expectation: aggravate_base_damage * (1.0 + bonus) * (1.0 + critical_damage * critical),
+                is_lunar: false,
                 is_heal: false,
                 is_shield: false
             } * (defensive_ratio * resistance_ratio);
@@ -288,6 +270,12 @@ impl DamageBuilder for ComplicatedDamageBuilder {
             lunar_charged_enhance: HashMap::new(),
             lunar_bloom_enhance: HashMap::new(),
 
+            lunar_charged_increase: HashMap::new(),
+            lunar_bloom_increase: HashMap::new(),
+
+            lunar_charged_extra_increase: HashMap::new(),
+            lunar_bloom_extra_increase: HashMap::new(),
+
             healing_bonus: HashMap::new(),
             shield_strength: HashMap::new(),
             def_minus: def_minus_comp.0,
@@ -295,6 +283,7 @@ impl DamageBuilder for ComplicatedDamageBuilder {
             res_minus: res_minus_comp.0,
 
             element,
+            is_lunar: false,
             is_heal: false,
             is_shield: false,
 
@@ -356,6 +345,16 @@ impl DamageBuilder for ComplicatedDamageBuilder {
         let lunar_bloom_enhance_comp = self.get_enhance_lunar_bloom_composition(attribute);
         let lunar_bloom_enhance = lunar_bloom_enhance_comp.sum();
 
+        let lunar_charged_increase_comp = self.get_increase_lunar_charged_composition(attribute);
+        let lunar_charged_increase = lunar_charged_increase_comp.sum();
+        let lunar_bloom_increase_comp = self.get_increase_lunar_bloom_composition(attribute);
+        let lunar_bloom_increase = lunar_bloom_increase_comp.sum();
+
+        let lunar_charged_extra_increase_comp = self.get_extra_increase_lunar_charged_composition(attribute);
+        let lunar_charged_extra_increase = lunar_charged_extra_increase_comp.sum();
+        let lunar_bloom_extra_increase_comp = self.get_extra_increase_lunar_bloom_composition(attribute);
+        let lunar_bloom_extra_increase = lunar_bloom_extra_increase_comp.sum();
+
         let lunar_charged_ratio = 3.0;
         let lunar_bloom_ratio = 1.0;
 
@@ -366,8 +365,20 @@ impl DamageBuilder for ComplicatedDamageBuilder {
         };
 
         let enhance = Reaction::moonglare(em) + match element {
-            Element::Electro => attribute.get_value(AttributeName::EnhanceLunarCharged),
-            Element::Dendro => attribute.get_value(AttributeName::EnhanceLunarBloom),
+            Element::Electro => lunar_charged_enhance,
+            Element::Dendro => lunar_bloom_enhance,
+            _ => 0.0
+        };
+
+        let increase = Reaction::moonglare(em) + match element {
+            Element::Electro => lunar_charged_increase,
+            Element::Dendro => lunar_bloom_increase,
+            _ => 0.0
+        };
+
+        let extra_increase = Reaction::moonglare(em) + match element {
+            Element::Electro => lunar_charged_extra_increase,
+            Element::Dendro => lunar_bloom_extra_increase,
             _ => 0.0
         };
 
@@ -376,15 +387,13 @@ impl DamageBuilder for ComplicatedDamageBuilder {
                 = base_damage
                 * reaction_ratio
                 * (1.0 + enhance)
-                * (1.0 + attribute.get_value(AttributeName::IncreaseLunarCharged))
-                + atk * atk_ratio
-                + def * def_ratio
-                + hp * hp_ratio
-                + em * em_ratio;
+                * (1.0 + increase)
+                + extra_increase;
             DamageResult {
                 critical: charged_base * (1.0 + critical_damage),
                 non_critical: charged_base,
                 expectation: charged_base * (1.0 + critical_damage * critical),
+                is_lunar: true,
                 is_heal: false,
                 is_shield: false
             } * resistance_ratio
@@ -412,6 +421,12 @@ impl DamageBuilder for ComplicatedDamageBuilder {
             lunar_charged_enhance: lunar_charged_enhance_comp.0,
             lunar_bloom_enhance: lunar_bloom_enhance_comp.0,
 
+            lunar_charged_increase: lunar_charged_increase_comp.0,
+            lunar_bloom_increase: lunar_bloom_increase_comp.0,
+
+            lunar_charged_extra_increase: lunar_charged_extra_increase_comp.0,
+            lunar_bloom_extra_increase: lunar_bloom_extra_increase_comp.0,
+
             healing_bonus: HashMap::new(),
             shield_strength: HashMap::new(),
             def_minus: HashMap::new(),
@@ -419,6 +434,7 @@ impl DamageBuilder for ComplicatedDamageBuilder {
             res_minus: res_minus_comp.0,
 
             element,
+            is_lunar: true,
             is_heal: false,
             is_shield: false,
 
@@ -450,6 +466,7 @@ impl DamageBuilder for ComplicatedDamageBuilder {
             expectation: heal_value,
             critical: heal_value,
             non_critical: heal_value,
+            is_lunar: false,
             is_heal: true,
             is_shield: false
         };
@@ -477,6 +494,12 @@ impl DamageBuilder for ComplicatedDamageBuilder {
             lunar_charged_enhance: HashMap::new(),
             lunar_bloom_enhance: HashMap::new(),
 
+            lunar_charged_increase: HashMap::new(),
+            lunar_bloom_increase: HashMap::new(),
+
+            lunar_charged_extra_increase: HashMap::new(),
+            lunar_bloom_extra_increase: HashMap::new(),
+
             healing_bonus: healing_bonus_comp.0,
             shield_strength: HashMap::new(),
             def_minus: HashMap::new(),
@@ -484,6 +507,7 @@ impl DamageBuilder for ComplicatedDamageBuilder {
             res_minus: HashMap::new(),
 
             element: Element::Pyro,
+            is_lunar: false,
             is_heal: true,
             is_shield: false,
 
@@ -515,6 +539,7 @@ impl DamageBuilder for ComplicatedDamageBuilder {
             expectation: shield_value,
             critical: 0.0,
             non_critical: 0.0,
+            is_lunar: false,
             is_heal: false,
             is_shield: true
         };
@@ -542,6 +567,12 @@ impl DamageBuilder for ComplicatedDamageBuilder {
             lunar_charged_enhance: HashMap::new(),
             lunar_bloom_enhance: HashMap::new(),
 
+            lunar_charged_increase: HashMap::new(),
+            lunar_bloom_increase: HashMap::new(),
+
+            lunar_charged_extra_increase: HashMap::new(),
+            lunar_bloom_extra_increase: HashMap::new(),
+
             healing_bonus: HashMap::new(),
             shield_strength: shield_strength_comp.0,
             def_minus: HashMap::new(),
@@ -549,8 +580,9 @@ impl DamageBuilder for ComplicatedDamageBuilder {
             res_minus: HashMap::new(),
 
             element,
-            is_heal: true,
-            is_shield: false,
+            is_lunar: false,
+            is_heal: false,
+            is_shield: true,
 
             normal: damage_normal,
             melt: None,
@@ -671,6 +703,16 @@ impl ComplicatedDamageBuilder {
 
     fn get_increase_lunar_bloom_composition(&self, attribute: &ComplicatedAttributeGraph) -> EntryType {
         let mut comp = attribute.get_attribute_composition(AttributeName::IncreaseLunarBloom);
+        comp
+    }
+
+    fn get_extra_increase_lunar_charged_composition(&self, attribute: &ComplicatedAttributeGraph) -> EntryType {
+        let mut comp = attribute.get_attribute_composition(AttributeName::ExtraIncreaseLunarCharged);
+        comp
+    }
+
+    fn get_extra_increase_lunar_bloom_composition(&self, attribute: &ComplicatedAttributeGraph) -> EntryType {
+        let mut comp = attribute.get_attribute_composition(AttributeName::ExtraIncreaseLunarBloom);
         comp
     }
 

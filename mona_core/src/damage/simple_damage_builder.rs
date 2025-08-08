@@ -24,11 +24,6 @@ pub struct SimpleDamageBuilder {
     pub ratio_hp: f64,
     pub ratio_em: f64,
 
-    pub extra_ratio_atk: f64, // 月曜反应的额外提升
-    pub extra_ratio_def: f64,
-    pub extra_ratio_hp: f64,
-    pub extra_ratio_em: f64,
-
     pub extra_enhance_melt: f64,
     pub extra_enhance_vaporize: f64,
     pub enhance_melt: f64,
@@ -58,22 +53,6 @@ impl DamageBuilder for SimpleDamageBuilder {
 
     fn add_hp_ratio(&mut self, _key: &str, value: f64) {
         self.ratio_hp += value
-    }
-
-    fn add_em_extra_ratio(&mut self, key: &str, value: f64) {
-        self.extra_ratio_em += value;
-    }
-    
-    fn add_atk_extra_ratio(&mut self, key: &str, value: f64) {
-        self.extra_ratio_atk += value;
-    }
-
-    fn add_def_extra_ratio(&mut self, key: &str, value: f64) {
-        self.extra_ratio_def += value;
-    }
-
-    fn add_hp_extra_ratio(&mut self, key: &str, value: f64) {
-        self.extra_ratio_hp += value;
     }
 
     fn add_extra_em(&mut self, _key: &str, value: f64) {
@@ -195,6 +174,7 @@ impl DamageBuilder for SimpleDamageBuilder {
             critical: base * (1.0 + bonus) * (1.0 + critical_damage),
             non_critical: base * (1.0 + bonus),
             expectation: base * (1.0 + bonus) * (1.0 + critical_damage * critical_rate),
+            is_lunar: false,
             is_heal: false,
             is_shield: false
         } * (defensive_ratio * resistance_ratio);
@@ -229,6 +209,7 @@ impl DamageBuilder for SimpleDamageBuilder {
                 critical: spread_base_damage * (1.0 + bonus) * (1.0 + critical_damage),
                 non_critical: spread_base_damage * (1.0 + bonus),
                 expectation: spread_base_damage * (1.0 + bonus) * (1.0 + critical_damage * critical_rate),
+                is_lunar: false,
                 is_heal: false,
                 is_shield: false
             } * (defensive_ratio * resistance_ratio);
@@ -249,6 +230,7 @@ impl DamageBuilder for SimpleDamageBuilder {
                 critical: aggravate_base_damage * (1.0 + bonus) * (1.0 + critical_damage),
                 non_critical: aggravate_base_damage * (1.0 + bonus),
                 expectation: aggravate_base_damage * (1.0 + bonus) * (1.0 + critical_damage * critical_rate),
+                is_lunar: false,
                 is_heal: false,
                 is_shield: false
             } * (defensive_ratio * resistance_ratio);
@@ -261,8 +243,9 @@ impl DamageBuilder for SimpleDamageBuilder {
             vaporize: vaporize_damage,
             spread: spread_damage,
             aggravate: aggravate_damage,
-            is_shield: false,
+            is_lunar: false,
             is_heal: false,
+            is_shield: false,
         }
     }
 
@@ -306,20 +289,30 @@ impl DamageBuilder for SimpleDamageBuilder {
             _ => 0.0
         };
 
+        let increase = Reaction::moonglare(em) + match element {
+            Element::Electro => attribute.get_value(AttributeName::IncreaseLunarCharged),
+            Element::Dendro => attribute.get_value(AttributeName::IncreaseLunarBloom),
+            _ => 0.0
+        };
+
+        let extra_increase = Reaction::moonglare(em) + match element {
+            Element::Electro => attribute.get_value(AttributeName::ExtraIncreaseLunarCharged),
+            Element::Dendro => attribute.get_value(AttributeName::ExtraIncreaseLunarBloom),
+            _ => 0.0
+        };
+
         let normal_damage = {
             let charged_base
                 = base
                 * reaction_ratio
                 * (1.0 + enhance)
-                * (1.0 + attribute.get_value(AttributeName::IncreaseLunarCharged))
-                + atk * self.extra_ratio_atk
-                + def * self.extra_ratio_def
-                + hp * self.extra_ratio_hp
-                + em * self.extra_ratio_em;
+                * (1.0 + increase)
+                + extra_increase;
             DamageResult {
                 critical: charged_base * (1.0 + critical_damage),
                 non_critical: charged_base,
                 expectation: charged_base * (1.0 + critical_damage * critical_rate),
+                is_lunar: true,
                 is_heal: false,
                 is_shield: false
             } * resistance_ratio
@@ -331,8 +324,9 @@ impl DamageBuilder for SimpleDamageBuilder {
             vaporize: None,
             spread: None,
             aggravate: None,
-            is_shield: false,
+            is_lunar: true,
             is_heal: false,
+            is_shield: false,
         }
     }
 
@@ -350,6 +344,7 @@ impl DamageBuilder for SimpleDamageBuilder {
                 critical: heal_value,
                 non_critical: heal_value,
                 expectation: heal_value,
+                is_lunar: false,
                 is_heal: true,
                 is_shield: false
             }
@@ -360,6 +355,7 @@ impl DamageBuilder for SimpleDamageBuilder {
             vaporize: None,
             spread: None,
             aggravate: None,
+            is_lunar: false,
             is_heal: true,
             is_shield: false,
         };
@@ -379,6 +375,7 @@ impl DamageBuilder for SimpleDamageBuilder {
                 critical: shield_value,
                 non_critical: shield_value,
                 expectation: shield_value,
+                is_lunar: false,
                 is_heal: false,
                 is_shield: true
             }
@@ -389,8 +386,9 @@ impl DamageBuilder for SimpleDamageBuilder {
             vaporize: None,
             spread: None,
             aggravate: None,
-            is_shield: true,
+            is_lunar: false,
             is_heal: false,
+            is_shield: true,
         };
     }
 }
@@ -414,11 +412,6 @@ impl SimpleDamageBuilder {
             ratio_hp,
             ratio_def,
             ratio_em: 0.0,
-
-            extra_ratio_atk: 0.0,
-            extra_ratio_hp: 0.0,
-            extra_ratio_def: 0.0,
-            extra_ratio_em: 0.0,
 
             extra_enhance_melt: 0.0,
             extra_enhance_vaporize: 0.0,

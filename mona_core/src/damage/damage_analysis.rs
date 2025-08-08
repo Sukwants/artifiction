@@ -25,12 +25,17 @@ pub struct DamageAnalysis {
     pub aggravate_compose: HashMap<String, f64>,
     pub lunar_charged_enhance: HashMap<String, f64>,
     pub lunar_bloom_enhance: HashMap<String, f64>,
+    pub lunar_charged_increase: HashMap<String, f64>,
+    pub lunar_bloom_increase: HashMap<String, f64>,
+    pub lunar_charged_extra_increase: HashMap<String, f64>,
+    pub lunar_bloom_extra_increase: HashMap<String, f64>,
 
     pub def_minus: HashMap<String, f64>,
     pub def_penetration: HashMap<String, f64>,
     pub res_minus: HashMap<String, f64>,
 
     pub element: Element,
+    pub is_lunar: bool,
     pub is_heal: bool,
     pub is_shield: bool,
 

@@ -268,6 +268,7 @@ export default {
         melt: "融化",
         vaporize: "蒸发",
         heal: "治疗",
+        shield: "护盾",
         spread: "蔓激化",
         aggravate: "超激化",
         bloom: "绽放",
