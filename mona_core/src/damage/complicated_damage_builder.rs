@@ -549,8 +549,8 @@ impl DamageBuilder for ComplicatedDamageBuilder {
             res_minus: HashMap::new(),
 
             element,
-            is_heal: true,
-            is_shield: false,
+            is_heal: false,
+            is_shield: true,
 
             normal: damage_normal,
             melt: None,

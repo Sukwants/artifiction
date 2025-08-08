@@ -261,8 +261,8 @@ impl DamageBuilder for SimpleDamageBuilder {
             vaporize: vaporize_damage,
             spread: spread_damage,
             aggravate: aggravate_damage,
-            is_shield: false,
             is_heal: false,
+            is_shield: false,
         }
     }
 
@@ -331,8 +331,8 @@ impl DamageBuilder for SimpleDamageBuilder {
             vaporize: None,
             spread: None,
             aggravate: None,
-            is_shield: false,
             is_heal: false,
+            is_shield: false,
         }
     }
 
@@ -389,8 +389,8 @@ impl DamageBuilder for SimpleDamageBuilder {
             vaporize: None,
             spread: None,
             aggravate: None,
-            is_shield: true,
             is_heal: false,
+            is_shield: true,
         };
     }
 }
