@@ -23,6 +23,8 @@ pub struct DamageAnalysis {
     pub shield_strength: HashMap<String, f64>,
     pub spread_compose: HashMap<String, f64>,
     pub aggravate_compose: HashMap<String, f64>,
+    pub lunar_charged_enhance: HashMap<String, f64>,
+    pub lunar_bloom_enhance: HashMap<String, f64>,
 
     pub def_minus: HashMap<String, f64>,
     pub def_penetration: HashMap<String, f64>,

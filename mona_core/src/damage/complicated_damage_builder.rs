@@ -32,6 +32,11 @@ pub struct ComplicatedDamageBuilder {
     pub ratio_def: EntryType,
     pub ratio_hp: EntryType,
     pub ratio_em: EntryType,
+
+    pub extra_ratio_atk: EntryType,
+    pub extra_ratio_def: EntryType,
+    pub extra_ratio_hp: EntryType,
+    pub extra_ratio_em: EntryType,
 }
 
 impl DamageBuilder for ComplicatedDamageBuilder {
@@ -56,6 +61,22 @@ impl DamageBuilder for ComplicatedDamageBuilder {
 
     fn add_hp_ratio(&mut self, key: &str, value: f64) {
         *self.ratio_hp.0.entry(String::from(key)).or_insert(0.0) += value;
+    }
+
+    fn add_em_extra_ratio(&mut self, key: &str, value: f64) {
+        *self.extra_ratio_em.0.entry(String::from(key)).or_insert(0.0) += value;
+    }
+    
+    fn add_atk_extra_ratio(&mut self, key: &str, value: f64) {
+        *self.extra_ratio_atk.0.entry(String::from(key)).or_insert(0.0) += value;
+    }
+
+    fn add_def_extra_ratio(&mut self, key: &str, value: f64) {
+        *self.extra_ratio_def.0.entry(String::from(key)).or_insert(0.0) += value;
+    }
+
+    fn add_hp_extra_ratio(&mut self, key: &str, value: f64) {
+        *self.extra_ratio_hp.0.entry(String::from(key)).or_insert(0.0) += value;
     }
 
     fn add_extra_em(&mut self, key: &str, value: f64) {
@@ -264,6 +285,9 @@ impl DamageBuilder for ComplicatedDamageBuilder {
             melt_enhance: melt_enhance_comp.0,
             vaporize_enhance: vaporize_enhance_comp.0,
 
+            lunar_charged_enhance: HashMap::new(),
+            lunar_bloom_enhance: HashMap::new(),
+
             healing_bonus: HashMap::new(),
             shield_strength: HashMap::new(),
             def_minus: def_minus_comp.0,
@@ -279,6 +303,130 @@ impl DamageBuilder for ComplicatedDamageBuilder {
             vaporize: damage_vaporize,
             spread: damage_spread,
             aggravate: damage_aggravate,
+        }
+    }
+
+    fn moonglare(
+        &self,
+        attribute:
+        &Self::AttributeType,
+        enemy: &Enemy,
+        element: Element,
+        skill: SkillType,
+        character_level: usize,
+        fumo: Option<Element>
+    ) -> Self::Result {
+        let atk_comp = self.get_atk_composition(attribute);
+        let atk = atk_comp.sum();
+        let atk_ratio_comp = EntryType(self.extra_atk.0.clone());
+        let atk_ratio = atk_ratio_comp.sum();
+
+        let def_comp = self.get_def_composition(attribute);
+        let def = def_comp.sum();
+        let def_ratio_comp = EntryType(self.extra_def.0.clone());
+        let def_ratio = def_ratio_comp.sum();
+
+        let hp_comp = self.get_hp_composition(attribute);
+        let hp = hp_comp.sum();
+        let hp_ratio_comp = EntryType(self.extra_hp.0.clone());
+        let hp_ratio = hp_ratio_comp.sum();
+
+        let em_comp = self.get_em_composition(attribute);
+        let em = em_comp.sum();
+        let em_ratio_comp = EntryType(self.extra_em.0.clone());
+        let em_ratio = em_ratio_comp.sum();
+
+        let extra_damage_comp = EntryType(self.extra_damage.0.clone());
+        let extra_damage = extra_damage_comp.sum();
+
+        let base_damage = atk * atk_ratio + def * def_ratio + hp * hp_ratio + em * em_ratio + extra_damage;
+
+        let critical_comp = self.get_critical_composition(attribute, element, skill);
+        let critical = critical_comp.sum().clamp(0.0, 1.0);
+
+        let critical_damage_comp = self.get_critical_damage_composition(attribute, element, skill);
+        let critical_damage = critical_damage_comp.sum();
+
+        let res_minus_comp = self.get_res_minus_composition(attribute, element);
+        let res_minus = res_minus_comp.sum();
+        let resistance_ratio = enemy.get_resistance_ratio(element, res_minus);
+
+        let lunar_charged_enhance_comp = self.get_enhance_lunar_charged_composition(attribute);
+        let lunar_charged_enhance = lunar_charged_enhance_comp.sum();
+        let lunar_bloom_enhance_comp = self.get_enhance_lunar_bloom_composition(attribute);
+        let lunar_bloom_enhance = lunar_bloom_enhance_comp.sum();
+
+        let lunar_charged_ratio = 3.0;
+        let lunar_bloom_ratio = 1.0;
+
+        let reaction_ratio = match element {
+            Element::Electro => 3.0,
+            Element::Dendro => 1.0,
+            _ => 0.0
+        };
+
+        let enhance = Reaction::moonglare(em) + match element {
+            Element::Electro => attribute.get_value(AttributeName::EnhanceLunarCharged),
+            Element::Dendro => attribute.get_value(AttributeName::EnhanceLunarBloom),
+            _ => 0.0
+        };
+
+        let damage_normal = {
+            let charged_base
+                = base_damage
+                * reaction_ratio
+                * (1.0 + enhance)
+                * (1.0 + attribute.get_value(AttributeName::IncreaseLunarCharged))
+                + atk * atk_ratio
+                + def * def_ratio
+                + hp * hp_ratio
+                + em * em_ratio;
+            DamageResult {
+                critical: charged_base * (1.0 + critical_damage),
+                non_critical: charged_base,
+                expectation: charged_base * (1.0 + critical_damage * critical),
+                is_heal: false,
+                is_shield: false
+            } * resistance_ratio
+        };
+
+        DamageAnalysis {
+            atk: atk_comp.0,
+            atk_ratio: atk_ratio_comp.0,
+            hp: hp_comp.0,
+            hp_ratio: hp_ratio_comp.0,
+            def: def_comp.0,
+            def_ratio: def_ratio_comp.0,
+            em: em_comp.0,
+            em_ratio: em_ratio_comp.0,
+            extra_damage: extra_damage_comp.0,
+            bonus: HashMap::new(),
+            critical: critical_comp.0,
+            critical_damage: critical_damage_comp.0,
+            spread_compose: HashMap::new(),
+            aggravate_compose: HashMap::new(),
+
+            melt_enhance: HashMap::new(),
+            vaporize_enhance: HashMap::new(),
+
+            lunar_charged_enhance: lunar_charged_enhance_comp.0,
+            lunar_bloom_enhance: lunar_bloom_enhance_comp.0,
+
+            healing_bonus: HashMap::new(),
+            shield_strength: HashMap::new(),
+            def_minus: HashMap::new(),
+            def_penetration: HashMap::new(),
+            res_minus: res_minus_comp.0,
+
+            element,
+            is_heal: false,
+            is_shield: false,
+
+            normal: damage_normal,
+            melt: None,
+            vaporize: None,
+            spread: None,
+            aggravate: None,
         }
     }
 
@@ -325,6 +473,9 @@ impl DamageBuilder for ComplicatedDamageBuilder {
 
             melt_enhance: HashMap::new(),
             vaporize_enhance: HashMap::new(),
+
+            lunar_charged_enhance: HashMap::new(),
+            lunar_bloom_enhance: HashMap::new(),
 
             healing_bonus: healing_bonus_comp.0,
             shield_strength: HashMap::new(),
@@ -387,6 +538,9 @@ impl DamageBuilder for ComplicatedDamageBuilder {
 
             melt_enhance: HashMap::new(),
             vaporize_enhance: HashMap::new(),
+
+            lunar_charged_enhance: HashMap::new(),
+            lunar_bloom_enhance: HashMap::new(),
 
             healing_bonus: HashMap::new(),
             shield_strength: shield_strength_comp.0,
@@ -489,6 +643,34 @@ impl ComplicatedDamageBuilder {
         if em > 0.0 {
             comp.add_value("精通", Reaction::catalyze(em));
         }
+        comp
+    }
+
+    fn get_enhance_lunar_charged_composition(&self, attribute: &ComplicatedAttributeGraph) -> EntryType {
+        let mut comp = attribute.get_attribute_composition(AttributeName::EnhanceLunarCharged);
+        let em = &self.extra_em.sum() + attribute.get_em_all();
+        if em > 0.0 {
+            comp.add_value("精通", Reaction::moonglare(em));
+        }
+        comp
+    }
+
+    fn get_enhance_lunar_bloom_composition(&self, attribute: &ComplicatedAttributeGraph) -> EntryType {
+        let mut comp = attribute.get_attribute_composition(AttributeName::EnhanceLunarBloom);
+        let em = &self.extra_em.sum() + attribute.get_em_all();
+        if em > 0.0 {
+            comp.add_value("精通", Reaction::moonglare(em));
+        }
+        comp
+    }
+
+    fn get_increase_lunar_charged_composition(&self, attribute: &ComplicatedAttributeGraph) -> EntryType {
+        let mut comp = attribute.get_attribute_composition(AttributeName::IncreaseLunarCharged);
+        comp
+    }
+
+    fn get_increase_lunar_bloom_composition(&self, attribute: &ComplicatedAttributeGraph) -> EntryType {
+        let mut comp = attribute.get_attribute_composition(AttributeName::IncreaseLunarBloom);
         comp
     }
 

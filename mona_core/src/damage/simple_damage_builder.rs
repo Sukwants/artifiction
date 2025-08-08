@@ -19,10 +19,15 @@ pub struct SimpleDamageBuilder {
     pub extra_res_minus: f64,
     pub extra_def_penetration: f64,
 
-    pub ratio_atk: f64,
+    pub ratio_atk: f64, // 技能倍率，（应该）不包含基础伤害加成
     pub ratio_def: f64,
     pub ratio_hp: f64,
     pub ratio_em: f64,
+
+    pub extra_ratio_atk: f64, // 月曜反应的额外提升
+    pub extra_ratio_def: f64,
+    pub extra_ratio_hp: f64,
+    pub extra_ratio_em: f64,
 
     pub extra_enhance_melt: f64,
     pub extra_enhance_vaporize: f64,
@@ -53,6 +58,22 @@ impl DamageBuilder for SimpleDamageBuilder {
 
     fn add_hp_ratio(&mut self, _key: &str, value: f64) {
         self.ratio_hp += value
+    }
+
+    fn add_em_extra_ratio(&mut self, key: &str, value: f64) {
+        self.extra_ratio_em += value;
+    }
+    
+    fn add_atk_extra_ratio(&mut self, key: &str, value: f64) {
+        self.extra_ratio_atk += value;
+    }
+
+    fn add_def_extra_ratio(&mut self, key: &str, value: f64) {
+        self.extra_ratio_def += value;
+    }
+
+    fn add_hp_extra_ratio(&mut self, key: &str, value: f64) {
+        self.extra_ratio_hp += value;
     }
 
     fn add_extra_em(&mut self, _key: &str, value: f64) {
@@ -178,13 +199,11 @@ impl DamageBuilder for SimpleDamageBuilder {
             is_shield: false
         } * (defensive_ratio * resistance_ratio);
 
-        let em_amp = Reaction::amp(em);
-
         let melt_damage = if element != Element::Pyro && element != Element::Cryo {
             None
         } else {
             let reaction_ratio = if element == Element::Pyro { 2.0 } else { 1.5 };
-            let enhance = em_amp + self.extra_enhance_melt + attribute.get_value(AttributeName::EnhanceMelt);
+            let enhance = Reaction::amp(em) + self.extra_enhance_melt + attribute.get_value(AttributeName::EnhanceMelt);
             Some(normal_damage * (reaction_ratio * (1.0 + enhance)))
         };
 
@@ -192,7 +211,7 @@ impl DamageBuilder for SimpleDamageBuilder {
             None
         } else {
             let reaction_ratio = if element == Element::Pyro { 1.5 } else { 2.0 };
-            let enhance = em_amp + self.extra_enhance_vaporize + attribute.get_value(AttributeName::EnhanceVaporize);
+            let enhance = Reaction::amp(em) + self.extra_enhance_vaporize + attribute.get_value(AttributeName::EnhanceVaporize);
             Some(normal_damage * (reaction_ratio * (1.0 + enhance)))
         };
 
@@ -242,6 +261,76 @@ impl DamageBuilder for SimpleDamageBuilder {
             vaporize: vaporize_damage,
             spread: spread_damage,
             aggravate: aggravate_damage,
+            is_shield: false,
+            is_heal: false,
+        }
+    }
+
+    fn moonglare(&self, attribute: &Self::AttributeType, enemy: &Enemy, element: Element, skill: SkillType, character_level: usize, fumo: Option<Element>) -> Self::Result {
+        let atk = attribute.get_atk() + self.extra_atk;
+        let def = attribute.get_def() + self.extra_def;
+        let hp = attribute.get_hp() + self.extra_hp;
+        let em = self.extra_em + attribute.get_em_all();
+
+        let base // without em bonus
+            = atk * self.ratio_atk
+            + def * self.ratio_def
+            + hp * self.ratio_hp
+            + em * self.ratio_em
+            // + attribute.get_extra_damage(element, skill)
+            + self.extra_damage; // This line is unused for now
+
+        let critical_rate
+            = attribute.get_critical_rate(element, skill)
+            + self.extra_critical_rate;
+        let critical_rate = critical_rate.clamp(0.0, 1.0);
+
+        let critical_damage
+            = attribute.get_critical_damage(element, skill)
+            + self.extra_critical_damage;
+
+        let resistance_ratio = {
+            let res_minus = self.extra_res_minus + attribute.get_enemy_res_minus(element, skill);
+            enemy.get_resistance_ratio(element, res_minus)
+        };
+
+        let reaction_ratio = match element {
+            Element::Electro => 3.0,
+            Element::Dendro => 1.0,
+            _ => 0.0
+        };
+
+        let enhance = Reaction::moonglare(em) + match element {
+            Element::Electro => attribute.get_value(AttributeName::EnhanceLunarCharged),
+            Element::Dendro => attribute.get_value(AttributeName::EnhanceLunarBloom),
+            _ => 0.0
+        };
+
+        let normal_damage = {
+            let charged_base
+                = base
+                * reaction_ratio
+                * (1.0 + enhance)
+                * (1.0 + attribute.get_value(AttributeName::IncreaseLunarCharged))
+                + atk * self.extra_ratio_atk
+                + def * self.extra_ratio_def
+                + hp * self.extra_ratio_hp
+                + em * self.extra_ratio_em;
+            DamageResult {
+                critical: charged_base * (1.0 + critical_damage),
+                non_critical: charged_base,
+                expectation: charged_base * (1.0 + critical_damage * critical_rate),
+                is_heal: false,
+                is_shield: false
+            } * resistance_ratio
+        };
+
+        SimpleDamageResult {
+            normal: normal_damage,
+            melt: None,
+            vaporize: None,
+            spread: None,
+            aggravate: None,
             is_shield: false,
             is_heal: false,
         }
@@ -309,26 +398,32 @@ impl DamageBuilder for SimpleDamageBuilder {
 impl SimpleDamageBuilder {
     pub fn new(ratio_atk: f64, ratio_def: f64, ratio_hp: f64) -> SimpleDamageBuilder {
         SimpleDamageBuilder {
-            extra_damage: 0.0,
-            extra_critical_rate: 0.0,
             extra_critical_damage: 0.0,
+            extra_critical_rate: 0.0,
             extra_bonus: 0.0,
-            ratio_atk,
-            ratio_hp,
-            extra_enhance_melt: 0.0,
-            ratio_def,
-            ratio_em: 0.0,
+            extra_damage: 0.0,
             extra_atk: 0.0,
-
             extra_def: 0.0,
             extra_hp: 0.0,
+
             extra_def_minus: 0.0,
             extra_def_penetration: 0.0,
             extra_res_minus: 0.0,
 
+            ratio_atk,
+            ratio_hp,
+            ratio_def,
+            ratio_em: 0.0,
+
+            extra_ratio_atk: 0.0,
+            extra_ratio_hp: 0.0,
+            extra_ratio_def: 0.0,
+            extra_ratio_em: 0.0,
+
+            extra_enhance_melt: 0.0,
+            extra_enhance_vaporize: 0.0,
             enhance_melt: 0.0,
             enhance_vaporize: 0.0,
-            extra_enhance_vaporize: 0.0,
             extra_em: 0.0
         }
     }

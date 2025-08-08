@@ -112,9 +112,11 @@ pub enum AttributeName {
     EnhanceMelt,
     EnhanceAggravate,
     EnhanceSpread,
+    EnhanceLunarCharged,
+    EnhanceLunarBloom,
 
-    // EnhanceLunarCharged,
-    // EnhanceLunarBloom,
+    IncreaseLunarCharged, // 天赋「月兆祝赐」给出的月曜反应基础提升
+    IncreaseLunarBloom,
 
     HPRatioBase,
     HPRatioNormalAttack,
