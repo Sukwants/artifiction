@@ -1,6 +1,6 @@
 use std::collections::HashMap;
 
-#[derive(Default)]
+#[derive(Default, Clone)]
 pub struct EntryType(pub HashMap<String, f64>);
 
 impl EntryType {

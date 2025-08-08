@@ -318,25 +318,25 @@ impl DamageBuilder for ComplicatedDamageBuilder {
     ) -> Self::Result {
         let atk_comp = self.get_atk_composition(attribute);
         let atk = atk_comp.sum();
-        let atk_ratio_comp = EntryType(self.extra_atk.0.clone());
+        let atk_ratio_comp = self.ratio_atk.clone();
         let atk_ratio = atk_ratio_comp.sum();
 
         let def_comp = self.get_def_composition(attribute);
         let def = def_comp.sum();
-        let def_ratio_comp = EntryType(self.extra_def.0.clone());
+        let def_ratio_comp = self.extra_def.clone();
         let def_ratio = def_ratio_comp.sum();
 
         let hp_comp = self.get_hp_composition(attribute);
         let hp = hp_comp.sum();
-        let hp_ratio_comp = EntryType(self.extra_hp.0.clone());
+        let hp_ratio_comp = self.extra_hp.clone();
         let hp_ratio = hp_ratio_comp.sum();
 
         let em_comp = self.get_em_composition(attribute);
         let em = em_comp.sum();
-        let em_ratio_comp = EntryType(self.extra_em.0.clone());
+        let em_ratio_comp = self.extra_em.clone();
         let em_ratio = em_ratio_comp.sum();
 
-        let extra_damage_comp = EntryType(self.extra_damage.0.clone());
+        let extra_damage_comp = self.extra_damage.clone();
         let extra_damage = extra_damage_comp.sum();
 
         let base_damage = atk * atk_ratio + def * def_ratio + hp * hp_ratio + em * em_ratio + extra_damage;
