@@ -399,6 +399,27 @@ impl DamageBuilder for ComplicatedDamageBuilder {
             } * resistance_ratio
         };
 
+        let damage_lunar_charged = if element != Element::Hydro && element != Element::Electro {
+            None
+        } else {
+            let reaction_ratio = 1.8;
+            let charged_base
+                = LEVEL_MULTIPLIER[character_level - 1]
+                * reaction_ratio
+                * (1.0 + enhance)
+                * (1.0 + increase)
+                + extra_increase;
+            let dmg = DamageResult {
+                critical: charged_base * (1.0 + critical_damage),
+                non_critical: charged_base,
+                expectation: charged_base * (1.0 + critical_damage * critical),
+                is_lunar: true,
+                is_heal: false,
+                is_shield: false
+            } * resistance_ratio;
+            Some(dmg)
+        };
+
         DamageAnalysis {
             atk: atk_comp.0,
             atk_ratio: atk_ratio_comp.0,

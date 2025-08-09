@@ -272,6 +272,7 @@ export default {
         bloom: "Bloom",
         hyperbloom: "HyperBloom",
         burgeon: "Burgeon",
+        lunarCharged: "Lunar-Charged",
     },
     res: {
         Pyro: "Pyro Res",

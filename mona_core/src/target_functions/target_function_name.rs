@@ -115,4 +115,5 @@ pub enum TargetFunctionName {
     VaresaDefault,
     IfaDefault,
     DahliaDefault,
+    IneffaDefault,
 }

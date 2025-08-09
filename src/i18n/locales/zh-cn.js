@@ -274,6 +274,7 @@ export default {
         bloom: "绽放",
         hyperbloom: "超绽放",
         burgeon: "烈绽放",
+        lunarCharged: "月感电",
     },
     res: {
         Pyro: "火抗",

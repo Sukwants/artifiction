@@ -243,6 +243,7 @@ impl DamageBuilder for SimpleDamageBuilder {
             vaporize: vaporize_damage,
             spread: spread_damage,
             aggravate: aggravate_damage,
+            lunar_charged: None,
             is_lunar: false,
             is_heal: false,
             is_shield: false,
@@ -318,12 +319,34 @@ impl DamageBuilder for SimpleDamageBuilder {
             } * resistance_ratio
         };
 
+        let lunar_charged_damage = if element != Element::Hydro && element != Element::Electro {
+            None
+        } else {
+            let reaction_ratio = 1.8;
+            let charged_base
+                = LEVEL_MULTIPLIER[character_level - 1]
+                * reaction_ratio
+                * (1.0 + enhance)
+                * (1.0 + increase)
+                + extra_increase;
+            let dmg = DamageResult {
+                critical: charged_base * (1.0 + critical_damage),
+                non_critical: charged_base,
+                expectation: charged_base * (1.0 + critical_damage * critical_rate),
+                is_lunar: true,
+                is_heal: false,
+                is_shield: false
+            } * resistance_ratio;
+            Some(dmg)
+        };
+
         SimpleDamageResult {
             normal: normal_damage,
             melt: None,
             vaporize: None,
             spread: None,
             aggravate: None,
+            lunar_charged: lunar_charged_damage,
             is_lunar: true,
             is_heal: false,
             is_shield: false,
@@ -355,6 +378,7 @@ impl DamageBuilder for SimpleDamageBuilder {
             vaporize: None,
             spread: None,
             aggravate: None,
+            lunar_charged: None,
             is_lunar: false,
             is_heal: true,
             is_shield: false,
@@ -386,6 +410,7 @@ impl DamageBuilder for SimpleDamageBuilder {
             vaporize: None,
             spread: None,
             aggravate: None,
+            lunar_charged: None,
             is_lunar: false,
             is_heal: false,
             is_shield: true,

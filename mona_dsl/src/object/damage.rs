@@ -2,6 +2,7 @@ use std::cell::RefCell;
 use std::rc::Rc;
 use mona::common::DamageResult;
 use mona::damage::transformative_damage::TransformativeDamage;
+use mona::damage::damage_result::SimpleDamageResult;
 use crate::error::runtime_error::{RuntimeError, RuntimeErrorEnum};
 use crate::object::mona_object::{MonaObject, MonaObjectEnum, MonaObjectTrait};
 
@@ -106,7 +107,8 @@ impl MonaObjectTrait for MonaObjectDamageNumber {
 }
 
 pub struct MonaObjectTransformativeDamage {
-    pub damage: TransformativeDamage
+    pub damage: TransformativeDamage,
+    // pub lunar_damage: SimpleDamageResult,
 }
 
 impl MonaObjectTrait for MonaObjectTransformativeDamage {
@@ -125,6 +127,7 @@ impl MonaObjectTrait for MonaObjectTransformativeDamage {
             "swirl_electro" => self.damage.swirl_electro,
             "overload" => self.damage.overload,
             "electro_charged" => self.damage.electro_charged,
+            // "lunar_charged" => if !self.lunar_damage.lunar_charged.is_none() {self.lunar_damage.lunar_charged.unwrap().expectation} else {f64::NAN},
             "shatter" => self.damage.shatter,
             "superconduct" | "super_conduct" => self.damage.superconduct,
             "bloom" => self.damage.bloom,

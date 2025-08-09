@@ -53,14 +53,14 @@ pub const INEFFA_SKILL: IneffaSkillType = IneffaSkillType {
     // Elemental Skill: Cleaning Mode: Carrier Frequency
     e_dmg: [0.864, 0.9288, 0.9936, 1.08, 1.1448, 1.2096, 1.296, 1.3824, 1.4688, 1.5552, 1.6416, 1.728, 1.836, 1.944, 2.052],
     e_birgitta_dmg: [0.96, 1.032, 1.104, 1.2, 1.272, 1.344, 1.44, 1.536, 1.632, 1.728, 1.824, 1.92, 2.04, 2.16, 2.28],
-    e_shield_base: [1386.6759, 1525.3628, 1675.6068, 1837.4082, 2010.7667, 2195.6826, 2392.1558, 2600.186, 2819.7734, 3050.9182, 3293.6204, 3547.8796, 3813.696, 4091.0698, 4380],
+    e_shield_base: [1386.6759, 1525.3628, 1675.6068, 1837.4082, 2010.7667, 2195.6826, 2392.1558, 2600.186, 2819.7734, 3050.9182, 3293.6204, 3547.8796, 3813.696, 4091.0698, 4380.0],
     e_shield_additional: [2.21184, 2.377728, 2.543616, 2.7648, 2.930688, 3.096576, 3.31776, 3.538944, 3.760128, 3.981312, 4.202496, 4.42368, 4.70016, 4.97664, 5.25312],
 
     // Elemental Burst: Supreme Instruction: Cyclonic Exterminator
     q_dmg: [6.768, 7.2756, 7.7832, 8.46, 8.9676, 9.4752, 10.152, 10.8288, 11.5056, 12.1824, 12.8592, 13.536, 14.382, 15.228, 16.074],
 
     p1_dmg: 0.65,
-    c2_dmg: 3,
+    c2_dmg: 3.0,
     c6_dmg: 1.35,
 };
 
@@ -99,7 +99,7 @@ pub struct IneffaEffect {
 
 impl<A: Attribute> ChangeAttribute<A> for IneffaEffect {
     fn change_attribute(&self, attribute: &mut A) {
-        if(self.has_p2) {
+        if self.has_p2 {
             attribute.add_edge1(
                 AttributeName::ATK,
                 AttributeName::ElementalMastery,
@@ -121,12 +121,12 @@ impl<A: Attribute> ChangeAttribute<A> for IneffaEffect {
             "伊涅芙天赋：月兆祝赐·象拟中继"
         );
 
-        if(self.has_c1) {
+        if self.has_c1 {
             attribute.add_edge1(
                 AttributeName::ATK,
                 AttributeName::EnhanceLunarCharged,
                 Box::new(move |atk, _| {
-                    min(atk * 0.00025, 0.5)
+                    (atk * 0.00025).min(0.5)
                 }),
                 Box::new(move |atk, _, grad| (0.0, 0.0)),
                 "伊涅芙命座：循环整流引擎"
@@ -153,13 +153,14 @@ damage_enum!(
     P1
     C2
     C6
+    LunarCharged
 );
 
 impl IneffaDamageEnum {
     pub fn get_element(&self) -> Element {
         use IneffaDamageEnum::*;
         match *self {
-            E | EContinued | EShield | Q | P1 | C2 | C6 => Element::Electro,
+            E | EContinued | EShield | Q | P1 | C2 | C6 | LunarCharged => Element::Electro,
             _ => Element::Physical,
         }
     }
@@ -173,7 +174,7 @@ impl IneffaDamageEnum {
             X2 | X3 => SkillType::PlungingAttackOnGround,
             E | EContinued | EShield => SkillType::ElementalSkill,
             Q => SkillType::ElementalBurst,
-            P1 | C2 | C6 => SkillType::NoneType,
+            P1 | C2 | C6 | LunarCharged => SkillType::NoneType,
         }
     }
 }
@@ -228,16 +229,31 @@ impl CharacterTrait for Ineffa {
         let mut builder = D::new();
 
         if s == EShield {
-            builder.add_def_ratio("护盾基础吸收量", INEFFA_SKILL.e_shield_base[s2]);
-            builder.add_def_ratio("护盾额外吸收量", INEFFA_SKILL.e_shield_additional[s2]);
+            builder.add_atk_ratio("护盾基础吸收量", INEFFA_SKILL.e_shield_additional[s2]);
+            builder.add_extra_damage("护盾额外吸收量", INEFFA_SKILL.e_shield_base[s2]);
             builder.shield(
                 &context.attribute,
                 s.get_element(),
             )
-        }
-        else if s == P1 {
-            builder.add_atk_ratio("技能倍率", INEFFA_SKILL.p1_dmg);
+        } else if s == P1 || s == C2 || s == C6 {
+            let ratio = match s {
+                P1 => INEFFA_SKILL.p1_dmg,
+                C2 => INEFFA_SKILL.c2_dmg,
+                C6 => INEFFA_SKILL.c6_dmg,
+                _ => 0.0
+            };
 
+            builder.add_atk_ratio("技能倍率", ratio);
+
+            builder.moonglare(
+                &context.attribute,
+                &context.enemy,
+                s.get_element(),
+                s.get_skill_type(),
+                context.character_common_data.level,
+                fumo,
+            )
+        } else if s == LunarCharged {
             builder.moonglare(
                 &context.attribute,
                 &context.enemy,
@@ -262,6 +278,9 @@ impl CharacterTrait for Ineffa {
                 Q => INEFFA_SKILL.q_dmg[s3],
                 _ => 0.0
             };
+
+            builder.add_atk_ratio("技能倍率", ratio);
+
             builder.damage(
                 &context.attribute,
                 &context.enemy,
@@ -274,13 +293,13 @@ impl CharacterTrait for Ineffa {
     }
 
     fn new_effect<A: Attribute>(common_data: &CharacterCommonData, config: &CharacterConfig) -> Option<Box<dyn ChangeAttribute<A>>> {
-        Some(Box::new(IfaEffect {
+        Some(Box::new(IneffaEffect {
             has_p2: common_data.has_talent2,
             has_c1: common_data.constellation >= 1,
         }))
     }
 
     fn get_target_function_by_role(role_index: usize, _team: &TeamQuantization, _c: &CharacterCommonData, _w: &WeaponCommonData) -> Box<dyn TargetFunction> {
-        Box::new(crate::target_functions::target_functions::electro::ineffa_default::IneffaDefaultTargetFunction)
+        unimplemented!()
     }
 }
