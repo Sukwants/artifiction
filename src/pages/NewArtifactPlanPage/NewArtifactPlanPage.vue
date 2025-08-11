@@ -1159,7 +1159,6 @@ const showDamageAnalysisDialog = ref(false)
 const damageAnalysisComponent = ref<null | InstanceType<typeof DamageAnalysis>>(null)
 
 const damageAnalysisWasmInterface = computed(() => {
-    // console.log("123")
     return {
         character: characterInterface.value,
         weapon: weaponInterface.value,
@@ -1177,7 +1176,6 @@ const characterDamageAnalysis = computed(() => {
         fumo2 = fumo.value
     }
     const temp = mona.CalculatorInterface.get_damage_analysis(damageAnalysisWasmInterface.value, fumo2)
-    // console.log(temp)
     return temp
 })
 

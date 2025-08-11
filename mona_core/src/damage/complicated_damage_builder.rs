@@ -1,6 +1,7 @@
+use core::panic;
 use std::collections::HashMap;
 use crate::attribute::{Attribute, AttributeName, ComplicatedAttributeGraph, AttributeCommon};
-use crate::common::{DamageResult, Element, SkillType};
+use crate::common::{DamageResult, Element, MoonglareReaction, SkillType};
 use crate::damage::damage_analysis::DamageAnalysis;
 use crate::enemies::Enemy;
 use crate::common::EntryType;
@@ -194,7 +195,7 @@ impl DamageBuilder for ComplicatedDamageBuilder {
             expectation: base_damage * (1.0 + bonus) * (1.0 + critical * critical_damage),
             critical: base_damage * (1.0 + bonus) * (1.0 + critical_damage),
             non_critical: base_damage * (1.0 + bonus),
-            is_lunar: false,
+            lunar_type: MoonglareReaction::None,
             is_heal: false,
             is_shield: false
         } * (defensive_ratio * resistance_ratio);
@@ -222,7 +223,7 @@ impl DamageBuilder for ComplicatedDamageBuilder {
                 critical: spread_base_damage * (1.0 + bonus) * (1.0 + critical_damage),
                 non_critical: spread_base_damage * (1.0 + bonus),
                 expectation: spread_base_damage * (1.0 + bonus) * (1.0 + critical_damage * critical),
-                is_lunar: false,
+                lunar_type: MoonglareReaction::None,
                 is_heal: false,
                 is_shield: false
             } * (defensive_ratio * resistance_ratio);
@@ -241,7 +242,7 @@ impl DamageBuilder for ComplicatedDamageBuilder {
                 critical: aggravate_base_damage * (1.0 + bonus) * (1.0 + critical_damage),
                 non_critical: aggravate_base_damage * (1.0 + bonus),
                 expectation: aggravate_base_damage * (1.0 + bonus) * (1.0 + critical_damage * critical),
-                is_lunar: false,
+                lunar_type: MoonglareReaction::None,
                 is_heal: false,
                 is_shield: false
             } * (defensive_ratio * resistance_ratio);
@@ -283,7 +284,7 @@ impl DamageBuilder for ComplicatedDamageBuilder {
             res_minus: res_minus_comp.0,
 
             element,
-            is_lunar: false,
+            lunar_type: MoonglareReaction::None,
             is_heal: false,
             is_shield: false,
 
@@ -364,60 +365,66 @@ impl DamageBuilder for ComplicatedDamageBuilder {
             _ => 0.0
         };
 
-        let enhance = Reaction::moonglare(em) + match element {
-            Element::Electro => lunar_charged_enhance,
-            Element::Dendro => lunar_bloom_enhance,
+        let enhance = match skill {
+            SkillType::LunarChargedReaction | SkillType::LunarCharged => lunar_charged_enhance,
+            SkillType::LunarBloom => lunar_bloom_enhance,
             _ => 0.0
         };
 
-        let increase = Reaction::moonglare(em) + match element {
-            Element::Electro => lunar_charged_increase,
-            Element::Dendro => lunar_bloom_increase,
+        let increase = match skill {
+            SkillType::LunarChargedReaction | SkillType::LunarCharged => lunar_charged_increase,
+            SkillType::LunarBloom => lunar_bloom_increase,
             _ => 0.0
         };
 
-        let extra_increase = Reaction::moonglare(em) + match element {
-            Element::Electro => lunar_charged_extra_increase,
-            Element::Dendro => lunar_bloom_extra_increase,
+        let extra_increase = match skill {
+            SkillType::LunarChargedReaction | SkillType::LunarCharged => lunar_charged_extra_increase,
+            SkillType::LunarBloom => lunar_bloom_extra_increase,
             _ => 0.0
         };
 
-        let damage_normal = {
-            let charged_base
-                = base_damage
-                * reaction_ratio
-                * (1.0 + enhance)
-                * (1.0 + increase)
-                + extra_increase;
-            DamageResult {
-                critical: charged_base * (1.0 + critical_damage),
-                non_critical: charged_base,
-                expectation: charged_base * (1.0 + critical_damage * critical),
-                is_lunar: true,
+        let damage_normal = match skill {
+            SkillType::LunarChargedReaction => {
+                let reaction_ratio = 1.8;
+                let charged_base
+                    = LEVEL_MULTIPLIER[character_level - 1]
+                    * reaction_ratio
+                    * (1.0 + enhance)
+                    * (1.0 + increase)
+                    + extra_increase;
+                DamageResult {
+                    critical: charged_base * (1.0 + critical_damage),
+                    non_critical: charged_base,
+                    expectation: charged_base * (1.0 + critical_damage * critical),
+                    lunar_type: MoonglareReaction::LunarChargedReaction,
+                    is_heal: false,
+                    is_shield: false
+                } * resistance_ratio
+            },
+            SkillType::LunarCharged => {
+                let charged_base
+                    = base_damage
+                    * reaction_ratio
+                    * (1.0 + enhance)
+                    * (1.0 + increase)
+                    + extra_increase;
+                DamageResult {
+                    critical: charged_base * (1.0 + critical_damage),
+                    non_critical: charged_base,
+                    expectation: charged_base * (1.0 + critical_damage * critical),
+                    lunar_type: MoonglareReaction::LunarCharged,
+                    is_heal: false,
+                    is_shield: false
+                } * resistance_ratio
+            },
+            _ => DamageResult {
+                critical: 0.0,
+                non_critical: 0.0,
+                expectation: 0.0,
+                lunar_type: MoonglareReaction::None,
                 is_heal: false,
                 is_shield: false
-            } * resistance_ratio
-        };
-
-        let damage_lunar_charged = if element != Element::Hydro && element != Element::Electro {
-            None
-        } else {
-            let reaction_ratio = 1.8;
-            let charged_base
-                = LEVEL_MULTIPLIER[character_level - 1]
-                * reaction_ratio
-                * (1.0 + enhance)
-                * (1.0 + increase)
-                + extra_increase;
-            let dmg = DamageResult {
-                critical: charged_base * (1.0 + critical_damage),
-                non_critical: charged_base,
-                expectation: charged_base * (1.0 + critical_damage * critical),
-                is_lunar: true,
-                is_heal: false,
-                is_shield: false
-            } * resistance_ratio;
-            Some(dmg)
+            }
         };
 
         DamageAnalysis {
@@ -455,7 +462,7 @@ impl DamageBuilder for ComplicatedDamageBuilder {
             res_minus: res_minus_comp.0,
 
             element,
-            is_lunar: true,
+            lunar_type: damage_normal.lunar_type,
             is_heal: false,
             is_shield: false,
 
@@ -487,7 +494,7 @@ impl DamageBuilder for ComplicatedDamageBuilder {
             expectation: heal_value,
             critical: heal_value,
             non_critical: heal_value,
-            is_lunar: false,
+            lunar_type: MoonglareReaction::None,
             is_heal: true,
             is_shield: false
         };
@@ -528,7 +535,7 @@ impl DamageBuilder for ComplicatedDamageBuilder {
             res_minus: HashMap::new(),
 
             element: Element::Pyro,
-            is_lunar: false,
+            lunar_type: MoonglareReaction::None,
             is_heal: true,
             is_shield: false,
 
@@ -560,7 +567,7 @@ impl DamageBuilder for ComplicatedDamageBuilder {
             expectation: shield_value,
             critical: 0.0,
             non_critical: 0.0,
-            is_lunar: false,
+            lunar_type: MoonglareReaction::None,
             is_heal: false,
             is_shield: true
         };
@@ -601,7 +608,7 @@ impl DamageBuilder for ComplicatedDamageBuilder {
             res_minus: HashMap::new(),
 
             element,
-            is_lunar: false,
+            lunar_type: MoonglareReaction::None,
             is_heal: false,
             is_shield: true,
 

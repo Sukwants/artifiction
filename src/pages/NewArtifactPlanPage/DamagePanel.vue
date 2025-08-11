@@ -54,10 +54,20 @@ export default {
             //     return map[this.element]
             // }
 
+            console.log(this.analysisFromWasm);
+
             if (this.analysisFromWasm.is_heal) {
                 return this.t("dmg.heal")
             } else if (this.analysisFromWasm.is_shield) {
                 return this.t("dmg.shield")
+            } else if (this.analysisFromWasm.lunar_type !== "None") {
+                if (this.analysisFromWasm.lunar_type == "LunarChargedReaction") {
+                    return this.t(`dmg.lunarChargedReaction`)
+                } else if (this.analysisFromWasm.lunar_type == "LunarCharged") {
+                    return this.t(`dmg.lunarCharged`)
+                } else if (this.analysisFromWasm.lunar_type == "LunarBloom") {
+                    return this.t(`dmg.lunarBloom`)
+                }
             } else {
                 return this.t("dmg", this.element)
             }

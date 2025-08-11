@@ -1,4 +1,4 @@
-pub use element::Element;
+pub use element::{Element, MoonglareReaction};
 pub use stat::{StatName, SUB_STAT_VALUE_5};
 pub use weapon_type::WeaponType;
 pub use change_attribute::ChangeAttribute;

@@ -1,4 +1,5 @@
 use std::ops::Mul;
+use crate::common::MoonglareReaction;
 use serde::{Serialize, Deserialize};
 use crate::damage::transformative_damage::TransformativeDamage;
 
@@ -9,7 +10,7 @@ pub struct DamageResult {
     pub non_critical: f64,
     pub expectation: f64,
 
-    pub is_lunar: bool,
+    pub lunar_type: MoonglareReaction,
     pub is_heal: bool,
     pub is_shield: bool
 }
@@ -22,7 +23,7 @@ impl Mul<f64> for DamageResult {
             critical: self.critical * rhs,
             non_critical: self.non_critical * rhs,
             expectation: self.expectation * rhs,
-            is_lunar: self.is_lunar,
+            lunar_type: self.lunar_type,
             is_shield: false,
             is_heal: false
         }
@@ -37,8 +38,7 @@ pub struct SimpleDamageResult {
     pub vaporize: Option<DamageResult>,
     pub spread: Option<DamageResult>,
     pub aggravate: Option<DamageResult>,
-    pub lunar_charged: Option<DamageResult>,
-    pub is_lunar: bool,
+    pub lunar_type: MoonglareReaction,
     pub is_heal: bool,
     pub is_shield: bool,
 }

@@ -16,7 +16,7 @@
     </div>
 
     <div class="header-row" style="overflow: auto; margin-bottom: 16px;">
-        <div>
+        <div v-if="lunarType !== 'LunarChargedReaction'">
             <div class="big-title base-damage-region" :title="Math.round(baseDamageSpread*1000)/1000" v-if="damageType === 'spread'">{{ baseRegionName }}</div>
             <div class="big-title base-damage-region" :title="Math.round(baseDamageAggravate*1000)/1000" v-else-if="damageType === 'aggravate'">{{ baseRegionName }}</div>
             <div class="big-title base-damage-region" :title="Math.round(baseDamage*1000)/1000" v-else>{{ baseRegionName }}</div>
@@ -90,7 +90,13 @@
                 ></damage-analysis-util>
             </div>
         </div>
-        <div v-if="!isLunar">
+        <div v-if="lunarType == 'LunarChargedReaction'">
+            <div class="big-title base-damage-region">基础伤害</div>
+            <div class="header-row" style="height: 100%; display: flex; align-items: center; justify-content: center">
+                <span>{{ Math.round(baseDamageReaction * 1000) / 1000 }}</span>
+            </div>
+        </div>
+        <div v-if="!isLunar && !isShield">
             <div class="big-title bonus-region">加成</div>
             <div class="header-row">
                 <damage-analysis-util
@@ -101,13 +107,13 @@
         </div>
         <div v-if="isLunar">
             <div class="big-title lunar-increase-region">基础提升</div>
-            <div v-if="element === 'electro'" class="header-row">
+            <div v-if="this.lunarType == 'LunarChargedReaction' || this.lunarType == 'LunarCharged'" class="header-row">
                 <damage-analysis-util
                     :arr="lunarChargedIncreaseState"
                     title="月感电基础提升"
                 ></damage-analysis-util>
             </div>
-            <div v-if="element === 'dendro'" class="header-row">
+            <div v-if="this.lunarType == 'LunarBloom'" class="header-row">
                 <damage-analysis-util
                     :arr="lunarBloomIncreaseState"
                     title="月绽放基础提升"
@@ -137,13 +143,13 @@
                         title="蒸发伤害加成"
                     ></damage-analysis-util>
                 </div>
-                <div v-if="isLunar && this.element == 'Electro'" class="header-row">
+                <div v-if="this.lunarType == 'LunarChargedReaction' || this.lunarType == 'LunarCharged'" class="header-row">
                     <damage-analysis-util
                         :arr="lunarChargedEnhanceState"
                         title="月感电伤害加成"
                     ></damage-analysis-util>
                 </div>
-                <div v-if="isLunar && this.element == 'Dendro'" class="header-row">
+                <div v-if="this.lunarType == 'LunarBloom'" class="header-row">
                     <damage-analysis-util
                         :arr="lunarBloomEnhanceState"
                         title="月绽放伤害加成"
@@ -151,16 +157,10 @@
                 </div>
             </div>
         </div>
-        <div v-if="isLunar">
+        <div v-if="this.lunarType == 'LunarBloom'">
             <div class="big-title lunar-extra-region">额外提升</div>
             <div class="header-row">
-                <div v-if="isLunar && this.element == 'Electro'" class="header-row">
-                    <damage-analysis-util
-                        :arr="lunarChargedExtraIncreaseState"
-                        title="月感电额外提升"
-                    ></damage-analysis-util>
-                </div>
-                <div v-if="isLunar && this.element == 'Dendro'" class="header-row">
+                <div v-if="this.lunarType == 'LunarBloom'" class="header-row">
                     <damage-analysis-util
                         :arr="lunarBloomExtraIncreaseState"
                         title="月绽放额外提升"
@@ -237,6 +237,7 @@ export default {
             isShield: false,
             isDamage: true,
             isLunar: false,
+            lunarType: "None",
 
             atkState: [{ name: "test", value: 1000, checked: true }],
             atkRatioState: [{ name: "test", value: 1000, checked: true }],
@@ -301,7 +302,8 @@ export default {
             this.isHeal = analysis.is_heal
             this.isShield = analysis.is_shield
             this.isDamage = !this.isHeal && !this.isShield
-            this.isLunar = analysis.is_lunar
+            this.isLunar = analysis.lunar_type !== "None"
+            this.lunarType = analysis.lunar_type
             this.damageType = "normal"
             for (let key in map) {
                 let fromKey = map[key]
@@ -330,11 +332,12 @@ export default {
                 "Physical": "物理伤害"
             }
             const lunarMap = {
-                "Electro": "月感电",
-                "Dendro": "月绽放",
+                "LunarChargedReaction": "月感电",
+                "LunarCharged": "月感电伤害",
+                "LunarBloom": "月绽放",
             }
             if (this.isLunar) {
-                return lunarMap[this.element]
+                return lunarMap[this.lunarType]
             } else if (this.isHeal) {
                 return "治疗量"
             } else if (this.isShield) {
@@ -387,16 +390,24 @@ export default {
         },
 
         reactionRatio() {
-            let map = {
-                "Cryomelt": 1.5,
-                "Pyromelt": 2,
-                "Pyrovaporize": 1.5,
-                "Hydrovaporize": 2,
-                "Electronormal": 3,
-                "Dendronormal": 1,
-            }
+            if(this.lunarType !== "None") {
+                let map = {
+                    "LunarChargedReaction": 1.8,
+                    "LunarCharged": 3.0,
+                    "LunarBloom": 1.0,
+                }
 
-            return map[this.element + this.damageType]
+                return map[this.lunarType]
+            } else {
+                let map = {
+                    "Cryomelt": 1.5,
+                    "Pyromelt": 2,
+                    "Pyrovaporize": 1.5,
+                    "Hydrovaporize": 2,
+                }
+    
+                return map[this.element + this.damageType]
+            }
         },
 
         atk() {
@@ -480,8 +491,24 @@ export default {
         },
 
         aggravateEnhance() {
-            console.log(this.aggravateState)
             return sum(this.aggravateState)
+        },
+
+        lunarChargedEnhance() {
+            return sum(this.lunarChargedEnhanceState)
+        },
+        lunarChargedIncrease() {
+            return sum(this.lunarChargedIncreaseState)
+        },
+
+        lunarBloomEnhance() {
+            return sum(this.lunarBloomEnhanceState)
+        },
+        lunarBloomIncrease() {
+            return sum(this.lunarBloomIncreaseState)
+        },
+        lunarBloomExtraIncrease() {
+            return sum(this.lunarBloomExtraIncreaseState)
         },
 
         baseDamageSpread() {
@@ -490,6 +517,10 @@ export default {
 
         baseDamageAggravate() {
             return this.baseDamage + LEVEL_MULTIPLIER[this.characterLevel - 1] * 1.15 * (1 + this.aggravateEnhance)
+        },
+
+        baseDamageReaction() {
+            return LEVEL_MULTIPLIER[this.characterLevel - 1];
         },
 
         baseDamageQuicken() {
@@ -531,6 +562,15 @@ export default {
             let d
             if (this.isHeal) {
                 d = this.baseDamage * (1 + this.healingBonus)
+            } else if (this.isShield){
+                d  = this.baseDamage
+            } else if (this.isLunar) {
+                if (this.lunarType == "LunarChargedReaction") {
+                    d = this.baseDamageReaction * (1 + this.critical * this.criticalDamage) * (1 + this.lunarChargedIncrease) * 1.8 * (1 + this.lunarChargedEnhance) * this.resRatio
+                } else if (this.lunarType == "LunarCharged") {
+                    d = this.baseDamage * (1 + this.critical * this.criticalDamage) * (1 + this.lunarChargedIncrease) * 3.0 * (1 + this.lunarChargedEnhance) * this.resRatio
+                }
+                else d = NaN
             } else {
                 d = this.baseDamage * (1 + this.critical * this.criticalDamage) * (1 + this.bonus) * this.resRatio * this.defMultiplier
             }

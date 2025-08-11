@@ -80,12 +80,15 @@ impl TargetFunction for IneffaDefaultTargetFunction {
         };
 
         let dmg_e = Ineffa::damage::<SimpleDamageBuilder>(&context, <Ineffa as CharacterTrait>::DamageEnumType::EContinued, &CharacterSkillConfig::NoConfig, None).normal.expectation;
+        let dmg_p1 = if context.character_common_data.has_talent1 {
+            Ineffa::damage::<SimpleDamageBuilder>(&context, <Ineffa as CharacterTrait>::DamageEnumType::P1, &CharacterSkillConfig::NoConfig, None).normal.expectation
+        } else { 0.0 };
         let dmg_c6 = if context.character_common_data.constellation >= 6 {
             Ineffa::damage::<SimpleDamageBuilder>(&context, <Ineffa as CharacterTrait>::DamageEnumType::C6, &CharacterSkillConfig::NoConfig, None).normal.expectation
-            * 2.0 / 3.5
+            * 2.0 / 4.0 // 元素战技持续伤害、天赋一额外伤害、月感电伤害 cd 均为 2s，而六命额外伤害 cd 为 3.5s，对齐月感电触发时间后间隔应为 4s。
         } else { 0.0 };
-        let dmg_lunar_charged = Ineffa::damage::<SimpleDamageBuilder>(&context, <Ineffa as CharacterTrait>::DamageEnumType::LunarCharged, &CharacterSkillConfig::NoConfig, None).lunar_charged.unwrap().expectation;
+        let dmg_lunar_charged = Ineffa::damage::<SimpleDamageBuilder>(&context, <Ineffa as CharacterTrait>::DamageEnumType::LunarCharged, &CharacterSkillConfig::NoConfig, None).normal.expectation;
 
-        dmg_e + dmg_c6 + dmg_lunar_charged * self.lunar_charged_coefficient
+        dmg_e + dmg_p1 + dmg_c6 + dmg_lunar_charged * self.lunar_charged_coefficient
     }
 }

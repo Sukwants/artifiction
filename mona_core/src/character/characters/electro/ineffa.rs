@@ -72,7 +72,7 @@ pub const INEFFA_STATIC_DATA: CharacterStaticData = CharacterStaticData {
     atk: [26, 67, 89, 133, 148, 171, 192, 214, 230, 253, 268, 291, 307, 330],
     def: [64, 167, 222, 333, 372, 428, 480, 537, 576, 633, 673, 730, 770, 828],
     sub_stat: CharacterSubStatFamily::CriticalRate192,
-    weapon_type: WeaponType::Catalyst,
+    weapon_type: WeaponType::Polearm,
     star: 5,
     skill_name1: locale!(
         zh_cn: "除尘旋刃",
@@ -174,7 +174,8 @@ impl IneffaDamageEnum {
             X2 | X3 => SkillType::PlungingAttackOnGround,
             E | EContinued | EShield => SkillType::ElementalSkill,
             Q => SkillType::ElementalBurst,
-            P1 | C2 | C6 | LunarCharged => SkillType::NoneType,
+            P1 | C2 | C6 => SkillType::LunarCharged,
+            LunarCharged => SkillType::LunarChargedReaction,
         }
     }
 }
@@ -210,6 +211,7 @@ impl CharacterTrait for Ineffa {
             P1 locale!(zh_cn: "薇尔琪塔额外放电伤害", en: "Birgitta Additional Discharge DMG")
             C2 locale!(zh_cn: "二命额外伤害", en: "C2 extra DMG")
             C6 locale!(zh_cn: "六命额外伤害", en: "C6 extra DMG")
+            LunarCharged locale!(zh_cn: "月感电伤害", en: "Lunar-Charged DMG")
         ),
         skill3: skill_map!(
             IneffaDamageEnum
@@ -235,25 +237,17 @@ impl CharacterTrait for Ineffa {
                 &context.attribute,
                 s.get_element(),
             )
-        } else if s == P1 || s == C2 || s == C6 {
+        } else if s == P1 || s == C2 || s == C6 || s == LunarCharged {
             let ratio = match s {
                 P1 => INEFFA_SKILL.p1_dmg,
                 C2 => INEFFA_SKILL.c2_dmg,
                 C6 => INEFFA_SKILL.c6_dmg,
+                LunarCharged => 0.0,
                 _ => 0.0
             };
 
             builder.add_atk_ratio("技能倍率", ratio);
 
-            builder.moonglare(
-                &context.attribute,
-                &context.enemy,
-                s.get_element(),
-                s.get_skill_type(),
-                context.character_common_data.level,
-                fumo,
-            )
-        } else if s == LunarCharged {
             builder.moonglare(
                 &context.attribute,
                 &context.enemy,
