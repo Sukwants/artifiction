@@ -631,6 +631,11 @@
                 <transformative-damage
                     :data="characterTransformativeDamage"
                 ></transformative-damage>
+
+                <h3 class="common-title2" style="margin-top: 24px">{{ t("calcPage.dmg3") }}</h3>
+                <moonglare-damage
+                    :data="characterMoonglareDamage"
+                ></moonglare-damage>
             </el-col>
 
             <el-col :sm="24" :md="6" class="right-container mona-scroll-hidden">
@@ -676,6 +681,7 @@ import BuffItem from "./BuffItem"
 import WeaponDisplay from "@/components/display/WeaponDisplay.vue"
 import SaveAsKumi from "./SaveAsKumi.vue"
 import TransformativeDamage from "./TransformativeDamage"
+import MoonglareDamage from "./MoonglareDamage.vue"
 import ValueDisplay from "./ValueDisplay"
 import EnemyConfigComponent from "./EnemyConfig"
 import SelectArtifactMainStat from "@c/select/SelectArtifactMainStat"
@@ -1175,6 +1181,7 @@ const characterDamageAnalysis = computed(() => {
     if (fumo.value !== "None") {
         fumo2 = fumo.value
     }
+    console.log(damageAnalysisWasmInterface.value)
     const temp = mona.CalculatorInterface.get_damage_analysis(damageAnalysisWasmInterface.value, fumo2)
     return temp
 })
@@ -1205,6 +1212,11 @@ const characterTransformativeDamage = computed(() => {
     //     "swirl_hydro": temp.swirl_hydro
     // }
     // return ret
+})
+
+const characterMoonglareDamage = computed(() => {
+    const result = mona.CalculatorInterface.get_moonglare_damage(damageAnalysisWasmInterface.value)
+    return result
 })
 
 function handleDisplayAnalysis() {
