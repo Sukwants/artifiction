@@ -1,6 +1,6 @@
 use std::collections::HashMap;
 use serde::{Serialize, Deserialize};
-use crate::common::{DamageResult, Element};
+use crate::common::{DamageResult, Element, MoonglareReaction};
 
 #[derive(Debug)]
 #[derive(Serialize, Deserialize)]
@@ -23,12 +23,19 @@ pub struct DamageAnalysis {
     pub shield_strength: HashMap<String, f64>,
     pub spread_compose: HashMap<String, f64>,
     pub aggravate_compose: HashMap<String, f64>,
+    pub lunar_charged_enhance: HashMap<String, f64>,
+    pub lunar_bloom_enhance: HashMap<String, f64>,
+    pub lunar_charged_increase: HashMap<String, f64>,
+    pub lunar_bloom_increase: HashMap<String, f64>,
+    pub lunar_charged_extra_increase: HashMap<String, f64>,
+    pub lunar_bloom_extra_increase: HashMap<String, f64>,
 
     pub def_minus: HashMap<String, f64>,
     pub def_penetration: HashMap<String, f64>,
     pub res_minus: HashMap<String, f64>,
 
     pub element: Element,
+    pub lunar_type: MoonglareReaction,
     pub is_heal: bool,
     pub is_shield: bool,
 

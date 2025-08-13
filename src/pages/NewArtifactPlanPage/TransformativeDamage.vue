@@ -45,7 +45,6 @@ export default defineComponent({
     props: ["data"],
     computed: {
         tableDataForElementUI() {
-            // console.log(this.data)
             let results = []
             results.push({ value: this.data.hyperbloom, key: "hyperbloom" })
             results.push({ value: this.data.burgeon, key: "burgeon" })

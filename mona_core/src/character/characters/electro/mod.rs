@@ -12,8 +12,9 @@ pub mod dori;
 pub mod clorinde;
 pub mod sethos;
 pub mod ororon;
-mod iansan;
-mod varesa;
+pub mod iansan;
+pub mod varesa;
+pub mod ineffa;
 
 pub use beidou::Beidou;
 pub use keqing::Keqing;
@@ -31,3 +32,4 @@ pub use sethos::Sethos;
 pub use ororon::Ororon;
 pub use iansan::Iansan;
 pub use varesa::Varesa;
+pub use ineffa::Ineffa;

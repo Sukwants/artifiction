@@ -112,9 +112,14 @@ pub enum AttributeName {
     EnhanceMelt,
     EnhanceAggravate,
     EnhanceSpread,
+    EnhanceLunarCharged,
+    EnhanceLunarBloom,
 
-    // EnhanceLunarCharged,
-    // EnhanceLunarBloom,
+    IncreaseLunarCharged, // 天赋「月兆祝赐」给出的月曜反应基础提升
+    IncreaseLunarBloom,
+
+    ExtraIncreaseLunarCharged, // 月曜反应额外提升，（大概）应由 add_edge 给出
+    ExtraIncreaseLunarBloom,
 
     HPRatioBase,
     HPRatioNormalAttack,
@@ -202,7 +207,7 @@ impl AttributeName {
             SkillType::PlungingAttackOnGround | SkillType::PlungingAttackInAction => Some(AttributeName::BonusPlungingAttack),
             SkillType::ElementalSkill => Some(AttributeName::BonusElementalSkill),
             SkillType::ElementalBurst => Some(AttributeName::BonusElementalBurst),
-            SkillType::NoneType => None,
+            _ => None,
         }
     }
 
@@ -226,7 +231,7 @@ impl AttributeName {
             SkillType::PlungingAttackOnGround | SkillType::PlungingAttackInAction => Some(AttributeName::CriticalPlungingAttack),
             SkillType::ElementalSkill => Some(AttributeName::CriticalElementalSkill),
             SkillType::ElementalBurst => Some(AttributeName::CriticalElementalBurst),
-            SkillType::NoneType => None,
+            _ => None,
         }
     }
 
@@ -250,7 +255,7 @@ impl AttributeName {
             SkillType::PlungingAttackOnGround | SkillType::PlungingAttackInAction => Some(AttributeName::CriticalDamagePlungingAttack),
             SkillType::ElementalSkill => Some(AttributeName::CriticalDamageElementalSkill),
             SkillType::ElementalBurst => Some(AttributeName::CriticalDamageElementalBurst),
-            SkillType::NoneType => None,
+            _ => None,
         }
     }
 
@@ -274,7 +279,7 @@ impl AttributeName {
             SkillType::PlungingAttackOnGround | SkillType::PlungingAttackInAction => Some(AttributeName::HPRatioPlungingAttack),
             SkillType::ElementalSkill => Some(AttributeName::HPRatioElementalSkill),
             SkillType::ElementalBurst => Some(AttributeName::HPRatioElementalBurst),
-            SkillType::NoneType => None,
+            _ => None,
         }
     }
 
@@ -298,7 +303,7 @@ impl AttributeName {
             SkillType::PlungingAttackOnGround | SkillType::PlungingAttackInAction => Some(AttributeName::DEFRatioPlungingAttack),
             SkillType::ElementalSkill => Some(AttributeName::DEFRatioElementalSkill),
             SkillType::ElementalBurst => Some(AttributeName::DEFRatioElementalBurst),
-            SkillType::NoneType => None,
+            _ => None,
         }
     }
 
@@ -322,7 +327,7 @@ impl AttributeName {
             SkillType::PlungingAttackOnGround | SkillType::PlungingAttackInAction => Some(AttributeName::ATKRatioPlungingAttack),
             SkillType::ElementalSkill => Some(AttributeName::ATKRatioElementalSkill),
             SkillType::ElementalBurst => Some(AttributeName::ATKRatioElementalBurst),
-            SkillType::NoneType => None,
+            _ => None,
         }
     }
 
@@ -346,7 +351,7 @@ impl AttributeName {
             SkillType::PlungingAttackOnGround | SkillType::PlungingAttackInAction => Some(AttributeName::ExtraDmgPlungingAttack),
             SkillType::ElementalSkill => Some(AttributeName::ExtraDmgElementalSkill),
             SkillType::ElementalBurst => Some(AttributeName::ExtraDmgElementalBurst),
-            SkillType::NoneType => None,
+            _ => None,
         }
     }
 

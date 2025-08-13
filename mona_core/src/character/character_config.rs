@@ -51,5 +51,6 @@ pub enum CharacterConfig {
     // Skirk { death_crossing_stacks: usize, team_has_hydro_cryo: bool },
     Escoffier { hydro_cryo_count: usize, after_burst: bool },
     Ifa { nightsoul_total: usize },
+    Ineffa { activated_p2: bool },
     NoConfig,
 }

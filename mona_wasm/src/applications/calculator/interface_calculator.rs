@@ -1,4 +1,5 @@
 use std::collections::HashMap;
+use serde_json::json;
 
 use mona::artifacts::{Artifact, ArtifactList};
 use mona::artifacts::effect_config::ArtifactEffectConfig;
@@ -8,7 +9,7 @@ use mona::character::{Character, CharacterName};
 use mona::character::characters::damage;
 use mona::character::skill_config::CharacterSkillConfig;
 use mona::character::traits::CharacterTrait;
-use mona::common::Element;
+use mona::common::{Element, MoonglareReaction};
 use mona::damage::{ComplicatedDamageBuilder, DamageAnalysis, DamageContext, SimpleDamageBuilder};
 use mona::damage::damage_builder::DamageBuilder;
 use mona::damage::damage_result::SimpleDamageResult;
@@ -153,6 +154,46 @@ impl CalculatorInterface {
         result
     }
 
+    pub fn get_moonglare_damage(value: JsValue) -> JsValue {
+        utils::set_panic_hook();
+
+        let input: CalculatorConfigInterface = serde_wasm_bindgen::from_value(value).unwrap();
+
+        let character: Character<ComplicatedAttributeGraph> = input.character.to_character();
+        let weapon = input.weapon.to_weapon(&character);
+
+        let buffs: Vec<Box<dyn Buff<ComplicatedAttributeGraph>>> = input.buffs.iter().map(|x| x.to_buff()).collect();
+        let artifacts: Vec<&Artifact> = input.artifacts.iter().collect();
+
+        let artifact_config = match input.artifact_config {
+            Some(x) => x,
+            None => Default::default()
+        };
+
+        let enemy = if let Some(x) = input.enemy {
+            x.to_enemy()
+        } else {
+            Default::default()
+        };
+
+        let get_damage = |lunar_type: MoonglareReaction| CalculatorInterface::get_damage_moonglare_internal(
+            &character,
+            &weapon,
+            &buffs,
+            artifacts,
+            &artifact_config,
+            lunar_type,
+            &enemy,
+        ).normal;
+
+        let result = json!({
+            "LunarChargedReaction": get_damage(MoonglareReaction::LunarChargedReaction)
+        });
+
+        let s = serde_wasm_bindgen::Serializer::new().serialize_maps_as_objects(true);
+        result.serialize(&s).unwrap()
+    }
+
     // pub fn damage_without_attribute(value: &JsValue) -> SimpleDamageResult {
     //     let input: DamageWithoutAttributeInterface = value.into_serde().unwrap();
     //
@@ -207,6 +248,46 @@ impl CalculatorInterface {
         };
 
         let damage: DamageAnalysis = damage::<ComplicatedDamageBuilder>(&context, skill_index, skill_config, fumo);
+        damage
+    }
+
+    pub fn get_damage_moonglare_internal(
+        character: &Character<ComplicatedAttributeGraph>,
+        weapon: &Weapon<ComplicatedAttributeGraph>,
+        buffs: &Vec<Box<dyn Buff<ComplicatedAttributeGraph>>>,
+        artifacts: Vec<&Artifact>,
+        artifact_config: &ArtifactEffectConfig,
+        lunar_type: MoonglareReaction,
+        enemy: &Enemy,
+    ) -> DamageAnalysis {
+
+        let artifact_list = ArtifactList {
+            artifacts: &artifacts,
+        };
+
+        let attribute = AttributeUtils::create_attribute_from_big_config(
+            &artifact_list,
+            artifact_config,
+            character,
+            weapon,
+            buffs
+        );
+
+        let context = DamageContext {
+            character_common_data: &character.common_data,
+            attribute: &attribute,
+            enemy: &enemy
+        };
+
+        let damage = ComplicatedDamageBuilder::new().moonglare(
+            &context.attribute,
+            &context.enemy,
+            MoonglareReaction::get_element(lunar_type).unwrap(),
+            lunar_type,
+            mona::common::SkillType::Moonglare,
+            context.character_common_data.level,
+            None,
+        );
         damage
     }
 }

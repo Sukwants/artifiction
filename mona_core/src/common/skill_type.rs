@@ -10,6 +10,7 @@ pub enum SkillType {
     PlungingAttackOnGround,
     ElementalSkill,
     ElementalBurst,
+    Moonglare,
 }
 
 impl SkillType {

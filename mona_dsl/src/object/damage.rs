@@ -2,6 +2,7 @@ use std::cell::RefCell;
 use std::rc::Rc;
 use mona::common::DamageResult;
 use mona::damage::transformative_damage::TransformativeDamage;
+use mona::damage::damage_result::SimpleDamageResult;
 use crate::error::runtime_error::{RuntimeError, RuntimeErrorEnum};
 use crate::object::mona_object::{MonaObject, MonaObjectEnum, MonaObjectTrait};
 
@@ -106,7 +107,7 @@ impl MonaObjectTrait for MonaObjectDamageNumber {
 }
 
 pub struct MonaObjectTransformativeDamage {
-    pub damage: TransformativeDamage
+    pub damage: TransformativeDamage,
 }
 
 impl MonaObjectTrait for MonaObjectTransformativeDamage {

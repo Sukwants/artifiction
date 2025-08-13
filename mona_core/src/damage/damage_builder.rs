@@ -1,5 +1,5 @@
 use crate::attribute::Attribute;
-use crate::common::{DamageResult, Element, SkillType};
+use crate::common::{DamageResult, Element, MoonglareReaction, SkillType};
 use crate::common::reaction_type::TransformativeType;
 use crate::damage::DamageAnalysis;
 use crate::enemies::Enemy;
@@ -49,6 +49,17 @@ pub trait DamageBuilder {
         attribute: &Self::AttributeType,
         enemy: &Enemy,
         element: Element,
+        skill_type: SkillType,
+        character_level: usize,
+        fumo: Option<Element>
+    ) -> Self::Result;
+
+    fn moonglare(
+        &self,
+        attribute: &Self::AttributeType,
+        enemy: &Enemy,
+        element: Element,
+        lunar_tpye: MoonglareReaction,
         skill_type: SkillType,
         character_level: usize,
         fumo: Option<Element>
