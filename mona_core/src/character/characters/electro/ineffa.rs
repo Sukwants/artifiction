@@ -95,11 +95,12 @@ pub const INEFFA_STATIC_DATA: CharacterStaticData = CharacterStaticData {
 pub struct IneffaEffect {
     pub has_p2: bool,
     pub has_c1: bool,
+    pub activated_p2: bool,
 }
 
 impl<A: Attribute> ChangeAttribute<A> for IneffaEffect {
     fn change_attribute(&self, attribute: &mut A) {
-        if self.has_p2 {
+        if self.has_p2 && self.activated_p2 {
             attribute.add_edge1(
                 AttributeName::ATK,
                 AttributeName::ElementalMastery,
@@ -115,7 +116,7 @@ impl<A: Attribute> ChangeAttribute<A> for IneffaEffect {
             AttributeName::ATK,
             AttributeName::IncreaseLunarCharged,
             Box::new(move |atk, _| {
-                atk * 0.00007
+                (atk * 0.00007).min(0.14)
             }),
             Box::new(move |atk, _, grad| (0.0, 0.0)),
             "伊涅芙天赋：月兆祝赐·象拟中继"
@@ -229,6 +230,14 @@ impl CharacterTrait for Ineffa {
 
     #[cfg(not(target_family = "wasm"))]
     const CONFIG_DATA: Option<&'static [ItemConfig]> = Some(&[
+        ItemConfig {
+            name: "activated_p2",
+            title: locale!(
+                zh_cn: "全相重构协议",
+                en: "Panoramic Permutation Protocol",
+            ),
+            config: ItemConfigType::Bool { default: true },
+        }
     ]);
 
     fn damage_internal<D: DamageBuilder>(context: &DamageContext<'_, D::AttributeType>, s: usize, config: &CharacterSkillConfig, fumo: Option<Element>) -> D::Result {
@@ -299,6 +308,10 @@ impl CharacterTrait for Ineffa {
         Some(Box::new(IneffaEffect {
             has_p2: common_data.has_talent2,
             has_c1: common_data.constellation >= 1,
+            activated_p2: match config {
+                    CharacterConfig::Ineffa { activated_p2 } => *activated_p2,
+                    _ => false,
+                }
         }))
     }
 
