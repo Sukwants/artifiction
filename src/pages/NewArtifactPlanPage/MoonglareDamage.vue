@@ -39,8 +39,6 @@ export default {
 
             const r = (x) => Math.round(x)
 
-            console.log(this.data)
-
             const push = (name) => {
                 temp.push({
                     expectation: r(this.data[name]?.expectation) ?? NO_DATA,

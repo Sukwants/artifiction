@@ -1181,7 +1181,6 @@ const characterDamageAnalysis = computed(() => {
     if (fumo.value !== "None") {
         fumo2 = fumo.value
     }
-    console.log(damageAnalysisWasmInterface.value)
     const temp = mona.CalculatorInterface.get_damage_analysis(damageAnalysisWasmInterface.value, fumo2)
     return temp
 })
