@@ -1,4 +1,4 @@
-const DEFAULT_WEAPON = "Azurelight";
+const DEFAULT_WEAPON = "FracturedHalo";
 
 import type {WeaponName, WeaponType} from "@/types/weapon"
 // @ts-ignore

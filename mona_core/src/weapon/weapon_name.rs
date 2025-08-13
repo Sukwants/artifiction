@@ -155,6 +155,7 @@ pub enum WeaponName {
     CrimsonMoonsSemblance,
     LumidouceElegy,
     SymphonistOfScents,
+    FracturedHalo,
 
     // catalyst
     // 1 star

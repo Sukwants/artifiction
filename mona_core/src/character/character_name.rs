@@ -127,4 +127,5 @@ pub enum CharacterName {
     Escoffier,
     Dahlia,
     Skirk,
+    Ineffa,
 }
