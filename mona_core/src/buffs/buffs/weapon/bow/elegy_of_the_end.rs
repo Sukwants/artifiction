@@ -7,11 +7,11 @@ use crate::common::item_config_type::ItemConfig;
 use crate::enemies::Enemy;
 use crate::weapon::WeaponName;
 
-pub struct BuffElegyOfTheEnd {
+pub struct BuffElegyForTheEnd {
     pub refine: usize,
 }
 
-impl<A: Attribute> Buff<A> for BuffElegyOfTheEnd {
+impl<A: Attribute> Buff<A> for BuffElegyForTheEnd {
     fn change_attribute(&self, attribute: &mut A) {
         let v = self.refine * 25 + 75;
         attribute.set_value_by(AttributeName::ElementalMastery, "终末嗟叹之诗「千年的大乐章·别离之歌」", v as f64);
@@ -21,21 +21,21 @@ impl<A: Attribute> Buff<A> for BuffElegyOfTheEnd {
     }
 }
 
-impl BuffMeta for BuffElegyOfTheEnd {
+impl BuffMeta for BuffElegyForTheEnd {
     #[cfg(not(target_family = "wasm"))]
     const META_DATA: BuffMetaData = BuffMetaData {
-        name: BuffName::ElegyOfTheEnd,
+        name: BuffName::ElegyForTheEnd,
         name_locale: crate::common::i18n::locale!(
             zh_cn: "终末嗟叹之诗-「千年的大乐章·别离之歌」",
             en: "Elegy for the End-「Millennial Movement: Farewell Song」",
         ),
-        image: BuffImage::Weapon(WeaponName::ElegyOfTheEnd),
+        image: BuffImage::Weapon(WeaponName::ElegyForTheEnd),
         genre: BuffGenre::Weapon,
         description: Some(crate::common::i18n::locale!(
             zh_cn: "千年的大乐章·别离之歌」效果：元素精通提高100/125/150/175/200点，攻击力提升20%/25%/30%/35%/40%。",
             en: "千年的大乐章·别离之歌」效果：元素精通提高100/125/150/175/200点，攻击力提升20%/25%/30%/35%/40%。",
         )),
-        from: BuffFrom::Weapon(WeaponName::ElegyOfTheEnd),
+        from: BuffFrom::Weapon(WeaponName::ElegyForTheEnd),
     };
 
     #[cfg(not(target_family = "wasm"))]
@@ -45,11 +45,11 @@ impl BuffMeta for BuffElegyOfTheEnd {
 
     fn create<A: Attribute>(b: &BuffConfig) -> Box<dyn Buff<A>> {
         let refine = match *b {
-            BuffConfig::ElegyOfTheEnd { refine } => refine,
+            BuffConfig::ElegyForTheEnd { refine } => refine,
             _ => 1
         };
 
-        Box::new(BuffElegyOfTheEnd {
+        Box::new(BuffElegyForTheEnd {
             refine
         })
     }

@@ -11,24 +11,24 @@ use crate::weapon::weapon_sub_stat::WeaponSubStatFamily;
 use crate::weapon::{WeaponConfig, WeaponName};
 use crate::weapon::weapon_trait::WeaponTrait;
 
-pub struct ElegyOfTheEndEffect {
+pub struct ElegyForTheEndEffect {
     rate: f64
 }
 
-impl ElegyOfTheEndEffect {
-    pub fn new(config: &WeaponConfig) -> ElegyOfTheEndEffect {
+impl ElegyForTheEndEffect {
+    pub fn new(config: &WeaponConfig) -> ElegyForTheEndEffect {
         match *config {
-            WeaponConfig::ElegyOfTheEnd { rate } => ElegyOfTheEndEffect {
+            WeaponConfig::ElegyForTheEnd { rate } => ElegyForTheEndEffect {
                 rate
             },
-            _ => ElegyOfTheEndEffect {
+            _ => ElegyForTheEndEffect {
                 rate: 0.0
             }
         }
     }
 }
 
-impl<T: Attribute> WeaponEffect<T> for ElegyOfTheEndEffect {
+impl<T: Attribute> WeaponEffect<T> for ElegyForTheEndEffect {
     fn apply(&self, data: &WeaponCommonData, attribute: &mut T) {
         let refine = data.refine as f64;
         let em_bonus = refine * 15.0 + 45.0 + (refine * 25.0 + 75.0) * self.rate;
@@ -38,11 +38,11 @@ impl<T: Attribute> WeaponEffect<T> for ElegyOfTheEndEffect {
     }
 }
 
-pub struct ElegyOfTheEnd;
+pub struct ElegyForTheEnd;
 
-impl WeaponTrait for ElegyOfTheEnd {
+impl WeaponTrait for ElegyForTheEnd {
     const META_DATA: WeaponStaticData = WeaponStaticData {
-        name: WeaponName::ElegyOfTheEnd,
+        name: WeaponName::ElegyForTheEnd,
         internal_name: "Bow_Widsith",
         weapon_type: WeaponType::Bow,
         weapon_sub_stat: Some(WeaponSubStatFamily::Recharge120),
@@ -66,6 +66,6 @@ impl WeaponTrait for ElegyOfTheEnd {
     ]);
 
     fn get_effect<A: Attribute>(_character: &CharacterCommonData, config: &WeaponConfig) -> Option<Box<dyn WeaponEffect<A>>> {
-        Some(Box::new(ElegyOfTheEndEffect::new(config)))
+        Some(Box::new(ElegyForTheEndEffect::new(config)))
     }
 }
