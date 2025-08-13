@@ -15,7 +15,7 @@
         <span class="damage-display" v-if="damageType === 'aggravate'">{{ Math.round(damageAggravate) }}</span>
     </div>
 
-    <div class="header-row" style="overflow: auto; margin-bottom: 16px;">
+    <div class="header-row" style="overflow: auto; margin-bottom: 16px; min-height: 200px;">
         <div v-if="lunarType !== 'LunarChargedReaction'">
             <div class="big-title base-damage-region" :title="Math.round(baseDamageSpread*1000)/1000" v-if="damageType === 'spread'">{{ baseRegionName }}</div>
             <div class="big-title base-damage-region" :title="Math.round(baseDamageAggravate*1000)/1000" v-else-if="damageType === 'aggravate'">{{ baseRegionName }}</div>
@@ -92,7 +92,7 @@
         </div>
         <div v-if="lunarType == 'LunarChargedReaction'">
             <div class="big-title base-damage-region">基础伤害</div>
-            <div class="header-row" style="height: 100%; display: flex; align-items: center; justify-content: center">
+            <div class="header-row" style="height: 80%; display: flex; align-items: center; justify-content: center">
                 <span>{{ Math.round(baseDamageReaction * 1000) / 1000 }}</span>
             </div>
         </div>
@@ -170,7 +170,7 @@
         </div>
     </div>
 
-    <div v-if="isDamage" class="header-row" style="overflow: auto; margin-bottom: 16px;">
+    <div v-if="isDamage" class="header-row" style="overflow: auto; margin-bottom: 16px; min-height: 200px;">
         <div>
             <div class="big-title critical-region" :title="Math.round(this.critical * this.criticalDamage * 1000)/1000">暴击区</div>
             <div class="header-row">
