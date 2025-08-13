@@ -1,3 +1,5 @@
+const DEFAULT_CHARACTER = "Ineffa";
+
 import type {WeaponType} from "@/types/weapon"
 // @ts-ignore
 import { characterData } from "@character"
@@ -5,10 +7,33 @@ import {type Ref} from "vue"
 import type {CharacterName} from "@/types/character"
 import {useI18n} from "@/i18n/i18n"
 
+function getDefaultCharacterConfig(name: string) {
+    let res: any;
+
+    const hasConfigData = characterData[name].config.length > 0;
+
+    // change config
+    if (hasConfigData) {
+        const configs = characterData[name].config
+
+        let defaultConfig: any = {}
+        for (let c of configs) {
+            defaultConfig[c.name] = c.default
+        }
+        res = {
+            [name]: defaultConfig
+        }
+    } else {
+        res = "NoConfig"
+    }
+
+    return res;
+}
+
 export function useCharacter() {
-    const characterName = ref("Amber")
+    const characterName = ref(DEFAULT_CHARACTER)
     const characterLevel = ref("90")
-    const characterConfig = ref<any>("NoConfig")
+    const characterConfig = ref<any>(getDefaultCharacterConfig(characterName.value))
     const characterSkill1 = ref(8)
     const characterSkill2 = ref(8)
     const characterSkill3 = ref(8)
@@ -64,23 +89,7 @@ export function useCharacter() {
 
     watch(() => characterName.value, name => {
         characterName.value = name
-
-        const hasConfigData = characterData[name].config.length > 0;
-
-        // change config
-        if (hasConfigData) {
-            const configs = characterData[name].config
-
-            let defaultConfig: any = {}
-            for (let c of configs) {
-                defaultConfig[c.name] = c.default
-            }
-            characterConfig.value = {
-                [name]: defaultConfig
-            }
-        } else {
-            characterConfig.value = "NoConfig"
-        }
+        characterConfig.value = getDefaultCharacterConfig(name)
     }, {
         flush: "sync"
     })
@@ -104,8 +113,29 @@ export function useCharacter() {
     }
 }
 
+function getDefaultCharacterSkillConfig(name: string) {
+    let res: any;
+
+    const hasConfigSkill = characterData[name].configSkill.length > 0
+
+    // change skill config
+    if (hasConfigSkill) {
+        let defaultConfig: any = {}
+        for (let c of characterData[name].configSkill) {
+            defaultConfig[c.name] = c.default
+        }
+        res = {
+            [name]: defaultConfig
+        }
+    } else {
+        res = "NoConfig"
+    }
+
+    return res;
+}
+
 export function useCharacterSkill(characterName: Ref<CharacterName>) {
-    const characterSkillConfig = ref<any>("NoConfig")
+    const characterSkillConfig = ref<any>(getDefaultCharacterSkillConfig(characterName.value))
     const characterSkillIndex = ref(0)
 
     const characterNeedSkillConfig = computed((): boolean => {
@@ -125,21 +155,7 @@ export function useCharacterSkill(characterName: Ref<CharacterName>) {
     })
 
     watch(() => characterName.value, name => {
-        const hasConfigSkill = characterData[name].configSkill.length > 0
-
-        // change skill config
-        if (hasConfigSkill) {
-            let defaultConfig: any = {}
-            for (let c of characterData[name].configSkill) {
-                defaultConfig[c.name] = c.default
-            }
-            characterSkillConfig.value = {
-                [name]: defaultConfig
-            }
-        } else {
-            characterSkillConfig.value = "NoConfig"
-        }
-
+        characterSkillConfig.value = getDefaultCharacterSkillConfig(name)
         // change skill index
         characterSkillIndex.value = 0
     }, {

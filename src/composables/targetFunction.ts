@@ -5,8 +5,41 @@ import {type Ref} from "vue"
 import type {CharacterName} from "@/types/character"
 import {useI18n} from "@/i18n/i18n";
 
+function getDefaultTargetFunction(name: string) {
+    let res: any;
+
+    const characterTfList = targetFunctionByCharacterName[name]
+    if (characterTfList && characterTfList.length > 0) {
+        res = characterTfList[0].name
+    } else {
+        res = targetFunctionByCharacterName["common"][0].name
+    }
+
+    return res;
+}
+
+function getDefaultTargetFunctionConfig(name: string) {
+    let res: any;
+
+    const hasConfig = targetFunctionData[name].config.length > 0
+
+    if (hasConfig) {
+        let defaultConfig: any = {}
+        for (let c of targetFunctionData[name].config) {
+            defaultConfig[c.name] = c.default
+        }
+        res = {
+            [name]: defaultConfig
+        }
+    } else {
+        res = "NoConfig"
+    }
+
+    return res;
+}
+
 export function useTargetFunction(characterName: Ref<CharacterName>) {
-    const targetFunctionName = ref<TargetFunctionName>("AmberDefault")
+    const targetFunctionName = ref<TargetFunctionName>(getDefaultTargetFunction(characterName.value))
     const targetFunctionConfig = ref<any>("NoConfig")
     const targetFunctionUseDSL = ref(false)
     const targetFunctionDSLSource = ref("")
@@ -42,42 +75,14 @@ export function useTargetFunction(characterName: Ref<CharacterName>) {
     })
 
     watch(() => characterName.value, name => {
-        const currentTargetFunctionData = targetFunctionData[targetFunctionName.value]
-        if (currentTargetFunctionData["for"] !== "common") {
-            // if not common, change to default character specific target function
-            const characterTfList = targetFunctionByCharacterName[name]
-            if (characterTfList && characterTfList.length > 0) {
-                targetFunctionName.value = characterTfList[0].name
-            } else {
-                targetFunctionName.value = targetFunctionByCharacterName["common"][0].name
-            }
-        } else {
-            // if current is common, change to character default
-            const characterTfList = targetFunctionByCharacterName[name]
-            if (characterTfList && characterTfList.length > 0) {
-                targetFunctionName.value = characterTfList[0].name
-            }
-        }
+        targetFunctionName.value = getDefaultTargetFunction(name)
     }, {
         flush: "sync"
     })
 
     watch(() => targetFunctionName.value, name => {
         targetFunctionName.value = name
-
-        const hasConfig = targetFunctionData[name].config.length > 0
-
-        if (hasConfig) {
-            let defaultConfig: any = {}
-            for (let c of targetFunctionData[name].config) {
-                defaultConfig[c.name] = c.default
-            }
-            targetFunctionConfig.value = {
-                [name]: defaultConfig
-            }
-        } else {
-            targetFunctionConfig.value = "NoConfig"
-        }
+        targetFunctionConfig.value = getDefaultTargetFunctionConfig(name)
     }, {
         flush: "sync"
     })

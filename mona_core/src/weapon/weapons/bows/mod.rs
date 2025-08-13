@@ -1,6 +1,6 @@
 pub use polar_star::PolarStar;
 pub use thundering_pulse::ThunderingPulse;
-pub use elegy_of_the_end::ElegyOfTheEnd;
+pub use elegy_of_the_end::ElegyForTheEnd;
 pub use skyward_harp::SkywardHarp;
 pub use amos_bow::AmosBow;
 pub use alley_hunter::AlleyHunter;

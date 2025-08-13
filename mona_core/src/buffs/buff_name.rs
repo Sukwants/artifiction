@@ -115,7 +115,7 @@ pub enum BuffName {
     SongOfBrokenPines,
     WolfsGravestone,
     ThrillingTalesOfDragonSlayers,
-    ElegyOfTheEnd,
+    ElegyForTheEnd,
     HakushinRing,
     SapwoodBlade,
     Moonpiercer,

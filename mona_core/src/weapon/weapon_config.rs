@@ -127,7 +127,7 @@ pub enum WeaponConfig {
     // Bow
     PolarStar { stack: usize },
     ThunderingPulse { stack: usize },
-    ElegyOfTheEnd { rate: f64 },
+    ElegyForTheEnd { rate: f64 },
     AmosBow { stack: f64 },
     AlleyHunter { stack: f64 },
     Predator { stack: f64 },

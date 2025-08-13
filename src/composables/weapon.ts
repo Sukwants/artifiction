@@ -1,18 +1,39 @@
+const DEFAULT_WEAPON = "FracturedHalo";
+
 import type {WeaponName, WeaponType} from "@/types/weapon"
 // @ts-ignore
 import {weaponByType, weaponData} from "@weapon"
 import {type Ref} from "vue"
 import {useI18n} from "@/i18n/i18n";
 
+function getDefaultWeaponConfig(name: string) {
+    let res: any;
+
+    // change config
+    const hasConfig = !!weaponData[name]?.configs
+    if (hasConfig) {
+        const configs = weaponData[name].configs
+
+        let defaultConfig: any = {}
+        for (let config of configs) {
+            defaultConfig[config.name] = config.default
+        }
+
+        res = {
+            [name]: defaultConfig
+        }
+    } else {
+        res = "NoConfig"
+    }
+
+    return res;
+}
+
 export function useWeapon(weaponType: null | Ref<WeaponType>) {
-    const weaponName = ref<WeaponName>("PolarStar")
+    const weaponName = ref(DEFAULT_WEAPON)
     const weaponLevel = ref("90")
     const weaponRefine = ref(1)
-    const weaponConfig = ref<any>({
-        "PolarStar": {
-            stack: 1
-        }
-    })
+    const weaponConfig = ref<any>(getDefaultWeaponConfig(weaponName.value))
 
     const weaponLevelNumber = computed(() => {
         return parseInt(weaponLevel.value)
@@ -60,23 +81,7 @@ export function useWeapon(weaponType: null | Ref<WeaponType>) {
 
     watch(() => weaponName.value, name => {
         weaponName.value = name
-
-        // change config
-        const hasConfig = !!weaponData[name]?.configs
-        if (hasConfig) {
-            const configs = weaponData[name].configs
-
-            let defaultConfig: any = {}
-            for (let config of configs) {
-                defaultConfig[config.name] = config.default
-            }
-
-            weaponConfig.value = {
-                [name]: defaultConfig
-            }
-        } else {
-            weaponConfig.value = "NoConfig"
-        }
+        weaponConfig.value = getDefaultWeaponConfig(name)
     }, {
         flush: "sync"
     })

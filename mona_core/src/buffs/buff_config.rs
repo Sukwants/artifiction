@@ -73,7 +73,7 @@ pub enum BuffConfig {
     SongOfBrokenPines { refine: usize },
     WolfsGravestone { refine: usize },
     ThrillingTalesOfDragonSlayers { refine: usize },
-    ElegyOfTheEnd { refine: usize },
+    ElegyForTheEnd { refine: usize },
     HakushinRing { refine: usize, element: Element },
     SapwoodBlade { refine: usize, rate: f64 },
     Moonpiercer { refine: usize },
