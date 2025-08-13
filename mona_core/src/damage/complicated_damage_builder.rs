@@ -315,17 +315,17 @@ impl DamageBuilder for ComplicatedDamageBuilder {
 
         let def_comp = self.get_def_composition(attribute);
         let def = def_comp.sum();
-        let def_ratio_comp = self.extra_def.clone();
+        let def_ratio_comp = self.ratio_def.clone();
         let def_ratio = def_ratio_comp.sum();
 
         let hp_comp = self.get_hp_composition(attribute);
         let hp = hp_comp.sum();
-        let hp_ratio_comp = self.extra_hp.clone();
+        let hp_ratio_comp = self.ratio_hp.clone();
         let hp_ratio = hp_ratio_comp.sum();
 
         let em_comp = self.get_em_composition(attribute);
         let em = em_comp.sum();
-        let em_ratio_comp = self.extra_em.clone();
+        let em_ratio_comp = self.ratio_em.clone();
         let em_ratio = em_ratio_comp.sum();
 
         let extra_damage_comp = self.extra_damage.clone();
