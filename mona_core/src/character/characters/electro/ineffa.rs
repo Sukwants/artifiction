@@ -5,7 +5,7 @@ use crate::character::{CharacterConfig, CharacterName, CharacterStaticData};
 use crate::character::skill_config::CharacterSkillConfig;
 use crate::character::traits::{CharacterSkillMap, CharacterSkillMapItem, CharacterTrait};
 use crate::character::macros::{damage_enum, skill_map};
-use crate::common::{ChangeAttribute, Element, SkillType, WeaponType};
+use crate::common::{ChangeAttribute, Element, MoonglareReaction, SkillType, WeaponType};
 use crate::common::i18n::{locale, hit_n_dmg, plunging_dmg, charged_dmg};
 use crate::common::item_config_type::{ItemConfig, ItemConfigType};
 use crate::damage::damage_builder::DamageBuilder;
@@ -165,6 +165,15 @@ impl IneffaDamageEnum {
         }
     }
 
+    pub fn get_lunar_type(&self) -> MoonglareReaction {
+        use IneffaDamageEnum::*;
+        match *self {
+            LunarCharged => MoonglareReaction::LunarChargedReaction,
+            P1 | C2 | C6 => MoonglareReaction::LunarCharged,
+            _ => MoonglareReaction::None,
+        }
+    }
+
     pub fn get_skill_type(&self) -> SkillType {
         use IneffaDamageEnum::*;
         match *self {
@@ -174,8 +183,7 @@ impl IneffaDamageEnum {
             X2 | X3 => SkillType::PlungingAttackOnGround,
             E | EContinued | EShield => SkillType::ElementalSkill,
             Q => SkillType::ElementalBurst,
-            P1 | C2 | C6 => SkillType::LunarCharged,
-            LunarCharged => SkillType::LunarChargedReaction,
+            P1 | C2 | C6 | LunarCharged => SkillType::Moonglare,
         }
     }
 }
@@ -252,6 +260,7 @@ impl CharacterTrait for Ineffa {
                 &context.attribute,
                 &context.enemy,
                 s.get_element(),
+                s.get_lunar_type(),
                 s.get_skill_type(),
                 context.character_common_data.level,
                 fumo,

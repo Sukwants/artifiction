@@ -1,5 +1,5 @@
 use crate::attribute::{Attribute, AttributeCommon, AttributeName, SimpleAttributeGraph2};
-use crate::common::{DamageResult, Element, MoonglareReaction, SkillType};
+use crate::common::{element, DamageResult, Element, MoonglareReaction, SkillType};
 use crate::damage::damage_builder::DamageBuilder;
 use crate::damage::damage_result::SimpleDamageResult;
 use crate::damage::level_coefficient::LEVEL_MULTIPLIER;
@@ -249,7 +249,7 @@ impl DamageBuilder for SimpleDamageBuilder {
         }
     }
 
-    fn moonglare(&self, attribute: &Self::AttributeType, enemy: &Enemy, element: Element, skill: SkillType, character_level: usize, fumo: Option<Element>) -> Self::Result {
+    fn moonglare(&self, attribute: &Self::AttributeType, enemy: &Enemy, element: Element, lunar_type: MoonglareReaction, skill: SkillType, character_level: usize, fumo: Option<Element>) -> Self::Result {
         let atk = attribute.get_atk() + self.extra_atk;
         let def = attribute.get_def() + self.extra_def;
         let hp = attribute.get_hp() + self.extra_hp;
@@ -277,81 +277,57 @@ impl DamageBuilder for SimpleDamageBuilder {
             enemy.get_resistance_ratio(element, res_minus)
         };
 
-        let reaction_ratio = match element {
-            Element::Electro => 3.0,
-            Element::Dendro => 1.0,
+        let reaction_ratio = match lunar_type {
+            MoonglareReaction::LunarChargedReaction => 1.8,
+            MoonglareReaction::LunarCharged => 3.0,
+            MoonglareReaction::LunarBloom => 1.0,
             _ => 0.0
         };
 
-        let enhance = Reaction::moonglare(em) + match skill {
-            SkillType::LunarCharged => attribute.get_value(AttributeName::EnhanceLunarCharged),
-            _ => match element {
-                Element::Electro => attribute.get_value(AttributeName::EnhanceLunarCharged),
-                Element::Dendro => attribute.get_value(AttributeName::EnhanceLunarBloom),
-                _ => 0.0 
-            }
+        let enhance = Reaction::moonglare(em) + match lunar_type {
+            MoonglareReaction::LunarChargedReaction | MoonglareReaction::LunarCharged => attribute.get_value(AttributeName::EnhanceLunarCharged),
+            MoonglareReaction::LunarBloom => attribute.get_value(AttributeName::EnhanceLunarBloom),
+            _ => 0.0
         };
 
-        let increase = match skill {
-            SkillType::LunarCharged => attribute.get_value(AttributeName::IncreaseLunarCharged),
-            _ => match element {
-                Element::Electro => attribute.get_value(AttributeName::IncreaseLunarCharged),
-                Element::Dendro => attribute.get_value(AttributeName::IncreaseLunarBloom),
-                _ => 0.0 
-            }
+        let increase = match lunar_type {
+            MoonglareReaction::LunarChargedReaction | MoonglareReaction::LunarCharged => attribute.get_value(AttributeName::IncreaseLunarCharged),
+            MoonglareReaction::LunarBloom => attribute.get_value(AttributeName::IncreaseLunarBloom),
+            _ => 0.0
         };
         
-        let extra_increase = match skill {
-            SkillType::LunarCharged => attribute.get_value(AttributeName::ExtraIncreaseLunarCharged),
-            _ => match element {
-                Element::Electro => attribute.get_value(AttributeName::ExtraIncreaseLunarCharged),
-                Element::Dendro => attribute.get_value(AttributeName::ExtraIncreaseLunarBloom),
-                _ => 0.0 
-            }
+        let extra_increase = match lunar_type {
+            MoonglareReaction::LunarChargedReaction | MoonglareReaction::LunarCharged => attribute.get_value(AttributeName::ExtraIncreaseLunarCharged),
+            MoonglareReaction::LunarBloom => attribute.get_value(AttributeName::ExtraIncreaseLunarBloom),
+            _ => 0.0
         };
 
-        let damage_normal = match skill {
-            SkillType::LunarChargedReaction => {
-                let reaction_ratio = 1.8;
-                let charged_base
-                    = LEVEL_MULTIPLIER[character_level - 1]
-                    * reaction_ratio
-                    * (1.0 + enhance)
-                    * (1.0 + increase)
-                    + extra_increase;
-                DamageResult {
-                    critical: charged_base * (1.0 + critical_damage),
-                    non_critical: charged_base,
-                    expectation: charged_base * (1.0 + critical_damage * critical_rate),
-                    lunar_type: MoonglareReaction::LunarChargedReaction,
-                    is_heal: false,
-                    is_shield: false
-                } * resistance_ratio
-            },
-            SkillType::LunarCharged => {
-                let charged_base
-                    = base
-                    * reaction_ratio
-                    * (1.0 + enhance)
-                    * (1.0 + increase)
-                    + extra_increase;
-                DamageResult {
-                    critical: charged_base * (1.0 + critical_damage),
-                    non_critical: charged_base,
-                    expectation: charged_base * (1.0 + critical_damage * critical_rate),
-                    lunar_type: MoonglareReaction::LunarCharged,
-                    is_heal: false,
-                    is_shield: false
-                } * resistance_ratio
-            },
-            _ => DamageResult {
-                critical: 0.0,
-                non_critical: 0.0,
-                expectation: 0.0,
-                lunar_type: MoonglareReaction::None,
+        let damage_normal = {
+            let charged_base = match lunar_type {
+                MoonglareReaction::LunarChargedReaction => {
+                    LEVEL_MULTIPLIER[character_level - 1]
+                        * reaction_ratio
+                        * (1.0 + enhance)
+                        * (1.0 + increase)
+                        + extra_increase
+                },
+                MoonglareReaction::LunarCharged => {
+                    base
+                        * reaction_ratio
+                        * (1.0 + enhance)
+                        * (1.0 + increase)
+                        + extra_increase
+                },
+                _ => 0.0
+            };
+            DamageResult {
+                critical: charged_base * (1.0 + critical_damage),
+                non_critical: charged_base,
+                expectation: charged_base * (1.0 + critical_damage * critical_rate),
+                lunar_type: lunar_type,
                 is_heal: false,
                 is_shield: false
-            }
+            } * resistance_ratio
         };
 
         SimpleDamageResult {
@@ -360,7 +336,7 @@ impl DamageBuilder for SimpleDamageBuilder {
             vaporize: None,
             spread: None,
             aggravate: None,
-            lunar_type: damage_normal.lunar_type,
+            lunar_type: lunar_type,
             is_heal: false,
             is_shield: false,
         }

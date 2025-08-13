@@ -283,7 +283,8 @@ impl CalculatorInterface {
             &context.attribute,
             &context.enemy,
             MoonglareReaction::get_element(lunar_type).unwrap(),
-            MoonglareReaction::get_skill_type(lunar_type).unwrap(),
+            lunar_type,
+            mona::common::SkillType::Moonglare,
             context.character_common_data.level,
             None,
         );

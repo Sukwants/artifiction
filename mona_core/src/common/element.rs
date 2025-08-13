@@ -39,10 +39,4 @@ impl MoonglareReaction {
             _ => None
         }
     }
-    pub fn get_skill_type(typ: MoonglareReaction) -> Option<SkillType> {
-        match typ {
-            MoonglareReaction::LunarChargedReaction => Some(SkillType::LunarChargedReaction),
-            _ => None
-        }
-    }
 }
