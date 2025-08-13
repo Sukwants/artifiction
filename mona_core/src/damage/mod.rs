@@ -8,7 +8,7 @@ mod complicated_damage_builder;
 mod damage_analysis;
 mod damage_context;
 pub mod reaction;
-pub mod damage_type;
+// pub mod damage_type;
 pub mod damage_builder;
 pub mod damage_result;
 pub mod transformative_damage;

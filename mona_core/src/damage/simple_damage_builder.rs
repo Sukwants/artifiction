@@ -1,5 +1,5 @@
 use crate::attribute::{Attribute, AttributeCommon, AttributeName, SimpleAttributeGraph2};
-use crate::common::{DamageResult, Element, SkillType};
+use crate::common::{element, DamageResult, Element, MoonglareReaction, SkillType};
 use crate::damage::damage_builder::DamageBuilder;
 use crate::damage::damage_result::SimpleDamageResult;
 use crate::damage::level_coefficient::LEVEL_MULTIPLIER;
@@ -19,7 +19,7 @@ pub struct SimpleDamageBuilder {
     pub extra_res_minus: f64,
     pub extra_def_penetration: f64,
 
-    pub ratio_atk: f64,
+    pub ratio_atk: f64, // 技能倍率，（应该）不包含基础伤害加成
     pub ratio_def: f64,
     pub ratio_hp: f64,
     pub ratio_em: f64,
@@ -174,17 +174,16 @@ impl DamageBuilder for SimpleDamageBuilder {
             critical: base * (1.0 + bonus) * (1.0 + critical_damage),
             non_critical: base * (1.0 + bonus),
             expectation: base * (1.0 + bonus) * (1.0 + critical_damage * critical_rate),
+            lunar_type: MoonglareReaction::None,
             is_heal: false,
             is_shield: false
         } * (defensive_ratio * resistance_ratio);
-
-        let em_amp = Reaction::amp(em);
 
         let melt_damage = if element != Element::Pyro && element != Element::Cryo {
             None
         } else {
             let reaction_ratio = if element == Element::Pyro { 2.0 } else { 1.5 };
-            let enhance = em_amp + self.extra_enhance_melt + attribute.get_value(AttributeName::EnhanceMelt);
+            let enhance = Reaction::amp(em) + self.extra_enhance_melt + attribute.get_value(AttributeName::EnhanceMelt);
             Some(normal_damage * (reaction_ratio * (1.0 + enhance)))
         };
 
@@ -192,7 +191,7 @@ impl DamageBuilder for SimpleDamageBuilder {
             None
         } else {
             let reaction_ratio = if element == Element::Pyro { 1.5 } else { 2.0 };
-            let enhance = em_amp + self.extra_enhance_vaporize + attribute.get_value(AttributeName::EnhanceVaporize);
+            let enhance = Reaction::amp(em) + self.extra_enhance_vaporize + attribute.get_value(AttributeName::EnhanceVaporize);
             Some(normal_damage * (reaction_ratio * (1.0 + enhance)))
         };
 
@@ -210,6 +209,7 @@ impl DamageBuilder for SimpleDamageBuilder {
                 critical: spread_base_damage * (1.0 + bonus) * (1.0 + critical_damage),
                 non_critical: spread_base_damage * (1.0 + bonus),
                 expectation: spread_base_damage * (1.0 + bonus) * (1.0 + critical_damage * critical_rate),
+                lunar_type: MoonglareReaction::None,
                 is_heal: false,
                 is_shield: false
             } * (defensive_ratio * resistance_ratio);
@@ -230,6 +230,7 @@ impl DamageBuilder for SimpleDamageBuilder {
                 critical: aggravate_base_damage * (1.0 + bonus) * (1.0 + critical_damage),
                 non_critical: aggravate_base_damage * (1.0 + bonus),
                 expectation: aggravate_base_damage * (1.0 + bonus) * (1.0 + critical_damage * critical_rate),
+                lunar_type: MoonglareReaction::None,
                 is_heal: false,
                 is_shield: false
             } * (defensive_ratio * resistance_ratio);
@@ -242,8 +243,102 @@ impl DamageBuilder for SimpleDamageBuilder {
             vaporize: vaporize_damage,
             spread: spread_damage,
             aggravate: aggravate_damage,
-            is_shield: false,
+            lunar_type: MoonglareReaction::None,
             is_heal: false,
+            is_shield: false,
+        }
+    }
+
+    fn moonglare(&self, attribute: &Self::AttributeType, enemy: &Enemy, element: Element, lunar_type: MoonglareReaction, skill: SkillType, character_level: usize, fumo: Option<Element>) -> Self::Result {
+        let atk = attribute.get_atk() + self.extra_atk;
+        let def = attribute.get_def() + self.extra_def;
+        let hp = attribute.get_hp() + self.extra_hp;
+        let em = self.extra_em + attribute.get_em_all();
+
+        let base // without em bonus
+            = atk * self.ratio_atk
+            + def * self.ratio_def
+            + hp * self.ratio_hp
+            + em * self.ratio_em
+            // + attribute.get_extra_damage(element, skill)
+            + self.extra_damage; // This line is unused for now
+
+        let critical_rate
+            = attribute.get_critical_rate(element, skill)
+            + self.extra_critical_rate;
+        let critical_rate = critical_rate.clamp(0.0, 1.0);
+
+        let critical_damage
+            = attribute.get_critical_damage(element, skill)
+            + self.extra_critical_damage;
+
+        let resistance_ratio = {
+            let res_minus = self.extra_res_minus + attribute.get_enemy_res_minus(element, skill);
+            enemy.get_resistance_ratio(element, res_minus)
+        };
+
+        let reaction_ratio = match lunar_type {
+            MoonglareReaction::LunarChargedReaction => 1.8,
+            MoonglareReaction::LunarCharged => 3.0,
+            MoonglareReaction::LunarBloom => 1.0,
+            _ => 0.0
+        };
+
+        let enhance = Reaction::moonglare(em) + match lunar_type {
+            MoonglareReaction::LunarChargedReaction | MoonglareReaction::LunarCharged => attribute.get_value(AttributeName::EnhanceLunarCharged),
+            MoonglareReaction::LunarBloom => attribute.get_value(AttributeName::EnhanceLunarBloom),
+            _ => 0.0
+        };
+
+        let increase = match lunar_type {
+            MoonglareReaction::LunarChargedReaction | MoonglareReaction::LunarCharged => attribute.get_value(AttributeName::IncreaseLunarCharged),
+            MoonglareReaction::LunarBloom => attribute.get_value(AttributeName::IncreaseLunarBloom),
+            _ => 0.0
+        };
+        
+        let extra_increase = match lunar_type {
+            MoonglareReaction::LunarChargedReaction | MoonglareReaction::LunarCharged => attribute.get_value(AttributeName::ExtraIncreaseLunarCharged),
+            MoonglareReaction::LunarBloom => attribute.get_value(AttributeName::ExtraIncreaseLunarBloom),
+            _ => 0.0
+        };
+
+        let damage_normal = {
+            let charged_base = match lunar_type {
+                MoonglareReaction::LunarChargedReaction => {
+                    LEVEL_MULTIPLIER[character_level - 1]
+                        * reaction_ratio
+                        * (1.0 + enhance)
+                        * (1.0 + increase)
+                        + extra_increase
+                },
+                MoonglareReaction::LunarCharged => {
+                    base
+                        * reaction_ratio
+                        * (1.0 + enhance)
+                        * (1.0 + increase)
+                        + extra_increase
+                },
+                _ => 0.0
+            };
+            DamageResult {
+                critical: charged_base * (1.0 + critical_damage),
+                non_critical: charged_base,
+                expectation: charged_base * (1.0 + critical_damage * critical_rate),
+                lunar_type: lunar_type,
+                is_heal: false,
+                is_shield: false
+            } * resistance_ratio
+        };
+
+        SimpleDamageResult {
+            normal: damage_normal,
+            melt: None,
+            vaporize: None,
+            spread: None,
+            aggravate: None,
+            lunar_type: lunar_type,
+            is_heal: false,
+            is_shield: false,
         }
     }
 
@@ -261,6 +356,7 @@ impl DamageBuilder for SimpleDamageBuilder {
                 critical: heal_value,
                 non_critical: heal_value,
                 expectation: heal_value,
+                lunar_type: MoonglareReaction::None,
                 is_heal: true,
                 is_shield: false
             }
@@ -271,6 +367,7 @@ impl DamageBuilder for SimpleDamageBuilder {
             vaporize: None,
             spread: None,
             aggravate: None,
+            lunar_type: MoonglareReaction::None,
             is_heal: true,
             is_shield: false,
         };
@@ -290,6 +387,7 @@ impl DamageBuilder for SimpleDamageBuilder {
                 critical: shield_value,
                 non_critical: shield_value,
                 expectation: shield_value,
+                lunar_type: MoonglareReaction::None,
                 is_heal: false,
                 is_shield: true
             }
@@ -300,8 +398,9 @@ impl DamageBuilder for SimpleDamageBuilder {
             vaporize: None,
             spread: None,
             aggravate: None,
-            is_shield: true,
+            lunar_type: MoonglareReaction::None,
             is_heal: false,
+            is_shield: true,
         };
     }
 }
@@ -309,26 +408,27 @@ impl DamageBuilder for SimpleDamageBuilder {
 impl SimpleDamageBuilder {
     pub fn new(ratio_atk: f64, ratio_def: f64, ratio_hp: f64) -> SimpleDamageBuilder {
         SimpleDamageBuilder {
-            extra_damage: 0.0,
-            extra_critical_rate: 0.0,
             extra_critical_damage: 0.0,
+            extra_critical_rate: 0.0,
             extra_bonus: 0.0,
-            ratio_atk,
-            ratio_hp,
-            extra_enhance_melt: 0.0,
-            ratio_def,
-            ratio_em: 0.0,
+            extra_damage: 0.0,
             extra_atk: 0.0,
-
             extra_def: 0.0,
             extra_hp: 0.0,
+
             extra_def_minus: 0.0,
             extra_def_penetration: 0.0,
             extra_res_minus: 0.0,
 
+            ratio_atk,
+            ratio_hp,
+            ratio_def,
+            ratio_em: 0.0,
+
+            extra_enhance_melt: 0.0,
+            extra_enhance_vaporize: 0.0,
             enhance_melt: 0.0,
             enhance_vaporize: 0.0,
-            extra_enhance_vaporize: 0.0,
             extra_em: 0.0
         }
     }

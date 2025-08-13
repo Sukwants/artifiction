@@ -140,6 +140,7 @@ pub enum WeaponName {
     FootprintOfTheRainbow,
     MountainBracingBolt,
     TamayurateiNoOhanashi,
+    FracturedHalo,
 
     // catalyst
     LostPrayerToTheSacredWinds,

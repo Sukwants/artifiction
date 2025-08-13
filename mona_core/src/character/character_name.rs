@@ -128,4 +128,5 @@ pub enum CharacterName {
     Varesa,
     Ifa,
     Dahlia,
+    Ineffa,
 }
