@@ -17,6 +17,7 @@ for (let weapon of Object.values(weaponData)) {
     }
 }
 for (let weaponType in _weaponsByType) {
+    _weaponsByType[weaponType].reverse();
     _weaponsByType[weaponType].sort((a, b) => {
         if (b.star !== a.star) {
             return b.star - a.star

@@ -48,7 +48,7 @@ export default {
     setup() {
         const { t, ta } = useI18n()
 
-        const elements = ["Pyro", "Cryo", "Anemo", "Electro", "Hydro", "Geo", "Dendro"]
+        const elements = ["Pyro", "Hydro", "Anemo", "Electro", "Dendro", "Cryo", "Geo"]
 
         const options = computed(() => {
             const result = []

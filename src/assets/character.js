@@ -21,6 +21,7 @@ for (let character of Object.values(characterData)) {
     }
 }
 for (let ele in _charactersByElement) {
+    _charactersByElement[ele].reverse();
     _charactersByElement[ele].sort((a, b) => {
         return b.star - a.star;
     })
