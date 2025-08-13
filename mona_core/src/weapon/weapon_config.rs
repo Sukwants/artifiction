@@ -90,6 +90,7 @@ pub enum WeaponConfig {
     FootprintOfTheRainbow { rate: f64 },
     MountainBracingBolt { rate: f64 },
     TamayurateiNoOhanashi { rate: f64 },
+    FracturedHalo { electrifying_edict: bool },
 
     // Catalyst
     LostPrayerToTheSacredWinds { stack: f64 },
