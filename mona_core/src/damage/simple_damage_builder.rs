@@ -284,7 +284,7 @@ impl DamageBuilder for SimpleDamageBuilder {
             _ => 0.0
         };
 
-        let enhance = Reaction::moonglare(em) + match lunar_type {
+        let enhance = Reaction::moonglare(em) + attribute.get_value(AttributeName::EnhanceMoonglare) + match lunar_type {
             MoonglareReaction::LunarChargedReaction | MoonglareReaction::LunarCharged => attribute.get_value(AttributeName::EnhanceLunarCharged),
             MoonglareReaction::LunarBloom => attribute.get_value(AttributeName::EnhanceLunarBloom),
             _ => 0.0
@@ -311,7 +311,7 @@ impl DamageBuilder for SimpleDamageBuilder {
                         * (1.0 + increase)
                         + extra_increase
                 },
-                MoonglareReaction::LunarCharged => {
+                MoonglareReaction::LunarCharged | MoonglareReaction::LunarBloom => {
                     base
                         * reaction_ratio
                         * (1.0 + enhance)

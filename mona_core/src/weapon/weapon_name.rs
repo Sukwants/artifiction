@@ -207,6 +207,7 @@ pub enum WeaponName {
     StarcallersWatch,
     SunnyMorningSleepIn,
     VividNotions,
+    NightweaversLookingGlass,
 
     // bows
     // 1 star

@@ -59,7 +59,7 @@ pub trait DamageBuilder {
         attribute: &Self::AttributeType,
         enemy: &Enemy,
         element: Element,
-        lunar_tpye: MoonglareReaction,
+        lunar_type: MoonglareReaction,
         skill_type: SkillType,
         character_level: usize,
         fumo: Option<Element>

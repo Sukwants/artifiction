@@ -128,4 +128,5 @@ pub enum CharacterName {
     Dahlia,
     Skirk,
     Ineffa,
+    Lauma,
 }

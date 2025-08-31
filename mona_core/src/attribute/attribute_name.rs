@@ -112,12 +112,16 @@ pub enum AttributeName {
     EnhanceMelt,
     EnhanceAggravate,
     EnhanceSpread,
+    EnhanceMoonglare,
     EnhanceLunarCharged,
     EnhanceLunarBloom,
 
     IncreaseLunarCharged, // 天赋「月兆祝赐」给出的月曜反应基础提升
     IncreaseLunarBloom,
 
+    ExtraIncreaseBurgeon, // 部分角色天赋给出的额外提升，不受益于精通和反应增伤
+    ExtraIncreaseHyperBloom,
+    ExtraIncreaseBloom,
     ExtraIncreaseLunarCharged, // 月曜反应额外提升，（大概）应由 add_edge 给出
     ExtraIncreaseLunarBloom,
 

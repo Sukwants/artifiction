@@ -395,7 +395,7 @@ impl DamageBuilder for ComplicatedDamageBuilder {
                         * (1.0 + increase)
                         + extra_increase
                 },
-                MoonglareReaction::LunarCharged => {
+                MoonglareReaction::LunarCharged | MoonglareReaction::LunarBloom => {
                     base_damage
                         * reaction_ratio
                         * (1.0 + enhance)
@@ -695,6 +695,7 @@ impl ComplicatedDamageBuilder {
 
     fn get_enhance_lunar_charged_composition(&self, attribute: &ComplicatedAttributeGraph) -> EntryType {
         let mut comp = attribute.get_attribute_composition(AttributeName::EnhanceLunarCharged);
+        comp.merge(&attribute.get_attribute_composition(AttributeName::EnhanceMoonglare));
         let em = &self.extra_em.sum() + attribute.get_em_all();
         if em > 0.0 {
             comp.add_value("精通", Reaction::moonglare(em));
@@ -704,6 +705,7 @@ impl ComplicatedDamageBuilder {
 
     fn get_enhance_lunar_bloom_composition(&self, attribute: &ComplicatedAttributeGraph) -> EntryType {
         let mut comp = attribute.get_attribute_composition(AttributeName::EnhanceLunarBloom);
+        comp.merge(&attribute.get_attribute_composition(AttributeName::EnhanceMoonglare));
         let em = &self.extra_em.sum() + attribute.get_em_all();
         if em > 0.0 {
             comp.add_value("精通", Reaction::moonglare(em));

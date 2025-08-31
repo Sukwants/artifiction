@@ -114,6 +114,10 @@ pub fn transformative_damage<A: Attribute>(level: usize, attribute: &A, enemy: &
     let enhance_burgeon = attribute.get_value(AttributeName::EnhanceBurgeon);
     let enhance_burning = attribute.get_value(AttributeName::EnhanceBurning);
 
+    let extra_increase_bloom = attribute.get_value(AttributeName::ExtraIncreaseBloom);
+    let extra_increase_hyperbloom = attribute.get_value(AttributeName::ExtraIncreaseHyperBloom);
+    let extra_increase_burgeon = attribute.get_value(AttributeName::ExtraIncreaseBurgeon);
+
     let mut base_swirl = get_transformative_base(level, TransformativeType::SwirlPyro);
 
     // introduced by Yumemizuki Mizuki C1
@@ -154,9 +158,9 @@ pub fn transformative_damage<A: Attribute>(level: usize, attribute: &A, enemy: &
     let dmg_superconduct = base_superconduct * res_ratio_cryo * (1.0 + em_bonus + enhance_superconduct);
     let dmg_shatter = base_shatter * res_ratio_physical * (1.0 + em_bonus + enhance_shatter);
     let dmg_electro_charged = base_electro_charged * res_ratio_electro * (1.0 + em_bonus + enhance_electro_charged);
-    let dmg_bloom = base_bloom * res_ratio_dendro * (1.0 + em_bonus + enhance_bloom);
-    let dmg_hyperbloom = base_hyperbloom * res_ratio_dendro * (1.0 + em_bonus + enhance_hyperbloom);
-    let dmg_burgeon = base_burgeon * res_ratio_dendro * (1.0 + em_bonus + enhance_burgeon);
+    let dmg_bloom = base_bloom * res_ratio_dendro * (1.0 + em_bonus + enhance_bloom) + extra_increase_bloom;
+    let dmg_hyperbloom = base_hyperbloom * res_ratio_dendro * (1.0 + em_bonus + enhance_hyperbloom) + extra_increase_hyperbloom;
+    let dmg_burgeon = base_burgeon * res_ratio_dendro * (1.0 + em_bonus + enhance_burgeon) + extra_increase_burgeon;
     let dmg_burning = base_burning * res_ratio_pyro * (1.0 + em_bonus + enhance_burning);
     let shield_crystallize = CRYSTALLIZE_BASE[level - 1] * (1.0 + 40.0 / 9.0 * em / (em + 1400.0));
 

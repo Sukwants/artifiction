@@ -334,7 +334,7 @@ export default {
             const lunarMap = {
                 "LunarChargedReaction": "月感电",
                 "LunarCharged": "月感电伤害",
-                "LunarBloom": "月绽放",
+                "LunarBloom": "月绽放伤害",
             }
             if (this.isLunar) {
                 return lunarMap[this.lunarType]
@@ -566,9 +566,11 @@ export default {
                 d  = this.baseDamage
             } else if (this.isLunar) {
                 if (this.lunarType == "LunarChargedReaction") {
-                    d = this.baseDamageReaction * (1 + this.critical * this.criticalDamage) * (1 + this.lunarChargedIncrease) * 1.8 * (1 + this.lunarChargedEnhance) * this.resRatio
+                    d = this.baseDamageReaction * (1 + this.lunarChargedIncrease) * 1.8 * (1 + this.lunarChargedEnhance) * (1 + this.critical * this.criticalDamage) * this.resRatio
                 } else if (this.lunarType == "LunarCharged") {
-                    d = this.baseDamage * (1 + this.critical * this.criticalDamage) * (1 + this.lunarChargedIncrease) * 3.0 * (1 + this.lunarChargedEnhance) * this.resRatio
+                    d = this.baseDamage * (1 + this.lunarChargedIncrease) * 3.0 * (1 + this.lunarChargedEnhance) * (1 + this.critical * this.criticalDamage) * this.resRatio
+                } else if (this.lunarType == "LunarBloom") {
+                    d = (this.baseDamage * (1 + this.lunarBloomIncrease) * (1 + this.lunarBloomEnhance) + this.lunarBloomExtraIncrease) * (1 + this.critical * this.criticalDamage) * this.resRatio
                 }
                 else d = NaN
             } else {

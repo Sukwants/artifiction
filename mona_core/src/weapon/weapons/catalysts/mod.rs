@@ -42,6 +42,7 @@ pub use waveriding_whirl::WaveridingWhirl;
 pub use starcallers_watch::StarcallersWatch;
 pub use sunny_morning_sleep_in::SunnyMorningSleepIn;
 pub use vivid_notions::VividNotions;
+pub use nightweavers_looking_glass::NightweaversLookingGlass;
 
 pub mod lost_prayer_to_the_sacred_winds;
 pub mod skyward_atlas;
@@ -87,3 +88,4 @@ mod waveriding_whirl;
 mod starcallers_watch;
 mod sunny_morning_sleep_in;
 mod vivid_notions;
+mod nightweavers_looking_glass;

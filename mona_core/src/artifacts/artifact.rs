@@ -78,6 +78,7 @@ pub enum ArtifactSetName {
     ObsidianCodex,
     LongNightsOath,
     FinaleOfTheDeepGalleries,
+    NightOfTheSkysUnveiling,
 }
 
 impl ArtifactSetName {
