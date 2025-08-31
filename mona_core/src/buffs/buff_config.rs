@@ -3,7 +3,7 @@ use serde::{Deserialize, Serialize};
 use crate::attribute::Attribute;
 use crate::buffs::Buff;
 use crate::buffs::buffs::get_buff;
-use crate::common::Element;
+use crate::common::{Element, Moonsign};
 use crate::common::item_config_type::ConfigElements8Multi;
 
 #[derive(Serialize, Deserialize)]
@@ -89,6 +89,9 @@ pub enum BuffConfig {
     ArchaicPetra4 { element: Element },
     ViridescentVenerer4 { element: Element },
     DeepwoodMemories4 { rate: f64 },
+    ScrollOfTheHeroOfCinderCity4 { elements: ConfigElements8Multi, nightsouls_blessing: bool },
+    NightOfTheSkysUnveiling4 { gleaming_moon_effect_count: usize },
+    SilkenMoonsSerenade4 { moonsign: Moonsign, gleaming_moon_effect_count: usize },
 
     NoConfig,
 }

@@ -102,17 +102,32 @@
                 >{{ option }}</el-radio-button>
             </el-radio-group>
         </template>
+        <template v-if="type === 'moonsign2'">
+            <select-moonsign-type
+                :modelValue="modelValue"
+                @update:modelValue="handleChangeValue"
+                :moonsigns="['Nascent', 'Ascendant']"
+            ></select-moonsign-type>
+        </template>
+        <template v-if="type === 'moonsign3'">
+            <select-moonsign-type
+                :modelValue="modelValue"
+                @update:modelValue="handleChangeValue"
+                :moonsigns="['None', 'Nascent', 'Ascendant']"
+            ></select-moonsign-type>
+        </template>
     </div>
 </template>
 
 <script>
 import SelectElementType from "@c/select/SelectElementType"
 import SelectSkillType from "@c/select/SelectSkillType"
+import SelectMoonsignType from "@c/select/SelectMoonsignType"
 import { useI18n } from "@/i18n/i18n"
 
 export default {
     name: "ConfigItem",
-    components: { SelectSkillType, SelectElementType },
+    components: { SelectSkillType, SelectElementType, SelectMoonsignType },
     props: {
         modelValue: {},
         type: {},

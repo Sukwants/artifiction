@@ -38,12 +38,7 @@ pub struct NightOfTheSkysUnveiling;
 impl ArtifactTrait for NightOfTheSkysUnveiling {
     fn create_effect<A: Attribute>(config: &ArtifactEffectConfig, character_common_data: &CharacterCommonData) -> Box<dyn ArtifactEffect<A>> {
         Box::new(NightOfTheSkysUnveilingEffect {
-            moonsign: match config.config_night_of_the_skys_unveiling.moonsign {
-                0 => Moonsign::None,
-                1 => Moonsign::Nascent,
-                2 => Moonsign::Ascendant,
-                _ => Moonsign::None,
-            },
+            moonsign: config.config_night_of_the_skys_unveiling.moonsign,
             gleaming_moon_effect_count: config.config_night_of_the_skys_unveiling.gleaming_moon_effect_count,
         })
     }
@@ -75,22 +70,11 @@ impl ArtifactTrait for NightOfTheSkysUnveiling {
 
     #[cfg(not(target_family = "wasm"))]
     const CONFIG4: Option<&'static [ItemConfig]> = Some(&[
-        ItemConfig {
-            name: "moonsign",
-            title: locale!(
-                zh_cn: "月兆",
-                en: "Moonsign",
-            ),
-            config: ItemConfigType::Option2 {
-                options_zh: "无,初辉,满辉",
-                options_en: "None,Nascent Gleam,Ascendant Gleam",
-                default: 0
-            }
-        },
+        ItemConfig::MOONSIGN3,
         ItemConfig {
             name: "gleaming_moon_effect_count",
             title: locale!(zh_cn: "「月辉明光」数量", en: "Gleaming Moon Effect Count"),
-            config: ItemConfigType::Int { min: 1, max: 2, default: 1 },
+            config: ItemConfigType::Int { min: 0, max: 2, default: 1 },
         }
     ]);
 }

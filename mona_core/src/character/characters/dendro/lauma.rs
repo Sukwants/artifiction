@@ -271,34 +271,12 @@ impl CharacterTrait for Lauma {
             ),
             config: ItemConfigType::Bool { default: true },
         },
-        ItemConfig {
-            name: "moonsign",
-            title: locale!(
-                zh_cn: "月兆",
-                en: "Moonsign",
-            ),
-            config: ItemConfigType::Option2 {
-                options_zh: "初辉,满辉",
-                options_en: "Nascent Gleam,Ascendant Gleam",
-                default: 0
-            }
-        }
+        ItemConfig::MOONSIGN2
     ]);
 
     #[cfg(not(target_family = "wasm"))]
     const CONFIG_SKILL: Option<&'static [ItemConfig]> = Some(&[
-        ItemConfig {
-            name: "moonsign",
-            title: locale!(
-                zh_cn: "月兆",
-                en: "Moonsign",
-            ),
-            config: ItemConfigType::Option2 {
-                options_zh: "初辉,满辉",
-                options_en: "Nascent Gleam,Ascendant Gleam",
-                default: 0
-            }
-        }
+        ItemConfig::MOONSIGN2
     ]);
 
     fn damage_internal<D: DamageBuilder>(context: &DamageContext<'_, D::AttributeType>, s: usize, config: &CharacterSkillConfig, fumo: Option<Element>) -> D::Result {
@@ -306,12 +284,7 @@ impl CharacterTrait for Lauma {
         let (s1, s2, s3) = context.character_common_data.get_3_skill();
 
         let moonsign = match *config {
-            CharacterSkillConfig::Lauma { moonsign } => 
-            match moonsign {
-                0 => Moonsign::Nascent,
-                1 => Moonsign::Ascendant,
-                _ => Moonsign::None,
-            },
+            CharacterSkillConfig::Lauma { moonsign } => moonsign,
             _ => Moonsign::None
         };
 
@@ -394,16 +367,12 @@ impl CharacterTrait for Lauma {
 
     fn new_effect<A: Attribute>(common_data: &CharacterCommonData, config: &CharacterConfig) -> Option<Box<dyn ChangeAttribute<A>>> {
         let (activated_q, moonsign) = match config {
-        CharacterConfig::Lauma { activated_q, moonsign } => (
-            *activated_q,
-            match *moonsign {
-                0 => Moonsign::Nascent,
-                1 => Moonsign::Ascendant,
-                _ => Moonsign::None,
-            }
-        ),
-        _ => (false, Moonsign::None),
-    };
+            CharacterConfig::Lauma { activated_q, moonsign } => (
+                *activated_q,
+                *moonsign,
+            ),
+            _ => (false, Moonsign::None),
+        };
         Some(Box::new(LaumaEffect {
             activated_q: activated_q,
             level_q: common_data.skill3,

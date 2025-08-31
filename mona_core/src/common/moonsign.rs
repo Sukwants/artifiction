@@ -2,10 +2,12 @@ use serde::{Serialize, Deserialize};
 use strum_macros::Display;
 use num_derive::FromPrimitive;
 use num_traits::FromPrimitive;
+use crate::common::{i18n::locale, item_config_type::{ItemConfig, ItemConfigType}};
 
 #[derive(Serialize, Deserialize, Display, FromPrimitive)]
-#[derive(Debug, Eq, PartialEq, Hash, Copy, Clone)]
+#[derive(Default, Debug, Eq, PartialEq, Hash, Copy, Clone)]
 pub enum Moonsign {
+    #[default]
     None,
     Nascent,
     Ascendant,

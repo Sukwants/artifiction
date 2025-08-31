@@ -46,18 +46,7 @@ impl TargetFunctionMetaTrait for LaumaDefaultTargetFunction {
 
     #[cfg(not(target_family = "wasm"))]
     const CONFIG: Option<&'static [ItemConfig]> = Some(&[
-        ItemConfig {
-            name: "moonsign",
-            title: locale!(
-                zh_cn: "月兆",
-                en: "Moonsign",
-            ),
-            config: ItemConfigType::Option2 {
-                options_zh: "初辉,满辉",
-                options_en: "Nascent Gleam,Ascendant Gleam",
-                default: 0
-            }
-        },
+        ItemConfig::MOONSIGN2,
         ItemConfig {
             name: "bloom_count",
             title: locale!(
@@ -87,11 +76,7 @@ impl TargetFunctionMetaTrait for LaumaDefaultTargetFunction {
     fn create(_character: &CharacterCommonData, _weapon: &WeaponCommonData, config: &TargetFunctionConfig) -> Box<dyn TargetFunction> {
         let (moonsign, bloom_count, hyperbloom_count, burgeon_count) = match *config {
             TargetFunctionConfig::LaumaDefault { moonsign, bloom_count, hyperbloom_count, burgeon_count } => (
-                match moonsign {
-                    0 => Moonsign::Nascent,
-                    1 => Moonsign::Ascendant,
-                    _ => Moonsign::None,
-                }, bloom_count, hyperbloom_count, burgeon_count),
+                moonsign, bloom_count, hyperbloom_count, burgeon_count),
             _ => (Moonsign::None, 0, 0, 0)
         };
         Box::new(LaumaDefaultTargetFunction {
@@ -119,11 +104,7 @@ impl TargetFunction for LaumaDefaultTargetFunction {
             enemy
         };
 
-        let config = CharacterSkillConfig::Lauma { moonsign: match self.moonsign {
-            Moonsign::None => 2,
-            Moonsign::Nascent => 0,
-            Moonsign::Ascendant => 1,
-        }};
+        let config = CharacterSkillConfig::Lauma { moonsign: self.moonsign };
 
         let dmg_e = 
             Lauma::damage::<SimpleDamageBuilder>(&context, <Lauma as CharacterTrait>::DamageEnumType::EHold1, &config, None).normal.expectation

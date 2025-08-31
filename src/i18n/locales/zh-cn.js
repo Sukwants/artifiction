@@ -110,6 +110,11 @@ export default {
         Physical: "物理",
         None: "无",
     },
+    moonsign: {
+        None: "无",
+        Nascent: "初辉",
+        Ascendant: "满辉"
+    },
     stat: {
         cureEffect: "治疗加成",
         criticalDamage: "暴击伤害",

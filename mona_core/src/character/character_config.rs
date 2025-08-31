@@ -1,4 +1,5 @@
 use serde::{Deserialize, Serialize};
+
 use crate::common::Moonsign;
 
 #[derive(Serialize, Deserialize)]
@@ -53,6 +54,6 @@ pub enum CharacterConfig {
     Escoffier { hydro_cryo_count: usize, after_burst: bool },
     Ifa { nightsoul_total: usize },
     Ineffa { activated_p2: bool },
-    Lauma { activated_q: bool, moonsign: usize },
+    Lauma { activated_q: bool, moonsign: Moonsign },
     NoConfig,
 }

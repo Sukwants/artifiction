@@ -138,4 +138,7 @@ pub enum BuffName {
     ViridescentVenerer4,
     TenacityOfTheMillelith4,
     DeepwoodMemories4,
+    ScrollOfTheHeroOfCinderCity4,
+    NightOfTheSkysUnveiling4,
+    SilkenMoonsSerenade4,
 }

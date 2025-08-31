@@ -56,6 +56,6 @@ pub enum CharacterSkillConfig {
     Mavuika { after_q: bool },
     Skirk { cunning_stacks: i32, seven_phase_mode: bool, death_crossing_stacks: i32, void_rift_count: i32 },
     Escoffier { hydro_cryo_count: usize, after_burst: bool },
-    Lauma { moonsign: usize },
+    Lauma { moonsign: Moonsign },
     NoConfig,
 }

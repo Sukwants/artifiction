@@ -61,6 +61,7 @@ pub use obsidian_codex::ObsidianCodex;
 pub use long_nights_oath::LongNightsOath;
 pub use finale_of_the_deep_galleries::FinaleOfTheDeepGalleries;
 pub use night_of_the_skys_unveiling::NightOfTheSkysUnveiling;
+pub use silken_moons_serenade::SilkenMoonsSerenade;
 
 pub mod empty;
 pub mod adventurer;
@@ -119,6 +120,7 @@ pub mod obsidian_codex;
 mod long_nights_oath;
 mod finale_of_the_deep_galleries;
 mod night_of_the_skys_unveiling;
+mod silken_moons_serenade;
 
 pub fn get_effect<T: Attribute>(name: ArtifactSetName, config: &ArtifactEffectConfig, character: &Character<T>) -> Box<dyn ArtifactEffect<T>> {
     name.create_effect(config, &character.common_data)

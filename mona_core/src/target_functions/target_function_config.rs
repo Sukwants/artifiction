@@ -1,6 +1,6 @@
 use serde::{Deserialize, Serialize};
 
-use crate::common::{Element, SkillType};
+use crate::common::{Element, Moonsign, SkillType};
 use crate::target_functions::target_functions::cryo::rosaria_default::RosariaDefaultTFConfig;
 
 #[derive(Serialize, Deserialize)]
@@ -64,6 +64,6 @@ pub enum TargetFunctionConfig {
     WriothesleyDefault { punch_ratio: f64, melt_rate:f64 },
     MualaniDefault { vaporize_rate: f64 },
     IneffaDefault { lunar_charged_coefficient: f64 },
-    LaumaDefault { moonsign: usize, bloom_count: usize, hyperbloom_count: usize, burgeon_count: usize },
+    LaumaDefault { moonsign: Moonsign, bloom_count: usize, hyperbloom_count: usize, burgeon_count: usize },
     NoConfig,
 }

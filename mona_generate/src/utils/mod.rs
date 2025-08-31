@@ -119,7 +119,23 @@ pub fn config_to_json(config: &ItemConfig) -> String {
                 "name": name,
                 "default": default,
             })
-        }
+        },
+        ItemConfigType::Moonsign2 { default } => {
+            json!({
+                "type": "moonsign2",
+                "title": title_index,
+                "name": name,
+                "default": default
+            })
+        },
+        ItemConfigType::Moonsign3 { default } => {
+            json!({
+                "type": "moonsign3",
+                "title": title_index,
+                "name": name,
+                "default": default
+            })
+        },
     };
 
     j.to_string()

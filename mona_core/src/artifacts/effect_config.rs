@@ -1,6 +1,6 @@
 use serde::{Deserialize, Serialize};
 use smallvec::SmallVec;
-use crate::common::Element;
+use crate::common::{Element, Moonsign};
 use crate::common::item_config_type::ConfigElements8Multi;
 use crate::common::max_trait::MaxValue;
 
@@ -204,7 +204,14 @@ pub struct ConfigFinaleOfTheDeepGalleries {
 #[derive(Serialize, Deserialize)]
 #[derive(Debug, Clone, Default)]
 pub struct ConfigNightOfTheSkysUnveiling {
-    pub moonsign: usize,
+    pub moonsign: Moonsign,
+    pub gleaming_moon_effect_count: usize,
+}
+
+#[derive(Serialize, Deserialize)]
+#[derive(Debug, Clone, Default)]
+pub struct ConfigSilkenMoonsSerenade {
+    pub moonsign: Moonsign,
     pub gleaming_moon_effect_count: usize,
 }
 
@@ -247,6 +254,7 @@ pub struct ArtifactEffectConfig {
     pub config_long_nights_oath: ConfigLevel,
     pub config_finale_of_the_deep_galleries: ConfigFinaleOfTheDeepGalleries,
     pub config_night_of_the_skys_unveiling: ConfigNightOfTheSkysUnveiling,
+    pub config_silken_moons_serenade: ConfigSilkenMoonsSerenade,
 }
 
 #[derive(Serialize, Deserialize)]
@@ -288,6 +296,7 @@ pub struct ArtifactConfigInterface {
     pub config_long_nights_oath: Option<ConfigLevel>,
     pub config_finale_of_the_deep_galleries: Option<ConfigFinaleOfTheDeepGalleries>,
     pub config_night_of_the_skys_unveiling: Option<ConfigNightOfTheSkysUnveiling>,
+    pub config_silken_moons_serenade: Option<ConfigSilkenMoonsSerenade>,
 }
 
 impl ArtifactConfigInterface {
@@ -329,6 +338,7 @@ impl ArtifactConfigInterface {
             config_long_nights_oath: self.config_long_nights_oath.unwrap_or_default(),
             config_finale_of_the_deep_galleries: self.config_finale_of_the_deep_galleries.unwrap_or_default(),
             config_night_of_the_skys_unveiling: self.config_night_of_the_skys_unveiling.unwrap_or_default(),
+            config_silken_moons_serenade: self.config_silken_moons_serenade.unwrap_or_default(),
         }
     }
 }

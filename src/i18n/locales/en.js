@@ -135,6 +135,11 @@ export default {
         Physical: "Physical",
         None: "None",
     },
+    moonsign: {
+        None: "None",
+        Nascent: "Nascent",
+        Ascendant: "Ascendant"
+    },
     accountPage: {
         title: "Accounts and Syncing",
         syncButton: "Sync with a local directory",
