@@ -157,6 +157,11 @@ pub enum ItemConfigType {
         options: &'static str, // comma separated
         default: usize
     },
+    Option2 {
+        options_zh: &'static str,
+        options_en: &'static str,
+        default: usize
+    },
     // NullOrValueInput {
     //     min: f64,
     //     max: f64,
@@ -277,6 +282,18 @@ impl ItemConfigType {
                     "name": name,
                     "default": default,
                     "options": temp
+                })
+            },
+            ItemConfigType::Option2 { options_zh, options_en, default } => {
+                let temp_zh: Vec<&str> = options_zh.split(",").collect();
+                let temp_en: Vec<&str> = options_en.split(",").collect();
+                json!({
+                    "type": "option2",
+                    "title": title,
+                    "name": name,
+                    "default": default,
+                    "options_zh": temp_zh,
+                    "options_en": temp_en
                 })
             },
             ItemConfigType::Element8Multi { default } => {

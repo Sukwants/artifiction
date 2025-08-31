@@ -52,8 +52,9 @@ impl TargetFunctionMetaTrait for LaumaDefaultTargetFunction {
                 zh_cn: "月兆",
                 en: "Moonsign",
             ),
-            config: ItemConfigType::Option {
-                options: "初辉 Nascent Gleam,满辉 Ascendant Gleam",
+            config: ItemConfigType::Option2 {
+                options_zh: "初辉,满辉",
+                options_en: "Nascent Gleam,Ascendant Gleam",
                 default: 0
             }
         },

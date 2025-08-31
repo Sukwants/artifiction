@@ -81,8 +81,9 @@ impl ArtifactTrait for NightOfTheSkysUnveiling {
                 zh_cn: "月兆",
                 en: "Moonsign",
             ),
-            config: ItemConfigType::Option {
-                options: "无 None,初辉 Nascent Gleam,满辉 Ascendant Gleam",
+            config: ItemConfigType::Option2 {
+                options_zh: "无,初辉,满辉",
+                options_en: "None,Nascent Gleam,Ascendant Gleam",
                 default: 0
             }
         },

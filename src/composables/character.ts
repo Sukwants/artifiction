@@ -1,4 +1,4 @@
-const DEFAULT_CHARACTER = "Ineffa";
+const DEFAULT_CHARACTER = "Lauma";
 
 import type {WeaponType} from "@/types/weapon"
 // @ts-ignore

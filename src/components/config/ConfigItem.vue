@@ -90,12 +90,25 @@
                 >{{ option }}</el-radio-button>
             </el-radio-group>
         </template>
+        <template v-if="type === 'option2'">
+            <el-radio-group
+                :modelValue="modelValue"
+                @update:modelValue="handleChangeValue"
+            >
+                <el-radio-button
+                    v-for="(option, index) in currentOptions"
+                    :key="index"
+                    :label="index"
+                >{{ option }}</el-radio-button>
+            </el-radio-group>
+        </template>
     </div>
 </template>
 
 <script>
 import SelectElementType from "@c/select/SelectElementType"
 import SelectSkillType from "@c/select/SelectSkillType"
+import { useI18n } from "@/i18n/i18n"
 
 export default {
     name: "ConfigItem",
@@ -107,6 +120,16 @@ export default {
         title: {},
     },
     emits: ["update:modelValue"],
+    computed: {
+        currentOptions() {
+            const { locale } = useI18n()
+            if (locale.value.startsWith('zh')) {
+                return this.params.options_zh;
+            } else {
+                return this.params.options_en;
+            }
+        }
+    },
     methods: {
         handleInputValue(value) {
             let v = 0
@@ -118,18 +141,12 @@ export default {
                     v = 0
                 }
             }
-            
             this.handleChangeValue(v)
         },
-
         handleChangeValue(value) {
-            // console.log("change value", value)
-            // it may be an element plus bug, when value is not changed, slider will also emit update:modelValue
             if (value !== this.modelValue) {
-                // console.log("model value", this.modelValue)
                 this.$emit("update:modelValue", value)
             }
-            // this.$emit("update:modelValue", value)
         },
     }
 }
