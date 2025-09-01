@@ -98,6 +98,7 @@ pub enum BuffName {
     KavehQ,
     BaizhuTalent2,
     BaizhuC4,
+    FurinaQ,
     XianyunTalent1,
     XianyunTalent2,
     KachinaC4,
@@ -109,6 +110,9 @@ pub enum BuffName {
     CitlaliC6,
     YumemizukiMizukiC1,
     YumemizukiMizukiC2,
+    EscoffierTalent2,
+    EscoffierC1,
+    EscoffierC2,
 
     // weapon
     FreedomSworn,
@@ -122,7 +126,12 @@ pub enum BuffName {
     XiphosMoonlight,
     MakhairaAquamarine,
     KeyOfKhajNisut,
+    AThousandFloatingDreams,
+    CranesEchoingCall,
     PeakPatrolSong,
+    StarcallersWatch,
+    SymphonistOfScents,
+    FracturedHalo,
     
 
     ResonancePyro2,
@@ -138,6 +147,7 @@ pub enum BuffName {
     ViridescentVenerer4,
     TenacityOfTheMillelith4,
     DeepwoodMemories4,
+    SongOfDaysPast4,
     ScrollOfTheHeroOfCinderCity4,
     NightOfTheSkysUnveiling4,
     SilkenMoonsSerenade4,

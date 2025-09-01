@@ -48,6 +48,7 @@ pub use kachina::BuffKachinaC4;
 pub use xilonen::{BuffXilonenE, BuffXilonenC2, BuffXilonenC4};
 pub use cryo::*;
 pub use anemo::*;
+pub use hydro::*;
 
 pub mod albedo;
 pub mod aloy;
@@ -97,5 +98,7 @@ pub mod baizhu;
 pub mod xianyun;
 pub mod kachina;
 mod xilonen;
+
 mod cryo;
 mod anemo;
+mod hydro;
