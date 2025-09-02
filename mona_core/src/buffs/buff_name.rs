@@ -93,6 +93,7 @@ pub enum BuffName {
     CandaceQ,
     CandaceTalent2,
     NahidaTalent1,
+    NahidaC2,
     FaruzanQ,
     Mika,
     KavehQ,
@@ -113,6 +114,8 @@ pub enum BuffName {
     EscoffierTalent2,
     EscoffierC1,
     EscoffierC2,
+    Ineffa,
+    Lauma,
 
     // weapon
     FreedomSworn,

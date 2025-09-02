@@ -18,6 +18,10 @@ impl<A: Attribute> Buff<A> for BuffCitlaliTalent1 {
 
         attribute.set_value_by(AttributeName::ResMinusPyro, "茜特菈莉「五重天的寒雨」", down * self.rate);
         attribute.set_value_by(AttributeName::ResMinusHydro, "茜特菈莉「五重天的寒雨」", down * self.rate);
+
+        if self.has_c2 {
+            attribute.set_value_by(AttributeName::ElementalMastery, "茜特菈莉「五重天的寒雨」", 250.0);
+        }
     }
 }
 

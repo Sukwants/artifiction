@@ -21,7 +21,6 @@ use crate::weapon::Weapon;
 use crate::weapon::weapon_common_data::WeaponCommonData;
 
 pub struct LaumaDefaultTargetFunction {
-    pub moonsign: Moonsign,
     pub bloom_count: usize,
     pub hyperbloom_count: usize,
     pub burgeon_count: usize,
@@ -46,7 +45,6 @@ impl TargetFunctionMetaTrait for LaumaDefaultTargetFunction {
 
     #[cfg(not(target_family = "wasm"))]
     const CONFIG: Option<&'static [ItemConfig]> = Some(&[
-        ItemConfig::MOONSIGN2,
         ItemConfig {
             name: "bloom_count",
             title: locale!(
@@ -74,13 +72,12 @@ impl TargetFunctionMetaTrait for LaumaDefaultTargetFunction {
     ]);
 
     fn create(_character: &CharacterCommonData, _weapon: &WeaponCommonData, config: &TargetFunctionConfig) -> Box<dyn TargetFunction> {
-        let (moonsign, bloom_count, hyperbloom_count, burgeon_count) = match *config {
-            TargetFunctionConfig::LaumaDefault { moonsign, bloom_count, hyperbloom_count, burgeon_count } => (
-                moonsign, bloom_count, hyperbloom_count, burgeon_count),
-            _ => (Moonsign::None, 0, 0, 0)
+        let (bloom_count, hyperbloom_count, burgeon_count) = match *config {
+            TargetFunctionConfig::LaumaDefault { bloom_count, hyperbloom_count, burgeon_count } => (
+                bloom_count, hyperbloom_count, burgeon_count),
+            _ => (0, 0, 0)
         };
         Box::new(LaumaDefaultTargetFunction {
-            moonsign,
             bloom_count,
             hyperbloom_count,
             burgeon_count,
@@ -104,7 +101,7 @@ impl TargetFunction for LaumaDefaultTargetFunction {
             enemy
         };
 
-        let config = CharacterSkillConfig::Lauma { moonsign: self.moonsign };
+        let config = CharacterSkillConfig::NoConfig;
 
         let dmg_e = 
             Lauma::damage::<SimpleDamageBuilder>(&context, <Lauma as CharacterTrait>::DamageEnumType::EHold1, &config, None).normal.expectation
@@ -121,8 +118,7 @@ impl TargetFunction for LaumaDefaultTargetFunction {
         let dmg_bloom = 
             transformative_damage(character.common_data.level, attribute, enemy).bloom * self.bloom_count as f64
             + transformative_damage(character.common_data.level, attribute, enemy).hyperbloom * self.hyperbloom_count as f64
-            + transformative_damage(character.common_data.level, attribute, enemy).burgeon * self.burgeon_count as f64
-            * if context.character_common_data.has_talent1 && self.moonsign == Moonsign::Nascent { 1.15 } else { 1.0 }; // 天赋一提供加成
+            + transformative_damage(character.common_data.level, attribute, enemy).burgeon * self.burgeon_count as f64;
 
         dmg_e + dmg_frostgrove_sanctuary + dmg_c6a + dmg_bloom
     }

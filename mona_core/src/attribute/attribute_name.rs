@@ -1,4 +1,4 @@
-use crate::common::{SkillType, Element};
+use crate::common::{Element, MoonglareReaction, SkillType};
 
 #[derive(Hash, Eq, PartialEq, Clone, Copy, Debug)]
 pub enum AttributeName {
@@ -125,6 +125,48 @@ pub enum AttributeName {
     ExtraIncreaseLunarCharged, // 月曜反应额外提升，（大概）应由 add_edge 给出
     ExtraIncreaseLunarBloom,
 
+    CriticalBurgeon,
+    CriticalHyperbloom,
+    CriticalBloom,
+    CriticalOverload,
+    CriticalBurning,
+    CriticalShatter,
+    CriticalElectroCharged,
+    CriticalSuperconduct,
+    CriticalSwirlElectro,
+    CriticalSwirlPyro,
+    CriticalSwirlHydro,
+    CriticalSwirlCryo,
+    CriticalSwirlBase,
+    // CriticalVaporize,
+    // CriticalMelt,
+    // CriticalAggravate,
+    // CriticalSpread,
+    CriticalMoonglare,
+    CriticalLunarCharged,
+    CriticalLunarBloom,
+
+    CriticalDamageBurgeon,
+    CriticalDamageHyperbloom,
+    CriticalDamageBloom,
+    CriticalDamageOverload,
+    CriticalDamageBurning,
+    CriticalDamageShatter,
+    CriticalDamageElectroCharged,
+    CriticalDamageSuperconduct,
+    CriticalDamageSwirlElectro,
+    CriticalDamageSwirlPyro,
+    CriticalDamageSwirlHydro,
+    CriticalDamageSwirlCryo,
+    CriticalDamageSwirlBase,
+    // CriticalDamageVaporize,
+    // CriticalDamageMelt,
+    // CriticalDamageAggravate,
+    // CriticalDamageSpread,
+    CriticalDamageMoonglare,
+    CriticalDamageLunarCharged,
+    CriticalDamageLunarBloom,
+
     HPRatioBase,
     HPRatioNormalAttack,
     HPRatioChargedAttack,
@@ -239,6 +281,15 @@ impl AttributeName {
         }
     }
 
+    pub fn critical_rate_name_by_moonglare_reaction(skill_type: MoonglareReaction) -> Option<AttributeName> {
+        match skill_type {
+            MoonglareReaction::None => None,
+            MoonglareReaction::LunarChargedReaction | MoonglareReaction::LunarCharged => Some(AttributeName::CriticalLunarCharged),
+            MoonglareReaction::LunarBloom => Some(AttributeName::CriticalLunarBloom),
+            _ => None,
+        }
+    }
+
     pub fn critical_damage_name_by_element(element: Element) -> AttributeName {
         match element {
             Element::Electro => AttributeName::CriticalDamageElectro,
@@ -259,6 +310,15 @@ impl AttributeName {
             SkillType::PlungingAttackOnGround | SkillType::PlungingAttackInAction => Some(AttributeName::CriticalDamagePlungingAttack),
             SkillType::ElementalSkill => Some(AttributeName::CriticalDamageElementalSkill),
             SkillType::ElementalBurst => Some(AttributeName::CriticalDamageElementalBurst),
+            _ => None,
+        }
+    }
+
+    pub fn critical_damage_name_by_moonglare_reaction(skill_type: MoonglareReaction) -> Option<AttributeName> {
+        match skill_type {
+            MoonglareReaction::None => None,
+            MoonglareReaction::LunarChargedReaction | MoonglareReaction::LunarCharged => Some(AttributeName::CriticalDamageLunarCharged),
+            MoonglareReaction::LunarBloom => Some(AttributeName::CriticalDamageLunarBloom),
             _ => None,
         }
     }

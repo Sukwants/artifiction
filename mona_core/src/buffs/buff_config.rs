@@ -52,6 +52,7 @@ pub enum BuffConfig {
     NilouTalent2 { hp: f64 },
     CandaceTalent2 { hp: f64 },
     NahidaTalent1 { max_em: f64 },
+    NahidaC2 { de_def: bool },
     FaruzanQ { base_atk: usize, q_level: usize, rate_q1: f64, rate_q2: f64, rate_talent2: f64, enable_c6: bool },
     Mika { stack_talent2: f64, rate_c6: f64 },
     KavehQ { q_level: usize, rate: f64 },
@@ -71,6 +72,8 @@ pub enum BuffConfig {
     YumemizukiMizukiC2 { em: f64 },
     EscoffierTalent2 { hydro_cryo_count: usize },
     EscoffierC2 { atk: f64 },
+    Ineffa { atk: f64, has_c1: bool, has_p2: bool },
+    Lauma { em: f64, activated_q: bool, level_q: usize, has_p1: bool, has_c2: bool, moonsign: Moonsign },
 
     FreedomSworn { refine: usize },
     SongOfBrokenPines { refine: usize },

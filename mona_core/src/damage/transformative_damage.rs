@@ -1,6 +1,7 @@
+use serde::{Serialize, Deserialize};
 use wasm_bindgen::prelude::*;
 use crate::attribute::{Attribute, AttributeName, AttributeCommon};
-use crate::common::{Element, SkillType};
+use crate::common::{DamageResult, Element, SkillType};
 use crate::common::reaction_type::TransformativeType;
 use crate::enemies::Enemy;
 use crate::damage::level_coefficient::{LEVEL_MULTIPLIER, CRYSTALLIZE_BASE};
@@ -20,6 +21,23 @@ pub struct TransformativeDamage {
     pub burgeon: f64,
     pub burning: f64,
     pub crystallize: f64,
+}
+
+#[derive(Serialize, Deserialize)]
+pub struct CriticalTransformativeDamage {
+    pub swirl_cryo: DamageResult,
+    pub swirl_hydro: DamageResult,
+    pub swirl_pyro: DamageResult,
+    pub swirl_electro: DamageResult,
+    pub overload: DamageResult,
+    pub electro_charged: DamageResult,
+    pub shatter: DamageResult,
+    pub superconduct: DamageResult,
+    pub bloom: DamageResult,
+    pub hyperbloom: DamageResult,
+    pub burgeon: DamageResult,
+    pub burning: DamageResult,
+    pub crystallize: DamageResult,
 }
 
 #[inline]
@@ -179,6 +197,65 @@ pub fn transformative_damage<A: Attribute>(level: usize, attribute: &A, enemy: &
         burning: dmg_burning,
         crystallize: shield_crystallize,
     }
+}
+
+pub fn critical_transformative_damage<A: Attribute>(level: usize, attribute: &A, enemy: &Enemy) -> CriticalTransformativeDamage {
+    let base_damage = transformative_damage(level, attribute, enemy);
+
+    let critical_swirl_cryo = attribute.get_value(AttributeName::CriticalSwirlCryo);
+    let critical_swirl_hydro = attribute.get_value(AttributeName::CriticalSwirlHydro);
+    let critical_swirl_pyro = attribute.get_value(AttributeName::CriticalSwirlPyro);
+    let critical_swirl_electro = attribute.get_value(AttributeName::CriticalSwirlElectro);
+    let critical_overload = attribute.get_value(AttributeName::CriticalOverload);
+    let critical_electro_charged = attribute.get_value(AttributeName::CriticalElectroCharged);
+    let critical_shatter = attribute.get_value(AttributeName::CriticalShatter);
+    let critical_superconduct = attribute.get_value(AttributeName::CriticalSuperconduct);
+    let critical_bloom = attribute.get_value(AttributeName::CriticalBloom);
+    let critical_hyperbloom = attribute.get_value(AttributeName::CriticalHyperbloom);
+    let critical_burgeon = attribute.get_value(AttributeName::CriticalBurgeon);
+    let critical_burning = attribute.get_value(AttributeName::CriticalBurning);
+
+    let critical_damage_swirl_cryo = attribute.get_value(AttributeName::CriticalDamageSwirlCryo);
+    let critical_damage_swirl_hydro = attribute.get_value(AttributeName::CriticalDamageSwirlHydro);
+    let critical_damage_swirl_pyro = attribute.get_value(AttributeName::CriticalDamageSwirlPyro);
+    let critical_damage_swirl_electro = attribute.get_value(AttributeName::CriticalDamageSwirlElectro);
+    let critical_damage_overload = attribute.get_value(AttributeName::CriticalDamageOverload);
+    let critical_damage_electro_charged = attribute.get_value(AttributeName::CriticalDamageElectroCharged);
+    let critical_damage_shatter = attribute.get_value(AttributeName::CriticalDamageShatter);
+    let critical_damage_superconduct = attribute.get_value(AttributeName::CriticalDamageSuperconduct);
+    let critical_damage_bloom = attribute.get_value(AttributeName::CriticalDamageBloom);
+    let critical_damage_hyperbloom = attribute.get_value(AttributeName::CriticalDamageHyperbloom);
+    let critical_damage_burgeon = attribute.get_value(AttributeName::CriticalDamageBurgeon);
+    let critical_damage_burning = attribute.get_value(AttributeName::CriticalDamageBurning);
+
+    fn get_critical_damage(base_damage: f64, critical: f64, critical_damage: f64) -> DamageResult {
+        DamageResult {
+            critical: base_damage * (1.0 + critical_damage),
+            non_critical: base_damage,
+            expectation: base_damage * (1.0 + critical_damage * critical),
+            lunar_type: crate::common::MoonglareReaction::None,
+            is_heal: false,
+            is_shield: false,
+        }
+    }
+
+    let result = CriticalTransformativeDamage {
+        swirl_cryo: get_critical_damage(base_damage.swirl_cryo, critical_swirl_cryo, critical_damage_swirl_cryo),
+        swirl_hydro: get_critical_damage(base_damage.swirl_hydro, critical_swirl_hydro, critical_damage_swirl_hydro),
+        swirl_pyro: get_critical_damage(base_damage.swirl_pyro, critical_swirl_pyro, critical_damage_swirl_pyro),
+        swirl_electro: get_critical_damage(base_damage.swirl_electro, critical_swirl_electro, critical_damage_swirl_electro),
+        overload: get_critical_damage(base_damage.overload, critical_overload, critical_damage_overload),
+        electro_charged: get_critical_damage(base_damage.electro_charged, critical_electro_charged, critical_damage_electro_charged),
+        shatter: get_critical_damage(base_damage.shatter, critical_shatter, critical_damage_shatter),
+        superconduct: get_critical_damage(base_damage.superconduct, critical_superconduct, critical_damage_superconduct),
+        bloom: get_critical_damage(base_damage.bloom, critical_bloom, critical_damage_bloom),
+        hyperbloom: get_critical_damage(base_damage.hyperbloom, critical_hyperbloom, critical_damage_hyperbloom),
+        burgeon: get_critical_damage(base_damage.burgeon, critical_burgeon, critical_damage_burgeon),
+        burning: get_critical_damage(base_damage.burning, critical_burning, critical_damage_burning),
+        crystallize: get_critical_damage(base_damage.crystallize, 0.0, 0.0),
+    };
+
+    result
 }
 
 // because there is no element, so we don't know which res to use, so use res_ratio explicitly

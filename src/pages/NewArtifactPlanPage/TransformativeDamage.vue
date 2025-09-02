@@ -1,71 +1,63 @@
 <template>
-<!--    <div v-for="row in tableDataForElementUI">-->
-<!--        <span v-if="row.chs === '感电'"-->
-<!--              style="color: #c250ff"-->
-<!--        >{{ row.value.toFixed(1) }}</span>-->
-<!--        <span v-if="row.chs === '超载'"-->
-<!--              style="color: #ff335a"-->
-<!--        >{{ row.value.toFixed(1) }}</span>-->
-<!--        <span v-if="row.chs !== '感电' && row.chs !== '超载'">{{ row.value.toFixed(1) }}</span>-->
-<!--    </div>-->
-
-    <el-table
-        :data="tableDataForElementUI"
-    >
-        <el-table-column
-            :label="t('misc.type1')"
+    <div>
+        <el-table
+            :data="tableData"
         >
-            <template #default="{ row }">
-                {{ t("dmg", row.key) }}
-            </template>
-        </el-table-column>
-        <el-table-column
-            :label="t('misc.dmg')"
-        >
-            <template #default="{ row }">
-                <template v-if="row && row.key && row.value">
-                    <span v-if="row.key === 'electroCharged'"
-                          style="color: #c250ff"
-                    >{{ row.value.toFixed(1) }}</span>
-                    <span v-else-if="row.key === 'overload'"
-                          style="color: #ff335a"
-                    >{{ row.value.toFixed(1) }}</span>
-                    <span v-else>{{ row.value.toFixed(1) }}</span>
-                </template>
-            </template>
-        </el-table-column>
-    </el-table>
+            <el-table-column
+                prop="name"
+                :label="t('misc.type1')"
+            >
+            </el-table-column>
+            <el-table-column
+                prop="expectation"
+                :label="t('dmg.expect')"
+            ></el-table-column>
+            <el-table-column
+                prop="critical"
+                :label="t('dmg.crit')"
+            ></el-table-column>
+            <el-table-column
+                prop="nonCritical"
+                :label="t('dmg.nonCrit')"
+            ></el-table-column>
+        </el-table>
+    </div>
 </template>
 
 <script>
 import {useI18n} from "@/i18n/i18n";
 
-export default defineComponent({
+export default {
     name: "TransformativeDamage",
-    props: ["data"],
-    computed: {
-        tableDataForElementUI() {
-            let results = []
-            results.push({ value: this.data.hyperbloom, key: "hyperbloom" })
-            results.push({ value: this.data.burgeon, key: "burgeon" })
-            results.push({ value: this.data.bloom, key: "bloom" })
-            results.push({ value: this.data.electro_charged, key: "electroCharged" })
-            results.push({ value: this.data.overload, key: "overload" })
-            results.push({ value: this.data.shatter, key: "shattered" })
-            results.push({ value: this.data.superconduct, key: "superConduct" })
-            results.push({ value: this.data.burning, key: "burning" })
-            results.push({ value: this.data.swirl_electro, key: "swirlElectro" })
-            results.push({ value: this.data.swirl_pyro, key: "swirlPyro" })
-            results.push({ value: this.data.swirl_cryo, key: "swirlCryo" })
-            results.push({ value: this.data.swirl_hydro, key: "swirlHydro" })
-            results.push({ value: this.data.crystallize, key: "crystallize" })
-            return results
-        }
+    props: {
+        data: {}
     },
-    methods: {
-        f(row) {
-            console.log(row)
-            return row.value.toFixed(1)
+    computed: {
+        tableData() {
+            let temp = []
+            const NO_DATA = "无数据"
+
+            const r = (x) => Math.round(x)
+
+            const checkNull = (value) => {
+                if(value < 0) return " "
+                return value
+            }
+
+            const push = (name) => {
+                temp.push({
+                    expectation: r(checkNull(this.data[name]?.expectation)) ?? NO_DATA,
+                    critical: r(checkNull(this.data[name]?.critical)) ?? NO_DATA,
+                    nonCritical: r(checkNull(this.data[name]?.non_critical)) ?? NO_DATA,
+                    name: this.t(`dmg.${name}`),
+                })
+            }
+
+            for(let name in this.data) {
+                push(name)
+            }
+
+            return temp
         }
     },
     setup() {
@@ -75,14 +67,53 @@ export default defineComponent({
             t
         }
     }
-    // data() {
-    //     return {
-    //
-    //     }
-    // }
-})
+}
 </script>
 
-<style scoped>
+<style scoped lang="scss">
+.item {
+    height: 32px;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    font-size: 14px;
 
+    &:hover {
+        background-color: rgb(241, 241, 241);
+    }
+
+    .name {
+        
+    }
+
+    .numbers {
+        display: flex;
+        gap: 4px;
+    }
+
+    .number {
+        padding: 4px;
+        border-radius: 3px;
+    }
+
+    .melt {
+        color: rgb(63, 63, 63);
+        // background-color: rgb(155, 218, 255);
+        background-image: url("@image/misc/cryo");
+        // background-size: 48px;
+        background-position-x: -20px;
+        background-position-y: -30px;
+        background-repeat: no-repeat;
+    }
+
+    .pyro {
+        color: rgb(255, 95, 95);
+        background-color: rgb(255, 224, 224);
+    }
+
+    .physical {
+        color: rgb(71, 71, 71);
+        background-color: rgb(218, 218, 218);
+    }
+}
 </style>

@@ -59,3 +59,74 @@ impl BuffMeta for BuffNahidaTalent1 {
         })
     }
 }
+
+pub struct BuffNahidaC2 {
+    de_def: bool,
+}
+
+impl<A: Attribute> Buff<A> for BuffNahidaC2 {
+    fn change_attribute(&self, attribute: &mut A) {
+        if self.de_def {
+            attribute.set_value_by(AttributeName::DefMinus, "纳西妲「正等善见之根」", 0.3);
+        }
+
+        attribute.set_value_by(AttributeName::CriticalDamageBloom, "纳西妲「正等善见之根」", 1.0);
+        attribute.set_value_by(AttributeName::CriticalDamageHyperbloom, "纳西妲「正等善见之根」", 1.0);
+        attribute.set_value_by(AttributeName::CriticalDamageBurgeon, "纳西妲「正等善见之根」", 1.0);
+        attribute.set_value_by(AttributeName::CriticalDamageBurning, "纳西妲「正等善见之根」", 1.0);
+
+        attribute.set_value_to(AttributeName::CriticalBloom, "纳西妲「正等善见之根」", 0.2);
+        attribute.set_value_to(AttributeName::CriticalHyperbloom, "纳西妲「正等善见之根」", 0.2);
+        attribute.set_value_to(AttributeName::CriticalBurgeon, "纳西妲「正等善见之根」", 0.2);
+        attribute.set_value_to(AttributeName::CriticalBurning, "纳西妲「正等善见之根」", 0.2);
+
+        attribute.set_value_by(AttributeName::CriticalDamageLunarBloom, "纳西妲「正等善见之根」", 0.2);
+        attribute.set_value_by(AttributeName::CriticalLunarBloom, "纳西妲「正等善见之根」", 0.1);
+    }
+}
+
+impl BuffMeta for BuffNahidaC2 {
+    #[cfg(not(target_family = "wasm"))]
+    const META_DATA: BuffMetaData = BuffMetaData {
+        name: BuffName::NahidaC2,
+        name_locale: crate::common::i18n::locale!(
+            zh_cn: "纳西妲「正等善见之根」",
+            en: "Nahida-「The Root of All Fullness」",
+        ),
+        image: BuffImage::Avatar(CharacterName::Nahida),
+        genre: BuffGenre::Character,
+        description: Some(locale!(
+            zh_cn: "处于纳西妲自身施加的蕴种印状态下的敌人，将受到以下效果影响：\
+                <br>· 受到的燃烧、绽放、超绽放、烈绽放反应伤害能够造成暴击，暴击率固定为20%，暴击伤害固定为100%，该效果提供的暴击率可以与使对应元素反应能够造成暴击的同类效果提供的暴击率叠加；\
+                <br> 受到原激化、超激化、蔓激化反应影响后的8秒内，防御力降低30%；\
+                <br> 受到月绽放反应伤害的暴击率提升10%，暴击伤害提升20%。",
+            en: "Opponents that are marked by Seeds of Skandha applied by Nahida herself will be affected by the following effects:\
+                <br>· Burning, Bloom, Hyperbloom, and Burgeon Reaction DMG they receive can score CRIT Hits. CRIT Rate and CRIT DMG are fixed at 20% and 100% respectively. CRIT Rate from this effect stacks with CRIT Rate from similar effects that allow these Elemental Reactions to CRIT.\
+                <br>· Within 8s of being affected by Quicken, Aggravate, or Spread, DEF is decreased by 30%.\
+                <br>· The CRIT Rate and CRIT DMG of Lunar-Bloom DMG received are increased by 10% and 20% respectively."
+        )),
+        from: BuffFrom::Character(CharacterName::Nahida)
+    };
+
+    #[cfg(not(target_family = "wasm"))]
+    const CONFIG: Option<&'static [ItemConfig]> = Some(&[
+        ItemConfig {
+            name: "de_def",
+            title: crate::common::i18n::locale!(
+                zh_cn: "防御力降低",
+                en: "Defense DEF",
+            ),
+            config: ItemConfigType::Bool { default: false }
+        }
+    ]);
+
+    fn create<A: Attribute>(b: &BuffConfig) -> Box<dyn Buff<A>> {
+        let de_def = match *b {
+            BuffConfig::NahidaC2 { de_def } => de_def,
+            _ => false
+        };
+        Box::new(BuffNahidaC2 {
+            de_def
+        })
+    }
+}

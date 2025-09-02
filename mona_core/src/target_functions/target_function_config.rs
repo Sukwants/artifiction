@@ -64,6 +64,6 @@ pub enum TargetFunctionConfig {
     WriothesleyDefault { punch_ratio: f64, melt_rate:f64 },
     MualaniDefault { vaporize_rate: f64 },
     IneffaDefault { lunar_charged_coefficient: f64 },
-    LaumaDefault { moonsign: Moonsign, bloom_count: usize, hyperbloom_count: usize, burgeon_count: usize },
+    LaumaDefault { bloom_count: usize, hyperbloom_count: usize, burgeon_count: usize },
     NoConfig,
 }

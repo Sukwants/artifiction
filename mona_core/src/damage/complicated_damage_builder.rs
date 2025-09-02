@@ -189,6 +189,24 @@ impl DamageBuilder for ComplicatedDamageBuilder {
         let aggravate_enhance_comp = self.get_enhance_aggravate_composition(attribute);
         let aggravate_enhance = aggravate_enhance_comp.sum();
 
+        // let melt_critical_comp = self.get_critical_melt_composition(attribute, element, skill);
+        // let melt_critical = melt_critical_comp.sum();
+        // let vaporize_critical_comp = self.get_critical_vaporize_composition(attribute, element, skill);
+        // let vaporize_critical = vaporize_critical_comp.sum();
+        // let spread_critical_comp = self.get_critical_spread_composition(attribute, element, skill);
+        // let spread_critical = spread_critical_comp.sum();
+        // let aggravate_critical_comp = self.get_critical_aggravate_composition(attribute, element, skill);
+        // let aggravate_critical = aggravate_critical_comp.sum();
+
+        // let melt_critical_damage_comp = self.get_critical_damage_melt_composition(attribute, element, skill);
+        // let melt_critical_damage = melt_critical_damage_comp.sum();
+        // let vaporize_critical_damage_comp = self.get_critical_damage_vaporize_composition(attribute, element, skill);
+        // let vaporize_critical_damage = vaporize_critical_damage_comp.sum();
+        // let spread_critical_damage_comp = self.get_critical_damage_spread_composition(attribute, element, skill);
+        // let spread_critical_damage = spread_critical_damage_comp.sum();
+        // let aggravate_critical_damage_comp = self.get_critical_damage_aggravate_composition(attribute, element, skill);
+        // let aggravate_critical_damage = aggravate_critical_damage_comp.sum();
+
         let melt_ratio = if element == Element::Pyro { 2.0 } else { 1.5 };
         let vaporize_ratio = if element == Element::Hydro { 2.0 } else { 1.5 };
 
@@ -200,6 +218,73 @@ impl DamageBuilder for ComplicatedDamageBuilder {
             is_heal: false,
             is_shield: false
         } * (defensive_ratio * resistance_ratio);
+
+        // let damage_melt = if element == Element::Pyro || element == Element::Cryo {
+        //     let base_damage = DamageResult {
+        //     expectation: base_damage * (1.0 + bonus) * (1.0 + melt_critical * melt_critical_damage),
+        //     critical: base_damage * (1.0 + bonus) * (1.0 + melt_critical_damage),
+        //     non_critical: base_damage * (1.0 + bonus),
+        //     lunar_type: MoonglareReaction::None,
+        //     is_heal: false,
+        //     is_shield: false
+        // } * (defensive_ratio * resistance_ratio);
+
+        //     Some(base_damage * melt_ratio * (1.0 + melt_enhance))
+        // } else {
+        //     None
+        // };
+        // let damage_vaporize = if element == Element::Pyro || element == Element::Hydro {
+        //     let base_damage = DamageResult {
+        //     expectation: base_damage * (1.0 + bonus) * (1.0 + vaporize_critical * vaporize_critical_damage),
+        //     critical: base_damage * (1.0 + bonus) * (1.0 + vaporize_critical_damage),
+        //     non_critical: base_damage * (1.0 + bonus),
+        //     lunar_type: MoonglareReaction::None,
+        //     is_heal: false,
+        //     is_shield: false
+        // } * (defensive_ratio * resistance_ratio);
+
+        //     Some(base_damage * vaporize_ratio * (1.0 + vaporize_enhance))
+        // } else {
+        //     None
+        // };
+
+        // let damage_spread = if element != Element::Dendro {
+        //     None
+        // } else {
+        //     let spread_base_damage = {
+        //         let reaction_ratio = 1.25;
+        //         base_damage + LEVEL_MULTIPLIER[character_level - 1] * reaction_ratio * (1.0 + spread_enhance)
+        //     };
+
+        //     let dmg = DamageResult {
+        //         critical: spread_base_damage * (1.0 + bonus) * (1.0 + spread_critical_damage),
+        //         non_critical: spread_base_damage * (1.0 + bonus),
+        //         expectation: spread_base_damage * (1.0 + bonus) * (1.0 + spread_critical_damage * spread_critical),
+        //         lunar_type: MoonglareReaction::None,
+        //         is_heal: false,
+        //         is_shield: false
+        //     } * (defensive_ratio * resistance_ratio);
+        //     Some(dmg)
+        // };
+
+        // let damage_aggravate = if element != Element::Electro {
+        //     None
+        // } else {
+        //     let aggravate_base_damage = {
+        //         let reaction_ratio = 1.15;
+        //         base_damage + LEVEL_MULTIPLIER[character_level - 1] * reaction_ratio * (1.0 + aggravate_enhance)
+        //     };
+
+        //     let dmg = DamageResult {
+        //         critical: aggravate_base_damage * (1.0 + bonus) * (1.0 + aggravate_critical_damage),
+        //         non_critical: aggravate_base_damage * (1.0 + bonus),
+        //         expectation: aggravate_base_damage * (1.0 + bonus) * (1.0 + aggravate_critical_damage * aggravate_critical),
+        //         lunar_type: MoonglareReaction::None,
+        //         is_heal: false,
+        //         is_shield: false
+        //     } * (defensive_ratio * resistance_ratio);
+        //     Some(dmg)
+        // };
 
         let damage_melt = if element == Element::Pyro || element == Element::Cryo {
             Some(damage_normal * melt_ratio * (1.0 + melt_enhance))
@@ -269,6 +354,16 @@ impl DamageBuilder for ComplicatedDamageBuilder {
             melt_enhance: melt_enhance_comp.0,
             vaporize_enhance: vaporize_enhance_comp.0,
 
+            // melt_critical: melt_critical_comp.0,
+            // vaporize_critical: vaporize_critical_comp.0,
+            // spread_critical: spread_critical_comp.0,
+            // aggravate_critical: aggravate_critical_comp.0,
+
+            // melt_critical_damage: melt_critical_damage_comp.0,
+            // vaporize_critical_damage: vaporize_critical_damage_comp.0,
+            // spread_critical_damage: spread_critical_damage_comp.0,
+            // aggravate_critical_damage: aggravate_critical_damage_comp.0,
+
             lunar_charged_enhance: HashMap::new(),
             lunar_bloom_enhance: HashMap::new(),
 
@@ -333,10 +428,10 @@ impl DamageBuilder for ComplicatedDamageBuilder {
 
         let base_damage = atk * atk_ratio + def * def_ratio + hp * hp_ratio + em * em_ratio + extra_damage;
 
-        let critical_comp = self.get_critical_composition(attribute, element, skill);
+        let critical_comp = self.get_critical_moonglare_composition(attribute, element, lunar_type, skill);
         let critical = critical_comp.sum().clamp(0.0, 1.0);
 
-        let critical_damage_comp = self.get_critical_damage_composition(attribute, element, skill);
+        let critical_damage_comp = self.get_critical_damage_moonglare_composition(attribute, element, lunar_type, skill);
         let critical_damage = critical_damage_comp.sum();
 
         let res_minus_comp = self.get_res_minus_composition(attribute, element);
@@ -433,6 +528,16 @@ impl DamageBuilder for ComplicatedDamageBuilder {
             melt_enhance: HashMap::new(),
             vaporize_enhance: HashMap::new(),
 
+            // melt_critical: HashMap::new(),
+            // vaporize_critical: HashMap::new(),
+            // spread_critical: HashMap::new(),
+            // aggravate_critical: HashMap::new(),
+
+            // melt_critical_damage: HashMap::new(),
+            // vaporize_critical_damage: HashMap::new(),
+            // spread_critical_damage: HashMap::new(),
+            // aggravate_critical_damage: HashMap::new(),
+
             lunar_charged_enhance: lunar_charged_enhance_comp.0,
             lunar_bloom_enhance: lunar_bloom_enhance_comp.0,
 
@@ -506,6 +611,16 @@ impl DamageBuilder for ComplicatedDamageBuilder {
             melt_enhance: HashMap::new(),
             vaporize_enhance: HashMap::new(),
 
+            // melt_critical: HashMap::new(),
+            // vaporize_critical: HashMap::new(),
+            // spread_critical: HashMap::new(),
+            // aggravate_critical: HashMap::new(),
+
+            // melt_critical_damage: HashMap::new(),
+            // vaporize_critical_damage: HashMap::new(),
+            // spread_critical_damage: HashMap::new(),
+            // aggravate_critical_damage: HashMap::new(),
+
             lunar_charged_enhance: HashMap::new(),
             lunar_bloom_enhance: HashMap::new(),
 
@@ -578,6 +693,16 @@ impl DamageBuilder for ComplicatedDamageBuilder {
 
             melt_enhance: HashMap::new(),
             vaporize_enhance: HashMap::new(),
+
+            // melt_critical: HashMap::new(),
+            // vaporize_critical: HashMap::new(),
+            // spread_critical: HashMap::new(),
+            // aggravate_critical: HashMap::new(),
+
+            // melt_critical_damage: HashMap::new(),
+            // vaporize_critical_damage: HashMap::new(),
+            // spread_critical_damage: HashMap::new(),
+            // aggravate_critical_damage: HashMap::new(),
 
             lunar_charged_enhance: HashMap::new(),
             lunar_bloom_enhance: HashMap::new(),
@@ -746,11 +871,73 @@ impl ComplicatedDamageBuilder {
         comp
     }
 
+    fn get_critical_damage_moonglare_composition(&self, attribute: &ComplicatedAttributeGraph, element: Element, lunar_type: MoonglareReaction, skill: SkillType) -> EntryType {
+        let mut comp = self.get_critical_damage_composition(attribute, element, skill);
+        comp.merge(&attribute.get_attribute_composition(AttributeName::critical_damage_name_by_moonglare_reaction(lunar_type).unwrap()));
+        comp
+    }
+
+    // fn get_critical_damage_melt_composition(&self, attribute: &ComplicatedAttributeGraph, element: Element, skill: SkillType) -> EntryType {
+    //     let mut comp = self.get_critical_damage_composition(attribute, element, skill);
+    //     comp.merge(&attribute.get_attribute_composition(AttributeName::CriticalDamageMelt));
+    //     comp
+    // }
+
+    // fn get_critical_damage_vaporize_composition(&self, attribute: &ComplicatedAttributeGraph, element: Element, skill: SkillType) -> EntryType {
+    //     let mut comp = self.get_critical_damage_composition(attribute, element, skill);
+    //     comp.merge(&attribute.get_attribute_composition(AttributeName::CriticalDamageVaporize));
+    //     comp
+    // }
+
+    // fn get_critical_damage_spread_composition(&self, attribute: &ComplicatedAttributeGraph, element: Element, skill: SkillType) -> EntryType {
+    //     let mut comp = self.get_critical_damage_composition(attribute, element, skill);
+    //     comp.merge(&attribute.get_attribute_composition(AttributeName::CriticalDamageSpread));
+    //     comp
+    // }
+
+    // fn get_critical_damage_aggravate_composition(&self, attribute: &ComplicatedAttributeGraph, element: Element, skill: SkillType) -> EntryType {
+    //     let mut comp = self.get_critical_damage_composition(attribute, element, skill);
+    //     comp.merge(&attribute.get_attribute_composition(AttributeName::CriticalDamageAggravate));
+    //     comp
+    // }
+
     fn get_critical_composition(&self, attribute: &ComplicatedAttributeGraph, element: Element, skill: SkillType) -> EntryType {
         let mut comp = attribute.get_critical_composition(element, skill);
         comp.merge(&self.extra_critical_rate);
+
         comp
     }
+
+    fn get_critical_moonglare_composition(&self, attribute: &ComplicatedAttributeGraph, element: Element, lunar_type: MoonglareReaction, skill: SkillType) -> EntryType {
+        let mut comp = self.get_critical_composition(attribute, element, skill);
+        comp.merge(&attribute.get_attribute_composition(AttributeName::critical_rate_name_by_moonglare_reaction(lunar_type).unwrap()));
+
+        comp
+    }
+
+    // fn get_critical_melt_composition(&self, attribute: &ComplicatedAttributeGraph, element: Element, skill: SkillType) -> EntryType {
+    //     let mut comp = self.get_critical_composition(attribute, element, skill);
+    //     comp.merge(&attribute.get_attribute_composition(AttributeName::CriticalMelt));
+    //     comp
+    // }
+
+    // fn get_critical_vaporize_composition(&self, attribute: &ComplicatedAttributeGraph, element: Element, skill: SkillType) -> EntryType {
+    //     let mut comp = self.get_critical_composition(attribute, element, skill);
+    //     comp.merge(&attribute.get_attribute_composition(AttributeName::CriticalVaporize));
+    //     comp
+    // }
+
+    // fn get_critical_spread_composition(&self, attribute: &ComplicatedAttributeGraph, element: Element, skill: SkillType) -> EntryType {
+    //     let mut comp = self.get_critical_composition(attribute, element, skill);
+    //     comp.merge(&attribute.get_attribute_composition(AttributeName::CriticalSpread));
+    //     comp
+    // }
+
+    // fn get_critical_aggravate_composition(&self, attribute: &ComplicatedAttributeGraph, element: Element, skill: SkillType) -> EntryType {
+    //     let mut comp = self.get_critical_composition(attribute, element, skill);
+    //     comp.merge(&attribute.get_attribute_composition(AttributeName::CriticalAggravate));
+    //     comp
+    // }
 
     fn get_bonus_composition(&self, attribute: &ComplicatedAttributeGraph, element: Element, skill: SkillType) -> EntryType {
         let mut names = vec![

@@ -182,22 +182,55 @@ impl DamageBuilder for SimpleDamageBuilder {
         let melt_damage = if element != Element::Pyro && element != Element::Cryo {
             None
         } else {
+            // let melt_critical_rate = critical_rate + attribute.get_value(AttributeName::CriticalMelt);
+            // let melt_critical_damage = critical_damage + attribute.get_value(AttributeName::CriticalDamageMelt);
+            let melt_critical_rate = critical_rate;
+            let melt_critical_damage = critical_damage;
+
+            let base_damage = DamageResult {
+                critical: base * (1.0 + bonus) * (1.0 + melt_critical_damage),
+                non_critical: base * (1.0 + bonus),
+                expectation: base * (1.0 + bonus) * (1.0 + melt_critical_damage * melt_critical_rate),
+                lunar_type: MoonglareReaction::None,
+                is_heal: false,
+                is_shield: false
+            } * (defensive_ratio * resistance_ratio);
+
             let reaction_ratio = if element == Element::Pyro { 2.0 } else { 1.5 };
             let enhance = Reaction::amp(em) + self.extra_enhance_melt + attribute.get_value(AttributeName::EnhanceMelt);
-            Some(normal_damage * (reaction_ratio * (1.0 + enhance)))
+            Some(base_damage * (reaction_ratio * (1.0 + enhance)))
         };
 
         let vaporize_damage = if element != Element::Pyro && element != Element::Hydro {
             None
         } else {
+            // let vaporize_critical_rate = critical_rate + attribute.get_value(AttributeName::CriticalVaporize);
+            // let vaporize_critical_damage = critical_damage + attribute.get_value(AttributeName::CriticalDamageVaporize);
+            let vaporize_critical_rate = critical_rate;
+            let vaporize_critical_damage = critical_damage;
+
+            let base_damage = DamageResult {
+                critical: base * (1.0 + bonus) * (1.0 + vaporize_critical_damage),
+                non_critical: base * (1.0 + bonus),
+                expectation: base * (1.0 + bonus) * (1.0 + vaporize_critical_damage * vaporize_critical_rate),
+                lunar_type: MoonglareReaction::None,
+                is_heal: false,
+                is_shield: false
+            } * (defensive_ratio * resistance_ratio);
+
             let reaction_ratio = if element == Element::Pyro { 1.5 } else { 2.0 };
             let enhance = Reaction::amp(em) + self.extra_enhance_vaporize + attribute.get_value(AttributeName::EnhanceVaporize);
-            Some(normal_damage * (reaction_ratio * (1.0 + enhance)))
+            Some(base_damage * (reaction_ratio * (1.0 + enhance)))
         };
 
         let spread_damage = if element != Element::Dendro {
             None
         } else {
+            // let spread_critical_rate = critical_rate + attribute.get_value(AttributeName::CriticalSpread);
+            // let spread_critical_damage = critical_damage + attribute.get_value(AttributeName::CriticalDamageSpread);
+            let spread_critical_rate = critical_rate;
+            let spread_critical_damage = critical_damage;
+
             let spread_base_damage = {
                 let reaction_ratio = 1.25;
                 let bonus = Reaction::catalyze(em);
@@ -206,9 +239,9 @@ impl DamageBuilder for SimpleDamageBuilder {
             };
 
             let dmg = DamageResult {
-                critical: spread_base_damage * (1.0 + bonus) * (1.0 + critical_damage),
+                critical: spread_base_damage * (1.0 + bonus) * (1.0 + spread_critical_damage),
                 non_critical: spread_base_damage * (1.0 + bonus),
-                expectation: spread_base_damage * (1.0 + bonus) * (1.0 + critical_damage * critical_rate),
+                expectation: spread_base_damage * (1.0 + bonus) * (1.0 + spread_critical_damage * spread_critical_rate),
                 lunar_type: MoonglareReaction::None,
                 is_heal: false,
                 is_shield: false
@@ -219,6 +252,11 @@ impl DamageBuilder for SimpleDamageBuilder {
         let aggravate_damage = if element != Element::Electro {
             None
         } else {
+            // let aggravate_critical_rate = critical_rate + attribute.get_value(AttributeName::CriticalAggravate);
+            // let aggravate_critical_damage = critical_damage + attribute.get_value(AttributeName::CriticalDamageAggravate);
+            let aggravate_critical_rate = critical_rate;
+            let aggravate_critical_damage = critical_damage;
+
             let aggravate_base_damage = {
                 let reaction_ratio = 1.15;
                 let bonus = Reaction::catalyze(em);
@@ -227,9 +265,9 @@ impl DamageBuilder for SimpleDamageBuilder {
             };
 
             let dmg = DamageResult {
-                critical: aggravate_base_damage * (1.0 + bonus) * (1.0 + critical_damage),
+                critical: aggravate_base_damage * (1.0 + bonus) * (1.0 + aggravate_critical_damage),
                 non_critical: aggravate_base_damage * (1.0 + bonus),
-                expectation: aggravate_base_damage * (1.0 + bonus) * (1.0 + critical_damage * critical_rate),
+                expectation: aggravate_base_damage * (1.0 + bonus) * (1.0 + aggravate_critical_damage * aggravate_critical_rate),
                 lunar_type: MoonglareReaction::None,
                 is_heal: false,
                 is_shield: false
@@ -265,12 +303,14 @@ impl DamageBuilder for SimpleDamageBuilder {
 
         let critical_rate
             = attribute.get_critical_rate(element, skill)
-            + self.extra_critical_rate;
+            + self.extra_critical_rate
+            + attribute.get_value(AttributeName::critical_rate_name_by_moonglare_reaction(lunar_type).unwrap());
         let critical_rate = critical_rate.clamp(0.0, 1.0);
 
         let critical_damage
             = attribute.get_critical_damage(element, skill)
-            + self.extra_critical_damage;
+            + self.extra_critical_damage
+            + attribute.get_value(AttributeName::critical_damage_name_by_moonglare_reaction(lunar_type).unwrap());
 
         let resistance_ratio = {
             let res_minus = self.extra_res_minus + attribute.get_enemy_res_minus(element, skill);

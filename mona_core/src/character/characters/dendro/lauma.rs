@@ -107,6 +107,22 @@ pub struct LaumaEffect {
 
 impl<A: Attribute> ChangeAttribute<A> for LaumaEffect {
     fn change_attribute(&self, attribute: &mut A) {
+        if self.has_p1 {
+            if self.moonsign == Moonsign::Nascent {
+                attribute.set_value_by(AttributeName::CriticalDamageBloom, "天赋：奉向霜夜的明光", 1.0);
+                attribute.set_value_by(AttributeName::CriticalDamageHyperbloom, "天赋：奉向霜夜的明光", 1.0);
+                attribute.set_value_by(AttributeName::CriticalDamageBurgeon , "天赋：奉向霜夜的明光", 1.0);
+
+                attribute.set_value_to(AttributeName::CriticalBloom, "天赋：奉向霜夜的明光", 0.15);
+                attribute.set_value_to(AttributeName::CriticalHyperbloom, "天赋：奉向霜夜的明光", 0.15);
+                attribute.set_value_to(AttributeName::CriticalBurgeon , "天赋：奉向霜夜的明光", 0.15);
+            } else if self.moonsign == Moonsign::Ascendant {
+                attribute.set_value_by(AttributeName::CriticalDamageLunarBloom, "天赋：奉向霜夜的明光", 0.2);
+
+                attribute.set_value_by(AttributeName::CriticalLunarBloom, "天赋：奉向霜夜的明光", 0.1);
+            }
+        }
+
         if self.has_p2 {
             attribute.add_edge1(
                 AttributeName::ElementalMastery,
@@ -130,8 +146,8 @@ impl<A: Attribute> ChangeAttribute<A> for LaumaEffect {
         );
 
         if self.activated_q {
-            let q_bloom_increase = LAUMA_SKILL.q_bloom_increase[self.level_q] + if self.has_c2 { LAUMA_SKILL.c2_bloom_increase } else { 0.0 };
-            let q_lunar_bloom_increase = LAUMA_SKILL.q_lunar_bloom_increase[self.level_q] + if self.has_c2 { LAUMA_SKILL.c2_lunar_bloom_increase } else { 0.0 };
+            let q_bloom_increase = LAUMA_SKILL.q_bloom_increase[self.level_q - 1] + if self.has_c2 { LAUMA_SKILL.c2_bloom_increase } else { 0.0 };
+            let q_lunar_bloom_increase = LAUMA_SKILL.q_lunar_bloom_increase[self.level_q - 1] + if self.has_c2 { LAUMA_SKILL.c2_lunar_bloom_increase } else { 0.0 };
 
             attribute.add_edge1(
                 AttributeName::ElementalMastery,
@@ -266,8 +282,8 @@ impl CharacterTrait for Lauma {
         ItemConfig {
             name: "activated_q",
             title: locale!(
-                zh_cn: "元素爆发：圣言述咏·众心为月",
-                en: "Elemental Burst: Runo: All Hearts Become the Beating Moon",
+                zh_cn: "苍色祷歌",
+                en: "Pale Hymn",
             ),
             config: ItemConfigType::Bool { default: true },
         },
@@ -275,18 +291,11 @@ impl CharacterTrait for Lauma {
     ]);
 
     #[cfg(not(target_family = "wasm"))]
-    const CONFIG_SKILL: Option<&'static [ItemConfig]> = Some(&[
-        ItemConfig::MOONSIGN2
-    ]);
+    const CONFIG_SKILL: Option<&'static [ItemConfig]> = Some(&[]);
 
     fn damage_internal<D: DamageBuilder>(context: &DamageContext<'_, D::AttributeType>, s: usize, config: &CharacterSkillConfig, fumo: Option<Element>) -> D::Result {
         let s: LaumaDamageEnum = num::FromPrimitive::from_usize(s).unwrap();
         let (s1, s2, s3) = context.character_common_data.get_3_skill();
-
-        let moonsign = match *config {
-            CharacterSkillConfig::Lauma { moonsign } => moonsign,
-            _ => Moonsign::None
-        };
 
         use LaumaDamageEnum::*;
         let mut builder = D::new();
@@ -300,11 +309,6 @@ impl CharacterTrait for Lauma {
             };
 
             builder.add_em_ratio("技能倍率", ratio);
-
-            if moonsign == Moonsign::Ascendant {
-                builder.add_extra_critical("天赋：奉向霜夜的明光", 0.1);
-                builder.add_extra_critical_damage("天赋：奉向霜夜的明光", 0.2);
-            }
 
             builder.moonglare(
                 &context.attribute,
