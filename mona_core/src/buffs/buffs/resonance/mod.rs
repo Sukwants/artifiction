@@ -242,3 +242,12 @@ impl BuffMeta for BuffResonanceDendro2 {
         })
     }
 }
+
+mod moonsign;
+pub use moonsign::BuffMoonsignPyro;
+pub use moonsign::BuffMoonsignHydro;
+pub use moonsign::BuffMoonsignAnemo;
+pub use moonsign::BuffMoonsignElectro;
+pub use moonsign::BuffMoonsignDendro;
+pub use moonsign::BuffMoonsignCryo;
+pub use moonsign::BuffMoonsignGeo;

@@ -142,6 +142,13 @@ pub enum BuffName {
     ResonanceGeo2,
     ResonanceHydro2,
     ResonanceDendro2,
+    MoonsignPyro,
+    MoonsignHydro,
+    MoonsignAnemo,
+    MoonsignElectro,
+    MoonsignDendro,
+    MoonsignCryo,
+    MoonsignGeo,
 
     // artifact
     Instructor4,
