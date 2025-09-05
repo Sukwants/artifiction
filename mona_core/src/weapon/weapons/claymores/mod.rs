@@ -37,6 +37,8 @@ pub use earth_shaker::EarthShaker;
 pub use fang_of_the_mountain_king::FangOfTheMountainKing;
 pub use fruitful_hook::FruitfulHook;
 pub use a_thousand_blazing_suns::AThousandBlazingSuns;
+pub use flameforged_insight::FlameforgedInsight;
+pub use master_key::MasterKey;
 
 pub mod wolfs_gravestone;
 pub mod skyward_pride;
@@ -77,3 +79,5 @@ mod earth_shaker;
 mod fang_of_the_mountain_king;
 mod fruitful_hook;
 mod a_thousand_blazing_suns;
+mod flameforged_insight;
+mod master_key;

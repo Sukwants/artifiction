@@ -43,6 +43,8 @@ pub use starcallers_watch::StarcallersWatch;
 pub use sunny_morning_sleep_in::SunnyMorningSleepIn;
 pub use vivid_notions::VividNotions;
 pub use nightweavers_looking_glass::NightweaversLookingGlass;
+pub use blackmarrow_lantern::BlackmarrowLantern;
+pub use etherlight_spindlelute::EtherlightSpindlelute;
 
 pub mod lost_prayer_to_the_sacred_winds;
 pub mod skyward_atlas;
@@ -89,3 +91,5 @@ mod starcallers_watch;
 mod sunny_morning_sleep_in;
 mod vivid_notions;
 mod nightweavers_looking_glass;
+mod blackmarrow_lantern;
+mod etherlight_spindlelute;

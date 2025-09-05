@@ -66,7 +66,7 @@ pub const AINO_STATIC_DATA: CharacterStaticData = CharacterStaticData {
     def: [51, 131, 169, 253, 280, 322, 358, 400, 427, 469, 496, 538, 565, 607, 649],
     sub_stat: CharacterSubStatFamily::ElementalMastery96,
     weapon_type: WeaponType::Claymore,
-    star: 5,
+    star: 4,
     skill_name1: locale!(
         zh_cn: "敲打修理法",
         en: "Bish-Bash-Bosh Repair",

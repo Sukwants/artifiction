@@ -46,6 +46,8 @@ pub use sturdy_bone::SturdyBone;
 pub use peak_patrol_song::PeakPatrolSong;
 pub use calamity_of_eshu::CalamityOfEshu;
 pub use azurelight::Azurelight;
+pub use serenitys_call::SerenitysCall;
+pub use moonweavers_dawn::MoonweaversDawn;
 
 pub mod mistsplitter_reforged;
 pub mod aquila_favonia;
@@ -95,3 +97,5 @@ mod sturdy_bone;
 mod peak_patrol_song;
 mod calamity_of_eshu;
 mod azurelight;
+mod serenitys_call;
+mod moonweavers_dawn;

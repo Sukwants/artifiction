@@ -41,6 +41,7 @@ pub use chain_breaker::ChainBreaker;
 pub use flower_wreathed_feathers::FlowerWreathedFeathers;
 pub use astral_vultures_crimson_plumage::AstralVulturesCrimsonPlumage;
 pub use sequence_of_solitude::SequenceOfSolitude;
+pub use snare_hook::SnareHook;
 
 pub mod polar_star;
 pub mod thundering_pulse;
@@ -85,3 +86,4 @@ pub mod chain_breaker;
 pub mod flower_wreathed_feathers;
 pub mod astral_vultures_crimson_plumage;
 pub mod sequence_of_solitude;
+mod snare_hook;
