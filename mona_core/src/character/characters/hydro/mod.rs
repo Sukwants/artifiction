@@ -12,6 +12,7 @@ pub mod furina;
 pub mod sigewinne;
 pub mod mualani;
 pub mod dahlia;
+pub mod aino;
 
 pub use barbara::Barbara;
 pub use mona::Mona;
@@ -27,3 +28,4 @@ pub use furina::Furina;
 pub use sigewinne::Sigewinne;
 pub use mualani::Mualani;
 pub use dahlia::Dahlia;
+pub use aino::Aino;

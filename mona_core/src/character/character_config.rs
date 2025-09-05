@@ -55,5 +55,6 @@ pub enum CharacterConfig {
     Ifa { nightsoul_total: usize },
     Ineffa { activated_p2: bool },
     Lauma { activated_q: bool, moonsign: Moonsign },
+    Aino { moonsign: Moonsign },
     NoConfig,
 }

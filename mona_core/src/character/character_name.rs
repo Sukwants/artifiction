@@ -129,4 +129,5 @@ pub enum CharacterName {
     Skirk,
     Ineffa,
     Lauma,
+    Aino,
 }

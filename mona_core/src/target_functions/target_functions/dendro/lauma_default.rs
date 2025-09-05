@@ -111,10 +111,10 @@ impl TargetFunction for LaumaDefaultTargetFunction {
             + (if context.character_common_data.constellation >= 6 {
                 Lauma::damage::<SimpleDamageBuilder>(&context, <Lauma as CharacterTrait>::DamageEnumType::C6E, &config, None).normal.expectation
             } else { 0.0 })
-        ) * 4.0;
+        ) * 4.0; // waiting to be measured
         let dmg_c6a = if context.character_common_data.constellation >= 6 {
             Lauma::damage::<SimpleDamageBuilder>(&context, <Lauma as CharacterTrait>::DamageEnumType::C6A, &config, None).normal.expectation
-        } else { 0.0 } * 12.0;
+        } else { 0.0 } * 12.0; // waiting to be measured
         let dmg_bloom = 
             transformative_damage(character.common_data.level, attribute, enemy).bloom * self.bloom_count as f64
             + transformative_damage(character.common_data.level, attribute, enemy).hyperbloom * self.hyperbloom_count as f64

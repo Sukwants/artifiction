@@ -116,6 +116,9 @@ pub enum BuffName {
     EscoffierC2,
     Ineffa,
     Lauma,
+    AinoC1,
+    AinoC6,
+
 
     // weapon
     FreedomSworn,
