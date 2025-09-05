@@ -108,7 +108,7 @@ pub struct LaumaEffect {
 impl<A: Attribute> ChangeAttribute<A> for LaumaEffect {
     fn change_attribute(&self, attribute: &mut A) {
         if self.has_p1 {
-            if self.moonsign == Moonsign::Nascent {
+            if self.moonsign.is_nascent() {
                 attribute.set_value_by(AttributeName::CriticalDamageBloom, "天赋：奉向霜夜的明光", 1.0);
                 attribute.set_value_by(AttributeName::CriticalDamageHyperbloom, "天赋：奉向霜夜的明光", 1.0);
                 attribute.set_value_by(AttributeName::CriticalDamageBurgeon , "天赋：奉向霜夜的明光", 1.0);
@@ -116,7 +116,7 @@ impl<A: Attribute> ChangeAttribute<A> for LaumaEffect {
                 attribute.set_value_to(AttributeName::CriticalBloom, "天赋：奉向霜夜的明光", 0.15);
                 attribute.set_value_to(AttributeName::CriticalHyperbloom, "天赋：奉向霜夜的明光", 0.15);
                 attribute.set_value_to(AttributeName::CriticalBurgeon , "天赋：奉向霜夜的明光", 0.15);
-            } else if self.moonsign == Moonsign::Ascendant {
+            } else if self.moonsign.is_ascendant() {
                 attribute.set_value_by(AttributeName::CriticalDamageLunarBloom, "天赋：奉向霜夜的明光", 0.2);
 
                 attribute.set_value_by(AttributeName::CriticalLunarBloom, "天赋：奉向霜夜的明光", 0.1);
@@ -187,7 +187,7 @@ impl<A: Attribute> ChangeAttribute<A> for LaumaEffect {
             );
         }
 
-        if self.has_c6 && self.moonsign == Moonsign::Ascendant {
+        if self.has_c6 && self.moonsign.is_ascendant() {
             attribute.set_value_by(AttributeName::IncreaseLunarBloom, "六命擢升", 0.25);
         }
     }

@@ -31,7 +31,7 @@ impl<A: Attribute> Buff<A> for BuffLauma {
         }
 
         if self.has_p1 {
-            if self.moonsign == Moonsign::Nascent {
+            if self.moonsign.is_nascent() {
                 attribute.set_value_by(AttributeName::CriticalDamageBloom, "菈乌玛「奉向霜夜的明光」", 1.0);
                 attribute.set_value_by(AttributeName::CriticalDamageHyperbloom, "菈乌玛「奉向霜夜的明光」", 1.0);
                 attribute.set_value_by(AttributeName::CriticalDamageBurgeon , "菈乌玛「奉向霜夜的明光」", 1.0);
@@ -39,7 +39,8 @@ impl<A: Attribute> Buff<A> for BuffLauma {
                 attribute.set_value_to(AttributeName::CriticalBloom, "菈乌玛「奉向霜夜的明光」", 0.15);
                 attribute.set_value_to(AttributeName::CriticalHyperbloom, "菈乌玛「奉向霜夜的明光」", 0.15);
                 attribute.set_value_to(AttributeName::CriticalBurgeon , "菈乌玛「奉向霜夜的明光」", 0.15);
-            } else if self.moonsign == Moonsign::Ascendant {
+            }
+            if self.moonsign.is_ascendant() {
                 attribute.set_value_by(AttributeName::CriticalDamageLunarBloom, "菈乌玛「奉向霜夜的明光」", 0.2);
 
                 attribute.set_value_by(AttributeName::CriticalLunarBloom, "菈乌玛「奉向霜夜的明光」", 0.1);

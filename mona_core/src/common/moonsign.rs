@@ -12,3 +12,13 @@ pub enum Moonsign {
     Nascent,
     Ascendant,
 }
+
+impl Moonsign {
+    pub fn is_nascent(&self) -> bool {
+        *self == Moonsign::Nascent || *self == Moonsign::Ascendant
+    }
+
+    pub fn is_ascendant(&self) -> bool {
+        *self == Moonsign::Ascendant
+    }
+}
