@@ -12,7 +12,7 @@ pub struct BuffMoonsignPyro {
 
 impl<A: Attribute> Buff<A> for BuffMoonsignPyro {
     fn change_attribute(&self, attribute: &mut A) {
-        attribute.set_value_by(AttributeName::EnhanceMoonglare, "月兆祝赐-火", (self.atk / 100.0 * 0.009).min(0.36));
+        attribute.set_value_by(AttributeName::EnhanceMoonglare, "月荫-火", (self.atk / 100.0 * 0.009).min(0.36));
     }
 }
 
@@ -21,7 +21,7 @@ impl BuffMeta for BuffMoonsignPyro {
     const META_DATA: BuffMetaData = BuffMetaData {
         name: BuffName::MoonsignPyro,
         name_locale: crate::common::i18n::locale!(
-            zh_cn: "月兆祝赐-火",
+            zh_cn: "月荫-火",
             en: "Moonsign-Benediction Pyro",
         ),
         image: BuffImage::Misc("moonsign_pyro"),
@@ -63,7 +63,7 @@ pub struct BuffMoonsignHydro {
 
 impl<A: Attribute> Buff<A> for BuffMoonsignHydro {
     fn change_attribute(&self, attribute: &mut A) {
-        attribute.set_value_by(AttributeName::EnhanceMoonglare, "月兆祝赐-水", (self.hp / 1000.0 * 0.006).min(0.36));
+        attribute.set_value_by(AttributeName::EnhanceMoonglare, "月荫-水", (self.hp / 1000.0 * 0.006).min(0.36));
     }
 }
 
@@ -72,7 +72,7 @@ impl BuffMeta for BuffMoonsignHydro {
     const META_DATA: BuffMetaData = BuffMetaData {
         name: BuffName::MoonsignHydro,
         name_locale: crate::common::i18n::locale!(
-            zh_cn: "月兆祝赐-水",
+            zh_cn: "月荫-水",
             en: "Moonsign-Benediction Hydro",
         ),
         image: BuffImage::Misc("moonsign_hydro"),
@@ -114,7 +114,7 @@ pub struct BuffMoonsignAnemo {
 
 impl<A: Attribute> Buff<A> for BuffMoonsignAnemo {
     fn change_attribute(&self, attribute: &mut A) {
-        attribute.set_value_by(AttributeName::EnhanceMoonglare, "月兆祝赐-风", (self.em / 100.0 * 0.0225).min(0.36));
+        attribute.set_value_by(AttributeName::EnhanceMoonglare, "月荫-风", (self.em / 100.0 * 0.0225).min(0.36));
     }
 }
 
@@ -123,7 +123,7 @@ impl BuffMeta for BuffMoonsignAnemo {
     const META_DATA: BuffMetaData = BuffMetaData {
         name: BuffName::MoonsignAnemo,
         name_locale: crate::common::i18n::locale!(
-            zh_cn: "月兆祝赐-风",
+            zh_cn: "月荫-风",
             en: "Moonsign-Benediction Anemo",
         ),
         image: BuffImage::Misc("moonsign_anemo"),
@@ -165,7 +165,7 @@ pub struct BuffMoonsignElectro {
 
 impl<A: Attribute> Buff<A> for BuffMoonsignElectro {
     fn change_attribute(&self, attribute: &mut A) {
-        attribute.set_value_by(AttributeName::EnhanceMoonglare, "月兆祝赐-雷", (self.atk / 100.0 * 0.009).min(0.36));
+        attribute.set_value_by(AttributeName::EnhanceMoonglare, "月荫-雷", (self.atk / 100.0 * 0.009).min(0.36));
     }
 }
 
@@ -174,7 +174,7 @@ impl BuffMeta for BuffMoonsignElectro {
     const META_DATA: BuffMetaData = BuffMetaData {
         name: BuffName::MoonsignElectro,
         name_locale: crate::common::i18n::locale!(
-            zh_cn: "月兆祝赐-雷",
+            zh_cn: "月荫-雷",
             en: "Moonsign-Benediction Electro",
         ),
         image: BuffImage::Misc("moonsign_electro"),
@@ -216,7 +216,7 @@ pub struct BuffMoonsignDendro {
 
 impl<A: Attribute> Buff<A> for BuffMoonsignDendro {
     fn change_attribute(&self, attribute: &mut A) {
-        attribute.set_value_by(AttributeName::EnhanceMoonglare, "月兆祝赐-草", (self.em * 0.0225).min(0.36));
+        attribute.set_value_by(AttributeName::EnhanceMoonglare, "月荫-草", (self.em * 0.0225).min(0.36));
     }
 }
 
@@ -225,7 +225,7 @@ impl BuffMeta for BuffMoonsignDendro {
     const META_DATA: BuffMetaData = BuffMetaData {
         name: BuffName::MoonsignDendro,
         name_locale: crate::common::i18n::locale!(
-            zh_cn: "月兆祝赐-草",
+            zh_cn: "月荫-草",
             en: "Moonsign-Benediction Dendro",
         ),
         image: BuffImage::Misc("moonsign_dendro"),
@@ -267,7 +267,7 @@ pub struct BuffMoonsignCryo {
 
 impl<A: Attribute> Buff<A> for BuffMoonsignCryo {
     fn change_attribute(&self, attribute: &mut A) {
-        attribute.set_value_by(AttributeName::EnhanceMoonglare, "月兆祝赐-冰", (self.atk / 100.0 * 0.009).min(0.36));
+        attribute.set_value_by(AttributeName::EnhanceMoonglare, "月荫-冰", (self.atk / 100.0 * 0.009).min(0.36));
     }
 }
 
@@ -276,7 +276,7 @@ impl BuffMeta for BuffMoonsignCryo {
     const META_DATA: BuffMetaData = BuffMetaData {
         name: BuffName::MoonsignCryo,
         name_locale: crate::common::i18n::locale!(
-            zh_cn: "月兆祝赐-冰",
+            zh_cn: "月荫-冰",
             en: "Moonsign-Benediction Cryo",
         ),
         image: BuffImage::Misc("moonsign_cryo"),
@@ -318,7 +318,7 @@ pub struct BuffMoonsignGeo {
 
 impl<A: Attribute> Buff<A> for BuffMoonsignGeo {
     fn change_attribute(&self, attribute: &mut A) {
-        attribute.set_value_by(AttributeName::EnhanceMoonglare, "月兆祝赐-岩", (self.def / 100.0 * 0.01).min(0.36));
+        attribute.set_value_by(AttributeName::EnhanceMoonglare, "月荫-岩", (self.def / 100.0 * 0.01).min(0.36));
     }
 }
 
@@ -327,7 +327,7 @@ impl BuffMeta for BuffMoonsignGeo {
     const META_DATA: BuffMetaData = BuffMetaData {
         name: BuffName::MoonsignGeo,
         name_locale: crate::common::i18n::locale!(
-            zh_cn: "月兆祝赐-岩",
+            zh_cn: "月荫-岩",
             en: "Moonsign-Benediction Geo",
         ),
         image: BuffImage::Misc("moonsign_geo"),
