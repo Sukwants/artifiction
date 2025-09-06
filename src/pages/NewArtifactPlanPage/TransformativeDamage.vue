@@ -39,16 +39,11 @@ export default {
 
             const r = (x) => Math.round(x)
 
-            const checkNull = (value) => {
-                if(value < 0) return " "
-                return value
-            }
-
             const push = (name) => {
                 temp.push({
-                    expectation: r(checkNull(this.data[name]?.expectation)) ?? NO_DATA,
-                    critical: r(checkNull(this.data[name]?.critical)) ?? NO_DATA,
-                    nonCritical: r(checkNull(this.data[name]?.non_critical)) ?? NO_DATA,
+                    expectation: r(this.data[name]?.expectation) ?? NO_DATA,
+                    critical: r(this.data[name]?.critical) ?? NO_DATA,
+                    nonCritical: r(this.data[name]?.non_critical) ?? NO_DATA,
                     name: this.t(`dmg.${name}`),
                 })
             }

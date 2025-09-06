@@ -56,7 +56,7 @@ impl WeaponTrait for MasterKey {
         #[cfg(not(target_family = "wasm"))]
         effect: Some(locale!(
             zh_cn: "触发元素反应后的12秒内，元素精通提升 <span style=\"color: #409EFF;\">60-75-90-105-120</span> 。月兆·满辉：该效果中的元素精通额外提升 <span style=\"color: #409EFF;\">60-75-90-105-120</span> 。装备者处于队伍后台时，依然能触发上述效果。",
-            en: "Upon causing an Elemental Reaction, increases Elemental Mastery by <span style=\"color: #409EFF;\">60-75-90-105-120</span> for 12s. Moonsign: Ascendant Gleam: Elemental Mastery from this effect is further increased by <span style=\"color: #409EFF;\">60-75-90-28%-32%</span> . This effect can be triggered even if the equipping character is off-field."
+            en: "Upon causing an Elemental Reaction, increases Elemental Mastery by <span style=\"color: #409EFF;\">60-75-90-105-120</span> for 12s. Moonsign: Ascendant Gleam: Elemental Mastery from this effect is further increased by <span style=\"color: #409EFF;\">60-75-90-105-120</span> . This effect can be triggered even if the equipping character is off-field."
         )),
         #[cfg(not(target_family = "wasm"))]
         name_locale: locale!(

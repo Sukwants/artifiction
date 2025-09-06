@@ -90,7 +90,7 @@ impl BuffMeta for BuffNahidaC2 {
     const META_DATA: BuffMetaData = BuffMetaData {
         name: BuffName::NahidaC2,
         name_locale: crate::common::i18n::locale!(
-            zh_cn: "纳西妲「正等善见之根」",
+            zh_cn: "纳西妲-「正等善见之根」",
             en: "Nahida-The Root of All Fullness",
         ),
         image: BuffImage::Avatar(CharacterName::Nahida),
