@@ -37,7 +37,7 @@ impl BuffMeta for BuffSilkenMoonsSerenade4 {
         name: BuffName::SilkenMoonsSerenade4,
         name_locale: crate::common::i18n::locale!(
             zh_cn: "纺月的夜歌4",
-            en: "SilkenMoonsSerenade4",
+            en: "Silken Moons Serenade 4",
         ),
         image: BuffImage::Artifact(ArtifactSetName::SilkenMoonsSerenade),
         genre: BuffGenre::Artifact,

@@ -23,7 +23,7 @@ impl BuffMeta for BuffSongOfDaysPast4 {
         name: BuffName::SongOfDaysPast4,
         name_locale: crate::common::i18n::locale!(
             zh_cn: "昔时之歌4",
-            en: "SongOfDaysPast4",
+            en: "Song Of Days Past 4",
         ),
         image: BuffImage::Artifact(ArtifactSetName::SongOfDaysPast),
         genre: BuffGenre::Artifact,

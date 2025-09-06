@@ -68,7 +68,7 @@ impl BuffMeta for BuffAinoC6 {
         name: BuffName::AinoC6,
         name_locale: locale!(
             zh_cn: "爱诺-「天才之为构造之责任」",
-            en: "Aino-The Theory of Ash–Field Equilibrium"
+            en: "Aino-The Burden of Creative Genius"
         ),
         image: BuffImage::Avatar(CharacterName::Aino),
         genre: BuffGenre::Character,

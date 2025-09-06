@@ -23,7 +23,7 @@ impl BuffMeta for BuffDeepwoodMemories4 {
         name: BuffName::DeepwoodMemories4,
         name_locale: crate::common::i18n::locale!(
             zh_cn: "深林的记忆4",
-            en: "DeepwoodMemories4",
+            en: "Deepwood Memories 4",
         ),
         image: BuffImage::Artifact(ArtifactSetName::DeepwoodMemories),
         genre: BuffGenre::Artifact,

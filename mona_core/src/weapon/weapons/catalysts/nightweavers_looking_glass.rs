@@ -42,7 +42,7 @@ pub struct NightweaversLookingGlass;
 impl WeaponTrait for NightweaversLookingGlass {
     const META_DATA: WeaponStaticData = WeaponStaticData {
         name: WeaponName::NightweaversLookingGlass,
-        internal_name: "Catalyst_Ayus",
+        internal_name: "Catalyst_NightweaversLookingGlass",
         weapon_type: WeaponType::Catalyst,
         weapon_sub_stat: Some(WeaponSubStatFamily::EM58),
         weapon_base: WeaponBaseATKFamily::ATK542,

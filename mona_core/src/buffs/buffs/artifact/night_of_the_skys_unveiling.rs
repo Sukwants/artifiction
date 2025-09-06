@@ -26,7 +26,7 @@ impl BuffMeta for BuffNightOfTheSkysUnveiling4 {
         name: BuffName::NightOfTheSkysUnveiling4,
         name_locale: crate::common::i18n::locale!(
             zh_cn: "穹境示现之夜4",
-            en: "NightOfTheSkysUnveiling4",
+            en: "Night Of The Sky's Unveiling 4",
         ),
         image: BuffImage::Artifact(ArtifactSetName::NightOfTheSkysUnveiling),
         genre: BuffGenre::Artifact,

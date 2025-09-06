@@ -30,7 +30,7 @@ impl BuffMeta for BuffScrollOfTheHeroOfCinderCity4 {
         name: BuffName::ScrollOfTheHeroOfCinderCity4,
         name_locale: crate::common::i18n::locale!(
             zh_cn: "烬城勇者绘卷4",
-            en: "ScrollOfTheHeroOfCinderCity4",
+            en: "Scroll Of The Hero Of Cinder City 4",
         ),
         image: BuffImage::Artifact(ArtifactSetName::ScrollOfTheHeroOfCinderCity),
         genre: BuffGenre::Artifact,

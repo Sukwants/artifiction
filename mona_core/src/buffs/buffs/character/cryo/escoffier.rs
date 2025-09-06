@@ -73,7 +73,7 @@ impl BuffMeta for BuffEscoffierC1 {
         name: BuffName::EscoffierC1,
         name_locale: locale!(
             zh_cn: "爱可菲-「味蕾绽放的餐前旋舞」",
-            en: "Escoffier-Inspiration-Immersed Seasoning"
+            en: "Escoffier-Pre-Dinner Dance for Your Taste Buds"
         ),
         image: BuffImage::Avatar(CharacterName::Escoffier),
         genre: BuffGenre::Character,
@@ -107,8 +107,8 @@ impl BuffMeta for BuffEscoffierC2 {
     const META_DATA: BuffMetaData = BuffMetaData {
         name: BuffName::EscoffierC2,
         name_locale: locale!(
-            zh_cn: "爱可菲-「味蕾绽放的餐前旋舞」",
-            en: "Escoffier-Inspiration-Immersed Seasoning"
+            zh_cn: "爱可菲-「鲜香味腴的炖煮艺术」",
+            en: "Escoffier-Fresh, Fragrant Stew Is an Art"
         ),
         image: BuffImage::Avatar(CharacterName::Escoffier),
         genre: BuffGenre::Character,
