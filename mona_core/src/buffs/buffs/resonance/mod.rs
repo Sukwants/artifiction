@@ -22,7 +22,7 @@ impl BuffMeta for BuffResonancePyro2 {
             zh_cn: "元素共鸣-热诚之火",
             en: "Resonance-Fervent Flames",
         ),
-        image: BuffImage::Misc("pyro"),
+        image: BuffImage::Misc("pyro2"),
         genre: BuffGenre::Resonance,
         description: Some(crate::common::i18n::locale!(
             zh_cn: "攻击力提升25%。",
@@ -55,7 +55,7 @@ impl BuffMeta for BuffResonanceCryo2 {
             zh_cn: "元素共鸣-粉碎之冰",
             en: "Resonance-Shattering Ice",
         ),
-        image: BuffImage::Misc("cryo"),
+        image: BuffImage::Misc("cryo2"),
         genre: BuffGenre::Resonance,
         description: Some(crate::common::i18n::locale!(
             zh_cn: "攻击冰元素附着或冻结状态下的敌人时，暴击率提高15%。",
@@ -110,7 +110,7 @@ impl BuffMeta for BuffResonanceGeo2 {
             zh_cn: "元素共鸣-坚定之岩",
             en: "Resonance-Enduring Rock",
         ),
-        image: BuffImage::Misc("geo"),
+        image: BuffImage::Misc("geo2"),
         genre: BuffGenre::Resonance,
         description: Some(crate::common::i18n::locale!(
             zh_cn: "护盾强效提升15%。角色处于护盾保护状态时，①造成的伤害提升15%，对敌人造成伤害时会使敌人的的②岩元素抗性降低20%，持续15秒。",
@@ -168,7 +168,7 @@ impl BuffMeta for BuffResonanceHydro2 {
             zh_cn: "元素共鸣-愈疗之水",
             en: "Resonance-Soothing Water",
         ),
-        image: BuffImage::Misc("hydro"),
+        image: BuffImage::Misc("hydro2"),
         genre: BuffGenre::Resonance,
         description: Some(crate::common::i18n::locale!(
             zh_cn: "火元素附着的持续时间下降40%。生命值上限提升25%",
@@ -202,7 +202,7 @@ impl BuffMeta for BuffResonanceDendro2 {
             zh_cn: "元素共鸣-蔓生之草",
             en: "Resonance-Sprawling Greenery",
         ),
-        image: BuffImage::Misc("dendro"),
+        image: BuffImage::Misc("dendro2"),
         genre: BuffGenre::Resonance,
         description: Some(crate::common::i18n::locale!(
             zh_cn: "元素精通提升50点。触发燃烧、原激化、绽放反应后，队伍中附近的所有角色元素精通提升30点，持续6秒。触发超激化、蔓激化、超绽放、烈绽放反应后，队伍中附近的所有角色元素精通提升20点,持续6秒。以上效果的持续时间独立计算。",
