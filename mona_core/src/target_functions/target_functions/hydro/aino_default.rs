@@ -69,6 +69,6 @@ impl TargetFunction for AinoDefaultTargetFunction {
         let dmg_q =   Aino::damage::<SimpleDamageBuilder>(&context, <Aino as CharacterTrait>::DamageEnumType::Q, &config, None).normal.expectation;
         let dmg_c2 =   Aino::damage::<SimpleDamageBuilder>(&context, <Aino as CharacterTrait>::DamageEnumType::C2, &config, None).normal.expectation;
 
-        dmg_q * 3.0 + dmg_c2  // waiting to be measured
+        dmg_q / 1.5 + dmg_c2 / 5.0  // 元素爆发伤害间隔 1.5s
     }
 }
