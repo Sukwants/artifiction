@@ -1,6 +1,6 @@
 use crate::artifacts::Artifact;
 use crate::artifacts::effect_config::ArtifactEffectConfig;
-use crate::attribute::SimpleAttributeGraph2;
+use crate::attribute::{Attribute, AttributeName, SimpleAttributeGraph2};
 use crate::character::{Character, CharacterName};
 use crate::character::character_common_data::CharacterCommonData;
 use crate::character::characters::Aino;
@@ -66,9 +66,11 @@ impl TargetFunction for AinoDefaultTargetFunction {
 
         let config = CharacterSkillConfig::NoConfig;
 
-        let dmg_q =   Aino::damage::<SimpleDamageBuilder>(&context, <Aino as CharacterTrait>::DamageEnumType::Q, &config, None).normal.expectation;
-        let dmg_c2 =   Aino::damage::<SimpleDamageBuilder>(&context, <Aino as CharacterTrait>::DamageEnumType::C2, &config, None).normal.expectation;
+        let dmg_q = Aino::damage::<SimpleDamageBuilder>(&context, <Aino as CharacterTrait>::DamageEnumType::Q, &config, None).normal.expectation;
+        let dmg_c2 = Aino::damage::<SimpleDamageBuilder>(&context, <Aino as CharacterTrait>::DamageEnumType::C2, &config, None).normal.expectation;
 
-        dmg_q / 1.5 + dmg_c2 / 5.0  // 元素爆发伤害间隔 1.5s
+        let interval = context.attribute.get_value(AttributeName::USER1);
+
+        dmg_q / interval + dmg_c2 / 5.0
     }
 }

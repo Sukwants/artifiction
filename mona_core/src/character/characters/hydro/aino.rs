@@ -15,6 +15,7 @@ use crate::damage::DamageContext;
 use crate::target_functions::TargetFunction;
 use crate::team::TeamQuantization;
 use crate::weapon::weapon_common_data::WeaponCommonData;
+use crate::weapon::weapons::moonpiercer;
 
 pub struct AinoSkillType {
     pub a_dmg1: [f64; 15],
@@ -86,6 +87,7 @@ pub const AINO_STATIC_DATA: CharacterStaticData = CharacterStaticData {
 };
 
 pub struct AinoEffect {
+    pub has_p1: bool,
     pub has_p2: bool,
     pub has_c1: bool,
     pub has_c6: bool,
@@ -121,6 +123,10 @@ impl<A: Attribute> ChangeAttribute<A> for AinoEffect {
             attribute.set_value_by(AttributeName::EnhanceBloom, "C6：天才之为构造之责任", val);
             attribute.set_value_by(AttributeName::EnhanceLunarCharged, "C6：天才之为构造之责任", val);
             attribute.set_value_by(AttributeName::EnhanceLunarBloom, "C6：天才之为构造之责任", val);
+        }
+
+        if self.has_p1 {
+            attribute.set_value_by(AttributeName::USER1, "Talent1: 模块式高效运作", if self.moonsign.is_ascendant() { 0.7 } else { 1.5 });   // 元素爆发伤害间隔(s)
         }
     }
 }
@@ -250,6 +256,7 @@ impl CharacterTrait for Aino {
             _ => Moonsign::None,
         };
         Some(Box::new(AinoEffect {
+            has_p1: common_data.has_talent1,
             has_p2: common_data.has_talent2,
             has_c1: common_data.constellation >= 1,
             has_c6: common_data.constellation >= 6,
