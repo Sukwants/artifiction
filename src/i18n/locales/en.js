@@ -98,6 +98,7 @@ export default {
         selected: "Selected",
         panel: "Stats",
         lang: "Language",
+        noData: "No Data",
     },
     stat: {
         cureEffect: "Healing Bonus",

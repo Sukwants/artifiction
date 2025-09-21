@@ -98,6 +98,7 @@ export default {
         selected: "选中",
         panel: "面板",
         lang: "语言",
+        noData: "无数据",
     },
     ele: {
         Pyro: "火",
