@@ -247,11 +247,11 @@ impl CharacterTrait for Flins {
         ),
         skill2: skill_map!(
             FlinsDamageEnum
-            E1 locale!(zh_cn: "一段伤害", en: "1-Hit DMG")
-            E2 locale!(zh_cn: "二段伤害", en: "2-Hit DMG")
-            E3 locale!(zh_cn: "三段伤害", en: "3-Hit DMG")
-            E4 locale!(zh_cn: "三段伤害", en: "3-Hit DMG")
-            E5 locale!(zh_cn: "三段伤害", en: "3-Hit DMG")
+            E1 hit_n_dmg!(1)
+            E2 hit_n_dmg!(2)
+            E3 hit_n_dmg!(3)
+            E4 hit_n_dmg!(4)
+            E5 hit_n_dmg!(5)
             ENS locale!(zh_cn: "北国枪阵伤害", en: "Northland Spearstorm DMG")
             C2 locale!(zh_cn: "二命额外伤害", en: "C2 extra DMG")
             LunarCharged locale!(zh_cn: "月感电伤害", en: "Lunar-Charged DMG")
