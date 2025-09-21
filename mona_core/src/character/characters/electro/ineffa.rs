@@ -206,7 +206,7 @@ impl CharacterTrait for Ineffa {
             A2 hit_n_dmg!(2)
             A31 hit_n_dmg!(3, 1)
             A32 hit_n_dmg!(3, 2)
-            A4 hit_n_dmg!(3)
+            A4 hit_n_dmg!(4)
             Z charged_dmg!()
             X1 plunging_dmg!(1)
             X2 plunging_dmg!(2)

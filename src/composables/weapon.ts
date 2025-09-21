@@ -1,4 +1,4 @@
-const DEFAULT_WEAPON = "NightweaversLookingGlass";
+const DEFAULT_WEAPON = "BloodsoakedRuins";
 
 import type {WeaponName, WeaponType} from "@/types/weapon"
 // @ts-ignore

@@ -118,4 +118,5 @@ pub enum TargetFunctionName {
     IneffaDefault,
     LaumaDefault,
     AinoDefault,
+    FlinsDefault,
 }

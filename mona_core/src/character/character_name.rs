@@ -130,4 +130,5 @@ pub enum CharacterName {
     Ineffa,
     Lauma,
     Aino,
+    Flins,
 }

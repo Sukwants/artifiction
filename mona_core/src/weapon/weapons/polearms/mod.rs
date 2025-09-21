@@ -36,6 +36,7 @@ pub use tamayuratei_no_ohanashi::TamayurateiNoOhanashi;
 pub use symphonist_of_scents::SymphonistOfScents;
 pub use fractured_halo::FracturedHalo;
 pub use prospectors_shovel::ProspectorsShovel;
+pub use bloodsoaked_ruins::BloodsoakedRuins;
 
 pub mod engulfing_lightning;
 pub mod skyward_spine;
@@ -75,3 +76,4 @@ pub mod tamayuratei_no_ohanashi;
 pub mod symphonist_of_scents;
 pub mod fractured_halo;
 mod prospectors_shovel;
+mod bloodsoaked_ruins;

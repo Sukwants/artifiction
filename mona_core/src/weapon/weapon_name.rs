@@ -161,6 +161,7 @@ pub enum WeaponName {
     LumidouceElegy,
     SymphonistOfScents,
     FracturedHalo,
+    BloodsoakedRuins,
 
     // catalyst
     // 1 star

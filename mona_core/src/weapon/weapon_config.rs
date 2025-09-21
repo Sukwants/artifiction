@@ -97,6 +97,7 @@ pub enum WeaponConfig {
     TamayurateiNoOhanashi { rate: f64 },
     FracturedHalo { electrifying_edict: bool },
     ProspectorsShovel { moonsign: Moonsign },
+    BloodsoakedRuins { rate: f64, requiem_of_ruin: bool },
 
     // Catalyst
     LostPrayerToTheSacredWinds { stack: f64 },

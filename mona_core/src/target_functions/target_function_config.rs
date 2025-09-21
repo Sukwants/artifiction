@@ -65,5 +65,6 @@ pub enum TargetFunctionConfig {
     MualaniDefault { vaporize_rate: f64 },
     IneffaDefault { lunar_charged_coefficient: f64 },
     LaumaDefault { bloom_count: usize, hyperbloom_count: usize, burgeon_count: usize },
+    FlinsDefault { lunar_charged_coefficient: f64, if_thunderclouds: bool },
     NoConfig,
 }
