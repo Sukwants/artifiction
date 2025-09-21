@@ -118,6 +118,7 @@ pub enum BuffName {
     Lauma,
     AinoC1,
     AinoC6,
+    FlinsC6,
 
 
     // weapon

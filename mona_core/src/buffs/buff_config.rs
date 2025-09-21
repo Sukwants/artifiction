@@ -75,6 +75,7 @@ pub enum BuffConfig {
     Ineffa { atk: f64, has_c1: bool, has_p2: bool },
     Lauma { em: f64, activated_q: bool, level_q: usize, has_p1: bool, has_c2: bool, moonsign: Moonsign },
     AinoC6 { moonsign: Moonsign },
+    FlinsC6 { moonsign: Moonsign },
 
     FreedomSworn { refine: usize },
     SongOfBrokenPines { refine: usize },
