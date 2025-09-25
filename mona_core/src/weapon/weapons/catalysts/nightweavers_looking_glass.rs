@@ -20,11 +20,11 @@ impl<A: Attribute> WeaponEffect<A> for NightweaversLookingGlassEffect {
     fn apply(&self, data: &WeaponCommonData, attribute: &mut A) {
 
         if self.effect1 {
-            attribute.set_value_by(AttributeName::ElementalMastery, "纺夜天镜：「终北圣言」", 0.45 + 0.15 * data.refine as f64);
+            attribute.set_value_by(AttributeName::ElementalMastery, "纺夜天镜：「终北圣言」", 45.0 + 15.0 * data.refine as f64);
         }
 
         if self.effect2 {
-            attribute.set_value_by(AttributeName::ElementalMastery, "纺夜天镜：「朔月诗篇」", 0.45 + 0.15 * data.refine as f64);
+            attribute.set_value_by(AttributeName::ElementalMastery, "纺夜天镜：「朔月诗篇」", 45.0 + 15.0 * data.refine as f64);
         }
 
         if self.effect1 && self.effect2 {
