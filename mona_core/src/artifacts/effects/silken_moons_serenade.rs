@@ -15,7 +15,7 @@ pub struct SilkenMoonsSerenadeEffect {
 
 impl<A: Attribute> ArtifactEffect<A> for SilkenMoonsSerenadeEffect {
     fn effect2(&self, attribute: &mut A) {
-        attribute.set_value_by(AttributeName::Recharge, "纺月的夜歌2", 20.0);
+        attribute.set_value_by(AttributeName::Recharge, "纺月的夜歌2", 0.2);
     }
 
     fn effect4(&self, attribute: &mut A) {
