@@ -216,7 +216,7 @@ pub struct BuffMoonsignDendro {
 
 impl<A: Attribute> Buff<A> for BuffMoonsignDendro {
     fn change_attribute(&self, attribute: &mut A) {
-        attribute.set_value_by(AttributeName::EnhanceMoonglare, "月荫-草", (self.em * 0.0225).min(0.36));
+        attribute.set_value_by(AttributeName::EnhanceMoonglare, "月荫-草", (self.em / 100.0 * 0.0225).min(0.36));
     }
 }
 
