@@ -30,6 +30,7 @@ pub struct LaumaSkillType {
     pub e_hold_dmg2: [f64; 15],
     pub e_frostgrove_sanctuary_dmg_atk: [f64; 15],
     pub e_frostgrove_sanctuary_dmg_em: [f64; 15],
+    pub e_res: [f64; 15],
 
     pub q_bloom_increase: [f64; 15],
     pub q_lunar_bloom_increase: [f64; 15],
@@ -56,6 +57,7 @@ pub const LAUMA_SKILL: LaumaSkillType = LaumaSkillType {
     e_hold_dmg2: [1.52, 1.634, 1.748, 1.9, 2.014, 2.128, 2.28, 2.432, 2.584, 2.736, 2.888, 3.04, 3.23, 3.42, 3.61],
     e_frostgrove_sanctuary_dmg_atk: [0.96, 1.032, 1.104, 1.2, 1.272, 1.344, 1.44, 1.536, 1.632, 1.728, 1.824, 1.92, 2.04, 2.16, 2.28],
     e_frostgrove_sanctuary_dmg_em: [1.92, 2.064, 2.208, 2.4, 2.544, 2.688, 2.88, 3.072, 3.264, 3.456, 3.648, 3.84, 4.08, 4.32, 4.56],
+    e_res: [0.025, 0.05, 0.075, 0.1, 0.125, 0.15, 0.175, 0.2, 0.225, 0.25, 0.28, 0.31, 0.34, 0.37, 0.4],
 
     // Elemental Burst: Runo: All Hearts Become the Beating Moon
     q_bloom_increase: [2.7776, 2.98592, 3.19424, 3.472, 3.68032, 3.88864, 4.1664, 4.44416, 4.72192, 4.99968, 5.27744, 5.5552, 5.9024, 6.2496, 6.5968],
@@ -97,6 +99,8 @@ pub const LAUMA_STATIC_DATA: CharacterStaticData = CharacterStaticData {
 
 pub struct LaumaEffect {
     pub activated_q: bool,
+    pub activated_res: bool,
+    pub level_e: usize,
     pub level_q: usize,
     pub has_p1: bool,
     pub has_p2: bool,
@@ -146,8 +150,8 @@ impl<A: Attribute> ChangeAttribute<A> for LaumaEffect {
         );
 
         if self.activated_q {
-            let q_bloom_increase = LAUMA_SKILL.q_bloom_increase[self.level_q - 1] + if self.has_c2 { LAUMA_SKILL.c2_bloom_increase } else { 0.0 };
-            let q_lunar_bloom_increase = LAUMA_SKILL.q_lunar_bloom_increase[self.level_q - 1] + if self.has_c2 { LAUMA_SKILL.c2_lunar_bloom_increase } else { 0.0 };
+            let q_bloom_increase = LAUMA_SKILL.q_bloom_increase[self.level_q] + if self.has_c2 { LAUMA_SKILL.c2_bloom_increase } else { 0.0 };
+            let q_lunar_bloom_increase = LAUMA_SKILL.q_lunar_bloom_increase[self.level_q] + if self.has_c2 { LAUMA_SKILL.c2_lunar_bloom_increase } else { 0.0 };
 
             attribute.add_edge1(
                 AttributeName::ElementalMastery,
@@ -185,6 +189,12 @@ impl<A: Attribute> ChangeAttribute<A> for LaumaEffect {
                 Box::new(move |em, _, grad| (0.0, 0.0)),
                 "元素爆发：圣言述咏·众心为月"
             );
+        }
+
+        if self.activated_res {
+            let e_res = LAUMA_SKILL.e_res[self.level_e];
+            attribute.set_value_by(AttributeName::ResMinusDendro, "元素战技：圣言述咏·终宵永眠", e_res);
+            attribute.set_value_by(AttributeName::ResMinusHydro, "元素战技：圣言述咏·终宵永眠", e_res);
         }
 
         if self.has_c6 && self.moonsign.is_ascendant() {
@@ -285,7 +295,15 @@ impl CharacterTrait for Lauma {
                 zh_cn: "苍色祷歌",
                 en: "Pale Hymn",
             ),
-            config: ItemConfigType::Bool { default: true },
+            config: ItemConfigType::Bool { default: false },
+        },
+        ItemConfig {
+            name: "activated_res",
+            title: locale!(
+                zh_cn: "圣言述咏·终宵永眠：减抗",
+                en: "Runo: Dawnless Rest of Karsikko - Res Down",
+            ),
+            config: ItemConfigType::Bool { default: false },
         },
         ItemConfig::MOONSIGN2
     ]);
@@ -370,15 +388,18 @@ impl CharacterTrait for Lauma {
     }
 
     fn new_effect<A: Attribute>(common_data: &CharacterCommonData, config: &CharacterConfig) -> Option<Box<dyn ChangeAttribute<A>>> {
-        let (activated_q, moonsign) = match config {
-            CharacterConfig::Lauma { activated_q, moonsign } => (
+        let (activated_q, activated_res, moonsign) = match config {
+            CharacterConfig::Lauma { activated_q, activated_res, moonsign } => (
                 *activated_q,
+                *activated_res,
                 *moonsign,
             ),
-            _ => (false, Moonsign::None),
+            _ => (false, false, Moonsign::None),
         };
         Some(Box::new(LaumaEffect {
             activated_q: activated_q,
+            activated_res: activated_res,
+            level_e: common_data.skill2,
             level_q: common_data.skill3,
             has_p1: common_data.has_talent1,
             has_p2: common_data.has_talent2,
