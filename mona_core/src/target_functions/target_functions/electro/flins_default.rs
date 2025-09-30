@@ -106,7 +106,7 @@ impl TargetFunction for FlinsDefaultTargetFunction {
             + Flins::damage::<SimpleDamageBuilder>(&context, <Flins as CharacterTrait>::DamageEnumType::Q3, &CharacterSkillConfig::NoConfig, None).normal.expectation;
 
         let dmg_lunar_charged = Flins::damage::<SimpleDamageBuilder>(&context, <Flins as CharacterTrait>::DamageEnumType::LunarCharged, &CharacterSkillConfig::NoConfig, None).normal.expectation;
-        
-        dmg_q + if context.character_common_data.constellation >= 1 { (dmg_ea + dmg_eq + dmg_e) * 3.0 } else { (dmg_ea * 2.0 + dmg_eq + dmg_e) * 2.0 } + dmg_lunar_charged * (20.0 / 2.0) * self.lunar_charged_coefficient // 一轮输出时间以元素爆发 cd 20s 为准，一套输出时间以特殊元素战技北国枪阵 cd 为准
+
+        dmg_q + if context.character_common_data.constellation >= 1 { (dmg_e + dmg_eq + dmg_ea) * 2.0 + (dmg_e + dmg_eq) } else { (dmg_e + dmg_eq + dmg_ea * 2.0) + (dmg_e + dmg_eq + dmg_ea) } + dmg_lunar_charged * (20.0 / 2.0) * self.lunar_charged_coefficient // 一轮输出时间以元素爆发 cd 20s 为准，一套输出时间以特殊元素战技北国枪阵 cd 为准
     }
 }
