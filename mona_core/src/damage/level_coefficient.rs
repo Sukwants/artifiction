@@ -102,12 +102,12 @@ pub const LEVEL_MULTIPLIER: [f64; 100] = [
     0.0,
     0.0,
     0.0,
-    1711.1978,
+    1561.468,
     0.0,
     0.0,
     0.0,
     0.0,
-    2030.0718,  // uncompleted
+    1674.8092,
 ];
 
 pub const CRYSTALLIZE_BASE: [f64; 100] = [
@@ -214,10 +214,10 @@ pub const CRYSTALLIZE_BASE: [f64; 100] = [
     0.0,
     0.0,
     0.0,
+    2041.569,
     0.0,
     0.0,
     0.0,
     0.0,
-    0.0,
-    0.0,  // uncompleted
+    2198.814,
 ];
