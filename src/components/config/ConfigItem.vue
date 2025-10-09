@@ -34,7 +34,7 @@
             <el-switch
                 :modelValue="modelValue"
                 @update:modelValue="handleChangeValue"
-                active-text="是"
+                :active-text="currentLocale.startsWith('zh') ? '是' : 'On'"
             ></el-switch>
         </template>
         <template v-if="type === 'floatPercentageInput'">
@@ -136,6 +136,10 @@ export default {
     },
     emits: ["update:modelValue"],
     computed: {
+        currentLocale() {
+            const { locale } = useI18n()
+            return locale.value
+        },
         currentOptions() {
             const { locale } = useI18n()
             if (locale.value.startsWith('zh')) {

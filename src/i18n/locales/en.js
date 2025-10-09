@@ -93,7 +93,7 @@ export default {
         art2: "Set2: ",
         stat: "Stat",
         value: "Value",
-        stat1: "Valuable Stat", // todo
+        stat1: "Valuable Stat",
         rollCount: "Roll Count",
         selected: "Selected",
         panel: "Stats",
@@ -239,13 +239,13 @@ export default {
         selectDir: "Select Dir",
         name: "Name",
         enterName: "Enter Name",
-        bonus1: "1 Roll Gain", // todo
-        statCount: "Roll Count", // todo
+        bonus1: "Gain per Stat",
+        statCount: "Stat Count",
         gain: "Relative Gain",
         lockAll: "Lock All",
         unlockAll: "Unlock All",
         skill: "Skill",
-        fumo: "附魔", // todo
+        fumo: "Element Infusion",
         skillConfig: "Skill Config",
     },
     dmg: {
