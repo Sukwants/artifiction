@@ -27,7 +27,7 @@ impl<A: Attribute> Buff<A> for BuffSilkenMoonsSerenade4 {
             _ => {}
         }
         
-        attribute.set_value_by(AttributeName::ElementalMastery, "BUFF: 纺月的夜歌4", 0.1 * self.gleaming_moon_effect_count as f64);
+        attribute.set_value_by(AttributeName::EnhanceMoonglare, "BUFF: 纺月的夜歌4", 0.1 * self.gleaming_moon_effect_count as f64);
     }
 }
 
