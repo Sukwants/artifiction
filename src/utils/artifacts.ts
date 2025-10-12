@@ -100,7 +100,7 @@ interface ImportJsonResult {
     add: number,
 }
 
-export function importMonaJson(rawObj: any, removeNonExisting: boolean, backupImportDir: boolean): ImportJsonResult {
+export function importMonaJson(rawObj: any, removeNonExisting: boolean, backupImportDir: boolean, importKumi: boolean): ImportJsonResult {
     // hash of level, main stat, sub stats, rarity, set name, slot
     let hashAll: Record<string, IArtifact> = {}
     // hash of level, main stat without value, sub stats without value, rarity, set name, slot
@@ -120,6 +120,8 @@ export function importMonaJson(rawObj: any, removeNonExisting: boolean, backupIm
     let skipCount = 0
     let upgradeCount = 0
     let newCount = 0
+
+    let artifactsId: Map<number, number> = new Map()
 
     let importFlat: any[] = [].concat(rawObj.flower ?? []).concat(rawObj.feather ?? []).concat(rawObj.sand ?? []).concat(rawObj.cup ?? []).concat(rawObj.head ?? [])
     for (let artifact of importFlat) {
@@ -148,6 +150,7 @@ export function importMonaJson(rawObj: any, removeNonExisting: boolean, backupIm
             newCount += 1
             artifactId = newArtifact(artifact, !!artifact.omit)
         }
+        artifactsId.set(artifact.id, artifactId)
 
         if (artifact.equip && artifact.equip !== "") {
             // artifact has equip data
@@ -187,6 +190,17 @@ export function importMonaJson(rawObj: any, removeNonExisting: boolean, backupIm
                kumiStore.addKumi(1, equipName, artifacts)
            }
         }   
+    }
+    if (importKumi && parseInt(rawObj.version) >= 2) {
+        const kumi = rawObj.kumi ?? []
+        for (const item of kumi) {
+            if (item.dir) {
+                kumiStore.importDir(item)
+            }
+            else {
+                kumiStore.importKumi(item, artifactsId)
+            }
+        }
     }
 
     return {

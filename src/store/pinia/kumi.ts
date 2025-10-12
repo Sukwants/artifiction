@@ -3,7 +3,7 @@ import { KumiItem } from "@/types/kumi"
 import {useArtifactStore} from "@/store/pinia/artifact"
 import {positionToIndex} from "@/utils/artifacts"
 
-import { type Ref } from "vue"
+import { type Ref, ref, computed } from "vue"
 
 
 const artifactStore = useArtifactStore()
@@ -96,6 +96,23 @@ function store() {
 
         kumi.value.push(item)
         kumiById.value.set(item.id, item)
+    }
+
+    function importDir(dir: KumiItem) {
+        if (!dir.dir) return
+        let baseDir = kumiById.value.get(dir.id)
+        if (!baseDir) {
+            kumi.value.push(dir)
+            kumiById.value.set(dir.id, dir)
+            return
+        }
+        for (let key of dir.children ?? []) {
+            baseDir.children?.push(key)
+        }
+        baseDir.children = [...new Set(baseDir.children)]
+
+        kumi.value[kumi.value.findIndex(x => x.id === baseDir?.id)] = baseDir
+        kumiById.value.set(baseDir.id, baseDir)
     }
 
     function deleteDir(id: number) {
@@ -207,6 +224,23 @@ function store() {
         }
     }
 
+    function importKumi(item: KumiItem, artifactsId: Map<number, number>) {
+        if (item.dir) return
+        if (item.artifactIds) {
+            for(let i = 0; i < item.artifactIds.length; i++) {
+                const id = item.artifactIds[i]
+                if(id) item.artifactIds[i] = artifactsId.get(id) ?? null
+            }
+        }
+        if (kumiById.value.get(item.id)) {
+            kumi.value[kumi.value.findIndex(x => x.id === item?.id)] = item
+            kumiById.value.set(item.id, item)
+        } else {
+            kumi.value.push(item)
+            kumiById.value.set(item.id, item)
+        }
+    }
+
     function createKumi(dirId: number, name: string): number | null {
         let dir = kumiById.value.get(dirId)
         if (dir) {
@@ -292,12 +326,14 @@ function store() {
         init,
 
         createDir,
+        importDir,
         deleteDir,
         clearDir,
         rename,
         backupImportDir,
 
         createKumi,
+        importKumi,
         deleteKumi,
         addKumi,
 

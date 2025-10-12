@@ -161,6 +161,7 @@ export default {
         shareDesc: "Use share link to import artifacts, expires in 1 day",
         deleteUnseen: "delete unseen artifacts",
         backupKumiDir: "backup the \"Import from game\" folder",
+        importKumi: "import artifact sets",
         edit: "edit",
         recommend: "recommend",
         unlockAll: "unlock all",

@@ -161,6 +161,7 @@ export default {
         shareDesc: "通过分享链接可以快速导入圣遗物，有效期为一天",
         deleteUnseen: "删除不存在的圣遗物",
         backupKumiDir: "备份“游戏中导入”收藏夹",
+        importKumi: "导入圣遗物套装",
         edit: "编辑圣遗物",
         recommend: "推荐圣遗物",
         unlockAll: "启用全部",
