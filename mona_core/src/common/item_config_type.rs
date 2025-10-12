@@ -5,7 +5,7 @@ use serde::de::{SeqAccess, Visitor};
 use serde::ser::SerializeSeq;
 use serde_json::json;
 use smallvec::{SmallVec};
-use crate::common::{Element, SkillType};
+use crate::common::{Element, Moonsign, SkillType};
 use crate::common::i18n::{I18nLocale, locale};
 
 #[derive(Default, Debug, Clone, Copy)]
@@ -157,6 +157,11 @@ pub enum ItemConfigType {
         options: &'static str, // comma separated
         default: usize
     },
+    Option2 {
+        options_zh: &'static str,
+        options_en: &'static str,
+        default: usize
+    },
     // NullOrValueInput {
     //     min: f64,
     //     max: f64,
@@ -179,7 +184,13 @@ pub enum ItemConfigType {
     },
     Skill4 {
         default: SkillType
-    }
+    },
+    Moonsign2 {
+        default: Moonsign
+    },
+    Moonsign3 {
+        default: Moonsign
+    },
 }
 
 pub struct ItemConfig {
@@ -279,6 +290,18 @@ impl ItemConfigType {
                     "options": temp
                 })
             },
+            ItemConfigType::Option2 { options_zh, options_en, default } => {
+                let temp_zh: Vec<&str> = options_zh.split(",").collect();
+                let temp_en: Vec<&str> = options_en.split(",").collect();
+                json!({
+                    "type": "option2",
+                    "title": title,
+                    "name": name,
+                    "default": default,
+                    "options_zh": temp_zh,
+                    "options_en": temp_en
+                })
+            },
             ItemConfigType::Element8Multi { default } => {
                 json!({
                     "type": "element8multi",
@@ -286,7 +309,23 @@ impl ItemConfigType {
                     "name": name,
                     "default": default
                 })
-            }
+            },
+            ItemConfigType::Moonsign2 { default } => {
+                json!({
+                    "type": "moonsign2",
+                    "title": title,
+                    "name": name,
+                    "default": default
+                })
+            },
+            ItemConfigType::Moonsign3 { default } => {
+                json!({
+                    "type": "moonsign3",
+                    "title": title,
+                    "name": name,
+                    "default": default
+                })
+            },
         };
 
         j.to_string()
@@ -309,4 +348,7 @@ impl ItemConfig {
     pub const BUFFV1P: ItemConfig = ItemConfig { name: "p", title: Self::DEFAULT_BUFF_TITLE, config: ItemConfigType::FloatPercentageInput { default: 0.0 } };
     pub const BUFFV1: ItemConfig = ItemConfig { name: "value", title: Self::DEFAULT_BUFF_TITLE, config: ItemConfigType::FloatInput { default: 0.0 } };
     pub const REFINE: ItemConfig = ItemConfig { name: "refine", title: locale!(zh_cn: "精炼", en: "Refine"), config: ItemConfigType::IntInput { min: 1, max: 5, default: 1 } };
+
+    pub const MOONSIGN2: ItemConfig = ItemConfig { name: "moonsign", title: locale!(zh_cn: "月兆", en: "Moonsign"), config: ItemConfigType::Moonsign2 { default: Moonsign::Nascent } };
+    pub const MOONSIGN3: ItemConfig = ItemConfig { name: "moonsign", title: locale!(zh_cn: "月兆", en: "Moonsign"), config: ItemConfigType::Moonsign3 { default: Moonsign::None } };
 }

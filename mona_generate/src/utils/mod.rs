@@ -100,6 +100,18 @@ pub fn config_to_json(config: &ItemConfig) -> String {
                     "options": temp
                 })
         },
+        ItemConfigType::Option2 { options_zh, options_en, default } => {
+            let temp_zh: Vec<&str> = options_zh.split(",").collect();
+            let temp_en: Vec<&str> = options_en.split(",").collect();
+            json!({
+                "type": "option2",
+                "title": title_index,
+                "name": name,
+                "default": default,
+                "options_zh": temp_zh,
+                "options_en": temp_en
+            })
+        },
         ItemConfigType::Element8Multi { default } => {
             json!({
                 "type": "element8multi",
@@ -107,7 +119,23 @@ pub fn config_to_json(config: &ItemConfig) -> String {
                 "name": name,
                 "default": default,
             })
-        }
+        },
+        ItemConfigType::Moonsign2 { default } => {
+            json!({
+                "type": "moonsign2",
+                "title": title_index,
+                "name": name,
+                "default": default
+            })
+        },
+        ItemConfigType::Moonsign3 { default } => {
+            json!({
+                "type": "moonsign3",
+                "title": title_index,
+                "name": name,
+                "default": default
+            })
+        },
     };
 
     j.to_string()

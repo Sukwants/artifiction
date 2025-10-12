@@ -111,7 +111,7 @@ impl CalculatorInterface {
         result.serialize(&s).unwrap()
     }
 
-    pub fn get_transformative_damage(value: JsValue) -> TransformativeDamage {
+    pub fn get_transformative_damage(value: JsValue) -> JsValue {
         utils::set_panic_hook();
 
         let input: CalculatorConfigInterface = serde_wasm_bindgen::from_value(value).unwrap();
@@ -149,9 +149,10 @@ impl CalculatorInterface {
             attribute: &attribute
         };
 
-        let result = context.transformative();
+        let tmp_result = context.critical_transformative();
 
-        result
+        let s = serde_wasm_bindgen::Serializer::new().serialize_maps_as_objects(true);
+        tmp_result.serialize(&s).unwrap()
     }
 
     pub fn get_moonglare_damage(value: JsValue) -> JsValue {

@@ -13,7 +13,7 @@ pub mod lyney;
 pub mod chevreuse;
 pub mod gaming;
 pub mod arlecchino;
-mod mavuika;
+pub mod mavuika;
 
 pub use amber::Amber;
 pub use bennett::Bennett;

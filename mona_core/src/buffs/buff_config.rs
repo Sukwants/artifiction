@@ -3,7 +3,7 @@ use serde::{Deserialize, Serialize};
 use crate::attribute::Attribute;
 use crate::buffs::Buff;
 use crate::buffs::buffs::get_buff;
-use crate::common::Element;
+use crate::common::{Element, Moonsign};
 use crate::common::item_config_type::ConfigElements8Multi;
 
 #[derive(Serialize, Deserialize)]
@@ -52,11 +52,13 @@ pub enum BuffConfig {
     NilouTalent2 { hp: f64 },
     CandaceTalent2 { hp: f64 },
     NahidaTalent1 { max_em: f64 },
+    NahidaC2 { de_def: bool },
     FaruzanQ { base_atk: usize, q_level: usize, rate_q1: f64, rate_q2: f64, rate_talent2: f64, enable_c6: bool },
     Mika { stack_talent2: f64, rate_c6: f64 },
     KavehQ { q_level: usize, rate: f64 },
     BaizhuTalent2 { hp: f64, rate: f64 },
     BaizhuC4 { rate: f64 },
+    FurinaQ { level_q: usize, fanfare: usize, rate: f64 },
     XianyunTalent1 { stack: f64 },
     XianyunTalent2 { rate: f64, c2: bool, atk: f64 },
     KachinaC4 { character_count: usize, rate: f64 },
@@ -68,6 +70,12 @@ pub enum BuffConfig {
     CitlaliC6 { stack: f64 },
     YumemizukiMizukiC1 { em: f64 },
     YumemizukiMizukiC2 { em: f64 },
+    EscoffierTalent2 { hydro_cryo_count: usize },
+    EscoffierC2 { atk: f64 },
+    Ineffa { atk: f64, has_c1: bool, has_p2: bool },
+    Lauma { em: f64, activated_q: bool, level_q: usize, has_p1: bool, has_c2: bool, moonsign: Moonsign },
+    AinoC6 { moonsign: Moonsign },
+    FlinsC6 { moonsign: Moonsign },
 
     FreedomSworn { refine: usize },
     SongOfBrokenPines { refine: usize },
@@ -80,15 +88,31 @@ pub enum BuffConfig {
     XiphosMoonlight { refine: usize, em: f64 },
     MakhairaAquamarine { refine: usize, em: f64 },
     KeyOfKhajNisut { refine: usize, hp: f64 },
+    AThousandFloatingDreams { refine: usize },
+    CranesEchoingCall { refine: usize },
     PeakPatrolSong { refine: usize, rate: f64, def: f64 },
+    StarcallersWatch { refine: usize },
+    SymphonistOfScents { refine: usize },
+    FracturedHalo { refine: usize },
 
     ResonanceCryo2 { rate: f64 },
     ResonanceGeo2 { rate1: f64, rate2: f64 },
     ResonanceDendro2 { rate1: f64, rate2: f64 },
+    MoonsignPyro { atk: f64 },
+    MoonsignHydro { hp: f64 },
+    MoonsignAnemo { em: f64 },
+    MoonsignElectro { atk: f64 },
+    MoonsignDendro { em: f64 },
+    MoonsignCryo { atk: f64 },
+    MoonsignGeo { def: f64 },
 
     ArchaicPetra4 { element: Element },
     ViridescentVenerer4 { element: Element },
     DeepwoodMemories4 { rate: f64 },
+    SongOfDaysPast4 { heal_amount: f64 },
+    ScrollOfTheHeroOfCinderCity4 { elements: ConfigElements8Multi, nightsouls_blessing: bool },
+    NightOfTheSkysUnveiling4 { gleaming_moon_effect_count: usize },
+    SilkenMoonsSerenade4 { moonsign: Moonsign, gleaming_moon_effect_count: usize },
 
     NoConfig,
 }

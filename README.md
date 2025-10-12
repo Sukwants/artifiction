@@ -2,7 +2,6 @@
 
 
 # 叶师傅开锁铺
-[![Netlify Status](https://api.netlify.com/api/v1/badges/3a2fc38c-d9dd-4257-98d5-11891cf9b064/deploy-status)](https://app.netlify.com/sites/jovial-chandrasekhar-293ccd/deploys)
 ![GitHub Repo stars](https://img.shields.io/github/stars/Sukwants/genshin_artifact)
 ![GitHub forks](https://img.shields.io/github/forks/Sukwants/genshin_artifact)
 

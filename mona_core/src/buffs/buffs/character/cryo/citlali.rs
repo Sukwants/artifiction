@@ -77,7 +77,7 @@ pub struct BuffCitlaliC1 {
 
 impl<A: Attribute> Buff<A> for BuffCitlaliC1 {
     fn change_attribute(&self, attribute: &mut A) {
-        attribute.set_value_by(AttributeName::ExtraDmgBase, "茜特菈莉C1", 2.0 * self.em);
+        attribute.set_value_by(AttributeName::ExtraDmgBase, "茜特菈莉「四百星的芒刃」", 2.0 * self.em);
     }
 }
 
@@ -121,6 +121,39 @@ impl BuffMeta for BuffCitlaliC1 {
     }
 }
 
+pub struct BuffCitlaliC2 {}
+
+impl<A: Attribute> Buff<A> for BuffCitlaliC2 {
+    fn change_attribute(&self, attribute: &mut A) {
+        attribute.set_value_by(AttributeName::ElementalMastery, "茜特菈莉「吞心者的巡行」", 250.0);
+    }
+}
+
+impl BuffMeta for BuffCitlaliC2 {
+    #[cfg(not(target_family = "wasm"))]
+    const META_DATA: BuffMetaData = BuffMetaData {
+        name: BuffName::CitlaliC2,
+        name_locale: locale!(
+            zh_cn: "茜特菈莉-「吞心者的巡行」",
+            en: "Citlali-Radiant Blades of Centzon Mimixcoah"
+        ),
+        image: BuffImage::Avatar(CharacterName::Citlali),
+        genre: BuffGenre::Character,
+        description: Some(locale!(
+            zh_cn: "处于白曜护盾的庇护下或是伊兹帕帕跟随的其他角色的元素精通提升250点。",
+            en: "Other characters shielded by her Opal Shield, or who have Itzpapa following them, gain 250 Elemental Mastery."
+        )),
+        from: BuffFrom::Character(CharacterName::Citlali),
+    };
+
+    #[cfg(not(target_family = "wasm"))]
+    const CONFIG: Option<&'static [ItemConfig]> = Some(&[]);
+
+    fn create<A: Attribute>(b: &BuffConfig) -> Box<dyn Buff<A>> {
+        Box::new(BuffCitlaliC2 {})
+    }
+}
+
 pub struct BuffCitlaliC6 {
     pub stack: f64
 }
@@ -128,8 +161,8 @@ pub struct BuffCitlaliC6 {
 impl<A: Attribute> Buff<A> for BuffCitlaliC6 {
     fn change_attribute(&self, attribute: &mut A) {
         let bonus = self.stack * 0.015;
-        attribute.set_value_by(AttributeName::BonusPyro, "茜特菈莉C6", bonus);
-        attribute.set_value_by(AttributeName::BonusHydro, "茜特菈莉C6", bonus);
+        attribute.set_value_by(AttributeName::BonusPyro, "茜特菈莉「原动天的密契」", bonus);
+        attribute.set_value_by(AttributeName::BonusHydro, "茜特菈莉「原动天的密契」", bonus);
     }
 }
 

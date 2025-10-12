@@ -44,6 +44,8 @@ export function useTargetFunction(characterName: Ref<CharacterName>) {
     const targetFunctionUseDSL = ref(false)
     const targetFunctionDSLSource = ref("")
 
+    targetFunctionConfig.value = getDefaultTargetFunctionConfig(getDefaultTargetFunction(characterName.value))
+
     const { t, ta } = useI18n()
 
     const targetFunctionBadge = computed(() => {

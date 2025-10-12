@@ -98,6 +98,7 @@ export default {
         selected: "选中",
         panel: "面板",
         lang: "语言",
+        noData: "无数据",
     },
     ele: {
         Pyro: "火",
@@ -109,6 +110,11 @@ export default {
         Geo: "岩",
         Physical: "物理",
         None: "无",
+    },
+    moonsign: {
+        None: "无",
+        Nascent: "初辉",
+        Ascendant: "满辉"
     },
     stat: {
         cureEffect: "治疗加成",
@@ -246,13 +252,20 @@ export default {
     },
     dmg: {
         electroCharged: "感电",
+        electro_charged: "感电",
         overload: "超载",
         shattered: "碎冰",
+        shatter: "碎冰",
         superConduct: "超导",
+        superconduct: "超导",
         swirlElectro: "扩散（雷）",
+        swirl_electro: "扩散（雷）",
         swirlPyro: "扩散（火）",
+        swirl_pyro: "扩散（火）",
         swirlCryo: "扩散（冰）",
+        swirl_cryo: "扩散（冰）",
         swirlHydro: "扩散（水）",
+        swirl_hydro: "扩散（水）",
         burning: "燃烧",
         crystallize: "结晶盾",
         "Pyro": "火元素伤害",

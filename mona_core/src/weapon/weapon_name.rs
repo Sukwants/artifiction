@@ -51,6 +51,8 @@ pub enum WeaponName {
     SturdyBone,
     FluteOfEzpitzal,
     CalamityOfEshu,
+    SerenitysCall,
+    MoonweaversDawn,
     // 5 star
     AquilaFavonia,
     SkywardBlade,
@@ -102,6 +104,8 @@ pub enum WeaponName {
     PortablePowerSaw,
     FruitfulHook,
     EarthShaker,
+    FlameforgedInsight,
+    MasterKey,
     // 5 star
     SkywardPride,
     WolfsGravestone,
@@ -144,6 +148,7 @@ pub enum WeaponName {
     MountainBracingBolt,
     FootprintOfTheRainbow,
     TamayurateiNoOhanashi,
+    ProspectorsShovel,
     // 5 star
     PrimordialJadeWingedSpear,
     SkywardSpine,
@@ -156,6 +161,7 @@ pub enum WeaponName {
     LumidouceElegy,
     SymphonistOfScents,
     FracturedHalo,
+    BloodsoakedRuins,
 
     // catalyst
     // 1 star
@@ -191,6 +197,8 @@ pub enum WeaponName {
     AshGravenDrinkingHorn,
     WaveridingWhirl,
     RingOfYaxche,
+    BlackmarrowLantern,
+    EtherlightSpindlelute,
     // 5 star
     SkywardAtlas,
     LostPrayerToTheSacredWinds,
@@ -207,6 +215,7 @@ pub enum WeaponName {
     StarcallersWatch,
     SunnyMorningSleepIn,
     VividNotions,
+    NightweaversLookingGlass,
 
     // bows
     // 1 star
@@ -246,6 +255,7 @@ pub enum WeaponName {
     FlowerWreathedFeathers,
     ChainBreaker,
     SequenceOfSolitude,
+    SnareHook,
     // 5 star
     SkywardHarp,
     AmosBow,

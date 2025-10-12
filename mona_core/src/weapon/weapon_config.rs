@@ -1,4 +1,5 @@
 use serde::{Deserialize, Serialize};
+use crate::common::Moonsign;
 
 #[derive(Serialize, Deserialize)]
 pub enum WeaponConfig {
@@ -38,6 +39,8 @@ pub enum WeaponConfig {
     CalamityOfEshu { rate: f64 },
     SymphonistOfScents { offfield_rate: f64, healing_rate: f64 },
     Azurelight { after_skill: bool, zero_energy: bool },
+    SerenitysCall { reaction: bool, moonsign: Moonsign },
+    MoonweaversDawn { energy: usize },
 
     // claymore
     WolfsGravestone { rate: f64 },
@@ -66,6 +69,8 @@ pub enum WeaponConfig {
     FangOfTheMountainKing { stack: f64 },
     FruitfulHook { rate: f64 },
     AThousandBlazingSuns { rate1: f64, rate2: f64 },
+    FlameforgedInsight { reaction: bool },
+    MasterKey { reaction: bool, moonsign: Moonsign },
 
     // Polearm
     EngulfingLightning { rate: f64 },
@@ -91,6 +96,8 @@ pub enum WeaponConfig {
     MountainBracingBolt { rate: f64 },
     TamayurateiNoOhanashi { rate: f64 },
     FracturedHalo { electrifying_edict: bool },
+    ProspectorsShovel { moonsign: Moonsign },
+    BloodsoakedRuins { rate: f64, requiem_of_ruin: bool },
 
     // Catalyst
     LostPrayerToTheSacredWinds { stack: f64 },
@@ -123,6 +130,8 @@ pub enum WeaponConfig {
     StarcallersWatch { use_buff: bool, rate: f64 },
     SunnyMorningSleepIn { rate1: f64, rate2: f64, rate3: f64 },
     VividNotions { rate1: f64, rate2: f64 },
+    NightweaversLookingGlass { effect1: bool, effect2: bool },
+    BlackmarrowLantern { moonsign: Moonsign },
 
     // Bow
     PolarStar { stack: usize },
@@ -155,6 +164,7 @@ pub enum WeaponConfig {
     ChainBreaker { count: usize },
     FlowerWreathedFeathers { stack: f64 },
     AstralVulturesCrimsonPlumage { rate: f64, different_count: usize },
+    SnareHook { reaction: bool, moonsign: Moonsign },
 }
 
 impl Default for WeaponConfig {

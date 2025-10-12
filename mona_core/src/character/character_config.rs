@@ -1,5 +1,7 @@
 use serde::{Deserialize, Serialize};
 
+use crate::common::Moonsign;
+
 #[derive(Serialize, Deserialize)]
 pub enum CharacterConfig {
     Ganyu { talent2_rate: f64 },
@@ -52,5 +54,8 @@ pub enum CharacterConfig {
     Escoffier { hydro_cryo_count: usize, after_burst: bool },
     Ifa { nightsoul_total: usize },
     Ineffa { activated_p2: bool },
+    Lauma { activated_q: bool, activated_res: bool, moonsign: Moonsign },
+    Aino { moonsign: Moonsign },
+    Flins { moonsign: Moonsign },
     NoConfig,
 }

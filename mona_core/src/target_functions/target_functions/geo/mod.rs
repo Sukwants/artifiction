@@ -7,7 +7,7 @@ pub mod yunjin_default;
 pub mod zhongli_default;
 pub mod navia_default;
 pub mod chiori_default;
-mod xilonen_default;
+pub mod xilonen_default;
 
 pub use albedo_default::AlbedoDefaultTargetFunction;
 pub use arataki_itto_default::AratakiIttoDefaultTargetFunction;

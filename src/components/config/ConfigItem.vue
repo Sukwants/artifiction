@@ -34,7 +34,7 @@
             <el-switch
                 :modelValue="modelValue"
                 @update:modelValue="handleChangeValue"
-                active-text="是"
+                :active-text="currentLocale.startsWith('zh') ? '是' : 'On'"
             ></el-switch>
         </template>
         <template v-if="type === 'floatPercentageInput'">
@@ -90,16 +90,44 @@
                 >{{ option }}</el-radio-button>
             </el-radio-group>
         </template>
+        <template v-if="type === 'option2'">
+            <el-radio-group
+                :modelValue="modelValue"
+                @update:modelValue="handleChangeValue"
+            >
+                <el-radio-button
+                    v-for="(option, index) in currentOptions"
+                    :key="index"
+                    :label="index"
+                >{{ option }}</el-radio-button>
+            </el-radio-group>
+        </template>
+        <template v-if="type === 'moonsign2'">
+            <select-moonsign-type
+                :modelValue="modelValue"
+                @update:modelValue="handleChangeValue"
+                :moonsigns="['Nascent', 'Ascendant']"
+            ></select-moonsign-type>
+        </template>
+        <template v-if="type === 'moonsign3'">
+            <select-moonsign-type
+                :modelValue="modelValue"
+                @update:modelValue="handleChangeValue"
+                :moonsigns="['None', 'Nascent', 'Ascendant']"
+            ></select-moonsign-type>
+        </template>
     </div>
 </template>
 
 <script>
 import SelectElementType from "@c/select/SelectElementType"
 import SelectSkillType from "@c/select/SelectSkillType"
+import SelectMoonsignType from "@c/select/SelectMoonsignType"
+import { useI18n } from "@/i18n/i18n"
 
 export default {
     name: "ConfigItem",
-    components: { SelectSkillType, SelectElementType },
+    components: { SelectSkillType, SelectElementType, SelectMoonsignType },
     props: {
         modelValue: {},
         type: {},
@@ -107,6 +135,20 @@ export default {
         title: {},
     },
     emits: ["update:modelValue"],
+    computed: {
+        currentLocale() {
+            const { locale } = useI18n()
+            return locale.value
+        },
+        currentOptions() {
+            const { locale } = useI18n()
+            if (locale.value.startsWith('zh')) {
+                return this.params.options_zh;
+            } else {
+                return this.params.options_en;
+            }
+        }
+    },
     methods: {
         handleInputValue(value) {
             let v = 0
@@ -118,18 +160,12 @@ export default {
                     v = 0
                 }
             }
-            
             this.handleChangeValue(v)
         },
-
         handleChangeValue(value) {
-            // console.log("change value", value)
-            // it may be an element plus bug, when value is not changed, slider will also emit update:modelValue
             if (value !== this.modelValue) {
-                // console.log("model value", this.modelValue)
                 this.$emit("update:modelValue", value)
             }
-            // this.$emit("update:modelValue", value)
         },
     }
 }
