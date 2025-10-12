@@ -153,6 +153,7 @@ pub enum BuffName {
     MoonsignDendro,
     MoonsignCryo,
     MoonsignGeo,
+    FantasticalBlessings,
 
     // artifact
     Instructor4,
