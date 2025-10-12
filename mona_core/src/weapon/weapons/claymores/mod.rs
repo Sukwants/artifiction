@@ -75,7 +75,7 @@ pub mod tidal_shadow;
 pub mod portable_power_saw;
 pub mod ultimate_overlords_mega_magic_sword;
 pub mod verdict;
-pub mod mod earth_shaker;
+pub mod earth_shaker;
 pub mod fang_of_the_mountain_king;
 pub mod fruitful_hook;
 pub mod a_thousand_blazing_suns;

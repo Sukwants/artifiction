@@ -93,7 +93,7 @@ pub mod splendor_of_tranquil_waters;
 pub mod uraku_misugiri;
 pub mod absolution;
 pub mod flute_of_ezpitzal;
-pub mod mod mod sturdy_bone;
+pub mod sturdy_bone;
 pub mod peak_patrol_song;
 pub mod calamity_of_eshu;
 pub mod azurelight;
