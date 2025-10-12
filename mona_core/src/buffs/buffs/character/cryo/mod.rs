@@ -1,6 +1,6 @@
 pub use aloy::BuffAloyTalent1;
 pub use chongyun::BuffChongyunTalent2;
-pub use citlali::{BuffCitlaliC1, BuffCitlaliC6, BuffCitlaliTalent1};
+pub use citlali::{BuffCitlaliC1, BuffCitlaliC2, BuffCitlaliC6, BuffCitlaliTalent1};
 pub use diona::BuffDionaC6G50;
 pub use escoffier::{BuffEscoffierC1, BuffEscoffierC2, BuffEscoffierTalent2};
 pub use eula::BuffEulaE;

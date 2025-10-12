@@ -108,6 +108,7 @@ pub enum BuffName {
     XilonenC4,
     CitlaliTalent1,
     CitlaliC1,
+    CitlaliC2,
     CitlaliC6,
     YumemizukiMizukiC1,
     YumemizukiMizukiC2,
