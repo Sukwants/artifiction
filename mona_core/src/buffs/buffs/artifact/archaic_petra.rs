@@ -30,7 +30,7 @@ impl BuffMeta for BuffArchaicPetra4 {
         image: BuffImage::Artifact(ArtifactSetName::ArchaicPetra),
         genre: BuffGenre::Artifact,
         description: Some(crate::common::i18n::locale!(
-            zh_cn: "获得结晶反应形成的晶片时，队伍中所有角色获得35%对应元素伤害加成，持续10秒。",
+            zh_cn: "获得结晶反应形成的晶片时，队伍中所有角色获得35%对应元素伤害加成，持续10秒。同时只能通过该效果获得一种元素伤害加成。",
             en: "Upon obtaining an Elemental Shard created through a Crystallize Reaction, all party members gain a 35% DMG Bonus for that particular element for 10s. Only one form of Elemental DMG Bonus can be gained in this manner at any one time.",
         )),
         from: BuffFrom::Artifact(ArtifactSetName::ArchaicPetra),

@@ -6,8 +6,8 @@ pub mod alhaitham;
 pub mod kaveh;
 pub mod baizhu;
 pub mod kirara;
-mod emilie;
-mod kinich;
+pub mod emilie;
+pub mod kinich;
 pub mod lauma;
 
 pub use collei::Collei;

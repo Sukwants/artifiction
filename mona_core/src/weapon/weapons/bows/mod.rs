@@ -86,4 +86,4 @@ pub mod chain_breaker;
 pub mod flower_wreathed_feathers;
 pub mod astral_vultures_crimson_plumage;
 pub mod sequence_of_solitude;
-mod snare_hook;
+pub mod snare_hook;

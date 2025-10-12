@@ -117,10 +117,10 @@ pub mod fragment_of_harmonic_whimsy;
 pub mod unfinished_reverie;
 pub mod scroll_of_the_hero_of_cinder_city;
 pub mod obsidian_codex;
-mod long_nights_oath;
-mod finale_of_the_deep_galleries;
-mod night_of_the_skys_unveiling;
-mod silken_moons_serenade;
+pub mod long_nights_oath;
+pub mod finale_of_the_deep_galleries;
+pub mod night_of_the_skys_unveiling;
+pub mod silken_moons_serenade;
 
 pub fn get_effect<T: Attribute>(name: ArtifactSetName, config: &ArtifactEffectConfig, character: &Character<T>) -> Box<dyn ArtifactEffect<T>> {
     name.create_effect(config, &character.common_data)

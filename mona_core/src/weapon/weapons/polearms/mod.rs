@@ -75,5 +75,5 @@ pub mod mountain_bracing_bolt;
 pub mod tamayuratei_no_ohanashi;
 pub mod symphonist_of_scents;
 pub mod fractured_halo;
-mod prospectors_shovel;
-mod bloodsoaked_ruins;
+pub mod prospectors_shovel;
+pub mod bloodsoaked_ruins;

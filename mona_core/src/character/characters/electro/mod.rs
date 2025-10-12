@@ -15,7 +15,7 @@ pub mod ororon;
 pub mod iansan;
 pub mod varesa;
 pub mod ineffa;
-mod flins;
+pub mod flins;
 
 pub use beidou::Beidou;
 pub use keqing::Keqing;

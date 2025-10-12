@@ -1,9 +1,9 @@
-mod tighnari_default;
-mod nahida_default;
-mod alhaitham_default;
-mod emilie_default;
-mod kinich_default;
-mod lauma_default;
+pub mod tighnari_default;
+pub mod nahida_default;
+pub mod alhaitham_default;
+pub mod emilie_default;
+pub mod kinich_default;
+pub mod lauma_default;
 
 pub use tighnari_default::TighnariDefaultTargetFunction;
 pub use nahida_default::NahidaDefaultTargetFunction;
