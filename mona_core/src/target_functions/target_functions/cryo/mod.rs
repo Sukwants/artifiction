@@ -14,7 +14,7 @@ pub mod skirk_default;
 pub mod mika_default;
 pub mod freminet_default;
 pub mod wriothesley_default;
-mod citlali_default;
+pub mod citlali_default;
 
 pub use aloy_default::AloyDefaultTargetFunction;
 pub use chongyun_default::ChongyunDefaultTargetFunction;

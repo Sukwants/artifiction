@@ -1,3 +1,3 @@
 pub use lauma::{BuffLauma};
 
-mod lauma;
+pub mod lauma;

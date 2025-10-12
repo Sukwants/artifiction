@@ -13,7 +13,7 @@ pub mod clorinde_default;
 pub mod sethos_default;
 pub mod varesa_default;
 pub mod ineffa_default;
-mod flins_default;
+pub mod flins_default;
 
 pub use beidou_default::BeidouDefaultTargetFunction;
 pub use fischl_default::FischlDefaultTargetFunction;

@@ -12,7 +12,7 @@ pub mod element;
 pub mod weapon_type;
 pub mod change_attribute;
 pub mod skill_type;
-mod entry_type;
+pub mod entry_type;
 pub mod moonsign;
 pub mod max_trait;
 pub mod reaction_type;

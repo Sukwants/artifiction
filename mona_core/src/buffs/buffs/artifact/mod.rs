@@ -4,10 +4,10 @@ pub mod archaic_petra;
 pub mod viridescent_venerer;
 pub mod tenacity_of_the_millelith;
 pub mod deepwood_memories;
-mod song_of_days_past;
-mod scroll_of_the_hero_of_cinder_city;
-mod night_of_the_skys_unveiling;
-mod silken_moons_serenade;
+pub mod song_of_days_past;
+pub mod scroll_of_the_hero_of_cinder_city;
+pub mod night_of_the_skys_unveiling;
+pub mod silken_moons_serenade;
 
 pub use instructor::BuffInstructor4;
 pub use noblesse_oblige::BuffNoblesseOblige4;
