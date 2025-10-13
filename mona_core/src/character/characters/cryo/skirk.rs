@@ -41,6 +41,10 @@ pub struct SkirkSkillType {
     pub void_rift_bonus_1: [f64; 15], // 汲取1枚虚境裂隙伤害提升  
     pub void_rift_bonus_2: [f64; 15], // 汲取2枚虚境裂隙伤害提升
     pub void_rift_bonus_3: [f64; 15], // 汲取3枚虚境裂隙伤害提升
+
+    pub c1_dmg: f64,
+    pub c6_dmg_a: f64,
+    pub c6_dmg_q: f64,
 }
 
 pub const SKIRK_SKILL: SkirkSkillType = SkirkSkillType {
@@ -73,6 +77,10 @@ pub const SKIRK_SKILL: SkirkSkillType = SkirkSkillType {
     void_rift_bonus_1: [0.066, 0.072, 0.078, 0.084, 0.09, 0.096, 0.102, 0.108, 0.114, 0.12, 0.126, 0.132, 0.138, 0.144, 0.15], // 1枚
     void_rift_bonus_2: [0.088, 0.096, 0.104, 0.112, 0.12, 0.128, 0.136, 0.144, 0.152, 0.16, 0.168, 0.176, 0.184, 0.192, 0.20], // 2枚
     void_rift_bonus_3: [0.11, 0.12, 0.13, 0.14, 0.15, 0.16, 0.17, 0.18, 0.19, 0.20, 0.21, 0.22, 0.23, 0.24, 0.25], // 3枚
+
+    c1_dmg: 5.0,
+    c6_dmg_a: 1.8,
+    c6_dmg_q: 7.5,
 };
 
 pub const SKIRK_STATIC_DATA: CharacterStaticData = CharacterStaticData {
@@ -129,6 +137,10 @@ damage_enum!(
     SkillCharged
     BurstSlash
     BurstFinalSlash
+    C1
+    C6A
+    C6Z
+    C6Q
 );
 
 impl SkirkDamageEnum {
@@ -145,11 +157,11 @@ impl SkirkDamageEnum {
         match *self {
             Normal1 | Normal2 | Normal3 | Normal4 | Normal5 => SkillType::NormalAttack,
             // 七相一闪模式下的攻击被视为普通攻击，类似于达达利亚的近战模式
-            Skill1 | Skill2 | Skill3 | Skill4 | Skill5 => SkillType::NormalAttack,
-            Charged | SkillCharged => SkillType::ChargedAttack,
+            Skill1 | Skill2 | Skill3 | Skill4 | Skill5 | C1 | C6A => SkillType::NormalAttack,
+            Charged | SkillCharged | C6Z => SkillType::ChargedAttack,
             Plunging1 => SkillType::PlungingAttackInAction,
             Plunging2 | Plunging3 => SkillType::PlungingAttackOnGround,
-            BurstSlash | BurstFinalSlash => SkillType::ElementalBurst,
+            BurstSlash | BurstFinalSlash | C6Q => SkillType::ElementalBurst,
         }
     }
 }
@@ -176,6 +188,9 @@ impl CharacterTrait for Skirk {
             Plunging1 locale!(zh_cn: "下坠期间伤害", en: "Plunging DMG")
             Plunging2 locale!(zh_cn: "低空坠地冲击伤害", en: "Low Plunging DMG")
             Plunging3 locale!(zh_cn: "高空坠地冲击伤害", en: "High Plunging DMG")
+            C1 locale!(zh_cn: "一命额外伤害", en: "C1 Extra DMG")
+            C6A locale!(zh_cn: "极恶技·斩普通攻击协同伤害", en: "Havoc: Sever coordinated with Normal Attack DMG")
+            C6Z locale!(zh_cn: "极恶技·斩重击协同伤害", en: "Havoc: Sever coordinated with Charged Attack DMG")
         ),
         skill2: skill_map!(
             SkirkDamageEnum
@@ -190,6 +205,7 @@ impl CharacterTrait for Skirk {
             SkirkDamageEnum
             BurstSlash locale!(zh_cn: "斩击伤害", en: "Slash DMG")
             BurstFinalSlash locale!(zh_cn: "斩击最终段伤害", en: "Final Slash DMG")
+            C6Q locale!(zh_cn: "极恶技·斩元素爆发协同伤害", en: "Havoc: Sever coordinated with Elemental Burst DMG")
         )
     };
 
@@ -232,6 +248,14 @@ impl CharacterTrait for Skirk {
             config: ItemConfigType::Bool { default: true }
         },
         ItemConfig {
+            name: "havoc_extinction",
+            title: locale!(
+                zh_cn: "极恶技·灭",
+                en: "Havoc: Extinction"
+            ),
+            config: ItemConfigType::Bool { default: true }
+        },
+        ItemConfig {
             name: "death_crossing_stacks",
             title: locale!(
                 zh_cn: "死河渡断层数",
@@ -253,9 +277,9 @@ impl CharacterTrait for Skirk {
         let s: SkirkDamageEnum = num::FromPrimitive::from_usize(s).unwrap();
         let (s1, s2, s3) = context.character_common_data.get_3_skill();
 
-        let (cunning_stacks, seven_phase_mode, death_crossing_stacks, void_rift_count) = match *config {
-            CharacterSkillConfig::Skirk { cunning_stacks, seven_phase_mode, death_crossing_stacks, void_rift_count } => (cunning_stacks, seven_phase_mode, death_crossing_stacks, void_rift_count),
-            _ => (100, true, 0, 0)
+        let (cunning_stacks, seven_phase_mode, havoc_extinction, death_crossing_stacks, void_rift_count) = match *config {
+            CharacterSkillConfig::Skirk { cunning_stacks, seven_phase_mode, havoc_extinction, death_crossing_stacks, void_rift_count } => (cunning_stacks, seven_phase_mode, havoc_extinction, death_crossing_stacks, void_rift_count),
+            _ => (100, true, true, 0, 0)
         };
 
         use SkirkDamageEnum::*;
@@ -277,6 +301,10 @@ impl CharacterTrait for Skirk {
             SkillCharged => SKIRK_SKILL.elemental_skill_charged_dmg[s2],
             BurstSlash => SKIRK_SKILL.elemental_burst_slash_dmg[s3] * 5.0, // 5 hits
             BurstFinalSlash => SKIRK_SKILL.elemental_burst_final_slash_dmg[s3],
+            C1 => SKIRK_SKILL.c1_dmg,
+            C6A => SKIRK_SKILL.c6_dmg_a,
+            C6Z => SKIRK_SKILL.c6_dmg_a,
+            C6Q => SKIRK_SKILL.c6_dmg_q,
         };
 
         let mut builder = D::new();
@@ -284,9 +312,15 @@ impl CharacterTrait for Skirk {
 
         // 蛇之狡谋加成 (仅对元素爆发)
         if matches!(s, BurstSlash | BurstFinalSlash) && cunning_stacks > 50 {
-            let cunning_bonus_stacks = ((cunning_stacks - 50).min(12)) as f64;
+            let cunning_bonus_stacks = ((cunning_stacks - 50).min(if context.character_common_data.constellation >= 2 { 22 } else { 12 })) as f64;
             let cunning_bonus_ratio = SKIRK_SKILL.elemental_burst_cunning_bonus[s3] * cunning_bonus_stacks;
             builder.add_atk_ratio("蛇之狡谋加成", cunning_bonus_ratio);
+        }
+
+        if context.character_common_data.constellation >= 2 {
+            if seven_phase_mode && havoc_extinction {
+                builder.add_atk_ratio("命座「坠渊」", 0.7);
+            }
         }
 
         // 万流归寂 - 死河渡断效果对七相一闪模式攻击的伤害提升
@@ -317,6 +351,11 @@ impl CharacterTrait for Skirk {
                     }
                 },
                 _ => {}
+            }
+
+            if context.character_common_data.constellation >= 4 {
+                let atk_bonus = [0.0, 0.1, 0.2, 0.4][death_crossing_stacks as usize];
+                builder.add_atk_ratio("命座「流断」额外倍率", atk_bonus);
             }
         }
 
