@@ -578,13 +578,17 @@ impl DamageBuilder for ComplicatedDamageBuilder {
 
         let healing_bonus_comp = self.get_healing_bonus_composition(attribute);
         let healing_bonus = healing_bonus_comp.sum();
+        let healing_critical_comp = &self.extra_critical_rate;
+        let healing_critical: f64 = healing_critical_comp.sum().clamp(0.0, 1.0);
+        let healing_critical_damage_comp = &self.extra_critical_damage;
+        let healing_critical_damage = healing_critical_damage_comp.sum();
 
         let base = atk * self.ratio_atk.sum() + hp * self.ratio_hp.sum() + def * self.ratio_def.sum() + em * self.ratio_em.sum() + self.extra_damage.sum();
 
         let heal_value = base * (1.0 + healing_bonus);
         let damage_normal = DamageResult {
-            expectation: heal_value,
-            critical: heal_value,
+            expectation: heal_value * (1.0 + healing_critical * healing_critical_damage),
+            critical: heal_value * (1.0 + healing_critical_damage),
             non_critical: heal_value,
             lunar_type: MoonglareReaction::None,
             is_heal: true,
@@ -605,8 +609,8 @@ impl DamageBuilder for ComplicatedDamageBuilder {
             aggravate_compose: HashMap::new(),
 
             bonus: HashMap::new(),
-            critical: HashMap::new(),
-            critical_damage: HashMap::new(),
+            critical: healing_critical_comp.0.clone(),
+            critical_damage: healing_critical_damage_comp.0.clone(),
 
             melt_enhance: HashMap::new(),
             vaporize_enhance: HashMap::new(),

@@ -51,7 +51,7 @@ pub enum CharacterConfig {
     Iansan { talent1_rate: f64 },
     Varesa { talent1_rate: f64, talent2_stack: f64, passion: bool },
     // Skirk { death_crossing_stacks: usize, team_has_hydro_cryo: bool },
-    Escoffier { hydro_cryo_count: usize, after_burst: bool },
+    Escoffier { hydro_cryo_count: usize },
     Ifa { nightsoul_total: usize },
     Ineffa { activated_p2: bool },
     Lauma { activated_q: bool, activated_res: bool, moonsign: Moonsign },
