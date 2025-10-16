@@ -45,6 +45,8 @@ pub use vivid_notions::VividNotions;
 pub use nightweavers_looking_glass::NightweaversLookingGlass;
 pub use blackmarrow_lantern::BlackmarrowLantern;
 pub use etherlight_spindlelute::EtherlightSpindlelute;
+pub use reliquary_of_truth::ReliquaryOfTruth;
+pub use dawning_frost::DawningFrost;
 
 pub mod lost_prayer_to_the_sacred_winds;
 pub mod skyward_atlas;
@@ -93,3 +95,5 @@ pub mod vivid_notions;
 pub mod nightweavers_looking_glass;
 pub mod blackmarrow_lantern;
 pub mod etherlight_spindlelute;
+pub mod reliquary_of_truth;
+pub mod dawning_frost;

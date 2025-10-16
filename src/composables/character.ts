@@ -1,4 +1,4 @@
-const DEFAULT_CHARACTER = "Flins";
+const DEFAULT_CHARACTER = "Nefer";
 
 import type {WeaponType} from "@/types/weapon"
 // @ts-ignore
