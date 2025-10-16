@@ -36,7 +36,7 @@ pub enum AttributeName {
 
     ATKBase,
     ATKFixed,
-    ATKPercentage,
+    ATKPercentage, // 并非攻击力百分比，如需添加百分比攻击请使用 add_edge: ATKBase -> ATKPercentage 或 add_atk_percentage
     ATK,
 
     DEFBase,

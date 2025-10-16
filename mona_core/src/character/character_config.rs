@@ -57,5 +57,6 @@ pub enum CharacterConfig {
     Lauma { activated_q: bool, activated_res: bool, moonsign: Moonsign },
     Aino { moonsign: Moonsign },
     Flins { moonsign: Moonsign },
+    Nefer { moonsign: Moonsign },
     NoConfig,
 }

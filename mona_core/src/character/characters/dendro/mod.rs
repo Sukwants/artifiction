@@ -9,6 +9,7 @@ pub mod kirara;
 pub mod emilie;
 pub mod kinich;
 pub mod lauma;
+pub mod nefer;
 
 pub use collei::Collei;
 pub use tighnari::Tighnari;
@@ -21,3 +22,4 @@ pub use kirara::Kirara;
 pub use emilie::Emilie;
 pub use kinich::Kinich;
 pub use lauma::Lauma;
+pub use nefer::Nefer;
