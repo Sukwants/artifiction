@@ -111,7 +111,7 @@ pub struct ReferEffect {
 
 impl<A: Attribute> ChangeAttribute<A> for ReferEffect {
     fn change_attribute(&self, attribute: &mut A) {
-        attribute.set_value_by(AttributeName::ElementalMastery, "初始精通", 200.0);
+        attribute.set_value_by(AttributeName::ElementalMastery, "初始精通", 100.0);
 
         attribute.add_edge1(
             AttributeName::ElementalMastery,
