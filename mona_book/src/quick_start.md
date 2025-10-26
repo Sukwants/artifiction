@@ -4,7 +4,7 @@
 你可以通过两种方法扫描圣遗物 
 
 ### 1. 下载圣遗物扫描软件，并将其导入至叶师傅开锁铺
-扫描软件推荐使用 [Yas](https://github.com/wormtql/yas/releases)  
+扫描软件推荐使用 [Yas](https://github.com/2745518585/yas/releases)  
 另外可以使用 [Amenoma](https://github.com/daydreaming666/Amenoma/releases)
 
 ![img.png](./assets/img.png)
