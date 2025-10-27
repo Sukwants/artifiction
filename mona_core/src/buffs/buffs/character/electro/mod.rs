@@ -1,6 +1,6 @@
 pub use beidou::BuffBeidouC6;
 pub use dori::BuffDoriC4;
-pub use flins::BuffFlinsC6;
+pub use flins::{BuffFlinsC6, BuffFlinsP3};
 pub use ineffa::BuffIneffa;
 pub use kujou_sara::BuffKujouSaraEOrQ;
 pub use lisa::BuffLisaTalent2;

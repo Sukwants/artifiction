@@ -116,10 +116,14 @@ pub enum BuffName {
     EscoffierC1,
     EscoffierC2,
     Ineffa,
-    Lauma,
+    LaumaE,
+    LaumaQ,
+    LaumaP3,
     AinoC1,
     AinoC6,
+    FlinsP3,
     FlinsC6,
+    NeferP3,
 
 
     // weapon
