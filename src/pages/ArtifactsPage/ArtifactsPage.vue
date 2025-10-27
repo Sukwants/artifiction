@@ -376,8 +376,8 @@ function shareArtifact() {
         if (response.status === 200) {
             // console.log("success")
             const code = response.data.code
-            // shareLink.value = `https://mona-uranai.com/artifacts?code=${code}`
-            shareLink.value = `https://mona-uranai.com/import?type=artifact&code=${code}`
+            // shareLink.value = `https://artifiction.pond.ink/artifacts?code=${code}`
+            shareLink.value = `https://artifiction.pond.ink/import?type=artifact&code=${code}`
             showOutputShareDialog.value = true
         }
     })

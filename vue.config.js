@@ -85,7 +85,7 @@ module.exports = {
         proxy: {
             "^/api/compute_result/analysis": {
                 // target: "http://localhost:8000"
-                target: "https://www.mona-uranai.com/"
+                target: "https://artifiction.pond.ink/"
             },
             "^/api": {
                 target: "http://localhost:8000/",

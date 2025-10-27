@@ -3,7 +3,7 @@
 
 ![img.png](img.png)
 
-已有的预设可以在 [计算预设](https://mona-uranai.com/presets) 页面查看
+已有的预设可以在 [计算预设](https://artifiction.pond.ink/presets) 页面查看
 
 ![img_1.png](img_1.png)
 

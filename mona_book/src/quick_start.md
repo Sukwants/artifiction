@@ -18,7 +18,7 @@
 ![img_2.png](./assets/img_2.png)
 
 ## 选择角色与武器开始计算
-前往 [计算器](https://mona-uranai.com/calculate) 页面，在这里可以进行伤害的计算、圣遗物的配装、分析等操作。
+前往 [计算器](https://artifiction.pond.ink/calculate) 页面，在这里可以进行伤害的计算、圣遗物的配装、分析等操作。
 
 以神里绫华为例，我们需要对主C绫华进行配装，首先选择角色和武器：
 ![img_1.png](./assets/img_1.png)
