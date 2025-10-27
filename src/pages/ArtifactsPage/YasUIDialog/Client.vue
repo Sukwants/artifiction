@@ -1,7 +1,8 @@
 <template>
     <div :class="$style.client">
         <div class="client-content">
-            <div v-if="loading">
+            <p> web 扫描尚未更新，请前往 GitHub (https://github.com/2745518585/yas) 下载 yas 本地扫描后导入。 </p>
+            <!-- <div v-if="loading">
                 <div :class="$style.loader">
                     <div class="loader-animation">
                         <span class="cssload-loader"><span class="cssload-loader-inner"></span></span>
@@ -16,7 +17,7 @@
                 </div>
                 <div class="content">
                     由于浏览器限制，自动操作无法在网页完成
-                    <a class="dlink" href="https://cocogoat.work/extra/client" target="_blank">
+                    <a class="dlink" href="https://.work/extra/client" target="_blank">
                         如果插件没有自动启动，请点击此处下载并运行辅助插件<small>(v{{ cVersion }} 500kB)</small>
                     </a>
                     <div class="absolute-area">
@@ -71,7 +72,7 @@
                         </el-button>
                     </div>
                 </div>
-            </div>
+            </div> -->
         </div>
     </div>
 </template>
