@@ -140,6 +140,7 @@ pub enum BuffName {
     StarcallersWatch,
     SymphonistOfScents,
     FracturedHalo,
+    NightweaversLookingGlass,
     
 
     ResonancePyro2,

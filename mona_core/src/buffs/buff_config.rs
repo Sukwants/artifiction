@@ -94,6 +94,7 @@ pub enum BuffConfig {
     StarcallersWatch { refine: usize },
     SymphonistOfScents { refine: usize },
     FracturedHalo { refine: usize },
+    NightweaversLookingGlass { refine: usize },
 
     ResonanceCryo2 { rate: f64 },
     ResonanceGeo2 { rate1: f64, rate2: f64 },
