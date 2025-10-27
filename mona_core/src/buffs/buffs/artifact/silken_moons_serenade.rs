@@ -53,7 +53,7 @@ impl BuffMeta for BuffSilkenMoonsSerenade4 {
         ItemConfig::MOONSIGN3,
         ItemConfig {
             name: "gleaming_moon_effect_count",
-            title: locale!(zh_cn: "「月辉明光」数量", en: "Gleaming Moon Effect Count"),
+            title: locale!(zh_cn: "「月辉明光」数量（如效果重复请填入 0）", en: "Gleaming Moon Effect Count (Enter 0 if effects are duplicated)"),
             config: ItemConfigType::Int { min: 0, max: 2, default: 1 },
         }
     ]);
