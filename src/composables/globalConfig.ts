@@ -5,12 +5,28 @@ import { RandomIDProvider } from "@/utils/idProvider"
 export function useGlobalConfig() {
     const values = ref<any>({});
 
-    function linkGlobalConfig(name: string, priority: number, get_value: Function, update_value: Function) {
-        values.value[name].push({
-            "priority": priority,
-            "get_value": get_value,
-            "update_value": update_value
-        })
+    function clearLinkedGlobalConfig() {
+        for(let i in globalConfigConfig) {
+            values.value[globalConfigConfig[i].name] = [
+                {
+                    "priority": 0,
+                    "value": globalConfigConfig[i].default,
+                    "update_value": () => {}
+                }
+            ]
+        }
+    }
+
+    function linkGlobalConfig(configs: any, config: any, unlinked: any) {
+        for (const i of configs) {
+            if (i.type == "globalLink" && unlinked[i.name] !== true) {
+                values.value[i.name].push({
+                    "priority": i.priority,
+                    "value": config[i.name],
+                    "update_value": (value: any) => {config[i.name] = value}
+                })
+            }
+        }
     }
 
     function updateGlobalConfig(name: string, value: any) {
@@ -27,26 +43,14 @@ export function useGlobalConfig() {
         }
     }
 
-    function clearLinkedGlobalConfig() {
-        for(let i in globalConfigConfig) {
-            values.value[globalConfigConfig[i].name] = [
-                {
-                    "priority": 0,
-                    "get_value": () => globalConfigConfig[i].default,
-                    "update_value": () => {}
-                }
-            ]
-        }
-    }
-
-    const globalConfig = computed((): Record<string, any> => {
-        let res: Record<string, any> = {};
+    const globalConfig = computed((): any => {
+        let res: any = {};
         for (let name in values.value) {
             let current_priority = -1;
             for (let id in values.value[name]) {
                 if (values.value[name][id].priority > current_priority) {
                     current_priority = values.value[name][id].priority;
-                    res[name] = values.value[name][id].get_value();
+                    res[name] = values.value[name][id].value;
                 }
             }
         }

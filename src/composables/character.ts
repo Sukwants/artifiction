@@ -53,7 +53,7 @@ export function useCharacter() {
     const characterName = ref(DEFAULT_CHARACTER)
     const characterLevel = ref("90")
     const characterConfig = ref<any>(getDefaultCharacterConfig(characterName.value))
-    const characterConfigValue = ref<any>(getDefaultCharacterConfig(characterName.value))
+    const characterConfigValue = ref<any>(getDefaultCharacterConfig(characterName.value))  // 合并 global config 后的值
     const characterConfigUnlinked = ref<any>(getDefaultCharacterConfigUnlinked(characterName.value))
     const characterSkill1 = ref(8)
     const characterSkill2 = ref(8)
@@ -105,7 +105,6 @@ export function useCharacter() {
             skill2: characterSkill2.value - 1,
             skill3: characterSkill3.value - 1,
             params: characterConfigValue.value,
-            originalParams: characterConfig.value,
             configUnlinked: characterConfigUnlinked.value,
         }
         return i
@@ -181,7 +180,7 @@ function getDefaultCharacterSkillConfigUnlinked(name: string) {
 
 export function useCharacterSkill(characterName: Ref<CharacterName>) {
     const characterSkillConfig = ref<any>(getDefaultCharacterSkillConfig(characterName.value))
-    const characterSkillConfigValue = ref<any>(getDefaultCharacterSkillConfig(characterName.value))
+    const characterSkillConfigValue = ref<any>(getDefaultCharacterSkillConfig(characterName.value))  // 合并 global config 后的值
     const characterSkillConfigUnlinked = ref<any>(getDefaultCharacterSkillConfigUnlinked(characterName.value))
     const characterSkillIndex = ref(0)
 

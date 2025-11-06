@@ -7,7 +7,6 @@ export interface ICharacter {
     skill2: number,
     skill3: number,
     params: any,
-    originalParams: any,
     configUnlinked: any
 }
 

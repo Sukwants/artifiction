@@ -3,7 +3,6 @@ export interface IWeapon {
     level: number,
     ascend: boolean,
     params: any,
-    originalParams: any,
     refine: number,
     configUnlinked: any
 }

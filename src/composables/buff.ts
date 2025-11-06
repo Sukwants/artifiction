@@ -28,7 +28,6 @@ export function useBuff() {
             temp.push({
                 name: buff.name,
                 config: buff.configValue,
-                originalConfig: buff.config,
                 configUnlinked: buff.configUnlinked,
             })
         }
@@ -68,7 +67,7 @@ export function useBuff() {
         buffs.value.push({
             name,
             config,
-            configValue: structuredClone(config),
+            configValue: structuredClone(config),  // 合并 global config 后的值
             configUnlinked,
             id: idGenerator.generateId(),
             lock: false
@@ -77,7 +76,6 @@ export function useBuff() {
 
     function deleteBuff(id: number) {
         const index = buffs.value.findIndex(e => e.id === id)
-        console.log(0)
         buffs.value.splice(index, 1)
     }
 

@@ -1019,13 +1019,21 @@ function handleClickSaveOptimizeConfig() {
 }
 
 function getPresetItem() {
+    let characterToBeSaved = deepCopy(characterInterface.value)
+    characterToBeSaved.params = deepCopy(characterConfig.value)
+
+    let weaponToBeSaved = deepCopy(weaponInterface.value)
+    weaponToBeSaved.params = deepCopy(weaponConfig.value)
+
+    let targetFunctionToBeSaved = deepCopy(targetFunctionInterface.value)
+    targetFunctionToBeSaved.params = deepCopy(targetFunctionConfig.value)
+
     type BuffType = Omit<IBuff, "id">
     let buffsToBeSaved: BuffType[] = []
     for (let buff of buffs.value) {
         buffsToBeSaved.push({
             name: buff.name,
             config: deepCopy(buff.configValue),
-            originalConfig: deepCopy(buff.config),
             configUnlinked: deepCopy(buff.configUnlinked),
             lock: buff.lock
         })
@@ -1034,9 +1042,9 @@ function getPresetItem() {
     const item = {
         // buffs: deepCopy(config.buffs),
         buffs: buffsToBeSaved,
-        character: deepCopy(characterInterface.value),
-        weapon: deepCopy(weaponInterface.value),
-        targetFunction: deepCopy(targetFunctionInterface.value),
+        character: characterToBeSaved,
+        weapon: weaponToBeSaved,
+        targetFunction: targetFunctionToBeSaved,
         constraint: {
             setNames: deepCopy(constraintArtifactSet.value),
             minRecharge: constraintMinRecharge.value,
@@ -1076,8 +1084,8 @@ function usePreset(name: string) {
             const newBuff: BuffEntry = {
                 id: idGenerator.generateId(),
                 name: buff.name,
-                config: buff.originalConfig,
-                configValue: buff.config,
+                config: buff.config,
+                configValue: deepCopy(buff.config),
                 configUnlinked: buff.configUnlinked,
                 lock: buff.lock
             }
@@ -1096,8 +1104,7 @@ function usePreset(name: string) {
         characterSkill1.value = c.skill1 + 1
         characterSkill2.value = c.skill2 + 1
         characterSkill3.value = c.skill3 + 1
-        characterConfigValue.value = c.params
-        characterConfig.value = c.originalParams ?? structuredClone(c.params)
+        characterConfig.value = c.params
         characterConfigUnlinked.value = c.configUnlinked ?? {}
     }
 
@@ -1107,8 +1114,7 @@ function usePreset(name: string) {
         weaponName.value = w.name
         weaponLevel.value = w.level.toString() + (w.ascend ? "+" : "-")
         weaponRefine.value = w.refine
-        weaponConfigValue.value = w.params
-        weaponConfig.value = w.originalParams ?? structuredClone(w.params)
+        weaponConfig.value = w.params
         weaponConfigUnlinked.value = w.configUnlinked ?? {}
     }
 
@@ -1116,8 +1122,7 @@ function usePreset(name: string) {
     const tf = item.targetFunction
     if (tf) {
         targetFunctionName.value = tf.name
-        targetFunctionConfigValue.value = tf.params,
-        targetFunctionConfig.value = tf.originalParams ?? structuredClone(tf.params)
+        targetFunctionConfig.value = tf.params,
         targetFunctionConfigUnlinked.value = tf.configUnlinked ?? {}
     }
 
@@ -1214,21 +1219,8 @@ const {
 watchEffect(() => {
     clearLinkedGlobalConfig()
 
-    function addLink(configs: any, config: any, unlinked: any) {
-        for (const i of configs) {
-            if (i.type == "globalLink" && unlinked[i.name] !== true) {
-                linkGlobalConfig(
-                    i.name,
-                    i.priority,
-                    () => {return config[i.name]},
-                    (value: any) => {config[i.name] = value}
-                )
-            }
-        }
-    }
-
     if (characterConfigConfig.value.length > 0) {
-        addLink(
+        linkGlobalConfig(
             characterConfigConfig.value,
             characterConfig.value[characterName.value],
             characterConfigUnlinked.value[characterName.value]
@@ -1236,7 +1228,7 @@ watchEffect(() => {
     }
 
     if (weaponConfigConfig.value.length > 0) {
-        addLink(
+        linkGlobalConfig(
             weaponConfigConfig.value,
             weaponConfig.value[weaponName.value],
             weaponConfigUnlinked.value[weaponName.value]
@@ -1244,7 +1236,7 @@ watchEffect(() => {
     }
 
     if (targetFunctionConfigConfig.value.length > 0) {
-        addLink(
+        linkGlobalConfig(
             targetFunctionConfigConfig.value,
             targetFunctionConfig.value[targetFunctionName.value],
             targetFunctionConfigUnlinked.value[targetFunctionName.value]
@@ -1253,7 +1245,7 @@ watchEffect(() => {
 
     for (const buff of buffs.value) {
         if ( buff && buffData[buff.name].config.length > 0) {
-            addLink(
+            linkGlobalConfig(
                 buffData[buff.name].config,
                 buff.config[buff.name],
                 buff.configUnlinked[buff.name]
@@ -1262,7 +1254,7 @@ watchEffect(() => {
     }
 
     if (characterSkillConfigConfig.value.length > 0) {
-        addLink(
+        linkGlobalConfig(
             characterSkillConfigConfig.value,
             characterSkillConfig.value[characterName.value],
             characterSkillConfigUnlinked.value[characterName.value]

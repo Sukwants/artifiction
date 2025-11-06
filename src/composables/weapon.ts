@@ -53,7 +53,7 @@ export function useWeapon(weaponType: null | Ref<WeaponType>) {
     const weaponLevel = ref("90")
     const weaponRefine = ref(1)
     const weaponConfig = ref<any>(getDefaultWeaponConfig(weaponName.value))
-    const weaponConfigValue = ref<any>(getDefaultWeaponConfig(weaponName.value))
+    const weaponConfigValue = ref<any>(getDefaultWeaponConfig(weaponName.value))  // 合并 global config 后的值
     const weaponConfigUnlinked = ref<any>(getDefaultWeaponConfigUnlinked(weaponName.value))
 
     const weaponLevelNumber = computed(() => {
@@ -85,7 +85,6 @@ export function useWeapon(weaponType: null | Ref<WeaponType>) {
             ascend: weaponAscend.value,
             refine: weaponRefine.value,
             params: weaponConfigValue.value,
-            originalParams: weaponConfig.value,
             configUnlinked: weaponConfigUnlinked.value
         }
     })

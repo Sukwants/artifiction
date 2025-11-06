@@ -92,7 +92,6 @@ export function useTargetFunction(characterName: Ref<CharacterName>) {
         return {
             name: targetFunctionName.value,
             params: targetFunctionConfigValue.value,
-            originalParams: targetFunctionConfig.value,
             configUnlinked: targetFunctionConfigUnlinked.value,
             use_dsl,
             dsl_source: use_dsl ? targetFunctionDSLSource.value : ""
