@@ -314,6 +314,10 @@
                                 v-model="characterConfig"
                                 :item-name="characterName"
                                 :configs="characterConfigConfig"
+                                :globalValue="globalConfig"
+                                :globalConfigs="globalConfigConfig"
+                                :updateGlobalConfig="updateGlobalConfig"
+                                v-model:unlinked="characterConfigUnlinked"
                             ></item-config>
                         </div>
                     </div>
@@ -361,6 +365,10 @@
                                 v-model="weaponConfig"
                                 :item-name="weaponName"
                                 :configs="weaponConfigConfig"
+                                :globalValue="globalConfig"
+                                :globalConfigs="globalConfigConfig"
+                                :updateGlobalConfig="updateGlobalConfig"
+                                v-model:unlinked="weaponConfigUnlinked"
                             ></item-config>
                         </div>
                     </div>
@@ -433,6 +441,10 @@
                                     v-model="targetFunctionConfig"
                                     :item-name="targetFunctionName"
                                     :configs="targetFunctionConfigConfig"
+                                    :globalValue="globalConfig"
+                                    :globalConfigs="globalConfigConfig"
+                                    :updateGlobalConfig="updateGlobalConfig"
+                                    v-model:unlinked="targetFunctionConfigUnlinked"
                                 ></item-config>
                             </div>
 
@@ -497,6 +509,10 @@
                             :key="buff.id"
                             :buff="buff"
                             v-model:buffConfig="buff.config"
+                            :globalValue="globalConfig"
+                            :globalConfigs="globalConfigConfig"
+                            :updateGlobalConfig="updateGlobalConfig"
+                            v-model:unlinked="buff.configUnlinked"
                             @delete="handleClickDeleteBuff(buff.id)"
                             @toggle="handleClickToggleBuff(buff.id)"
                         ></buff-item>
@@ -613,6 +629,10 @@
                         v-model="characterSkillConfig"
                         :item-name="characterName"
                         :configs="characterSkillConfigConfig"
+                        :globalValue="globalConfig"
+                        :globalConfigs="globalConfigConfig"
+                        :updateGlobalConfig="updateGlobalConfig"
+                        v-model:unlinked="characterSkillConfigUnlinked"
                     ></item-config>
                 </div>
                 <div class="damage-analysis-div">
@@ -678,6 +698,7 @@ import DamagePanel from "./DamagePanel"
 import AttributePanel from "@c/display/AttributePanel"
 import ItemConfig from "@c/config/ItemConfig"
 import BuffItem from "./BuffItem"
+import { buffData } from "@buff"
 import WeaponDisplay from "@/components/display/WeaponDisplay.vue"
 import SaveAsKumi from "./SaveAsKumi.vue"
 import TransformativeDamage from "./TransformativeDamage"
@@ -687,6 +708,7 @@ import EnemyConfigComponent from "./EnemyConfig"
 import SelectArtifactMainStat from "@c/select/SelectArtifactMainStat"
 import ArtifactConfig from "./ArtifactConfig.vue"
 import DamageAnalysis from "@/components/display/DamageAnalysis"
+import {useGlobalConfig} from "@/composables/globalConfig"
 import {useCharacter, useCharacterSkill} from "@/composables/character"
 import {useEnemy} from "@/composables/enemy"
 import {useWeapon} from "@/composables/weapon"
@@ -705,7 +727,7 @@ import {useComputeConstraint} from "@/composables/constraint"
 import {BuffEntry, useBuff} from "@/composables/buff"
 import {type PresetEntry, usePresetStore} from "@/store/pinia/preset"
 import {useArtifactStore} from "@/store/pinia/artifact"
-import type {IPreset} from "@/types/preset"
+import type {IBuff, IPreset} from "@/types/preset"
 import {RandomIDProvider} from "@/utils/idProvider"
 import {use5Artifacts} from "@/composables/artifact"
 import {positions} from "@/constants/artifact"
@@ -722,6 +744,7 @@ import {artifactsData} from "@/assets/artifacts"
 import {ElMessage} from "element-plus"
 import "element-plus/es/components/message/style/css"
 import SelectElementType from "@/components/select/SelectElementType.vue";
+import { add } from "lodash"
 
 // stores
 const presetStore = usePresetStore()
@@ -782,12 +805,16 @@ const {
     characterSplash,
     characterNeedConfig,
     characterConfigConfig,
+    characterConfigValue,
+    characterConfigUnlinked,
     characterInterface,
     characterLocale,
 } = useCharacter()
 
 const {
     characterSkillConfig,
+    characterSkillConfigValue,
+    characterSkillConfigUnlinked,
     characterSkillIndex,
     characterNeedSkillConfig,
     characterSkillConfigConfig,
@@ -809,6 +836,8 @@ const {
     weaponSplash,
     weaponNeedConfig,
     weaponConfigConfig,
+    weaponConfigValue,
+    weaponConfigUnlinked,
     weaponInterface,
     weaponLocale
 } = useWeapon(characterWeaponType)
@@ -819,6 +848,8 @@ const {
 const {
     targetFunctionName,
     targetFunctionConfig,
+    targetFunctionConfigValue,
+    targetFunctionConfigUnlinked,
     targetFunctionUseDSL,
     targetFunctionDSLSource,
     targetFunctionBadge,
@@ -988,12 +1019,14 @@ function handleClickSaveOptimizeConfig() {
 }
 
 function getPresetItem() {
-    type BuffType = Omit<BuffEntry, "id">
+    type BuffType = Omit<IBuff, "id">
     let buffsToBeSaved: BuffType[] = []
     for (let buff of buffs.value) {
         buffsToBeSaved.push({
             name: buff.name,
-            config: deepCopy(buff.config),
+            config: deepCopy(buff.configValue),
+            originalConfig: deepCopy(buff.config),
+            configUnlinked: deepCopy(buff.configUnlinked),
             lock: buff.lock
         })
     }
@@ -1043,7 +1076,9 @@ function usePreset(name: string) {
             const newBuff: BuffEntry = {
                 id: idGenerator.generateId(),
                 name: buff.name,
-                config: buff.config,
+                config: buff.originalConfig,
+                configValue: buff.config,
+                configUnlinked: buff.configUnlinked,
                 lock: buff.lock
             }
             newBuffs.push(newBuff)
@@ -1061,7 +1096,9 @@ function usePreset(name: string) {
         characterSkill1.value = c.skill1 + 1
         characterSkill2.value = c.skill2 + 1
         characterSkill3.value = c.skill3 + 1
-        characterConfig.value = c.params
+        characterConfigValue.value = c.params
+        characterConfig.value = c.originalParams ?? structuredClone(c.params)
+        characterConfigUnlinked.value = c.configUnlinked ?? {}
     }
 
     // use weapon
@@ -1070,14 +1107,18 @@ function usePreset(name: string) {
         weaponName.value = w.name
         weaponLevel.value = w.level.toString() + (w.ascend ? "+" : "-")
         weaponRefine.value = w.refine
-        weaponConfig.value = w.params
+        weaponConfigValue.value = w.params
+        weaponConfig.value = w.originalParams ?? structuredClone(w.params)
+        weaponConfigUnlinked.value = w.configUnlinked ?? {}
     }
 
     // use target function
     const tf = item.targetFunction
     if (tf) {
         targetFunctionName.value = tf.name
-        targetFunctionConfig.value = tf.params
+        targetFunctionConfigValue.value = tf.params,
+        targetFunctionConfig.value = tf.originalParams ?? structuredClone(tf.params)
+        targetFunctionConfigUnlinked.value = tf.configUnlinked ?? {}
     }
 
     // is DSL?
@@ -1157,6 +1198,130 @@ function handleSelectBuff(name: string) {
     showSelectBuffDialog.value = false
     addBuff(name)
 }
+
+
+///////////////////////////////////////////////////////////
+// global config
+
+const {
+    globalConfig,
+    globalConfigConfig,
+    linkGlobalConfig,
+    updateGlobalConfig,
+    clearLinkedGlobalConfig
+} = useGlobalConfig()
+
+watchEffect(() => {
+    clearLinkedGlobalConfig()
+
+    function addLink(configs: any, config: any, unlinked: any) {
+        for (const i of configs) {
+            if (i.type == "globalLink" && unlinked[i.name] !== true) {
+                linkGlobalConfig(
+                    i.name,
+                    i.priority,
+                    () => {return config[i.name]},
+                    (value: any) => {config[i.name] = value}
+                )
+            }
+        }
+    }
+
+    if (characterConfigConfig.value.length > 0) {
+        addLink(
+            characterConfigConfig.value,
+            characterConfig.value[characterName.value],
+            characterConfigUnlinked.value[characterName.value]
+        )
+    }
+
+    if (weaponConfigConfig.value.length > 0) {
+        addLink(
+            weaponConfigConfig.value,
+            weaponConfig.value[weaponName.value],
+            weaponConfigUnlinked.value[weaponName.value]
+        )
+    }
+
+    if (targetFunctionConfigConfig.value.length > 0) {
+        addLink(
+            targetFunctionConfigConfig.value,
+            targetFunctionConfig.value[targetFunctionName.value],
+            targetFunctionConfigUnlinked.value[targetFunctionName.value]
+        )
+    }
+
+    for (const buff of buffs.value) {
+        if ( buff && buffData[buff.name].config.length > 0) {
+            addLink(
+                buffData[buff.name].config,
+                buff.config[buff.name],
+                buff.configUnlinked[buff.name]
+            )
+        }
+    }
+
+    if (characterSkillConfigConfig.value.length > 0) {
+        addLink(
+            characterSkillConfigConfig.value,
+            characterSkillConfig.value[characterName.value],
+            characterSkillConfigUnlinked.value[characterName.value]
+        )
+    }
+
+}, {
+    flush: "post"
+})
+
+watchEffect(() => {
+    const res: any = structuredClone(characterConfig.value)
+    for (const i of characterConfigConfig.value) {
+        if (i.type == "globalLink" && characterConfigUnlinked.value[characterName.value][i.name] !== true) {
+            res[characterName.value][i.name] = globalConfig.value[i.name]
+        }
+    }
+    characterConfigValue.value = res
+}, {
+    flush: "post"
+})
+
+watchEffect(() => {
+    const res: any = structuredClone(weaponConfig.value)
+    for (const i of weaponConfigConfig.value) {
+        if (i.type == "globalLink" && weaponConfigUnlinked.value[weaponName.value][i.name] !== true) {
+            res[weaponName.value][i.name] = globalConfig.value[i.name]
+        }
+    }
+    weaponConfigValue.value = res
+}, {
+    flush: "post"
+})
+
+watchEffect(() => {
+    const res: any = structuredClone(characterSkillConfig.value)
+    for (const i of characterSkillConfigConfig.value) {
+        if (i.type == "globalLink" && characterSkillConfigUnlinked.value[characterName.value][i.name] !== true) {
+            res[characterName.value][i.name] = globalConfig.value[i.name]
+        }
+    }
+    characterSkillConfigValue.value = res
+}, {
+    flush: "post"
+})
+
+watchEffect(() => {
+    for (const buff of buffs.value) {
+        const res: any = structuredClone(buff.config)
+        for (const i of buffData[buff.name].config) {
+            if (i.type == "globalLink" && buff.configUnlinked[buff.name][i.name] !== true) {
+                res[buff.name][i.name] = globalConfig.value[i.name]
+            }
+        }
+        buff.configValue = res
+    }
+}, {
+    flush: "post"
+})
 
 
 ////////////////////////////////////////////////////////////////////////

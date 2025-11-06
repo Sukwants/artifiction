@@ -38,13 +38,33 @@ function getDefaultTargetFunctionConfig(name: string) {
     return res;
 }
 
+function getDefaultTargetFunctionUnlinked(name: string) {
+    let res: any = {};
+
+    if (!!targetFunctionData[name]?.config) {
+        let defaultConfigUnlinked: any = {}
+        for (let c of targetFunctionData[name].config) {
+            defaultConfigUnlinked[c.name] = c.unlinked
+        }
+        res = {
+            [name]: defaultConfigUnlinked
+        }
+    }
+
+    return res;
+}
+
 export function useTargetFunction(characterName: Ref<CharacterName>) {
     const targetFunctionName = ref<TargetFunctionName>(getDefaultTargetFunction(characterName.value))
     const targetFunctionConfig = ref<any>("NoConfig")
+    const targetFunctionConfigValue = ref<any>("NoConfig")
+    const targetFunctionConfigUnlinked = ref<any>({})
     const targetFunctionUseDSL = ref(false)
     const targetFunctionDSLSource = ref("")
 
     targetFunctionConfig.value = getDefaultTargetFunctionConfig(getDefaultTargetFunction(characterName.value))
+    targetFunctionConfigValue.value = getDefaultTargetFunctionConfig(getDefaultTargetFunction(characterName.value))
+    targetFunctionConfigUnlinked.value = getDefaultTargetFunctionUnlinked(getDefaultTargetFunction(characterName.value))
 
     const { t, ta } = useI18n()
 
@@ -63,6 +83,7 @@ export function useTargetFunction(characterName: Ref<CharacterName>) {
     })
 
     const targetFunctionConfigConfig = computed(() => {
+        targetFunctionConfigUnlinked.value = getDefaultTargetFunctionUnlinked(getDefaultTargetFunction(characterName.value))
         return targetFunctionData[targetFunctionName.value].config
     })
 
@@ -70,7 +91,9 @@ export function useTargetFunction(characterName: Ref<CharacterName>) {
         const use_dsl = targetFunctionUseDSL.value
         return {
             name: targetFunctionName.value,
-            params: targetFunctionConfig.value,
+            params: targetFunctionConfigValue.value,
+            originalParams: targetFunctionConfig.value,
+            configUnlinked: targetFunctionConfigUnlinked.value,
             use_dsl,
             dsl_source: use_dsl ? targetFunctionDSLSource.value : ""
         }
@@ -92,6 +115,8 @@ export function useTargetFunction(characterName: Ref<CharacterName>) {
     return {
         targetFunctionName,
         targetFunctionConfig,
+        targetFunctionConfigValue,
+        targetFunctionConfigUnlinked,
         targetFunctionUseDSL,
         targetFunctionDSLSource,
         targetFunctionBadge,

@@ -6,7 +6,9 @@ export interface ICharacter {
     skill1: number,
     skill2: number,
     skill3: number,
-    params: any
+    params: any,
+    originalParams: any,
+    configUnlinked: any
 }
 
 export type CharacterName = string

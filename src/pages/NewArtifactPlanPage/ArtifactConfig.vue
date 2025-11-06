@@ -68,7 +68,7 @@ import {useI18n} from "@/i18n/i18n";
 export default {
     name: "ArtifactConfig",
     components: {ItemConfig},
-    props: ["modelValue"],
+    props: ["modelValue", "globalValue"],
     emits: ["update:modelValue"],
     data() {
         return {

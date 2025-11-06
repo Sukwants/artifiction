@@ -29,11 +29,32 @@ function getDefaultWeaponConfig(name: string) {
     return res;
 }
 
+function getDefaultWeaponConfigUnlinked(name: string) {
+    let res: any = {};
+
+    if (!!weaponData[name]?.configs) {
+        const configs = weaponData[name].configs
+
+        let defaultConfigUnlinked: any = {}
+        for (let config of configs) {
+            defaultConfigUnlinked[config.name] = config.unlinked
+        }
+
+        res = {
+            [name]: defaultConfigUnlinked
+        }
+    }
+
+    return res;
+}
+
 export function useWeapon(weaponType: null | Ref<WeaponType>) {
     const weaponName = ref(DEFAULT_WEAPON)
     const weaponLevel = ref("90")
     const weaponRefine = ref(1)
     const weaponConfig = ref<any>(getDefaultWeaponConfig(weaponName.value))
+    const weaponConfigValue = ref<any>(getDefaultWeaponConfig(weaponName.value))
+    const weaponConfigUnlinked = ref<any>(getDefaultWeaponConfigUnlinked(weaponName.value))
 
     const weaponLevelNumber = computed(() => {
         return parseInt(weaponLevel.value)
@@ -53,6 +74,7 @@ export function useWeapon(weaponType: null | Ref<WeaponType>) {
     })
 
     const weaponConfigConfig = computed(() => {
+        weaponConfigUnlinked.value = getDefaultWeaponConfigUnlinked(weaponName.value)
         return weaponData[weaponName.value].configs
     })
 
@@ -62,7 +84,9 @@ export function useWeapon(weaponType: null | Ref<WeaponType>) {
             level: weaponLevelNumber.value,
             ascend: weaponAscend.value,
             refine: weaponRefine.value,
-            params: weaponConfig.value
+            params: weaponConfigValue.value,
+            originalParams: weaponConfig.value,
+            configUnlinked: weaponConfigUnlinked.value
         }
     })
 
@@ -102,6 +126,8 @@ export function useWeapon(weaponType: null | Ref<WeaponType>) {
         weaponSplash,
         weaponNeedConfig,
         weaponConfigConfig,
+        weaponConfigValue,
+        weaponConfigUnlinked,
         weaponInterface,
         weaponLocale
 

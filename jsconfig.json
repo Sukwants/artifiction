@@ -18,6 +18,7 @@
             "@targetFunction": ["src/assets/target_function"],
             "@potentialFunction": ["src/assets/potential_function"],
             "@buff": ["src/assets/buff"],
+            "@globalConfig": ["src/assets/global_config"],
             "@image": ["src/images"],
             "@artifact": ["src/assets/artifacts"]
         }

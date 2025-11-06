@@ -6,6 +6,8 @@ import type {ArtifactStatName} from "@/types/artifact"
 export interface IBuff {
     name: string,
     config: any,
+    originalConfig: any,
+    configUnlinked: any,
     lock: boolean,
 }
 

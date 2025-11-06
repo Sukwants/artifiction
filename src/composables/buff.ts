@@ -2,11 +2,14 @@
 import {buffData} from "@buff"
 import {RandomIDProvider} from "@/utils/idProvider"
 import type {IBuffWasm} from "@/types/preset"
+import { config } from "localforage"
 
 export interface BuffEntry {
     id: number,
     name: string,
     config: any,
+    configValue: any,
+    configUnlinked: any,
     lock: boolean,
 }
 
@@ -24,7 +27,9 @@ export function useBuff() {
         for (let buff of buffsUnlocked.value) {
             temp.push({
                 name: buff.name,
-                config: buff.config
+                config: buff.configValue,
+                originalConfig: buff.config,
+                configUnlinked: buff.configUnlinked,
             })
         }
         return temp
@@ -46,9 +51,25 @@ export function useBuff() {
             }
         }
 
+        let defaultUnlinked: any = {}
+        for (let c of data.config) {
+            defaultUnlinked[c.name] = c.unlinked
+        }
+
+        let configUnlinked
+        if (data.config.length === 0) {
+            configUnlinked = {}
+        } else {
+            configUnlinked = {
+                [name]: defaultUnlinked
+            }
+        }
+        
         buffs.value.push({
             name,
             config,
+            configValue: structuredClone(config),
+            configUnlinked,
             id: idGenerator.generateId(),
             lock: false
         })
@@ -56,6 +77,7 @@ export function useBuff() {
 
     function deleteBuff(id: number) {
         const index = buffs.value.findIndex(e => e.id === id)
+        console.log(0)
         buffs.value.splice(index, 1)
     }
 

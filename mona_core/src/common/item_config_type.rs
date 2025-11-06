@@ -191,6 +191,12 @@ pub enum ItemConfigType {
     Moonsign3 {
         default: Moonsign
     },
+    GlobalLinkMoonsign {
+        name: &'static str,
+        default: Moonsign,
+        priority: usize,
+        team_shared: bool,
+    }
 }
 
 pub struct ItemConfig {
@@ -324,6 +330,17 @@ impl ItemConfigType {
                     "title": title,
                     "name": name,
                     "default": default
+                })
+            },
+            ItemConfigType::GlobalLinkMoonsign { name, default, priority, team_shared } => {
+                json!({
+                    "type": "globalLink",
+                    "title": title,
+                    "name": name,
+                    "default": default,
+                    "priority": priority,
+                    "unlinked": false,
+                    "team_shared": team_shared
                 })
             },
         };

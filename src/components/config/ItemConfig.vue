@@ -3,7 +3,23 @@
 <!--        {{ configs }}-->
         <ConfigItem
             class="config"
-            v-for="config in configs"
+            v-for="config in configs.filter(c => c.type === 'globalLink')"
+            :key="config.name"
+            :params="config"
+            :title="ta(config.title)"
+            :type="config.type"
+            :modelValue="value2[config.name]"
+            @update:modelValue="handleInput(config.name, $event)"
+            :name="config.name"
+            :globalValue="globalValue"
+            :globalConfigs="globalConfigs"
+            :updateGlobalConfig="updateGlobalConfig"
+            :unlinked="unlinked2[config.name]"
+            @update:unlinked="handleUnlinked(config.name, $event)"
+        ></ConfigItem>
+        <ConfigItem
+            class="config"
+            v-for="config in configs.filter(c => c.type !== 'globalLink')"
             :key="config.name"
             :params="config"
             :title="ta(config.title)"
@@ -15,6 +31,7 @@
 </template>
 
 <script>
+import { update } from "lodash";
 import ConfigItem from "./ConfigItem"
 import {useI18n} from "@/i18n/i18n"
 
@@ -29,6 +46,21 @@ export default {
         configs: {
             type: Array
         },
+        globalValue: {
+            required: false
+        },
+        globalConfigs: {
+            type: Object,
+            required: false
+        },
+        updateGlobalConfig: {
+            type: Function,
+            required: false
+        },
+        unlinked: {
+            type: Object,
+            required: false
+        },
         bg: {
             default: "rgb(239, 246, 253)"
         },
@@ -36,7 +68,7 @@ export default {
             default: true,
         }
     },
-    emits: ["update:modelValue"],
+    emits: ["update:modelValue", "update:unlinked"],
     computed: {
         styleRoot() {
             return {
@@ -49,6 +81,14 @@ export default {
                 return this.modelValue[this.itemName]
             } else {
                 return this.modelValue
+            }
+        },
+
+        unlinked2() {
+            if (this.needItemName) {
+                return this.unlinked[this.itemName]
+            } else {
+                return this.unlinked
             }
         }
     },
@@ -66,6 +106,21 @@ export default {
                 let obj = Object.assign({}, this.modelValue)
                 obj[name] = value
                 this.$emit("update:modelValue", obj)
+            }
+        },
+
+        handleUnlinked(name, value) {
+            if (this.needItemName) {
+                let obj = Object.assign({}, this.unlinked[this.itemName])
+                obj[name] = value
+
+                this.$emit("update:unlinked", {
+                    [this.itemName]: obj
+                })
+            } else {
+                let obj = Object.assign({}, this.unlinked)
+                obj[name] = value
+                this.$emit("update:unlinked", obj)
             }
         }
     },
