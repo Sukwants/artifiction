@@ -7,6 +7,7 @@ use serde_json::json;
 use smallvec::{SmallVec};
 use crate::common::{Element, Moonsign, SkillType};
 use crate::common::i18n::{I18nLocale, locale};
+use crate::common::global_config::GlobalConfigName;
 
 #[derive(Default, Debug, Clone, Copy)]
 pub struct ConfigElements8Multi {
@@ -368,4 +369,15 @@ impl ItemConfig {
 
     pub const MOONSIGN2: ItemConfig = ItemConfig { name: "moonsign", title: locale!(zh_cn: "月兆", en: "Moonsign"), config: ItemConfigType::Moonsign2 { default: Moonsign::Nascent } };
     pub const MOONSIGN3: ItemConfig = ItemConfig { name: "moonsign", title: locale!(zh_cn: "月兆", en: "Moonsign"), config: ItemConfigType::Moonsign3 { default: Moonsign::None } };
+
+    pub const PRIORITY_DEFAULT: usize = 0;
+    pub const PRIORITY_CHARACTERSKILL: usize = 1;
+    pub const PRIORITY_ARTIFACT: usize = 2;
+    pub const PRIORITY_BUFF: usize = 3;
+    pub const PRIORITY_WEAPON: usize = 4;
+    pub const PRIORITY_CHARACTER: usize = 5;
+
+    pub const fn MOONSIGN_GLOBAL(default: Moonsign, priority: usize, team_shared: bool) -> ItemConfig {
+        return ItemConfig { name: "moonsign", title: locale!(zh_cn: "月兆", en: "Moonsign"), config: ItemConfigType::GlobalLinkMoonsign { name: GlobalConfigName::GLOBAL_CONFIG_MOONSIGN.name, default, priority, team_shared }, };
+    }
 }

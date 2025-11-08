@@ -70,7 +70,7 @@ impl ArtifactTrait for NightOfTheSkysUnveiling {
 
     #[cfg(not(target_family = "wasm"))]
     const CONFIG4: Option<&'static [ItemConfig]> = Some(&[
-        ItemConfig::MOONSIGN3,
+        ItemConfig::MOONSIGN_GLOBAL(Moonsign::None, ItemConfig::PRIORITY_ARTIFACT, true),
         ItemConfig {
             name: "gleaming_moon_effect_count",
             title: locale!(zh_cn: "「月辉明光」数量", en: "Gleaming Moon Effect Count"),

@@ -75,7 +75,7 @@ impl WeaponTrait for MasterKey {
             ),
             config: ItemConfigType::Bool { default: true }
         },
-        ItemConfig::MOONSIGN3
+        ItemConfig::MOONSIGN_GLOBAL(Moonsign::None, ItemConfig::PRIORITY_WEAPON, true),
     ]);
 
     fn get_effect<A: Attribute>(character: &CharacterCommonData, config: &WeaponConfig) -> Option<Box<dyn WeaponEffect<A>>> {
