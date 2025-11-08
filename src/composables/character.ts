@@ -8,7 +8,7 @@ import type {CharacterName} from "@/types/character"
 import {useI18n} from "@/i18n/i18n"
 import { getObjectConfigValue } from "@/composables/globalConfig";
 
-function getDefaultCharacterConfig(name: string) {
+export function getDefaultCharacterConfig(name: string) {
     let res: any;
 
     const hasConfigData = characterData[name].config.length > 0;

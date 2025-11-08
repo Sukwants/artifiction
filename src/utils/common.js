@@ -20,6 +20,25 @@ export function deepCopy(obj) {
     return obj;
 }
 
+export function deepMerge(a, b) {
+    if (typeof a !== 'object' || a === null) {
+        return a;
+    }
+    if (typeof b !== 'object' || b === null) {
+        return a;
+    }
+
+    const result = { ...b };
+    for (const key of Object.keys(a)) {
+        if (key in b) {
+            result[key] = deepMerge(a[key], b[key]);
+        } else {
+            result[key] = a[key];
+        }
+    }
+    return result;
+}
+
 export function convertArtifact(art) {
     let temp = {
         position: art.position,

@@ -19,7 +19,7 @@ function getDefaultTargetFunction(name: string) {
     return res;
 }
 
-function getDefaultTargetFunctionConfig(name: string) {
+export function getDefaultTargetFunctionConfig(name: string) {
     let res: any;
 
     const hasConfig = targetFunctionData[name].config.length > 0

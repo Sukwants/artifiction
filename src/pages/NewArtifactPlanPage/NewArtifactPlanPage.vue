@@ -646,7 +646,7 @@
 <script setup lang="ts">
 import {convertArtifact} from "@util/converter"
 import {mergeArtifactConfig, newDefaultArtifactConfig} from "@util/artifacts"
-import {deepCopy, toSnakeCase} from "@/utils/common"
+import {deepCopy, deepMerge, toSnakeCase} from "@/utils/common"
 import {wasmSingleOptimize} from "@/wasm/single_optimize"
 import {createComputeResult} from "@/api/misc"
 import {deviceIsPC} from "@util/device"
@@ -676,10 +676,10 @@ import SelectArtifactMainStat from "@c/select/SelectArtifactMainStat"
 import ArtifactConfig from "./ArtifactConfig.vue"
 import DamageAnalysis from "@/components/display/DamageAnalysis"
 import {getObjectConfigUnlinked, useGlobalConfig} from "@/composables/globalConfig"
-import {useCharacter, useCharacterSkill} from "@/composables/character"
+import {getDefaultCharacterConfig, useCharacter, useCharacterSkill} from "@/composables/character"
 import {useEnemy} from "@/composables/enemy"
-import {useWeapon} from "@/composables/weapon"
-import {useTargetFunction} from "@/composables/targetFunction"
+import {getDefaultWeaponConfig, useWeapon} from "@/composables/weapon"
+import {getDefaultTargetFunctionConfig, useTargetFunction} from "@/composables/targetFunction"
 import type {ArtifactPosition, IArtifact, IArtifactWasm} from "@/types/artifact"
 import {getObjectConfig, getObjectConfigValue, restoreObjectConfig} from "@/composables/globalConfig"
 import IconEpCaretRight from "~icons/ep/caret-right"
@@ -712,7 +712,7 @@ import {artifactsData} from "@/assets/artifacts"
 import {ElMessage} from "element-plus"
 import "element-plus/es/components/message/style/css"
 import SelectElementType from "@/components/select/SelectElementType.vue";
-import { add } from "lodash"
+import { add, get } from "lodash"
 
 // stores
 const presetStore = usePresetStore()
@@ -1066,7 +1066,7 @@ function usePreset(name: string) {
         characterSkill1.value = c.skill1 + 1
         characterSkill2.value = c.skill2 + 1
         characterSkill3.value = c.skill3 + 1
-        characterConfig.value = restoreObjectConfig(c.params, c.params, c.configUnlinked ?? {})
+        characterConfig.value = deepMerge(restoreObjectConfig(c.params, c.params, c.configUnlinked ?? {}), getDefaultCharacterConfig(c.name))
     }
 
     // use weapon
@@ -1075,14 +1075,14 @@ function usePreset(name: string) {
         weaponName.value = w.name
         weaponLevel.value = w.level.toString() + (w.ascend ? "+" : "-")
         weaponRefine.value = w.refine
-        weaponConfig.value = restoreObjectConfig(w.params, w.params, w.configUnlinked ?? {})
+        weaponConfig.value = deepMerge(restoreObjectConfig(w.params, w.params, w.configUnlinked ?? {}), getDefaultWeaponConfig(w.name) )
     }
 
     // use target function
     const tf = item.targetFunction
     if (tf) {
         targetFunctionName.value = tf.name
-        targetFunctionConfig.value = restoreObjectConfig(tf.params, tf.params, tf.configUnlinked ?? {})
+        targetFunctionConfig.value = deepMerge(restoreObjectConfig(tf.params, tf.params, tf.configUnlinked ?? {}), getDefaultTargetFunctionConfig(tf.name) )
     }
 
     // is DSL?
@@ -1126,7 +1126,7 @@ function usePreset(name: string) {
     // use artifact config
     const art = item.artifactConfig
     if (art) {
-        artifactConfig.value = restoreObjectConfig(art.config, art.config, art.unlinked ?? {})
+        artifactConfig.value = deepMerge(restoreObjectConfig(art.config, art.config, art.unlinked ?? {}), newDefaultArtifactConfig() )
     }
 
     miscCurrentPresetName.value = name
