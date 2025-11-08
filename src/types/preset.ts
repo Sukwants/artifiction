@@ -12,7 +12,7 @@ export interface IBuff {
 
 export type IBuffWithID = IBuff & { id: number }
 
-export type IBuffWasm = Omit<IBuff, "lock">
+export type IBuffWasm = Omit<Omit<IBuff, "lock">, "configUnlinked">;
 
 export interface IPreset {
     name: string,

@@ -6,6 +6,7 @@ import { characterData } from "@character"
 import {type Ref} from "vue"
 import type {CharacterName} from "@/types/character"
 import {useI18n} from "@/i18n/i18n"
+import { getObjectConfigValue } from "@/composables/globalConfig";
 
 function getDefaultCharacterConfig(name: string) {
     let res: any;
@@ -18,7 +19,11 @@ function getDefaultCharacterConfig(name: string) {
 
         let defaultConfig: any = {}
         for (let c of configs) {
-            defaultConfig[c.name] = c.default
+            defaultConfig[c.name] = {
+                config: c.default,
+                configValue: c.default,
+                unlinked: c.unlinked,
+            }
         }
         res = {
             [name]: defaultConfig
@@ -30,31 +35,10 @@ function getDefaultCharacterConfig(name: string) {
     return res;
 }
 
-function getDefaultCharacterConfigUnlinked(name: string) {
-    let res: any = {};
-
-    if (!!characterData[name]?.config) {
-        const configs = characterData[name].config
-
-        let defaultConfigUnlinked: any = {}
-        for (let c of configs) {
-            defaultConfigUnlinked[c.name] = c.unlinked
-        }
-
-        res = {
-            [name]: defaultConfigUnlinked
-        }
-    }
-
-    return res;
-}
-
 export function useCharacter() {
     const characterName = ref(DEFAULT_CHARACTER)
     const characterLevel = ref("90")
     const characterConfig = ref<any>(getDefaultCharacterConfig(characterName.value))
-    const characterConfigValue = ref<any>(getDefaultCharacterConfig(characterName.value))  // 合并 global config 后的值
-    const characterConfigUnlinked = ref<any>(getDefaultCharacterConfigUnlinked(characterName.value))
     const characterSkill1 = ref(8)
     const characterSkill2 = ref(8)
     const characterSkill3 = ref(8)
@@ -87,7 +71,6 @@ export function useCharacter() {
     })
 
     const characterConfigConfig = computed(() => {
-        characterConfigUnlinked.value = getDefaultCharacterConfigUnlinked(characterName.value)
         return characterData[characterName.value].config
     })
 
@@ -104,8 +87,7 @@ export function useCharacter() {
             skill1: characterSkill1.value - 1,
             skill2: characterSkill2.value - 1,
             skill3: characterSkill3.value - 1,
-            params: characterConfigValue.value,
-            configUnlinked: characterConfigUnlinked.value,
+            params: getObjectConfigValue(characterConfig.value)
         }
         return i
     })
@@ -131,8 +113,6 @@ export function useCharacter() {
         characterSplash,
         characterNeedConfig,
         characterConfigConfig,
-        characterConfigValue,
-        characterConfigUnlinked,
         characterInterface,
         characterLocale,
     }
@@ -147,7 +127,11 @@ function getDefaultCharacterSkillConfig(name: string) {
     if (hasConfigSkill) {
         let defaultConfig: any = {}
         for (let c of characterData[name].configSkill) {
-            defaultConfig[c.name] = c.default
+            defaultConfig[c.name] = {
+                config: c.default,
+                configValue: c.default,
+                unlinked: c.unlinked,
+            }
         }
         res = {
             [name]: defaultConfig
@@ -159,29 +143,8 @@ function getDefaultCharacterSkillConfig(name: string) {
     return res;
 }
 
-function getDefaultCharacterSkillConfigUnlinked(name: string) {
-    let res: any = {};
-
-    if (!!characterData[name]?.configSkill) {
-        const configs = characterData[name].configSkill
-
-        let defaultConfigUnlinked: any = {}
-        for (let c of configs) {
-            defaultConfigUnlinked[c.name] = c.unlinked
-        }
-
-        res = {
-            [name]: defaultConfigUnlinked
-        }
-    }
-
-    return res;
-}
-
 export function useCharacterSkill(characterName: Ref<CharacterName>) {
     const characterSkillConfig = ref<any>(getDefaultCharacterSkillConfig(characterName.value))
-    const characterSkillConfigValue = ref<any>(getDefaultCharacterSkillConfig(characterName.value))  // 合并 global config 后的值
-    const characterSkillConfigUnlinked = ref<any>(getDefaultCharacterSkillConfigUnlinked(characterName.value))
     const characterSkillIndex = ref(0)
 
     const characterNeedSkillConfig = computed((): boolean => {
@@ -190,14 +153,13 @@ export function useCharacterSkill(characterName: Ref<CharacterName>) {
     })
 
     const characterSkillConfigConfig = computed(() => {
-        characterSkillConfigUnlinked.value = getDefaultCharacterSkillConfigUnlinked(characterName.value)
         return characterData[characterName.value].configSkill
     })
 
     const characterSkillInterface = computed(() => {
         return {
             index: characterSkillIndex.value,
-            config: characterSkillConfigValue.value
+            config: getObjectConfigValue(characterSkillConfig.value)
         }
     })
 
@@ -219,8 +181,6 @@ export function useCharacterSkill(characterName: Ref<CharacterName>) {
 
     return {
         characterSkillConfig,
-        characterSkillConfigValue,
-        characterSkillConfigUnlinked,
         characterSkillIndex,
         characterNeedSkillConfig,
         characterSkillConfigConfig,

@@ -3,13 +3,12 @@ import {buffData} from "@buff"
 import {RandomIDProvider} from "@/utils/idProvider"
 import type {IBuffWasm} from "@/types/preset"
 import { config } from "localforage"
+import { getObjectConfigValue } from "@/composables/globalConfig";
 
 export interface BuffEntry {
     id: number,
     name: string,
     config: any,
-    configValue: any,
-    configUnlinked: any,
     lock: boolean,
 }
 
@@ -27,8 +26,7 @@ export function useBuff() {
         for (let buff of buffsUnlocked.value) {
             temp.push({
                 name: buff.name,
-                config: buff.configValue,
-                configUnlinked: buff.configUnlinked,
+                config: getObjectConfigValue(buff.config),
             })
         }
         return temp
@@ -38,7 +36,11 @@ export function useBuff() {
         const data = buffData[name]
         let defaultConfig: any = {}
         for (let c of data.config) {
-            defaultConfig[c.name] = c.default
+            defaultConfig[c.name] = {
+                config: c.default,
+                configValue: c.default,
+                unlinked: c.unlinked,
+            }
         }
 
         let config
@@ -49,26 +51,10 @@ export function useBuff() {
                 [name]: defaultConfig
             }
         }
-
-        let defaultUnlinked: any = {}
-        for (let c of data.config) {
-            defaultUnlinked[c.name] = c.unlinked
-        }
-
-        let configUnlinked
-        if (data.config.length === 0) {
-            configUnlinked = {}
-        } else {
-            configUnlinked = {
-                [name]: defaultUnlinked
-            }
-        }
         
         buffs.value.push({
             name,
-            config,
-            configValue: structuredClone(config),  // 合并 global config 后的值
-            configUnlinked,
+            config: config,
             id: idGenerator.generateId(),
             lock: false
         })

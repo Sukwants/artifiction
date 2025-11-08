@@ -125,7 +125,7 @@
                     :params="globalConfigs[name]"
                     :title="title"
                     :type="globalConfigs[name].type"
-                    :modelValue="globalValue[name]"
+                    :modelValue="globalValue"
                     @update:modelValue="updateGlobalConfig(name, $event)"
                 ></ConfigItem>
                 <ConfigItem

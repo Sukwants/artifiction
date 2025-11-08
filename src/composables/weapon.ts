@@ -5,6 +5,8 @@ import type {WeaponName, WeaponType} from "@/types/weapon"
 import {weaponByType, weaponData} from "@weapon"
 import {type Ref} from "vue"
 import {useI18n} from "@/i18n/i18n";
+import { getObjectConfigValue } from "@/composables/globalConfig";
+import { get } from "lodash";
 
 function getDefaultWeaponConfig(name: string) {
     let res: any;
@@ -16,7 +18,11 @@ function getDefaultWeaponConfig(name: string) {
 
         let defaultConfig: any = {}
         for (let config of configs) {
-            defaultConfig[config.name] = config.default
+            defaultConfig[config.name] = {
+                config: config.default,
+                configValue: config.default,
+                unlinked: config.unlinked,
+            }
         }
 
         res = {
@@ -28,33 +34,11 @@ function getDefaultWeaponConfig(name: string) {
 
     return res;
 }
-
-function getDefaultWeaponConfigUnlinked(name: string) {
-    let res: any = {};
-
-    if (!!weaponData[name]?.configs) {
-        const configs = weaponData[name].configs
-
-        let defaultConfigUnlinked: any = {}
-        for (let config of configs) {
-            defaultConfigUnlinked[config.name] = config.unlinked
-        }
-
-        res = {
-            [name]: defaultConfigUnlinked
-        }
-    }
-
-    return res;
-}
-
 export function useWeapon(weaponType: null | Ref<WeaponType>) {
     const weaponName = ref(DEFAULT_WEAPON)
     const weaponLevel = ref("90")
     const weaponRefine = ref(1)
     const weaponConfig = ref<any>(getDefaultWeaponConfig(weaponName.value))
-    const weaponConfigValue = ref<any>(getDefaultWeaponConfig(weaponName.value))  // 合并 global config 后的值
-    const weaponConfigUnlinked = ref<any>(getDefaultWeaponConfigUnlinked(weaponName.value))
 
     const weaponLevelNumber = computed(() => {
         return parseInt(weaponLevel.value)
@@ -74,7 +58,6 @@ export function useWeapon(weaponType: null | Ref<WeaponType>) {
     })
 
     const weaponConfigConfig = computed(() => {
-        weaponConfigUnlinked.value = getDefaultWeaponConfigUnlinked(weaponName.value)
         return weaponData[weaponName.value].configs
     })
 
@@ -84,8 +67,7 @@ export function useWeapon(weaponType: null | Ref<WeaponType>) {
             level: weaponLevelNumber.value,
             ascend: weaponAscend.value,
             refine: weaponRefine.value,
-            params: weaponConfigValue.value,
-            configUnlinked: weaponConfigUnlinked.value
+            params: getObjectConfigValue(weaponConfig.value),
         }
     })
 
@@ -125,8 +107,6 @@ export function useWeapon(weaponType: null | Ref<WeaponType>) {
         weaponSplash,
         weaponNeedConfig,
         weaponConfigConfig,
-        weaponConfigValue,
-        weaponConfigUnlinked,
         weaponInterface,
         weaponLocale
 

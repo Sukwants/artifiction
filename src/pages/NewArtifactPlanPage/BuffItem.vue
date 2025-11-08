@@ -35,11 +35,7 @@
             @update:modelValue="handleChangeConfig"
             :item-name="props.buff.name"
             :configs="data.config"
-            :globalValue="globalValue"
-            :globalConfigs="globalConfigs"
             :updateGlobalConfig="updateGlobalConfig"
-            :unlinked="unlinked"
-            @update:unlinked="$emit('update:unlinked', $event)"
         ></item-config>
     </div>
 </template>
@@ -61,10 +57,7 @@ const { t, ta } = useI18n()
 interface Props {
     buff: BuffEntry,
     buffConfig: any,
-    globalValue: any,
-    globalConfigs: any,
     updateGlobalConfig: any,
-    unlinked: any,
 }
 
 const props = defineProps<Props>()
