@@ -247,6 +247,7 @@
             <h3 class="common-title2">{{ t("calcPage.artEffect") }}</h3>
             <artifact-config
                 v-model="artifactConfig"
+                :updateGlobalConfig="updateGlobalConfig"
             ></artifact-config>
         </el-dialog>
 
@@ -561,31 +562,12 @@
                     </div>
                 </div>
 
-                <div v-if="artifactNeedConfig2" style="margin-top: 16px">
-                    <p class="common-description">
-                        <span class="effect2">{{ t("calcPage.effect2") }}</span>
-                        <span v-html="artifactEffect2Text"></span>
-                    </p>
-                    <item-config
-                        v-if="artifactSingleConfig"
-                        v-model="artifactSingleConfig"
-                        :item-name="artifactConfigItemName"
-                        :configs="artifactConfig2Configs"
-                    ></item-config>
-                </div>
-
-                <div v-if="artifactNeedConfig4" style="margin-top: 16px">
-                    <p class="common-description">
-                        <span class="effect4">{{ t("calcPage.effect4") }}</span>
-                        <span v-html="artifactEffect4Text"></span>
-                    </p>
-                    <item-config
-                        v-if="artifactSingleConfig"
-                        v-model="artifactSingleConfig"
-                        :item-name="artifactConfigItemName"
-                        :configs="artifactConfig4Configs"
-                    ></item-config>
-                </div>
+                <artifact-config
+                    v-model="artifactSingleConfig"
+                    :enableSearch="false"
+                    :artifactSetCount="artifactSetCount"
+                    :updateGlobalConfig="updateGlobalConfig"
+                ></artifact-config>
 
                 <el-divider></el-divider>
 
@@ -663,8 +645,8 @@
 
 <script setup lang="ts">
 import {convertArtifact} from "@util/converter"
-import {mergeArtifactConfig, newDefaultArtifactConfigForWasm} from "@util/artifacts"
-import {deepCopy} from "@/utils/common"
+import {mergeArtifactConfig, newDefaultArtifactConfig} from "@util/artifacts"
+import {deepCopy, toSnakeCase} from "@/utils/common"
 import {wasmSingleOptimize} from "@/wasm/single_optimize"
 import {createComputeResult} from "@/api/misc"
 import {deviceIsPC} from "@util/device"
@@ -715,7 +697,7 @@ import {type PresetEntry, usePresetStore} from "@/store/pinia/preset"
 import {useArtifactStore} from "@/store/pinia/artifact"
 import type {IBuff, IPreset} from "@/types/preset"
 import {RandomIDProvider} from "@/utils/idProvider"
-import {use5Artifacts} from "@/composables/artifact"
+import {use5Artifacts, useArtifactConfig} from "@/composables/artifact"
 import {positions} from "@/constants/artifact"
 import {positionToIndex} from "@/utils/artifacts"
 import {useMona} from "@/wasm/mona"
@@ -848,18 +830,11 @@ watch(() => miscTargetFunctionTab.value, v => {
 const {
     artifactIds,
     artifactCount,
-    artifactSingleConfig,
-    artifactWasmFormat,
-
-    artifactItems,
     artifactSetCount,
-    artifactNeedConfig4,
-    artifactNeedConfig2,
-    artifactConfigItemName,
-    artifactEffect4Text,
-    artifactEffect2Text,
-    artifactConfig4Configs,
-    artifactConfig2Configs,
+    artifactItems,
+    artifactWasmFormat,
+    
+    artifactSingleConfig,
     artifactConfigForCalculator,
 
     setArtifact,
@@ -933,13 +908,13 @@ function handleClickSetupOptimization() {
 
 //////////////////////////////////////////////////////////////
 // artifact config
-const showConfigArtifactDialog = ref(false)
-const artifactEffectMode = ref<"auto" | "custom">("auto")
-const artifactConfig = ref(newDefaultArtifactConfigForWasm())
-
-function handleClickArtifactConfig() {
-    showConfigArtifactDialog.value = true
-}
+const {
+    artifactConfig,
+    artifactConfigValue,
+    artifactEffectMode,
+    showConfigArtifactDialog,
+    handleClickArtifactConfig
+} = useArtifactConfig()
 
 
 ///////////////////////////////////////////////////////////////
@@ -1019,6 +994,11 @@ function getPresetItem() {
         })
     }
 
+    let artifactToBeSaved = {
+        config: getObjectConfig(artifactConfig.value),
+        configUnlinked: getObjectConfigUnlinked(artifactConfig.value)
+    }
+
     const item = {
         // buffs: deepCopy(config.buffs),
         buffs: buffsToBeSaved,
@@ -1037,7 +1017,7 @@ function getPresetItem() {
             gobletMainStats: deepCopy(constraintGobletMainStats.value),
             headMainStats: deepCopy(constraintHeadMainStats.value),
         },
-        artifactConfig: deepCopy(artifactConfig.value),
+        artifactConfig: artifactToBeSaved,
         algorithm: algorithm.value,
         artifactEffectMode: artifactEffectMode.value,
         useDSL: miscTargetFunctionTab.value === "dsl",
@@ -1144,10 +1124,9 @@ function usePreset(name: string) {
     artifactEffectMode.value = item.artifactEffectMode ?? "auto"
 
     // use artifact config
-    if (item.artifactConfig) {
-        artifactConfig.value = mergeArtifactConfig(item.artifactConfig)
-    } else {
-        artifactConfig.value = newDefaultArtifactConfigForWasm()
+    const art = item.artifactConfig
+    if (art) {
+        artifactConfig.value = restoreObjectConfig(art.config, art.config, art.unlinked ?? {})
     }
 
     miscCurrentPresetName.value = name
@@ -1213,7 +1192,23 @@ watchEffect(() => {
         {
             configConfig: characterSkillConfigConfig.value,
             config: characterSkillConfig.value[characterName.value]
-        }
+        },
+        ...Object.entries(artifactsData).map(([key, artifact]) => ({
+            configConfig: artifactsData[key].config2,
+            config: artifactConfig.value["config_" + toSnakeCase(artifactsData[key].name2)]
+        })),
+        ...Object.entries(artifactsData).map(([key, artifact]) => ({
+            configConfig: artifactsData[key].config4,
+            config: artifactConfig.value["config_" + toSnakeCase(artifactsData[key].name2)]
+        })),
+        ...Object.entries(artifactsData).map(([key, artifact]) => ({
+            configConfig: artifactsData[key].config2,
+            config: artifactSingleConfig.value["config_" + toSnakeCase(artifactsData[key].name2)]
+        })),
+        ...Object.entries(artifactsData).map(([key, artifact]) => ({
+            configConfig: artifactsData[key].config4,
+            config: artifactSingleConfig.value["config_" + toSnakeCase(artifactsData[key].name2)]
+        })),
     ])
 }, {
     flush: "post"
@@ -1481,7 +1476,7 @@ function handleUseNthOptimizationResult(n: number) {
 function getOptimizeArtifactWasmInterface() {
     let artifact_config: any = null
     if (artifactEffectMode.value === "custom") {
-        artifact_config = artifactConfig.value
+        artifact_config = artifactConfigValue.value
     }
 
     const i = {
