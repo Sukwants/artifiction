@@ -50,7 +50,6 @@ import IconEpDelete from "~icons/ep/delete"
 import IconEpLock from "~icons/ep/lock"
 import IconEpUnlock from "~icons/ep/unlock"
 import {useI18n} from "@/i18n/i18n";
-import { emit } from "process"
 
 const { t, ta } = useI18n()
 

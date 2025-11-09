@@ -6,7 +6,6 @@ import {convertArtifact, convertArtifactName} from "@/utils/converter"
 import {toSnakeCase} from "@/utils/common"
 import {getArtifactAllConfigsByName, newDefaultArtifactConfig} from "@/utils/artifacts"
 import {useI18n} from "@/i18n/i18n"
-import { get } from "lodash"
 import { getObjectConfigValue } from "./globalConfig"
 
 export function useArtifactConfig() {

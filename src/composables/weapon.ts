@@ -6,7 +6,6 @@ import {weaponByType, weaponData} from "@weapon"
 import {type Ref} from "vue"
 import {useI18n} from "@/i18n/i18n";
 import { getObjectConfigValue } from "@/composables/globalConfig";
-import { get } from "lodash";
 
 export function getDefaultWeaponConfig(name: string) {
     let res: any;

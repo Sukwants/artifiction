@@ -46,8 +46,6 @@ export function getDefaultTargetFunctionConfig(name: string) {
 export function useTargetFunction(characterName: Ref<CharacterName>) {
     const targetFunctionName = ref<TargetFunctionName>(getDefaultTargetFunction(characterName.value))
     const targetFunctionConfig = ref<any>("NoConfig")
-    const targetFunctionConfigValue = ref<any>("NoConfig")
-    const targetFunctionConfigUnlinked = ref<any>({})
     const targetFunctionUseDSL = ref(false)
     const targetFunctionDSLSource = ref("")
 

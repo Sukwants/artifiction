@@ -2,7 +2,6 @@
 import {buffData} from "@buff"
 import {RandomIDProvider} from "@/utils/idProvider"
 import type {IBuffWasm} from "@/types/preset"
-import { config } from "localforage"
 import { getObjectConfigValue } from "@/composables/globalConfig";
 
 export interface BuffEntry {
