@@ -54,10 +54,12 @@ impl BuffMeta for BuffLaumaE {
         description: Some(locale!(
             zh_cn: "天赋 - 奉向霜夜的明光：菈乌玛施放元素战技圣言述咏·终宵永眠后的20秒内，将依据队伍的月兆，分别产生不同的强化效果，不同月兆等级提供的强化效果无法叠加。\
                 <br>月兆·初辉：队伍中附近的所有角色触发的绽放、超绽放、烈绽放反应造成的伤害能够造成暴击，暴击率固定为15%，暴击伤害固定为100%。该效果提供的暴击率可以与使对应元素反应能够造成暴击的同类效果提供的暴击率叠加。\
-                <br>月兆·满辉：队伍中附近的所有角色造成的月绽放反应伤害，暴击率提升10%，暴击伤害提升20%。",
+                <br>月兆·满辉：队伍中附近的所有角色造成的月绽放反应伤害，暴击率提升10%，暴击伤害提升20%。\
+                <br>菈乌玛的元素战技或霜林圣域的攻击命中敌人时，将使该敌人的草元素抗性与水元素抗性降低，持续10秒。",
             en: "Talent - Light for the Frosty Night: For the next 20s after Lauma uses her Elemental Skill Runo: Dawnless Rest of Karsikko, corresponding differing buff effects will be granted depending on the party's Moonsign. The buffs provided by different Moonsign levels cannot stack.\
                 <br>Moonsign: Nascent Gleam: Bloom, Hyperbloom, and Burgeon DMG dealt by all nearby party members can score CRIT Hits, with CRIT Rate fixed at 15%, and CRIT DMG fixed at 100%. CRIT Rate from this effect stacks with CRIT Rate from similar effects that allow these Elemental Reactions to CRIT.\
-                <br>Moonsign: Ascendant Gleam: All nearby party members' Lunar-Bloom DMG CRIT Rate +10%, CRIT DMG +20%."
+                <br>Moonsign: Ascendant Gleam: All nearby party members' Lunar-Bloom DMG CRIT Rate +10%, CRIT DMG +20%.\
+                <br>When Lauma's Elemental Skill or attacks from Frostgrove Sanctuary hit an opponent, that opponent's Dendro RES and Hydro RES will be decreased for 10s."
         )),
         from: BuffFrom::Character(CharacterName::Lauma),
     };
