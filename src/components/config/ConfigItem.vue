@@ -139,6 +139,7 @@
                     @update:modelValue="handleChangeValue"
                 ></ConfigItem>
                 <el-switch
+                    class="unlinked"
                     :modelValue="unlinked"
                     @update:modelValue="$emit('update:unlinked', $event)"
                     :inactive-text="'linked'"
@@ -228,13 +229,13 @@ export default {
     position: relative;
 }
 
-.global-config-item :deep(.el-switch--small) {
+.unlinked {
     position: absolute;
     top: -4%;
     right: 0;
 }
 
-.global-config-item :deep(.el-switch__core) {
+.unlinked :deep(.el-switch__core) {
     display: none;
 }
 
