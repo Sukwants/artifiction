@@ -1,3 +1,4 @@
+pub mod gen_gc_meta;
 pub mod gen_weapon_meta;
 pub mod gen_artifact_meta;
 pub mod gen_buff_meta;

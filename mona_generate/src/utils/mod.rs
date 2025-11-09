@@ -136,6 +136,17 @@ pub fn config_to_json(config: &ItemConfig) -> String {
                 "default": default
             })
         },
+        ItemConfigType::GlobalLinkMoonsign { name, default, priority, team_shared } => {
+            json!({
+                "type": "globalLink",
+                "title": title_index,
+                "name": name,
+                "default": default,
+                "priority": priority,
+                "unlinked": false,
+                "team_shared": team_shared
+            })
+        },
     };
 
     j.to_string()

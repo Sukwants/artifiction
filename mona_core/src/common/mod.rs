@@ -17,6 +17,7 @@ pub mod moonsign;
 pub mod max_trait;
 pub mod reaction_type;
 pub mod item_config_type;
+pub mod global_config;
 pub mod code_escape;
 pub mod i18n;
 

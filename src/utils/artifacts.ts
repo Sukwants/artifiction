@@ -32,7 +32,7 @@ export function howManyUpgradeCount(value: number, tagName: ArtifactStatName, st
 
 
 // create new default artifact config
-export function newDefaultArtifactConfigForWasm(): any {
+export function newDefaultArtifactConfig(): any {
     let configs: any = {}
 
     for (let name in artifactsData) {
@@ -44,7 +44,11 @@ export function newDefaultArtifactConfigForWasm(): any {
         if (configAll.length > 0) {
             let c: any = {}
             for (let item of configAll) {
-                c[item.name] = deepCopy(item.default)
+                c[item.name] = {
+                    config: deepCopy(item.default),
+                    configValue: deepCopy(item.default),
+                    unlinked: deepCopy(item.unlinked)
+                }
             }
 
             const snake = toSnakeCase(name2)
@@ -232,7 +236,7 @@ export function getArtifactThumbnail(name: ArtifactSetName): string {
 // otherwise, use default value
 export function upgradeArtifactConfig(oldConfig: any) {
     if (!oldConfig) {
-        return newDefaultArtifactConfigForWasm()
+        return newDefaultArtifactConfig()
     }
 
     let newConfig: any = {}
@@ -372,7 +376,7 @@ export function getArtifactAllConfigsByName(name: ArtifactSetName): any {
 /// merge configs into a legit config
 /// note: there may be circumstances where a merging config is not complete (e.g. lacking some config2 fields)
 export function mergeArtifactConfig(config: any): any {
-    const defaultConfig = newDefaultArtifactConfigForWasm()
+    const defaultConfig = newDefaultArtifactConfig()
     for (const key in config) {
         if (key in defaultConfig) {
             for (const configKey in config[key]) {

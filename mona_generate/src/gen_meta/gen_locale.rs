@@ -1,5 +1,6 @@
 use std::collections::{HashMap, HashSet};
 use mona::character::{CharacterName, CharacterStaticData};
+use mona::common::global_config::GlobalConfigName;
 use mona::common::i18n::I18nLocale;
 use strum::*;
 use lazy_static::lazy_static;
@@ -199,6 +200,11 @@ pub fn collect_config_locale() -> Vec<I18nLocale> {
                 set.insert(item.title.clone());
             }
         }
+    }
+
+    for gc in GlobalConfigName::iter() {
+        let item = gc.get_global_config_data();
+        set.insert(item.title.clone());
     }
 
     set.into_iter().collect()

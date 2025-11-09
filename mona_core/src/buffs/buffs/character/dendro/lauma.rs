@@ -88,7 +88,7 @@ impl BuffMeta for BuffLaumaE {
             ),
             config: ItemConfigType::Bool { default: false }
         },
-        ItemConfig::MOONSIGN2,
+        ItemConfig::MOONSIGN_GLOBAL(Moonsign::Nascent, ItemConfig::PRIORITY_BUFF, true),
     ]);
 
     fn create<A: Attribute>(b: &BuffConfig) -> Box<dyn Buff<A>> {

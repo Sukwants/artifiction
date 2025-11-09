@@ -1,7 +1,7 @@
 <template>
     <div>
 <!--        <h3 class="config-title">{{ // params.title }}</h3>-->
-        <h3 class="config-title">{{ title }}</h3>
+        <h3 class="config-title" v-if="type !== 'globalLink'">{{ title }}</h3>
         <template v-if="type === 'float'">
             <el-slider
                 :modelValue="modelValue"
@@ -116,6 +116,37 @@
                 :moonsigns="['None', 'Nascent', 'Ascendant']"
             ></select-moonsign-type>
         </template>
+        <template v-if="type === 'globalLink'">
+            <div class="global-config-item">
+                <ConfigItem
+                    class="config"
+                    v-if="type === 'globalLink' && !unlinked"
+                    :key="'[global]' + name"
+                    :params="globalConfigs[name]"
+                    :title="title"
+                    :type="globalConfigs[name].type"
+                    :modelValue="globalValue"
+                    @update:modelValue="updateGlobalConfig(name, $event)"
+                ></ConfigItem>
+                <ConfigItem
+                    class="config"
+                    v-if="type === 'globalLink' && unlinked"
+                    :key="'[local]' + name"
+                    :params="globalConfigs[name]"
+                    :title="title"
+                    :type="globalConfigs[name].type"
+                    :modelValue="modelValue"
+                    @update:modelValue="handleChangeValue"
+                ></ConfigItem>
+                <el-switch
+                    class="unlinked"
+                    :modelValue="unlinked"
+                    @update:modelValue="$emit('update:unlinked', $event)"
+                    :inactive-text="'linked'"
+                    :size="'small'"
+                ></el-switch>
+            </div>
+        </template>
     </div>
 </template>
 
@@ -133,8 +164,24 @@ export default {
         type: {},
         params: {},
         title: {},
+        name: {
+            type: String,
+            required: false
+        },
+        globalValue: {},
+        globalConfigs: {
+            type: Object
+        },
+        updateGlobalConfig: {
+            type: Function,
+            required: false
+        },
+        unlinked: {
+            type: Boolean,
+            required: false
+        }
     },
-    emits: ["update:modelValue"],
+    emits: ["update:modelValue", "update:unlinked"],
     computed: {
         currentLocale() {
             const { locale } = useI18n()
@@ -176,6 +223,20 @@ export default {
     font-size: 12px;
     color: #666666;
     margin: 0 0 12px 0;
+}
+
+.global-config-item {
+    position: relative;
+}
+
+.unlinked {
+    position: absolute;
+    top: -4%;
+    right: 0;
+}
+
+.unlinked :deep(.el-switch__core) {
+    display: none;
 }
 
 // .config-item {

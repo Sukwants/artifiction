@@ -4,6 +4,7 @@ import {targetFunctionByCharacterName, targetFunctionData} from "@targetFunction
 import {type Ref} from "vue"
 import type {CharacterName} from "@/types/character"
 import {useI18n} from "@/i18n/i18n";
+import { getObjectConfigValue } from "@/composables/globalConfig";
 
 function getDefaultTargetFunction(name: string) {
     let res: any;
@@ -18,7 +19,7 @@ function getDefaultTargetFunction(name: string) {
     return res;
 }
 
-function getDefaultTargetFunctionConfig(name: string) {
+export function getDefaultTargetFunctionConfig(name: string) {
     let res: any;
 
     const hasConfig = targetFunctionData[name].config.length > 0
@@ -26,7 +27,11 @@ function getDefaultTargetFunctionConfig(name: string) {
     if (hasConfig) {
         let defaultConfig: any = {}
         for (let c of targetFunctionData[name].config) {
-            defaultConfig[c.name] = c.default
+            defaultConfig[c.name] = {
+                config: c.default,
+                configValue: c.default,
+                unlinked: c.unlinked,
+            }
         }
         res = {
             [name]: defaultConfig
@@ -41,6 +46,8 @@ function getDefaultTargetFunctionConfig(name: string) {
 export function useTargetFunction(characterName: Ref<CharacterName>) {
     const targetFunctionName = ref<TargetFunctionName>(getDefaultTargetFunction(characterName.value))
     const targetFunctionConfig = ref<any>("NoConfig")
+    const targetFunctionConfigValue = ref<any>("NoConfig")
+    const targetFunctionConfigUnlinked = ref<any>({})
     const targetFunctionUseDSL = ref(false)
     const targetFunctionDSLSource = ref("")
 
@@ -70,7 +77,7 @@ export function useTargetFunction(characterName: Ref<CharacterName>) {
         const use_dsl = targetFunctionUseDSL.value
         return {
             name: targetFunctionName.value,
-            params: targetFunctionConfig.value,
+            params: getObjectConfigValue(targetFunctionConfig.value),
             use_dsl,
             dsl_source: use_dsl ? targetFunctionDSLSource.value : ""
         }

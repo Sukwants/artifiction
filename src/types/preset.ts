@@ -6,12 +6,13 @@ import type {ArtifactStatName} from "@/types/artifact"
 export interface IBuff {
     name: string,
     config: any,
+    configUnlinked: any,
     lock: boolean,
 }
 
 export type IBuffWithID = IBuff & { id: number }
 
-export type IBuffWasm = Omit<IBuff, "lock">
+export type IBuffWasm = Omit<Omit<IBuff, "lock">, "configUnlinked">;
 
 export interface IPreset {
     name: string,

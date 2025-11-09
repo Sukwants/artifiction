@@ -2,6 +2,8 @@
 import {buffData} from "@buff"
 import {RandomIDProvider} from "@/utils/idProvider"
 import type {IBuffWasm} from "@/types/preset"
+import { config } from "localforage"
+import { getObjectConfigValue } from "@/composables/globalConfig";
 
 export interface BuffEntry {
     id: number,
@@ -24,7 +26,7 @@ export function useBuff() {
         for (let buff of buffsUnlocked.value) {
             temp.push({
                 name: buff.name,
-                config: buff.config
+                config: getObjectConfigValue(buff.config),
             })
         }
         return temp
@@ -34,7 +36,11 @@ export function useBuff() {
         const data = buffData[name]
         let defaultConfig: any = {}
         for (let c of data.config) {
-            defaultConfig[c.name] = c.default
+            defaultConfig[c.name] = {
+                config: c.default,
+                configValue: c.default,
+                unlinked: c.unlinked,
+            }
         }
 
         let config
@@ -45,10 +51,10 @@ export function useBuff() {
                 [name]: defaultConfig
             }
         }
-
+        
         buffs.value.push({
             name,
-            config,
+            config: config,
             id: idGenerator.generateId(),
             lock: false
         })

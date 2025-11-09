@@ -1,6 +1,6 @@
 <template>
     <div>
-        <el-input
+        <el-input v-if="enableSearch"
             v-model="searchString"
             style="margin-bottom: 16px"
             :placeholder="t('misc.search')"
@@ -17,16 +17,16 @@
                 :key="item.name"
                 class="item"
             >
-                <div class="top">
+                <div class="top" v-if="hasEffect2(item) || hasEffect4(item)">
                     <img :src="item.thumbnail" class="image" >
                     <div>
                         <h3 class="artifact-title">{{ item.title }}</h3>
                         <div>
-                            <p v-if="hasConfig2(item)" style="font-size: 12px;">
+                            <p v-if="hasEffect2(item)" style="font-size: 12px;">
                                 <span class="effect-title">{{ t("misc.art2") }}</span>
                                 <span class="effect-body">{{ item.effect2 }}</span>
                             </p>
-                            <p v-if="hasConfig4(item)" style="font-size: 12px;">
+                            <p v-if="hasEffect4(item)" style="font-size: 12px;">
                                 <span class="effect-title">{{ t("misc.art4") }}</span>
                                 <span class="effect-body">{{ item.effect4 }}</span>
                             </p>
@@ -40,6 +40,7 @@
                     :configs="item.config2"
                     :need-item-name="false"
                     @update:modelValue="handleChangeValue(item.snake, $event)"
+                    :updateGlobalConfig="updateGlobalConfig"
                     style="margin-bottom: 8px"
                 ></item-config>
                 <item-config
@@ -48,6 +49,7 @@
                     :configs="item.config4"
                     :need-item-name="false"
                     @update:modelValue="handleChangeValue(item.snake, $event)"
+                    :updateGlobalConfig="updateGlobalConfig"
                 ></item-config>
             </div>
         </div>
@@ -68,7 +70,23 @@ import {useI18n} from "@/i18n/i18n";
 export default {
     name: "ArtifactConfig",
     components: {ItemConfig},
-    props: ["modelValue"],
+    props: {
+        modelValue: {},
+        enableSearch: {
+            type: Boolean,
+            required: false,
+            default: true
+        },
+        artifactSetCount: {
+            type: Object,
+            required: false,
+            default: {}
+        },
+        updateGlobalConfig: {
+            type: Function,
+            required: false
+        },
+    },
     emits: ["update:modelValue"],
     data() {
         return {
@@ -93,6 +111,7 @@ export default {
                         config2: config2,
                         effect4: this.ta(d.effect4),
                         effect2: this.ta(d.effect2),
+                        count: this.artifactSetCount[name],
                         thumbnail: getArtifactThumbnail(name),
                         // chs: d.chs,
                     })
@@ -115,18 +134,37 @@ export default {
     },
     methods: {
         handleChangeValue(snake, value) {
-            // console.log(snake, value)
             let temp = deepCopy(this.modelValue)
             temp[snake] = value
             this.$emit("update:modelValue", temp)
         },
 
         hasConfig2(item) {
+            if (item.count != undefined) {
+                return item.count >= 2 && item.config2 && item.config2.length > 0
+            }
             return item.config2 && item.config2.length > 0
         },
 
         hasConfig4(item) {
+            if (item.count != undefined) {
+                return item.count >= 4 && item.config4 && item.config4.length > 0
+            }
             return item.config4 && item.config4.length > 0
+        },
+
+        hasEffect2(item) {
+            if (item.count != undefined) {
+                return item.count >= 2
+            }
+            return true
+        },
+
+        hasEffect4(item) {
+            if (item.count != undefined) {
+                return item.count >= 4
+            }
+            return true
         }
     },
     setup() {
@@ -152,6 +190,7 @@ export default {
 
         .top {
             display: flex;
+            color: #606266;
         }
 
         .image {

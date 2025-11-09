@@ -5,8 +5,10 @@ import type {WeaponName, WeaponType} from "@/types/weapon"
 import {weaponByType, weaponData} from "@weapon"
 import {type Ref} from "vue"
 import {useI18n} from "@/i18n/i18n";
+import { getObjectConfigValue } from "@/composables/globalConfig";
+import { get } from "lodash";
 
-function getDefaultWeaponConfig(name: string) {
+export function getDefaultWeaponConfig(name: string) {
     let res: any;
 
     // change config
@@ -16,7 +18,11 @@ function getDefaultWeaponConfig(name: string) {
 
         let defaultConfig: any = {}
         for (let config of configs) {
-            defaultConfig[config.name] = config.default
+            defaultConfig[config.name] = {
+                config: config.default,
+                configValue: config.default,
+                unlinked: config.unlinked,
+            }
         }
 
         res = {
@@ -28,7 +34,6 @@ function getDefaultWeaponConfig(name: string) {
 
     return res;
 }
-
 export function useWeapon(weaponType: null | Ref<WeaponType>) {
     const weaponName = ref(DEFAULT_WEAPON)
     const weaponLevel = ref("90")
@@ -62,7 +67,7 @@ export function useWeapon(weaponType: null | Ref<WeaponType>) {
             level: weaponLevelNumber.value,
             ascend: weaponAscend.value,
             refine: weaponRefine.value,
-            params: weaponConfig.value
+            params: getObjectConfigValue(weaponConfig.value),
         }
     })
 
