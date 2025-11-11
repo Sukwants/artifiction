@@ -9,6 +9,7 @@ pub use kamisato_ayaka::BuffKamisatoAyakaC4;
 pub use mika::BuffMika;
 pub use rosaria::{BuffRosariaC6, BuffRosariaTalent2};
 pub use shenhe::{BuffShenheE, BuffShenheQ, BuffShenheTalent1, BuffShenheTalent2};
+pub use layla::BuffLaylaC4;
 
 pub mod aloy;
 pub mod chongyun;
@@ -21,3 +22,4 @@ pub mod kamisato_ayaka;
 pub mod mika;
 pub mod rosaria;
 pub mod shenhe;
+pub mod layla;

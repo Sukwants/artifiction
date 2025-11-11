@@ -5,6 +5,8 @@ pub use thoma::{BuffThomaC6, BuffThomaTalent1};
 pub use xiangling::{BuffXianglingC1, BuffXianglingC6, BuffXianglingTalent2};
 pub use xinyan::{BuffXinyanC4, BuffXinyanTalent2};
 pub use yoimiya::BuffYoimiyaTalent2;
+pub use amber::BuffAmberC6;
+pub use chevreuse::{BuffChevreuseP1, BuffChevreuseP2, BuffChevreuseC6};
 
 pub mod bennett;
 pub mod hu_tao;
@@ -13,3 +15,5 @@ pub mod thoma;
 pub mod xiangling;
 pub mod xinyan;
 pub mod yoimiya;
+pub mod amber;
+pub mod chevreuse;

@@ -8,7 +8,7 @@ use crate::character::characters::Kaveh;
 use crate::character::traits::CharacterTrait;
 use crate::common::i18n::locale;
 use crate::common::item_config_type::{ItemConfig, ItemConfigType};
-use crate::enemies::Enemy;
+use crate::character::characters::dendro::kaveh::KAVEH_SKILL;
 
 pub struct BuffKavehQ {
     pub q_level: usize,
@@ -17,9 +17,9 @@ pub struct BuffKavehQ {
 
 impl<A: Attribute> Buff<A> for BuffKavehQ {
     fn change_attribute(&self, attribute: &mut A) {
-        let value = <Kaveh as CharacterTrait>::SKILL.q_bonus[self.q_level - 1];
+        let value = KAVEH_SKILL.q_bonus[self.q_level - 1];
 
-        attribute.set_value_by(AttributeName::EnhanceBloom, "BUFF: 卡维Q", value * self.rate);
+        attribute.set_value_by(AttributeName::EnhanceBloom, "卡维「繁绘隅穹」", value * self.rate);
     }
 }
 
@@ -27,12 +27,15 @@ impl BuffMeta for BuffKavehQ {
     #[cfg(not(target_family = "wasm"))]
     const META_DATA: BuffMetaData = BuffMetaData {
         name: BuffName::KavehQ,
-        name_locale: locale!(zh_cn: "卡维Q", en: "Kaveh Q"),
+        name_locale: locale!(
+            zh_cn: "卡维-「繁绘隅穹」",
+            en: "Kaveh-Painted Dome"
+        ),
         image: BuffImage::Avatar(CharacterName::Kaveh),
         genre: BuffGenre::Character,
         description: Some(locale!(
-            zh_cn: "队伍中自己的角色触发绽放反应产生的草原核，在迸发时造成的伤害提升",
-            en: "All Dendro Cores created by all your own party members through Bloom reactions will deal additional DMG when they burst",
+            zh_cn: "卡维Q技能：队伍中自己的角色触发绽放或月绽放反应产生的草原核，在迸发时造成的伤害提升。",
+            en: "Kaveh Elemental Burst: All Dendro Cores created by all your own party members through Bloom and Lunar-Bloom reactions will deal additional DMG when they burst.",
         )),
         from: BuffFrom::Character(CharacterName::Kaveh)
     };
