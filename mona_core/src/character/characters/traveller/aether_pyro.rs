@@ -7,7 +7,7 @@ use crate::character::traits::{CharacterSkillMap, CharacterSkillMapItem, Charact
 use crate::character::macros::{damage_enum, skill_map};
 use crate::common::{ChangeAttribute, Element, MoonglareReaction, Moonsign, SkillType, WeaponType};
 use crate::common::i18n::{locale, hit_n_dmg, plunging_dmg, charged_dmg};
-use crate::common::item_config_type::{ItemConfig, ItemConfigType};
+use crate::common::item_config_type::{ItemConfig, ItemConfigType, GlobalLinkConfig};
 use crate::damage::damage_builder::DamageBuilder;
 use crate::damage::DamageContext;
 use crate::target_functions::TargetFunction;
@@ -185,7 +185,9 @@ impl CharacterTrait for AetherPyro {
                 zh_cn: "对抗「古斯托特」化形的蚀灭的源焰之主",
                 en: "Opposing the Lord of Eroded Primal Fire incarnated by Gosoythoth",
             ),
-            config: ItemConfigType::Bool { default: false }
+            config: ItemConfigType::GlobalLinkBool { default: false, global_link:
+                GlobalLinkConfig { key: "gosoythoth", priority: ItemConfig::PRIORITY_CHARACTERSKILL, team_shared: true }
+            }
         },
         ItemConfig {
             name: "nightsouls_blessing",
@@ -225,34 +227,36 @@ impl CharacterTrait for AetherPyro {
         use AetherPyroDamageEnum::*;
         let mut builder = D::new();
 
-        if context.character_common_data.constellation >= 1 && active {
+        let c_count = context.character_common_data.constellation;
+
+        if c_count >= 1 && active {
             builder.add_extra_bonus("命座1：流光的星火", if nightsouls_blessing { 0.15 } else { 0.06 });
         }
 
-        if context.character_common_data.constellation >= 4 && activated_q {
+        if c_count >= 4 && activated_q {
             builder.add_extra_bonus("命座4：燎灼的烈火", 0.2);
         }
 
-        let infused = context.character_common_data.constellation >= 6 && nightsouls_blessing;
+        let infused = c_count >= 6 && nightsouls_blessing;
 
         if infused && matches!(s.get_skill_type(), SkillType::NormalAttack | SkillType::ChargedAttack | SkillType::PlungingAttackInAction | SkillType::PlungingAttackOnGround) {
             builder.add_extra_critical_damage("命座6：永燃的圣火", 0.4);
         }
 
         if gosoythoth {
-            if context.character_common_data.constellation >= 1 {
+            if c_count >= 1 {
                 builder.add_extra_atk("命座1：流光的星火", context.attribute.get_value(AttributeName::ATKBase) * 0.4);
             }
 
-            if context.character_common_data.constellation >= 2 && nightsouls_blessing {
+            if c_count >= 2 && nightsouls_blessing {
                 builder.add_extra_res_minus("命座2：长明的烛火", 0.4);
             }
 
-            if context.character_common_data.constellation >= 3 {
+            if c_count >= 3 {
                 builder.add_extra_bonus("命座3：燧传的烽火", 0.4);
             }
 
-            if context.character_common_data.constellation >= 5 {
+            if c_count >= 5 {
                 builder.add_extra_critical("命座5：不灭的薪火", 0.2);
                 builder.add_extra_critical_damage("命座5：不灭的薪火", 0.4);
             }

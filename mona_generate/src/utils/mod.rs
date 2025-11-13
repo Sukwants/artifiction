@@ -11,7 +11,7 @@ pub fn config_to_json(config: &ItemConfig) -> String {
     let name = config.name;
     let title_index = *index_map.get(&config.title).unwrap();
 
-    let j = match config.config {
+    let j = match &config.config {
         ItemConfigType::Skill4 { default } => {
             json!({
                     "type": "skill4",
@@ -136,15 +136,47 @@ pub fn config_to_json(config: &ItemConfig) -> String {
                 "default": default
             })
         },
-        ItemConfigType::GlobalLinkMoonsign3 { key, default, priority, team_shared } => {
+        ItemConfigType::GlobalLinkBool { default, global_link } => {
             json!({
                 "type": "globalLink",
                 "name": name,
-                "key": key,
+                "key": global_link.key,
                 "default": default,
-                "priority": priority,
+                "priority": global_link.priority,
                 "unlinked": false,
-                "team_shared": team_shared,
+                "team_shared": global_link.team_shared,
+                "config": {
+                    "type": "bool",
+                    "title": title_index,
+                }
+            })
+        },
+        ItemConfigType::GlobalLinkFloat { min, max, default, global_link } => {
+            json!({
+                "type": "globalLink",
+                "name": name,
+                "key": global_link.key,
+                "default": default,
+                "priority": global_link.priority,
+                "unlinked": false,
+                "team_shared": global_link.team_shared,
+                "config": {
+                    "type": "float",
+                    "title": title_index,
+                    "min": min,
+                    "max": max
+                }
+            })
+        },
+        ItemConfigType::GlobalLinkMoonsign3 { default, global_link } => {
+            json!({
+                "type": "globalLink",
+                "name": name,
+                "key": global_link.key,
+                "default": default,
+                "priority": global_link.priority,
+                "unlinked": false,
+                "team_shared": global_link.team_shared,
                 "config": {
                     "type": "moonsign3",
                     "title": title_index,

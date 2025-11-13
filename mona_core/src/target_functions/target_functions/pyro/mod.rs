@@ -14,6 +14,8 @@ pub mod dehya_default;
 pub mod lyney_default;
 pub mod arlecchino_default;
 pub mod mavuika_default;
+pub mod aether_pyro_default;
+pub mod lumine_pyro_default;
 
 pub use amber_default::AmberDefaultTargetFunction;
 pub use bennett_damage::BennettDamageTargetFunction;
@@ -31,3 +33,5 @@ pub use dehya_default::DehyaDefaultTargetFunction;
 pub use lyney_default::LyneyDefaultTargetFunction;
 pub use arlecchino_default::ArlecchinoDefaultTargetFunction;
 pub use mavuika_default::MavuikaDefaultTargetFunction;
+pub use aether_pyro_default::AetherPyroDefaultTargetFunction;
+pub use lumine_pyro_default::LuminePyroDefaultTargetFunction;

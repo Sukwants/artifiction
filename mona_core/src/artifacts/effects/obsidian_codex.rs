@@ -5,7 +5,7 @@ use crate::artifacts::effect_config::ArtifactEffectConfig;
 use crate::attribute::{Attribute, AttributeName};
 use crate::character::character_common_data::CharacterCommonData;
 use crate::common::i18n::locale;
-use crate::common::item_config_type::{ItemConfig, ItemConfigType};
+use crate::common::item_config_type::{ItemConfig, ItemConfigType, GlobalLinkConfig};
 
 pub struct ObsidianCodexEffect {
     pub set2_rate: f64,
@@ -83,7 +83,9 @@ impl ArtifactTrait for ObsidianCodex {
                 zh_cn: "四件套被动比例",
                 en: "4-Set Ratio"
             ),
-            config: ItemConfigType::Float { min: 0.0, max: 1.0, default: 0.0 }
+            config: ItemConfigType::GlobalLinkFloat { min: 0.0, max: 1.0, default: 0.0, 
+                global_link: GlobalLinkConfig { key: "[obsidian_codex]set4_rate", priority: ItemConfig::PRIORITY_ARTIFACT, team_shared: false } 
+            }
         }
     ]);
 
@@ -95,7 +97,9 @@ impl ArtifactTrait for ObsidianCodex {
                 zh_cn: "二件套被动比例",
                 en: "2-Set Ratio"
             ),
-            config: ItemConfigType::Float { min: 0.0, max: 1.0, default: 0.0 }
+            config: ItemConfigType::GlobalLinkFloat { min: 0.0, max: 1.0, default: 0.0, 
+                global_link: GlobalLinkConfig { key: "[obsidian_codex]set2_rate", priority: ItemConfig::PRIORITY_ARTIFACT, team_shared: false } 
+            }
         }
     ]);
 }

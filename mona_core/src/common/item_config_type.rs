@@ -134,6 +134,12 @@ impl<'de> Deserialize<'de> for ConfigElements8Multi {
     }
 }
 
+pub struct GlobalLinkConfig {
+    pub key: &'static str,
+    pub priority: usize,
+    pub team_shared: bool,
+}
+
 pub enum ItemConfigType {
     Float {
         min: f64,
@@ -191,11 +197,19 @@ pub enum ItemConfigType {
     Moonsign3 {
         default: Moonsign
     },
+    GlobalLinkBool {
+        default: bool,
+        global_link: GlobalLinkConfig,
+    },
+    GlobalLinkFloat {
+        min: f64,
+        max: f64,
+        default: f64,
+        global_link: GlobalLinkConfig,
+    },
     GlobalLinkMoonsign3 {
-        key: &'static str,
         default: Moonsign,
-        priority: usize,
-        team_shared: bool,
+        global_link: GlobalLinkConfig,
     }
 }
 
@@ -332,15 +346,47 @@ impl ItemConfigType {
                     "default": default
                 })
             },
-            ItemConfigType::GlobalLinkMoonsign3 { key, default, priority, team_shared } => {
+            ItemConfigType::GlobalLinkBool { default, global_link } => {
                 json!({
                     "type": "globalLink",
                     "name": name,
-                    "key": key,
+                    "key": global_link.key,
                     "default": default,
-                    "priority": priority,
+                    "priority": global_link.priority,
                     "unlinked": false,
-                    "team_shared": team_shared,
+                    "team_shared": global_link.team_shared,
+                    "config": {
+                        "type": "bool",
+                        "title": title,
+                    }
+                })
+            },
+            ItemConfigType::GlobalLinkFloat { min, max, default, global_link } => {
+                json!({
+                    "type": "globalLink",
+                    "name": name,
+                    "key": global_link.key,
+                    "default": default,
+                    "priority": global_link.priority,
+                    "unlinked": false,
+                    "team_shared": global_link.team_shared,
+                    "config": {
+                        "type": "float",
+                        "title": title,
+                        "min": min,
+                        "max": max
+                    }
+                })
+            },
+            ItemConfigType::GlobalLinkMoonsign3 { default, global_link } => {
+                json!({
+                    "type": "globalLink",
+                    "name": name,
+                    "key": global_link.key,
+                    "default": default,
+                    "priority": global_link.priority,
+                    "unlinked": false,
+                    "team_shared": global_link.team_shared,
                     "config": {
                         "type": "moonsign3",
                         "title": title,
@@ -382,6 +428,6 @@ impl ItemConfig {
     pub const PRIORITY_CHARACTER: usize = 6;
 
     pub const fn MOONSIGN_GLOBAL(default: Moonsign, priority: usize, team_shared: bool) -> ItemConfig {
-        return ItemConfig { name: "moonsign", title: locale!(zh_cn: "月兆", en: "Moonsign"), config: ItemConfigType::GlobalLinkMoonsign3 { key: "moonsign", default, priority, team_shared }, };
+        return ItemConfig { name: "moonsign", title: locale!(zh_cn: "月兆", en: "Moonsign"), config: ItemConfigType::GlobalLinkMoonsign3 { default, global_link: GlobalLinkConfig { key: "moonsign", priority, team_shared } } };
     }
 }

@@ -1,31 +1,33 @@
 <template>
     <div class="config-root" :style="styleRoot">
 <!--        {{ configs }}-->
-        <ConfigItem
-            class="config"
-            v-for="config in configs.filter(c => c.type === 'globalLink')"
-            :key="config.name"
-            :params="config"
-            :title="ta(config.config.title)"
-            :type="config.type"
-            :modelValue="value2[config.name].config"
-            @update:modelValue="handleInput(config.name, $event)"
-            :name="config.name"
-            :globalValue="value2[config.name].configValue"
-            :updateGlobalConfig="updateGlobalConfig"
-            :unlinked="value2[config.name].unlinked"
-            @update:unlinked="handleUnlinked(config.name, $event)"
-        ></ConfigItem>
-        <ConfigItem
-            class="config"
-            v-for="config in configs.filter(c => c.type !== 'globalLink')"
-            :key="config.name"
-            :params="config"
-            :title="ta(config.title)"
-            :type="config.type"
-            :modelValue="value2[config.name].config"
-            @update:modelValue="handleInput(config.name, $event)"
-        ></ConfigItem>
+        <div v-for="config in configs">
+            <ConfigItem
+                class="config"
+                v-if="config.type === 'globalLink'"
+                :key="config.name"
+                :params="config"
+                :title="ta(config.config.title)"
+                :type="config.type"
+                :modelValue="value2[config.name].config"
+                @update:modelValue="handleInput(config.name, $event)"
+                :name="config.name"
+                :globalValue="value2[config.name].configValue"
+                :updateGlobalConfig="updateGlobalConfig"
+                :unlinked="value2[config.name].unlinked"
+                @update:unlinked="handleUnlinked(config.name, $event)"
+            ></ConfigItem>
+            <ConfigItem
+                class="config"
+                v-if="config.type !== 'globalLink'"
+                :key="config.name"
+                :params="config"
+                :title="ta(config.title)"
+                :type="config.type"
+                :modelValue="value2[config.name].config"
+                @update:modelValue="handleInput(config.name, $event)"
+            ></ConfigItem>
+        </div>
     </div>
 </template>
 
