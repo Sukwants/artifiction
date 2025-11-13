@@ -31,8 +31,8 @@ impl TargetFunctionMetaTrait for AetherPyroDefaultTargetFunction {
     const META_DATA: TargetFunctionMeta = TargetFunctionMeta {
         name: TargetFunctionName::AetherPyroDefault,
         name_locale: locale!(
-            zh_cn: "空-旅行者",
-            en: "AetherPyro-Secret Beneath the Sands"
+            zh_cn: "空-火-旅行者",
+            en: "Aether-Pyro-Traveller"
         ),
         description: locale!(
             zh_cn: "旅行者空-火前台每轮总伤害",

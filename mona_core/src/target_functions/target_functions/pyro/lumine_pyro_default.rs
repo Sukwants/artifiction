@@ -31,8 +31,8 @@ impl TargetFunctionMetaTrait for LuminePyroDefaultTargetFunction {
     const META_DATA: TargetFunctionMeta = TargetFunctionMeta {
         name: TargetFunctionName::LuminePyroDefault,
         name_locale: locale!(
-            zh_cn: "荧-旅行者",
-            en: "LuminePyro-Secret Beneath the Sands"
+            zh_cn: "荧-火-旅行者",
+            en: "Lumine-Pyro-Traveller"
         ),
         description: locale!(
             zh_cn: "旅行者荧-火前台每轮总伤害",
