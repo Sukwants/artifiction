@@ -1,5 +1,5 @@
 use serde::{Deserialize, Serialize};
-use crate::common::Moonsign;
+use crate::common::{Element, Moonsign};
 
 fn default_true() -> bool {
     true
@@ -11,10 +11,17 @@ fn default_false() -> bool {
 
 #[derive(Serialize, Deserialize, Debug)]
 pub enum CharacterSkillConfig {
+    AetherAnemo { elemental_absorption: Element },
+    LumineAnemo { elemental_absorption: Element },
+    AetherDendro { overflowing_lotuslight_count: usize },
+    LumineDendro { overflowing_lotuslight_count: usize },
+    AetherHydro { hp_above_half: bool, consumed_hp_times: usize },
+    LumineHydro { hp_above_half: bool, consumed_hp_times: usize },
+    AetherPyro { gosoythoth: bool, nightsouls_blessing: bool, active: bool, activated_q: bool },
+    LuminePyro { gosoythoth: bool, nightsouls_blessing: bool, active: bool, activated_q: bool },
     Albedo { fatal_count: usize },
     Aloy { coil_count: usize },
     AratakiItto { after_q: bool },
-
     Diluc { pyro: bool },
     Eula { lightfall_stack: usize },
     Ganyu { talent1_rate: f64 },

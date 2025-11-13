@@ -27,6 +27,17 @@ use crate::weapon::weapon_common_data::WeaponCommonData;
 #[derive(Display, FromPrimitive, EnumString, CharacterData, EnumLen, EnumIter)]
 pub enum CharacterName {
     AetherAnemo,
+    LumineAnemo,
+    AetherGeo,
+    LumineGeo,
+    AetherElectro,
+    LumineElectro,
+    AetherDendro,
+    LumineDendro,
+    AetherHydro,
+    LumineHydro,
+    AetherPyro,
+    LuminePyro,
     Amber,
     Kaeya,
     Lisa,

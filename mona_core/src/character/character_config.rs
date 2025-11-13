@@ -4,6 +4,8 @@ use crate::common::Moonsign;
 
 #[derive(Serialize, Deserialize)]
 pub enum CharacterConfig {
+    AetherElectro { abundance_amulet_count: usize },
+    LumineElectro { abundance_amulet_count: usize },
     Ganyu { talent2_rate: f64 },
     HuTao { le_50: bool },
     KamisatoAyaka { talent1_rate: f64, talent2_rate: f64 },

@@ -14,7 +14,7 @@ use crate::target_functions::TargetFunction;
 use crate::team::TeamQuantization;
 use crate::weapon::weapon_common_data::WeaponCommonData;
 
-pub struct AetherAnemoSkillType {
+pub struct LumineAnemoSkillType {
     pub a_dmg1: [f64; 15],
     pub a_dmg2: [f64; 15],
     pub a_dmg3: [f64; 15],
@@ -38,7 +38,7 @@ pub struct AetherAnemoSkillType {
     pub p2_dmg: f64,
 }
 
-pub const AETHERANEMO_SKILL: AetherAnemoSkillType = AetherAnemoSkillType {
+pub const LUMINEANEMO_SKILL: LumineAnemoSkillType = LumineAnemoSkillType {
     // Normal Attack: Foreign Ironwind
     a_dmg1: [0.44462, 0.48081, 0.517, 0.5687, 0.60489, 0.64625, 0.70312, 0.76, 0.81686, 0.8789, 0.94094, 1.00298, 1.06502, 1.12706, 1.1891],
     a_dmg2: [0.4343, 0.46965, 0.505, 0.5555, 0.59085, 0.63125, 0.6868, 0.74235, 0.7979, 0.8585, 0.9191, 0.9797, 1.0403, 1.1009, 1.1615],
@@ -46,7 +46,7 @@ pub const AETHERANEMO_SKILL: AetherAnemoSkillType = AetherAnemoSkillType {
     a_dmg4: [0.58308, 0.63054, 0.678, 0.7458, 0.79326, 0.8475, 0.92208, 0.99666, 1.07124, 1.1526, 1.23396, 1.31532, 1.39668, 1.47804, 1.5594],
     a_dmg5: [0.70778, 0.76539, 0.823, 0.9053, 0.96291, 1.02875, 1.11928, 1.20981, 1.30034, 1.3991, 1.49786, 1.59662, 1.69538, 1.79414, 1.8929],
     z_dmg1: [0.559, 0.6045, 0.65, 0.715, 0.7605, 0.8125, 0.884, 0.9555, 1.027, 1.105, 1.183, 1.261, 1.339, 1.417, 1.495],
-    z_dmg2: [0.60716, 0.65658, 0.706, 0.7766, 0.82602, 0.8825, 0.96016, 1.03782, 1.11548, 1.2002, 1.28492, 1.36964, 1.45436, 1.53908, 1.6238],
+    z_dmg2: [0.7224, 0.7812, 0.84, 0.924, 0.9828, 1.05, 1.1424, 1.2348, 1.3272, 1.428, 1.5288, 1.6296, 1.7304, 1.8312, 1.932],
     x_dmg1: [0.639324, 0.691362, 0.7434, 0.81774, 0.869778, 0.92925, 1.011024, 1.092798, 1.174572, 1.26378, 1.352988, 1.442196, 1.531404, 1.620612, 1.70982],
     x_dmg2: [1.278377, 1.382431, 1.486485, 1.635134, 1.739187, 1.858106, 2.02162, 2.185133, 2.348646, 2.527025, 2.705403, 2.883781, 3.062159, 3.240537, 3.418915],
     x_dmg3: [1.596762, 1.726731, 1.8567, 2.04237, 2.172339, 2.320875, 2.525112, 2.729349, 2.933586, 3.15639, 3.379194, 3.601998, 3.824802, 4.047606, 4.27041],
@@ -65,9 +65,9 @@ pub const AETHERANEMO_SKILL: AetherAnemoSkillType = AetherAnemoSkillType {
     p2_dmg: 0.6,
 };
 
-pub const AETHERANEMO_STATIC_DATA: CharacterStaticData = CharacterStaticData {
-    name: CharacterName::AetherAnemo,
-    internal_name: "AetherAnemo",
+pub const LUMINEANEMO_STATIC_DATA: CharacterStaticData = CharacterStaticData {
+    name: CharacterName::LumineAnemo,
+    internal_name: "LumineAnemo",
     element: Element::Anemo,
     hp: [912, 2342, 3024, 4529, 5031, 5766, 6411, 7164, 7648, 8401, 8885, 9638, 10122, 10875, 11627],
     atk: [18, 46, 59, 88, 98, 113, 125, 140, 149, 164, 174, 188, 198, 212, 266],
@@ -88,17 +88,17 @@ pub const AETHERANEMO_STATIC_DATA: CharacterStaticData = CharacterStaticData {
         en: "Gust Surge",
     ),
     name_locale: locale!(
-        zh_cn: "空-风",
-        en: "Aether-Anemo",
+        zh_cn: "荧-风",
+        en: "Lumine-Anemo",
     )
 };
 
-pub struct AetherAnemoEffect {
+pub struct LumineAnemoEffect {
     pub has_c2: bool,
     pub has_c6: bool,
 }
 
-impl<A: Attribute> ChangeAttribute<A> for AetherAnemoEffect {
+impl<A: Attribute> ChangeAttribute<A> for LumineAnemoEffect {
     fn change_attribute(&self, attribute: &mut A) {
         if self.has_c2 {
             attribute.set_value_by(AttributeName::Recharge, "二命：革新的旋风", 0.16);
@@ -111,7 +111,7 @@ impl<A: Attribute> ChangeAttribute<A> for AetherAnemoEffect {
 }
 
 damage_enum!(
-    AetherAnemoDamageEnum
+    LumineAnemoDamageEnum
     A1
     A2
     A3
@@ -135,9 +135,9 @@ damage_enum!(
     P2
 );
 
-impl AetherAnemoDamageEnum {
+impl LumineAnemoDamageEnum {
     pub fn get_element(&self, elemental_absorption: Element) -> Element {
-        use AetherAnemoDamageEnum::*;
+        use LumineAnemoDamageEnum::*;
         match *self {
             EC1 | EC2 | ES1 | ES2 | Q | P2 => Element::Anemo,
             EC1A | EC2A | ES1A | ES2A | QA => elemental_absorption,
@@ -146,7 +146,7 @@ impl AetherAnemoDamageEnum {
     }
 
     pub fn get_skill_type(&self) -> SkillType {
-        use AetherAnemoDamageEnum::*;
+        use LumineAnemoDamageEnum::*;
         match *self {
             A1 | A2 | A3 | A4 | A5 | P2 => SkillType::NormalAttack,
             Z1 | Z2 => SkillType::ChargedAttack,
@@ -158,19 +158,19 @@ impl AetherAnemoDamageEnum {
     }
 }
 
-pub struct AetherAnemo;
+pub struct LumineAnemo;
 
-impl CharacterTrait for AetherAnemo {
-    const STATIC_DATA: CharacterStaticData = AETHERANEMO_STATIC_DATA;
-    type SkillType = AetherAnemoSkillType;
-    const SKILL: Self::SkillType = AETHERANEMO_SKILL;
-    type DamageEnumType = AetherAnemoDamageEnum;
+impl CharacterTrait for LumineAnemo {
+    const STATIC_DATA: CharacterStaticData = LUMINEANEMO_STATIC_DATA;
+    type SkillType = LumineAnemoSkillType;
+    const SKILL: Self::SkillType = LUMINEANEMO_SKILL;
+    type DamageEnumType = LumineAnemoDamageEnum;
     type RoleEnum = ();
 
     #[cfg(not(target_family = "wasm"))]
     const SKILL_MAP: CharacterSkillMap = CharacterSkillMap {
         skill1: skill_map!(
-            AetherAnemoDamageEnum
+            LumineAnemoDamageEnum
             A1 hit_n_dmg!(1)
             A2 hit_n_dmg!(2)
             A3 hit_n_dmg!(3)
@@ -184,7 +184,7 @@ impl CharacterTrait for AetherAnemo {
             P2 locale!(zh_cn: "裂空之风", en: "Slitting Wind")
         ),
         skill2: skill_map!(
-            AetherAnemoDamageEnum
+            LumineAnemoDamageEnum
             EC1 locale!(zh_cn: "初始切割伤害", en: "Initial Cutting DMG")
             EC2 locale!(zh_cn: "最大切割伤害", en: "Max Cutting DMG")
             ES1 locale!(zh_cn: "初始爆风伤害", en: "Initial Storm DMG")
@@ -195,7 +195,7 @@ impl CharacterTrait for AetherAnemo {
             ES2A locale!(zh_cn: "最大爆风染色伤害", en: "Max Storm DMG (Absorbed)")
         ),
         skill3: skill_map!(
-            AetherAnemoDamageEnum
+            LumineAnemoDamageEnum
             Q locale!(zh_cn: "龙卷风伤害", en: "Tornado DMG")
             QA locale!(zh_cn: "附加元素伤害", en: "Additional Elemental DMG")
         )
@@ -215,15 +215,15 @@ impl CharacterTrait for AetherAnemo {
     ]);
 
     fn damage_internal<D: DamageBuilder>(context: &DamageContext<'_, D::AttributeType>, s: usize, config: &CharacterSkillConfig, fumo: Option<Element>) -> D::Result {
-        let s: AetherAnemoDamageEnum = num::FromPrimitive::from_usize(s).unwrap();
+        let s: LumineAnemoDamageEnum = num::FromPrimitive::from_usize(s).unwrap();
         let (s1, s2, s3) = context.character_common_data.get_3_skill();
 
         let elemental_absorption = match *config {
-            CharacterSkillConfig::AetherAnemo { elemental_absorption } => elemental_absorption,
+            CharacterSkillConfig::LumineAnemo { elemental_absorption } => elemental_absorption,
             _ => Element::Cryo,
         };
 
-        use AetherAnemoDamageEnum::*;
+        use LumineAnemoDamageEnum::*;
         let mut builder = D::new();
 
         if context.character_common_data.constellation >= 6 && s.get_element(elemental_absorption) != Element::Anemo {
@@ -231,27 +231,27 @@ impl CharacterTrait for AetherAnemo {
         }
 
         let ratio = match s {
-            A1 => AETHERANEMO_SKILL.a_dmg1[s1],
-            A2 => AETHERANEMO_SKILL.a_dmg2[s1],
-            A3 => AETHERANEMO_SKILL.a_dmg3[s1],
-            A4 => AETHERANEMO_SKILL.a_dmg4[s1],
-            A5 => AETHERANEMO_SKILL.a_dmg5[s1],
-            Z1 => AETHERANEMO_SKILL.z_dmg1[s1],
-            Z2 => AETHERANEMO_SKILL.z_dmg2[s1],
-            X1 => AETHERANEMO_SKILL.x_dmg1[s1],
-            X2 => AETHERANEMO_SKILL.x_dmg2[s1],
-            X3 => AETHERANEMO_SKILL.x_dmg3[s1],
-            EC1 => AETHERANEMO_SKILL.e_dmgc1[s2],
-            EC2 => AETHERANEMO_SKILL.e_dmgc2[s2],
-            ES1 => AETHERANEMO_SKILL.e_dmgs1[s2],
-            ES2 => AETHERANEMO_SKILL.e_dmgs2[s2],
-            EC1A => AETHERANEMO_SKILL.e_dmgc1[s2] * AETHERANEMO_SKILL.e_dmga_rate,
-            EC2A => AETHERANEMO_SKILL.e_dmgc2[s2] * AETHERANEMO_SKILL.e_dmga_rate,
-            ES1A => AETHERANEMO_SKILL.e_dmgs1[s2] * AETHERANEMO_SKILL.e_dmga_rate,
-            ES2A => AETHERANEMO_SKILL.e_dmgs2[s2] * AETHERANEMO_SKILL.e_dmga_rate,
-            Q => AETHERANEMO_SKILL.q_dmg[s3],
-            QA => AETHERANEMO_SKILL.q_dmga[s3],
-            P2 => AETHERANEMO_SKILL.p2_dmg,
+            A1 => LUMINEANEMO_SKILL.a_dmg1[s1],
+            A2 => LUMINEANEMO_SKILL.a_dmg2[s1],
+            A3 => LUMINEANEMO_SKILL.a_dmg3[s1],
+            A4 => LUMINEANEMO_SKILL.a_dmg4[s1],
+            A5 => LUMINEANEMO_SKILL.a_dmg5[s1],
+            Z1 => LUMINEANEMO_SKILL.z_dmg1[s1],
+            Z2 => LUMINEANEMO_SKILL.z_dmg2[s1],
+            X1 => LUMINEANEMO_SKILL.x_dmg1[s1],
+            X2 => LUMINEANEMO_SKILL.x_dmg2[s1],
+            X3 => LUMINEANEMO_SKILL.x_dmg3[s1],
+            EC1 => LUMINEANEMO_SKILL.e_dmgc1[s2],
+            EC2 => LUMINEANEMO_SKILL.e_dmgc2[s2],
+            ES1 => LUMINEANEMO_SKILL.e_dmgs1[s2],
+            ES2 => LUMINEANEMO_SKILL.e_dmgs2[s2],
+            EC1A => LUMINEANEMO_SKILL.e_dmgc1[s2] * LUMINEANEMO_SKILL.e_dmga_rate,
+            EC2A => LUMINEANEMO_SKILL.e_dmgc2[s2] * LUMINEANEMO_SKILL.e_dmga_rate,
+            ES1A => LUMINEANEMO_SKILL.e_dmgs1[s2] * LUMINEANEMO_SKILL.e_dmga_rate,
+            ES2A => LUMINEANEMO_SKILL.e_dmgs2[s2] * LUMINEANEMO_SKILL.e_dmga_rate,
+            Q => LUMINEANEMO_SKILL.q_dmg[s3],
+            QA => LUMINEANEMO_SKILL.q_dmga[s3],
+            P2 => LUMINEANEMO_SKILL.p2_dmg,
             _ => 0.0
         };
 
@@ -268,7 +268,7 @@ impl CharacterTrait for AetherAnemo {
     }
 
     fn new_effect<A: Attribute>(common_data: &CharacterCommonData, config: &CharacterConfig) -> Option<Box<dyn ChangeAttribute<A>>> {
-        Some(Box::new(AetherAnemoEffect {
+        Some(Box::new(LumineAnemoEffect {
             has_c2: common_data.constellation >= 2,
             has_c6: common_data.constellation >= 6,
         }))
