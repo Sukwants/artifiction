@@ -1,15 +1,4 @@
 // @ts-ignore
-import { globalConfigData } from "@globalConfig"
-
-const globalConfigConfig: any = {};
-
-for(let i in globalConfigData) {
-    globalConfigConfig[globalConfigData[i].name] = globalConfigData[i].config[0];
-}
-
-export function getGlobalConfigConfig() {
-    return globalConfigConfig;
-}
 
 export function getObjectConfig(config: any) {
     if (config === "NoConfig") {
@@ -81,23 +70,16 @@ export function restoreObjectConfig(config: any, configValue: any, unlinked: any
 }
 
 export function useGlobalConfig() {
-    const values: any = {};
+    let values: any = {};
 
     function setGlobalConfig(list: any) {
-        for(let i in globalConfigConfig) {
-            values[globalConfigConfig[i].name] = [
-                {
-                    "priority": 0,
-                    "value": globalConfigConfig[i].default,
-                    "update_value": (val: any) => {}
-                }
-            ]
-        }
+        values = {};
 
         for (const p of list) {
             for (const i of p.configConfig) {
                 if (i.type == "globalLink" && p.config[i.name].unlinked !== true) {
-                    values[i.name].push({
+                    if (!values[i.key]) values[i.key] = [];
+                    values[i.key].push({
                         "priority": i.priority,
                         "value": p.config[i.name].config,
                         "update_value": (val: any) => {
@@ -109,12 +91,12 @@ export function useGlobalConfig() {
         }
 
         let res: any = {};
-        for (const name in values) {
+        for (const key in values) {
             let current_priority = -1;
-            for (const i of values[name]) {
+            for (const i of values[key]) {
                 if (i.priority > current_priority) {
                     current_priority = i.priority;
-                    res[name] = i.value;
+                    res[key] = i.value;
                 }
             }
         }
@@ -122,7 +104,7 @@ export function useGlobalConfig() {
         for (const p of list) {
             for (const i of p.configConfig) {
                 if (i.type == "globalLink" && p.config[i.name].unlinked !== true) {
-                    p.config[i.name].configValue = res[i.name];
+                    p.config[i.name].configValue = res[i.key];
                 } else {
                     p.config[i.name].configValue = p.config[i.name].config;
                 }
@@ -130,14 +112,16 @@ export function useGlobalConfig() {
         }
     }
 
-    function updateGlobalConfig(name: string, value: any) {
+    function updateGlobalConfig(key: string, value: any) {
+        console.log(key, value)
+        
         let max_priority = -1;
-        for (let i of values[name]) {
+        for (let i of values[key]) {
             if (i.priority > max_priority) {
                 max_priority = i.priority;
             }
         }
-        for (let i of values[name]) {
+        for (let i of values[key]) {
             if (i.priority === max_priority) {
                 i.update_value(value);
             }

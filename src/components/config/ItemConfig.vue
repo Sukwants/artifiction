@@ -6,13 +6,12 @@
             v-for="config in configs.filter(c => c.type === 'globalLink')"
             :key="config.name"
             :params="config"
-            :title="ta(config.title)"
+            :title="ta(config.config.title)"
             :type="config.type"
             :modelValue="value2[config.name].config"
             @update:modelValue="handleInput(config.name, $event)"
             :name="config.name"
             :globalValue="value2[config.name].configValue"
-            :globalConfigs="globalConfigs"
             :updateGlobalConfig="updateGlobalConfig"
             :unlinked="value2[config.name].unlinked"
             @update:unlinked="handleUnlinked(config.name, $event)"
@@ -34,7 +33,6 @@
 import { update } from "lodash";
 import ConfigItem from "./ConfigItem"
 import {useI18n} from "@/i18n/i18n"
-import { getGlobalConfigConfig } from "@/composables/globalConfig"
 
 export default {
     name: "ItemConfig",
@@ -72,10 +70,6 @@ export default {
             } else {
                 return this.modelValue
             }
-        },
-
-        globalConfigs() {
-            return getGlobalConfigConfig()
         }
     },
     

@@ -434,33 +434,6 @@ pub fn derive_buff_data(input: TokenStream) -> TokenStream {
     output.parse().unwrap()
 }
 
-#[proc_macro_derive(GlobalConfigData)]
-pub fn derive_global_config_data(input: TokenStream) -> TokenStream {
-    let ast = parse_macro_input!(input as DeriveInput);
-
-    let mut vars = get_enum_variants(&ast);
-
-    let mut rows_global_config_data = String::new();
-
-    for v in vars.iter() {
-        rows_global_config_data.push_str(&format!("GlobalConfigName::{n} => crate::common::global_config::GlobalConfigName::{n}.get_config(),\n", n=v));
-    }
-
-    let output = format!(
-        r#"
-        impl GlobalConfigName {{
-            #[cfg(not(target_family = "wasm"))]
-            pub fn get_global_config_data(&self) -> &'static ItemConfig {{
-                match *self {{ {rows_global_config_data} }}
-            }}
-        }}
-        "#,
-        rows_global_config_data=rows_global_config_data,
-    );
-
-    output.parse().unwrap()
-}
-
 #[proc_macro_derive(EnumLen)]
 pub fn derive_enum_len(input: TokenStream) -> TokenStream {
     let ast = parse_macro_input!(input as DeriveInput);

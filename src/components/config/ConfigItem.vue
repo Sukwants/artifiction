@@ -122,19 +122,19 @@
                     class="config"
                     v-if="type === 'globalLink' && !unlinked"
                     :key="'[global]' + name"
-                    :params="globalConfigs[name]"
+                    :params="params.config"
                     :title="title"
-                    :type="globalConfigs[name].type"
+                    :type="params.config.type"
                     :modelValue="globalValue"
-                    @update:modelValue="updateGlobalConfig(name, $event)"
+                    @update:modelValue="updateGlobalConfig(params.key, $event)"
                 ></ConfigItem>
                 <ConfigItem
                     class="config"
                     v-if="type === 'globalLink' && unlinked"
                     :key="'[local]' + name"
-                    :params="globalConfigs[name]"
+                    :params="params.config"
                     :title="title"
-                    :type="globalConfigs[name].type"
+                    :type="params.config.type"
                     :modelValue="modelValue"
                     @update:modelValue="handleChangeValue"
                 ></ConfigItem>
@@ -169,9 +169,6 @@ export default {
             required: false
         },
         globalValue: {},
-        globalConfigs: {
-            type: Object
-        },
         updateGlobalConfig: {
             type: Function,
             required: false

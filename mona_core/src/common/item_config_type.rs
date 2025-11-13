@@ -7,7 +7,6 @@ use serde_json::json;
 use smallvec::{SmallVec};
 use crate::common::{Element, Moonsign, SkillType};
 use crate::common::i18n::{I18nLocale, locale};
-use crate::common::global_config::GlobalConfigName;
 
 #[derive(Default, Debug, Clone, Copy)]
 pub struct ConfigElements8Multi {
@@ -192,8 +191,8 @@ pub enum ItemConfigType {
     Moonsign3 {
         default: Moonsign
     },
-    GlobalLinkMoonsign {
-        name: &'static str,
+    GlobalLinkMoonsign3 {
+        key: &'static str,
         default: Moonsign,
         priority: usize,
         team_shared: bool,
@@ -333,15 +332,19 @@ impl ItemConfigType {
                     "default": default
                 })
             },
-            ItemConfigType::GlobalLinkMoonsign { name, default, priority, team_shared } => {
+            ItemConfigType::GlobalLinkMoonsign3 { key, default, priority, team_shared } => {
                 json!({
                     "type": "globalLink",
-                    "title": title,
                     "name": name,
+                    "key": key,
                     "default": default,
                     "priority": priority,
                     "unlinked": false,
-                    "team_shared": team_shared
+                    "team_shared": team_shared,
+                    "config": {
+                        "type": "moonsign3",
+                        "title": title,
+                    }
                 })
             },
         };
@@ -373,11 +376,12 @@ impl ItemConfig {
     pub const PRIORITY_DEFAULT: usize = 0;
     pub const PRIORITY_CHARACTERSKILL: usize = 1;
     pub const PRIORITY_ARTIFACT: usize = 2;
-    pub const PRIORITY_BUFF: usize = 3;
-    pub const PRIORITY_WEAPON: usize = 4;
-    pub const PRIORITY_CHARACTER: usize = 5;
+    pub const PRIORITY_TARGETFUNCTION: usize = 3;
+    pub const PRIORITY_BUFF: usize = 4;
+    pub const PRIORITY_WEAPON: usize = 5;
+    pub const PRIORITY_CHARACTER: usize = 6;
 
     pub const fn MOONSIGN_GLOBAL(default: Moonsign, priority: usize, team_shared: bool) -> ItemConfig {
-        return ItemConfig { name: "moonsign", title: locale!(zh_cn: "月兆", en: "Moonsign"), config: ItemConfigType::GlobalLinkMoonsign { name: GlobalConfigName::GLOBAL_CONFIG_MOONSIGN.name, default, priority, team_shared }, };
+        return ItemConfig { name: "moonsign", title: locale!(zh_cn: "月兆", en: "Moonsign"), config: ItemConfigType::GlobalLinkMoonsign3 { key: "moonsign", default, priority, team_shared }, };
     }
 }
