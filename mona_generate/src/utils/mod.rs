@@ -30,6 +30,15 @@ pub fn config_to_json(config: &ItemConfig) -> String {
                     "default": default
                 })
         },
+        ItemConfigType::Element { elements, default } => {
+            json!({
+                "type": "element",
+                "elements": elements,
+                "title": title_index,
+                "name": name,
+                "default": default
+            })
+        },
         ItemConfigType::Element4 { default } => {
             json!({
                     "type": "element4",

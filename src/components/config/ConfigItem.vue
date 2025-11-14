@@ -52,6 +52,13 @@
             >
             </el-input>
         </template>
+        <template v-if="type === 'element'">
+            <select-element-type
+                :modelValue="modelValue"
+                @update:modelValue="handleChangeValue"
+                :elements=params.elements
+            ></select-element-type>
+        </template>
         <template v-if="type === 'element4'">
             <select-element-type
                 :modelValue="modelValue"

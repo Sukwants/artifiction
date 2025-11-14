@@ -9,6 +9,8 @@ pub use yumemizuki_mizuki::{BuffYumemizukiMizukiC1, BuffYumemizukiMizukiC2};
 pub use lynette::BuffLynetteP1;
 pub use lanyan::BuffLanyanC4;
 pub use ifa::BuffIfa;
+pub use aether_anemo::BuffAetherAnemoC6;
+pub use lumine_anemo::BuffLumineAnemoC6;
 
 pub mod faruzan;
 pub mod jean;
@@ -21,3 +23,5 @@ pub mod yumemizuki_mizuki;
 pub mod lynette;
 pub mod lanyan;
 pub mod ifa;
+pub mod aether_anemo;
+pub mod lumine_anemo;
