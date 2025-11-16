@@ -1126,7 +1126,7 @@ function usePreset(name: string) {
     // use artifact config
     const art = item.artifactConfig
     if (art) {
-        artifactConfig.value = deepMerge(restoreObjectConfig(art.config, art.config, art.unlinked ?? {}), newDefaultArtifactConfig() )
+        artifactConfig.value = deepMerge(restoreObjectConfig(art.config, art.config, art.configUnlinked ?? {}), newDefaultArtifactConfig() )
     }
 
     miscCurrentPresetName.value = name
