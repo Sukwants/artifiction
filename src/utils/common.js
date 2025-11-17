@@ -21,6 +21,9 @@ export function deepCopy(obj) {
 }
 
 export function deepMerge(a, b) {
+    if (Array.isArray(a) || Array.isArray(b)) {
+        return a;
+    }
     if (typeof a !== 'object' || a === null) {
         return a;
     }

@@ -113,8 +113,6 @@ export function useGlobalConfig() {
     }
 
     function updateGlobalConfig(key: string, value: any) {
-        console.log(key, value)
-        
         let max_priority = -1;
         for (let i of values[key]) {
             if (i.priority > max_priority) {
