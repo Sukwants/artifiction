@@ -33,8 +33,8 @@ impl BuffMeta for BuffLumineAnemoC6 {
         image: BuffImage::Avatar(CharacterName::LumineAnemo),
         genre: BuffGenre::Character,
         description: Some(locale!(
-            zh_cn: "受到风息激荡伤害的目标，风元素抗性下降20%。如果产生了元素转化，那么对应元素抗性也下降20%。",
-            en: "Targets who take DMG from Gust Surge have their Anemo RES decreased by 20%. If an Elemental Absorption occrred, then their RES towards the corresponding Element is also decreased by 20%."
+            zh_cn: "荧-风命座6：受到风息激荡伤害的目标，风元素抗性下降20%。如果产生了元素转化，那么对应元素抗性也下降20%。",
+            en: "Lumine-Anemo C6: Targets who take DMG from Gust Surge have their Anemo RES decreased by 20%. If an Elemental Absorption occrred, then their RES towards the corresponding Element is also decreased by 20%."
         )),
         from: BuffFrom::Character(CharacterName::LumineAnemo),
     };

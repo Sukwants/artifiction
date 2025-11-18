@@ -28,8 +28,8 @@ impl BuffMeta for BuffLumineElectroC2 {
         image: BuffImage::Avatar(CharacterName::LumineElectro),
         genre: BuffGenre::Character,
         description: Some(locale!(
-            zh_cn: "雷轰电转的威光落雷命中敌人后，会使敌人的雷元素抗性降低15%，持续8秒。",
-            en: "When Falling Thunder created by Bellowing Thunder hits an opponent, it will decrease their Electro RES by 15% for 8s."
+            zh_cn: "荧-雷命座2：雷轰电转的威光落雷命中敌人后，会使敌人的雷元素抗性降低15%，持续8秒。",
+            en: "Lumine-Electro C2: When Falling Thunder created by Bellowing Thunder hits an opponent, it will decrease their Electro RES by 15% for 8s."
         )),
         from: BuffFrom::Character(CharacterName::LumineElectro),
     };

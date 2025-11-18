@@ -29,7 +29,7 @@ impl BuffMeta for BuffChevreuseP1 {
         genre: BuffGenre::Character,
         description: Some(locale!(
             zh_cn: "夏沃蕾天赋1：队伍中所有角色的元素类型均为火元素与雷元素，并且至少有一名火元素角色、一名雷元素角色时：夏沃蕾将为队伍中附近的角色施加「协同战法」：角色触发超载反应后，受本次反应影响的敌人的火元素与雷元素抗性降低40%，持续6秒。",
-            en: "Chevreuse Talent 1: When all party members are Pyro and Electro characters and there is at least one Pyro and one Electro character each in the party: Chevreuse grants \"Coordinated Tactics\" to nearby party members: After a character triggers the Overloaded reaction, the Pyro and Electro RES of the opponent(s) affected by this Overloaded reaction will be decreased by 40% for 6s."
+            en: "Chevreuse Talent1: When all party members are Pyro and Electro characters and there is at least one Pyro and one Electro character each in the party: Chevreuse grants \"Coordinated Tactics\" to nearby party members: After a character triggers the Overloaded reaction, the Pyro and Electro RES of the opponent(s) affected by this Overloaded reaction will be decreased by 40% for 6s."
         )),
         from: BuffFrom::Character(CharacterName::Chevreuse),
     };
@@ -66,7 +66,7 @@ impl BuffMeta for BuffChevreuseP2 {
         genre: BuffGenre::Character,
         description: Some(locale!(
             zh_cn: "夏沃蕾天赋2：夏沃蕾发射近迫式急促拦射的「超量装药弹头」后，基于夏沃蕾的生命值上限，每1000点生命值上限都将使队伍中附近的所有火元素与雷元素角色的攻击力提升1%，持续30秒，至多通过这种方式提升40%攻击力。",
-            en: "Chevreuse Talent 2: After Chevreuse fires an Overcharged Ball using Short-Range Rapid Interdiction Fire, nearby Pyro and Electro characters in the party gain 1% increased ATK for every 1,000 Max HP Chevreuse has for 30s. ATK can be increased by up to 40% in this way."
+            en: "Chevreuse Talent2: After Chevreuse fires an Overcharged Ball using Short-Range Rapid Interdiction Fire, nearby Pyro and Electro characters in the party gain 1% increased ATK for every 1,000 Max HP Chevreuse has for 30s. ATK can be increased by up to 40% in this way."
         )),
         from: BuffFrom::Character(CharacterName::Chevreuse),
     };

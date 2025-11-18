@@ -28,8 +28,8 @@ impl BuffMeta for BuffAetherPyroC1 {
         image: BuffImage::Avatar(CharacterName::AetherPyro),
         genre: BuffGenre::Character,
         description: Some(locale!(
-            zh_cn: "焰烈之槛或灼火之槛存在期间，当前场上角色造成的伤害提升6%；若当前场上角色处于夜魂加持状态，造成的伤害还会提升9%。",
-            en: "While Blazing Threshold or Scorching Threshold are active, the current active character deals 6% increased DMG. If said character is in the Nightsoul's Blessing state, they will deal an additional 9% DMG."
+            zh_cn: "空-火命座1：焰烈之槛或灼火之槛存在期间，当前场上角色造成的伤害提升6%；若当前场上角色处于夜魂加持状态，造成的伤害还会提升9%。",
+            en: "Aether-Pyro C1: While Blazing Threshold or Scorching Threshold are active, the current active character deals 6% increased DMG. If said character is in the Nightsoul's Blessing state, they will deal an additional 9% DMG."
         )),
         from: BuffFrom::Character(CharacterName::AetherPyro),
     };
@@ -78,8 +78,8 @@ impl BuffMeta for BuffAetherPyroC2 {
         image: BuffImage::Avatar(CharacterName::AetherPyro),
         genre: BuffGenre::Character,
         description: Some(locale!(
-            zh_cn: "对抗「古斯托特」化形的蚀灭的源焰之主时，处于夜魂加持状态下时，旅行者的元素类型为火元素的攻击命中敌人后，该敌人的火元素抗性降低20%，持续6秒，此效果至多叠加2层，每层独立计算持续时间。",
-            en: "When opposing the Lord of Eroded Primal Fire incarnated by Gosoythoth, while in the Nightsoul's Blessing state, after the Traveler hits an opponent with Pyro attacks, that opponent's Pyro RES is decreased by 20% for 6s. Max 2 stacks. Each stack's duration is counted independently."
+            zh_cn: "空-火命座2：对抗「古斯托特」化形的蚀灭的源焰之主时，处于夜魂加持状态下时，旅行者的元素类型为火元素的攻击命中敌人后，该敌人的火元素抗性降低20%，持续6秒，此效果至多叠加2层，每层独立计算持续时间。",
+            en: "Aether-Pyro C2: When opposing the Lord of Eroded Primal Fire incarnated by Gosoythoth, while in the Nightsoul's Blessing state, after the Traveler hits an opponent with Pyro attacks, that opponent's Pyro RES is decreased by 20% for 6s. Max 2 stacks. Each stack's duration is counted independently."
         )),
         from: BuffFrom::Character(CharacterName::AetherPyro),
     };

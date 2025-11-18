@@ -28,8 +28,8 @@ impl BuffMeta for BuffAetherGeoC1 {
         image: BuffImage::Avatar(CharacterName::AetherGeo),
         genre: BuffGenre::Character,
         description: Some(locale!(
-            zh_cn: "队伍中角色处于岩潮叠嶂的岩嶂包围中时，暴击率提升10%，并提高抗打断能力。",
-            en: "Party members within the radius of Wake of Earth have their CRIT Rate increased by 10% and have increased resistance against interruption."
+            zh_cn: "空-岩命座1：队伍中角色处于岩潮叠嶂的岩嶂包围中时，暴击率提升10%，并提高抗打断能力。",
+            en: "Aether-Geo C1: Party members within the radius of Wake of Earth have their CRIT Rate increased by 10% and have increased resistance against interruption."
         )),
         from: BuffFrom::Character(CharacterName::AetherGeo),
     };

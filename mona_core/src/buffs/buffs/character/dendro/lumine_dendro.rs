@@ -29,8 +29,8 @@ impl BuffMeta for BuffLumineDendroP1 {
         image: BuffImage::Avatar(CharacterName::LumineDendro),
         genre: BuffGenre::Character,
         description: Some(locale!(
-            zh_cn: "草灯莲将在其存在期间每秒获得一层莲光遍照效果，使其领域内的当前场上角色的元素精通提升6点。草灯莲的莲光遍照效果至多叠加10层。",
-            en: "Lea Lotus Lamp will obtain one level of Overflowing Lotuslight every second it is on the field, increasing the Elemental Mastery of active character(s) within its AoE by 6. Overflowing Lotuslight has a maximum of 10 stacks."
+            zh_cn: "荧-草天赋1：草灯莲将在其存在期间每秒获得一层莲光遍照效果，使其领域内的当前场上角色的元素精通提升6点。草灯莲的莲光遍照效果至多叠加10层。",
+            en: "Lumine-Dendro Talent1: Lea Lotus Lamp will obtain one level of Overflowing Lotuslight every second it is on the field, increasing the Elemental Mastery of active character(s) within its AoE by 6. Overflowing Lotuslight has a maximum of 10 stacks."
         )),
         from: BuffFrom::Character(CharacterName::LumineDendro),
     };
@@ -84,8 +84,8 @@ impl BuffMeta for BuffLumineDendroC6 {
         image: BuffImage::Avatar(CharacterName::LumineDendro),
         genre: BuffGenre::Character,
         description: Some(locale!(
-            zh_cn: "处于草灯莲的莲光遍照效果影响下的角色获得12%草元素伤害加成；若草灯莲发生过莲光幻变转化，还将获得12%对应元素伤害加成。",
-            en: "The Dendro DMG Bonus of the character under the effect of Overflowing Lotuslight as created by the Lea Lotus Lamp is increased by 12%. If the Lamp has experienced a Lotuslight Transfiguration previously, the character will also gain 12% DMG Bonus for the corresponding element."
+            zh_cn: "荧-草命座6：处于草灯莲的莲光遍照效果影响下的角色获得12%草元素伤害加成；若草灯莲发生过莲光幻变转化，还将获得12%对应元素伤害加成。",
+            en: "Lumine-Dendro C6: The Dendro DMG Bonus of the character under the effect of Overflowing Lotuslight as created by the Lea Lotus Lamp is increased by 12%. If the Lamp has experienced a Lotuslight Transfiguration previously, the character will also gain 12% DMG Bonus for the corresponding element."
         )),
         from: BuffFrom::Character(CharacterName::LumineDendro),
     };

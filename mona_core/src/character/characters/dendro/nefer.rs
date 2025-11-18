@@ -318,7 +318,9 @@ impl CharacterTrait for Nefer {
             };
 
             builder.add_atk_ratio("技能倍率", atk_ratio);
-            builder.add_em_ratio("技能倍率", em_ratio);
+            if em_ratio > 0.0 {
+                builder.add_em_ratio("技能倍率", em_ratio);
+            }
 
             builder.damage(
                 &context.attribute,

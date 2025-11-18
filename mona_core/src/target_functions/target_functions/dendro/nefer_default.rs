@@ -29,7 +29,7 @@ impl TargetFunctionMetaTrait for NeferDefaultTargetFunction {
     const META_DATA: TargetFunctionMeta = TargetFunctionMeta {
         name: TargetFunctionName::NeferDefault,
         name_locale: locale!(
-            zh_cn: "菈乌玛-湮沙的秘闻",
+            zh_cn: "奈芙尔-湮沙的秘闻",
             en: "Nefer-Secret Beneath the Sands"
         ),
         description: locale!(
