@@ -994,10 +994,8 @@ function getPresetItem() {
         })
     }
 
-    let artifactToBeSaved = {
-        config: getObjectConfig(artifactConfig.value),
-        configUnlinked: getObjectConfigUnlinked(artifactConfig.value)
-    }
+    let artifactConfigToBeSaved = getObjectConfig(artifactConfig.value)
+    let artifactConfigUnlinkedToBeSaved = getObjectConfigUnlinked(artifactConfig.value)
 
     const item = {
         // buffs: deepCopy(config.buffs),
@@ -1017,7 +1015,8 @@ function getPresetItem() {
             gobletMainStats: deepCopy(constraintGobletMainStats.value),
             headMainStats: deepCopy(constraintHeadMainStats.value),
         },
-        artifactConfig: artifactToBeSaved,
+        artifactConfig: artifactConfigToBeSaved,
+        artifactConfigUnlinked: artifactConfigUnlinkedToBeSaved,
         algorithm: algorithm.value,
         artifactEffectMode: artifactEffectMode.value,
         useDSL: miscTargetFunctionTab.value === "dsl",
@@ -1125,8 +1124,9 @@ function usePreset(name: string) {
 
     // use artifact config
     const art = item.artifactConfig
+    const artUnlinked = item.artifactConfigUnlinked
     if (art) {
-        artifactConfig.value = deepMerge(restoreObjectConfig(art.config, art.config, art.configUnlinked ?? {}), newDefaultArtifactConfig() )
+        artifactConfig.value = deepMerge(restoreObjectConfig(art, art, artUnlinked ?? {}), newDefaultArtifactConfig() )
     }
 
     miscCurrentPresetName.value = name

@@ -17,6 +17,7 @@ import { hash, hashExceptValue } from "@/utils/artifactHash"
 import { positions } from "@/constants/artifact"
 import {useI18n} from "@/i18n/i18n";
 import {useKumiStore} from "@/store/pinia/kumi";
+import { getObjectConfig } from "@/composables/globalConfig"
 
 
 const artifactStore = useArtifactStore()
@@ -236,7 +237,7 @@ export function getArtifactThumbnail(name: ArtifactSetName): string {
 // otherwise, use default value
 export function upgradeArtifactConfig(oldConfig: any) {
     if (!oldConfig) {
-        return newDefaultArtifactConfig()
+        return getObjectConfig(newDefaultArtifactConfig())
     }
 
     let newConfig: any = {}

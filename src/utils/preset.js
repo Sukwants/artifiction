@@ -25,7 +25,7 @@ export function upgradePresetItem(item) {
     const targetFunctionName = item.targetFunction.name
     temp.targetFunction.params = upgradeTargetFunctionConfig(targetFunctionName, temp.targetFunction.params)
     if (temp.artifactConfig) {
-        temp.artifactConfig.config = upgradeArtifactConfig(temp.artifactConfig.config)
+        temp.artifactConfig = upgradeArtifactConfig(temp.artifactConfig)
     }
 
     // console.log(temp)

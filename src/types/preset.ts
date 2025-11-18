@@ -18,6 +18,7 @@ export interface IPreset {
     name: string,
     algorithm?: PresetAlgorithm,
     artifactConfig?: any,
+    artifactConfigUnlinked?: any,
     artifactEffectMode?: ArtifactEffectMode,
     constraint?: IConstraint,
     dslSource?: string,
