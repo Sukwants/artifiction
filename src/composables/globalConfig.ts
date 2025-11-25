@@ -76,6 +76,7 @@ export function useGlobalConfig() {
         values = {};
 
         for (const p of list) {
+            if (!p.configConfig) continue;
             for (const i of p.configConfig) {
                 if (i.type == "globalLink" && p.config[i.name].unlinked !== true) {
                     if (!values[i.key]) values[i.key] = [];
@@ -102,6 +103,7 @@ export function useGlobalConfig() {
         }
 
         for (const p of list) {
+            if (!p.configConfig) continue;
             for (const i of p.configConfig) {
                 if (i.type == "globalLink" && p.config[i.name].unlinked !== true) {
                     p.config[i.name].configValue = res[i.key];
