@@ -145,13 +145,20 @@
                     :modelValue="modelValue"
                     @update:modelValue="handleChangeValue"
                 ></ConfigItem>
-                <el-switch
-                    class="unlinked"
-                    :modelValue="unlinked"
-                    @update:modelValue="$emit('update:unlinked', $event)"
-                    :inactive-text="'linked'"
-                    :size="'small'"
-                ></el-switch>
+                <el-tooltip
+                    :content="'key: ' + params.key + '<br>' + 'prioirty: ' + params.priority"
+                    :placement="'top'"
+                    :show-after="1000"
+                    raw-content
+                >
+                    <el-switch
+                        class="unlinked"
+                        :modelValue="unlinked"
+                        @update:modelValue="$emit('update:unlinked', $event)"
+                        :inactive-text="'linked'"
+                        :size="'small'"
+                    ></el-switch>
+                </el-tooltip>
             </div>
         </template>
     </div>
