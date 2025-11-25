@@ -48,7 +48,7 @@ export function convertArtifact(art) {
         setName: art.setName,
         primary: {},
         secondary: {},
-        Nefer: art,
+        refer: art,
     }
 
     temp.primary[art.primary.tag] = Number(art.primary.value);
