@@ -155,8 +155,7 @@
                         class="unlinked"
                         :modelValue="unlinked"
                         @update:modelValue="$emit('update:unlinked', $event)"
-                        :inactive-text="'linked'"
-                        :size="'small'"
+                        :inactive-icon="Connection"
                     ></el-switch>
                 </el-tooltip>
             </div>
@@ -169,6 +168,8 @@ import SelectElementType from "@c/select/SelectElementType"
 import SelectSkillType from "@c/select/SelectSkillType"
 import SelectMoonsignType from "@c/select/SelectMoonsignType"
 import { useI18n } from "@/i18n/i18n"
+
+import { Connection } from '@element-plus/icons-vue'
 
 export default {
     name: "ConfigItem",
@@ -205,7 +206,10 @@ export default {
             } else {
                 return this.params.options_en;
             }
-        }
+        },
+        Connection() {
+            return Connection;
+        },
     },
     methods: {
         handleInputValue(value) {
@@ -242,8 +246,8 @@ export default {
 
 .unlinked {
     position: absolute;
-    top: -4%;
-    right: 0;
+    top: -15%;
+    right: -5px;
 }
 
 .unlinked :deep(.el-switch__core) {
