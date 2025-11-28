@@ -14,6 +14,7 @@ pub mod chevreuse;
 pub mod gaming;
 pub mod arlecchino;
 pub mod mavuika;
+pub mod durin;
 
 pub use amber::Amber;
 pub use bennett::Bennett;
@@ -31,3 +32,4 @@ pub use chevreuse::Chevreuse;
 pub use gaming::Gaming;
 pub use arlecchino::Arlecchino;
 pub use mavuika::Mavuika;
+pub use durin::Durin;

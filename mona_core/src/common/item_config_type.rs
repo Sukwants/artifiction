@@ -11,12 +11,12 @@ use crate::common::i18n::{I18nLocale, locale};
 #[derive(Default, Debug, Clone, Copy)]
 pub struct ConfigElements8Multi {
     pub pyro: bool,
+    pub hydro: bool,
+    pub anemo: bool,
     pub electro: bool,
     pub dendro: bool,
     pub cryo: bool,
-    pub anemo: bool,
     pub geo: bool,
-    pub hydro: bool,
     pub physical: bool,
 }
 
@@ -189,6 +189,10 @@ pub enum ItemConfigType {
     Element8 {
         default: Element
     },
+    ElementMulti {
+        elements: &'static [Element],
+        default: ConfigElements8Multi
+    },
     Element8Multi {
         default: ConfigElements8Multi
     },
@@ -256,5 +260,8 @@ impl ItemConfig {
 
     pub const fn MOONSIGN_GLOBAL(default: Moonsign, priority: usize, team_shared: bool) -> ItemConfig {
         return ItemConfig { name: "moonsign", title: locale!(zh_cn: "月兆", en: "Moonsign"), config: ItemConfigType::GlobalLinkMoonsign3 { default, global_link: GlobalLinkConfig { key: "moonsign", priority, team_shared } } };
+    }
+    pub const fn HEXEREI_SECRET_RITE_GLOBAL(default: bool, priority: usize) -> ItemConfig {
+        return ItemConfig { name: "hexerei_secret_rite", title: locale!(zh_cn: "魔导·秘仪", en: "Hexerei Secret Rite"), config: ItemConfigType::GlobalLinkBool { default, global_link: GlobalLinkConfig { key: "hexerei_secret_rite", priority, team_shared: true } } };
     }
 }

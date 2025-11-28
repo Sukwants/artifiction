@@ -2,7 +2,7 @@ use serde::{Deserialize, Serialize};
 
 use crate::common::Moonsign;
 
-#[derive(Serialize, Deserialize)]
+#[derive(Serialize, Deserialize, Clone)]
 pub enum CharacterConfig {
     AetherElectro { abundance_amulet_count: usize },
     LumineElectro { abundance_amulet_count: usize },
@@ -60,5 +60,6 @@ pub enum CharacterConfig {
     Aino { moonsign: Moonsign },
     Flins { moonsign: Moonsign },
     Nefer { moonsign: Moonsign },
+    Durin { hexerei_secret_rite: bool, essential_transmutation: usize },
     NoConfig,
 }

@@ -41,6 +41,7 @@ pub enum WeaponConfig {
     Azurelight { after_skill: bool, zero_energy: bool },
     SerenitysCall { reaction: bool, moonsign: Moonsign },
     MoonweaversDawn { energy: usize },
+    AthameArtis { hexerei_secret_rite: bool, effect: bool },
 
     // claymore
     WolfsGravestone { rate: f64 },

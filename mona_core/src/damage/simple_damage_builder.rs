@@ -149,6 +149,12 @@ impl DamageBuilder for SimpleDamageBuilder {
         let bonus
             = attribute.get_bonus(element, skill)
             + self.extra_bonus;
+        let melt_bonus
+            = bonus
+            + attribute.get_value(AttributeName::BonusMelt);
+        let vaporize_bonus
+            = bonus
+            + attribute.get_value(AttributeName::BonusVaporize);
 
         let critical_rate
             = attribute.get_critical_rate(element, skill)
@@ -188,9 +194,9 @@ impl DamageBuilder for SimpleDamageBuilder {
             let melt_critical_damage = critical_damage;
 
             let base_damage = DamageResult {
-                critical: base * (1.0 + bonus) * (1.0 + melt_critical_damage),
-                non_critical: base * (1.0 + bonus),
-                expectation: base * (1.0 + bonus) * (1.0 + melt_critical_damage * melt_critical_rate),
+                critical: base * (1.0 + melt_bonus) * (1.0 + melt_critical_damage),
+                non_critical: base * (1.0 + melt_bonus),
+                expectation: base * (1.0 + melt_bonus) * (1.0 + melt_critical_damage * melt_critical_rate),
                 lunar_type: MoonglareReaction::None,
                 is_heal: false,
                 is_shield: false
@@ -210,9 +216,9 @@ impl DamageBuilder for SimpleDamageBuilder {
             let vaporize_critical_damage = critical_damage;
 
             let base_damage = DamageResult {
-                critical: base * (1.0 + bonus) * (1.0 + vaporize_critical_damage),
-                non_critical: base * (1.0 + bonus),
-                expectation: base * (1.0 + bonus) * (1.0 + vaporize_critical_damage * vaporize_critical_rate),
+                critical: base * (1.0 + vaporize_bonus) * (1.0 + vaporize_critical_damage),
+                non_critical: base * (1.0 + vaporize_bonus),
+                expectation: base * (1.0 + vaporize_bonus) * (1.0 + vaporize_critical_damage * vaporize_critical_rate),
                 lunar_type: MoonglareReaction::None,
                 is_heal: false,
                 is_shield: false

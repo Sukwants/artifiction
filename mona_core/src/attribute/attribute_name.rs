@@ -94,6 +94,8 @@ pub enum AttributeName {
     BonusGeo,
     BonusDendro,
     BonusPhysical,
+    BonusMelt, // 融化反应造成的伤害的增伤区提升
+    BonusVaporize, // 蒸发反应造成的伤害的增伤区提升
     BonusNormalAndElemental, // 普通攻击&元素伤害 todo 以后应该重构掉
 
     EnhanceBurgeon,

@@ -98,6 +98,8 @@ pub enum BuffConfig {
     FlinsP3 { atk: f64 },
     FlinsC6 { moonsign: Moonsign },
     NeferP3 { em: f64 },
+    DurinP1 { hexerei_secret_rite: bool, elements: ConfigElements8Multi },
+    DurinC1 { atk: f64 },
 
     FreedomSworn { refine: usize },
     SongOfBrokenPines { refine: usize },

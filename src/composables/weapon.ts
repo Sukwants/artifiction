@@ -1,4 +1,4 @@
-const DEFAULT_WEAPON = "ReliquaryOfTruth";
+const DEFAULT_WEAPON = "AthameArtis";
 
 import type {WeaponName, WeaponType} from "@/types/weapon"
 // @ts-ignore

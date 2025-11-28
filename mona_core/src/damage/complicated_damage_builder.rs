@@ -164,6 +164,10 @@ impl DamageBuilder for ComplicatedDamageBuilder {
 
         let bonus_comp = self.get_bonus_composition(attribute, element, skill);
         let bonus = bonus_comp.sum();
+        let melt_bonus_comp = self.get_melt_bonus_composition(attribute, element, skill);
+        let melt_bonus = melt_bonus_comp.sum();
+        let vaporize_bonus_comp = self.get_vaporize_bonus_composition(attribute, element, skill);
+        let vaporize_bonus = vaporize_bonus_comp.sum();
 
         let critical_comp = self.get_critical_composition(attribute, element, skill);
         let critical = critical_comp.sum().clamp(0.0, 1.0);
@@ -287,12 +291,26 @@ impl DamageBuilder for ComplicatedDamageBuilder {
         // };
 
         let damage_melt = if element == Element::Pyro || element == Element::Cryo {
-            Some(damage_normal * melt_ratio * (1.0 + melt_enhance))
+            Some(DamageResult {
+                expectation: base_damage * (1.0 + melt_bonus) * (1.0 + critical * critical_damage),
+                critical: base_damage * (1.0 + melt_bonus) * (1.0 + critical_damage),
+                non_critical: base_damage * (1.0 + melt_bonus),
+                lunar_type: MoonglareReaction::None,
+                is_heal: false,
+                is_shield: false
+            } * (defensive_ratio * resistance_ratio) * melt_ratio * (1.0 + melt_enhance))
         } else {
             None
         };
         let damage_vaporize = if element == Element::Pyro || element == Element::Hydro {
-            Some(damage_normal * vaporize_ratio * (1.0 + vaporize_enhance))
+            Some(DamageResult {
+                expectation: base_damage * (1.0 + vaporize_bonus) * (1.0 + critical * critical_damage),
+                critical: base_damage * (1.0 + vaporize_bonus) * (1.0 + critical_damage),
+                non_critical: base_damage * (1.0 + vaporize_bonus),
+                lunar_type: MoonglareReaction::None,
+                is_heal: false,
+                is_shield: false
+            } * (defensive_ratio * resistance_ratio) * vaporize_ratio * (1.0 + vaporize_enhance))
         } else {
             None
         };
@@ -346,6 +364,8 @@ impl DamageBuilder for ComplicatedDamageBuilder {
             em_ratio: em_ratio_comp.0,
             extra_damage: extra_damage_comp.0,
             bonus: bonus_comp.0,
+            melt_bonus: melt_bonus_comp.0,
+            vaporize_bonus: vaporize_bonus_comp.0,
             critical: critical_comp.0,
             critical_damage: critical_damage_comp.0,
             spread_compose: spread_enhance_comp.0,
@@ -520,6 +540,8 @@ impl DamageBuilder for ComplicatedDamageBuilder {
             em_ratio: em_ratio_comp.0,
             extra_damage: extra_damage_comp.0,
             bonus: HashMap::new(),
+            melt_bonus: HashMap::new(),
+            vaporize_bonus: HashMap::new(),
             critical: critical_comp.0,
             critical_damage: critical_damage_comp.0,
             spread_compose: HashMap::new(),
@@ -609,6 +631,8 @@ impl DamageBuilder for ComplicatedDamageBuilder {
             aggravate_compose: HashMap::new(),
 
             bonus: HashMap::new(),
+            melt_bonus: HashMap::new(),
+            vaporize_bonus: HashMap::new(),
             critical: healing_critical_comp.0.clone(),
             critical_damage: healing_critical_damage_comp.0.clone(),
 
@@ -692,6 +716,8 @@ impl DamageBuilder for ComplicatedDamageBuilder {
             aggravate_compose: HashMap::new(),
 
             bonus: HashMap::new(),
+            melt_bonus: HashMap::new(),
+            vaporize_bonus: HashMap::new(),
             critical: HashMap::new(),
             critical_damage: HashMap::new(),
 
@@ -957,6 +983,18 @@ impl ComplicatedDamageBuilder {
             comp.merge(&attribute.get_attribute_composition(AttributeName::BonusNormalAndElemental));
         }
         comp.merge(&self.extra_bonus);
+        comp
+    }
+
+    fn get_melt_bonus_composition(&self, attribute: &ComplicatedAttributeGraph, element: Element, skill: SkillType) -> EntryType {
+        let mut comp = self.get_bonus_composition(attribute, element, skill);
+        comp.merge(&attribute.get_attribute_composition(AttributeName::BonusMelt));
+        comp
+    }
+
+    fn get_vaporize_bonus_composition(&self, attribute: &ComplicatedAttributeGraph, element: Element, skill: SkillType) -> EntryType {
+        let mut comp = self.get_bonus_composition(attribute, element, skill);
+        comp.merge(&attribute.get_attribute_composition(AttributeName::BonusVaporize));
         comp
     }
 

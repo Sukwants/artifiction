@@ -41,7 +41,8 @@ impl<T: Attribute> Character<T> {
             constellation,
             skill1,
             skill2,
-            skill3
+            skill3,
+            config
         );
         let effect = get_effect(name, &common_data, config);
 

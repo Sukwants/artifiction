@@ -48,6 +48,7 @@ pub use calamity_of_eshu::CalamityOfEshu;
 pub use azurelight::Azurelight;
 pub use serenitys_call::SerenitysCall;
 pub use moonweavers_dawn::MoonweaversDawn;
+pub use athame_artis::AthameArtis;
 
 pub mod mistsplitter_reforged;
 pub mod aquila_favonia;
@@ -99,3 +100,4 @@ pub mod calamity_of_eshu;
 pub mod azurelight;
 pub mod serenitys_call;
 pub mod moonweavers_dawn;
+pub mod athame_artis;

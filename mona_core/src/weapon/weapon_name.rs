@@ -68,6 +68,7 @@ pub enum WeaponName {
     Absolution,
     PeakPatrolSong,
     Azurelight,
+    AthameArtis,
 
     // claymore
     // 1 star

@@ -143,4 +143,5 @@ pub enum CharacterName {
     Aino,
     Flins,
     Nefer,
+    Durin,
 }

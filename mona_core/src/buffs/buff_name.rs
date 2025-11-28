@@ -155,8 +155,11 @@ pub enum BuffName {
     FlinsP3,
     FlinsC6,
     NeferP3,
-    AloyTalent1,
+    DurinP1,
+    DurinC1,
+    DurinC6,
 
+    AloyTalent1,
 
     // weapon
     FreedomSworn,
