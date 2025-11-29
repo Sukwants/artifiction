@@ -183,6 +183,10 @@ pub enum ItemConfigType {
         elements: &'static [Element],
         default: Element
     },
+    ElementOptional {
+        elements: &'static [Element],
+        default: Option<Element>
+    },
     Element4 {      // cryo, pyro, electro, hydro
         default: Element
     },
@@ -258,8 +262,8 @@ impl ItemConfig {
     pub const PRIORITY_WEAPON: usize = 5;
     pub const PRIORITY_CHARACTER: usize = 6;
 
-    pub const fn MOONSIGN_GLOBAL(default: Moonsign, priority: usize, team_shared: bool) -> ItemConfig {
-        return ItemConfig { name: "moonsign", title: locale!(zh_cn: "月兆", en: "Moonsign"), config: ItemConfigType::GlobalLinkMoonsign3 { default, global_link: GlobalLinkConfig { key: "moonsign", priority, team_shared } } };
+    pub const fn MOONSIGN_GLOBAL(default: Moonsign, priority: usize) -> ItemConfig {
+        return ItemConfig { name: "moonsign", title: locale!(zh_cn: "月兆", en: "Moonsign"), config: ItemConfigType::GlobalLinkMoonsign3 { default, global_link: GlobalLinkConfig { key: "moonsign", priority, team_shared: true } } };
     }
     pub const fn HEXEREI_SECRET_RITE_GLOBAL(default: bool, priority: usize) -> ItemConfig {
         return ItemConfig { name: "hexerei_secret_rite", title: locale!(zh_cn: "魔导·秘仪", en: "Hexerei Secret Rite"), config: ItemConfigType::GlobalLinkBool { default, global_link: GlobalLinkConfig { key: "hexerei_secret_rite", priority, team_shared: true } } };

@@ -59,6 +59,13 @@
                 :elements=params.elements
             ></select-element-type>
         </template>
+        <template v-if="type === 'elementOptional'">
+            <select-element-type
+                :modelValue="modelValue"
+                @update:modelValue="handleChangeValue"
+                :elements="[...params.elements, 'None']"
+            ></select-element-type>
+        </template>
         <template v-if="type === 'element4'">
             <select-element-type
                 :modelValue="modelValue"

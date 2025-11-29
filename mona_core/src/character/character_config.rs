@@ -1,6 +1,6 @@
 use serde::{Deserialize, Serialize};
 
-use crate::common::Moonsign;
+use crate::common::{Moonsign, item_config_type::ConfigElements8Multi};
 
 #[derive(Serialize, Deserialize, Clone)]
 pub enum CharacterConfig {
@@ -60,6 +60,7 @@ pub enum CharacterConfig {
     Aino { moonsign: Moonsign },
     Flins { moonsign: Moonsign },
     Nefer { moonsign: Moonsign },
+    Jahoda { max_elements: ConfigElements8Multi, moonsign: Moonsign },
     Durin { hexerei_secret_rite: bool, essential_transmutation: usize },
     NoConfig,
 }

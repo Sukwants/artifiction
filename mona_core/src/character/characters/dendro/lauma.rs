@@ -307,7 +307,7 @@ impl CharacterTrait for Lauma {
             ),
             config: ItemConfigType::Bool { default: false },
         },
-        ItemConfig::MOONSIGN_GLOBAL(Moonsign::Nascent, ItemConfig::PRIORITY_CHARACTER, true),
+        ItemConfig::MOONSIGN_GLOBAL(Moonsign::Nascent, ItemConfig::PRIORITY_CHARACTER),
     ]);
 
     #[cfg(not(target_family = "wasm"))]

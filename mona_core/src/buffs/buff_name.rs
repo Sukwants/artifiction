@@ -155,6 +155,8 @@ pub enum BuffName {
     FlinsP3,
     FlinsC6,
     NeferP3,
+    JahodaP2,
+    JahodaC6,
     DurinP1,
     DurinC1,
     DurinC6,

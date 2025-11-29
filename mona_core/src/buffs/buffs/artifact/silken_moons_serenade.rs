@@ -50,7 +50,7 @@ impl BuffMeta for BuffSilkenMoonsSerenade4 {
 
     #[cfg(not(target_family = "wasm"))]
     const CONFIG: Option<&'static [ItemConfig]> = Some(&[
-        ItemConfig::MOONSIGN_GLOBAL(Moonsign::None, ItemConfig::PRIORITY_BUFF, true),
+        ItemConfig::MOONSIGN_GLOBAL(Moonsign::None, ItemConfig::PRIORITY_BUFF),
         ItemConfig {
             name: "gleaming_moon_effect_count",
             title: locale!(zh_cn: "「月辉明光」数量（如效果重复请填入 0）", en: "Gleaming Moon Effect Count (Enter 0 if effects are duplicated)"),

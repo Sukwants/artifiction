@@ -11,6 +11,7 @@ pub use lanyan::BuffLanyanC4;
 pub use ifa::BuffIfa;
 pub use aether_anemo::BuffAetherAnemoC6;
 pub use lumine_anemo::BuffLumineAnemoC6;
+pub use jahoda::{BuffJahodaP2, BuffJahodaC6};
 
 pub mod faruzan;
 pub mod jean;
@@ -25,3 +26,4 @@ pub mod lanyan;
 pub mod ifa;
 pub mod aether_anemo;
 pub mod lumine_anemo;
+pub mod jahoda;
