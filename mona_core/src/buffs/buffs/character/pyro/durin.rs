@@ -151,7 +151,7 @@ impl BuffMeta for BuffDurinC6 {
         name: BuffName::DurinC6,
         name_locale: locale!(
             zh_cn: "杜林-「双重诞生」",
-            en: "Durin-Adamah's Redemption"
+            en: "Durin-Dual Birth"
         ),
         image: BuffImage::Avatar(CharacterName::Durin),
         genre: BuffGenre::Character,
