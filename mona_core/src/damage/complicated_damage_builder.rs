@@ -218,9 +218,6 @@ impl DamageBuilder for ComplicatedDamageBuilder {
             expectation: base_damage * (1.0 + bonus) * (1.0 + critical * critical_damage),
             critical: base_damage * (1.0 + bonus) * (1.0 + critical_damage),
             non_critical: base_damage * (1.0 + bonus),
-            lunar_type: MoonglareReaction::None,
-            is_heal: false,
-            is_shield: false
         } * (defensive_ratio * resistance_ratio);
 
         // let damage_melt = if element == Element::Pyro || element == Element::Cryo {
@@ -295,9 +292,6 @@ impl DamageBuilder for ComplicatedDamageBuilder {
                 expectation: base_damage * (1.0 + melt_bonus) * (1.0 + critical * critical_damage),
                 critical: base_damage * (1.0 + melt_bonus) * (1.0 + critical_damage),
                 non_critical: base_damage * (1.0 + melt_bonus),
-                lunar_type: MoonglareReaction::None,
-                is_heal: false,
-                is_shield: false
             } * (defensive_ratio * resistance_ratio) * melt_ratio * (1.0 + melt_enhance))
         } else {
             None
@@ -307,9 +301,6 @@ impl DamageBuilder for ComplicatedDamageBuilder {
                 expectation: base_damage * (1.0 + vaporize_bonus) * (1.0 + critical * critical_damage),
                 critical: base_damage * (1.0 + vaporize_bonus) * (1.0 + critical_damage),
                 non_critical: base_damage * (1.0 + vaporize_bonus),
-                lunar_type: MoonglareReaction::None,
-                is_heal: false,
-                is_shield: false
             } * (defensive_ratio * resistance_ratio) * vaporize_ratio * (1.0 + vaporize_enhance))
         } else {
             None
@@ -327,9 +318,6 @@ impl DamageBuilder for ComplicatedDamageBuilder {
                 critical: spread_base_damage * (1.0 + bonus) * (1.0 + critical_damage),
                 non_critical: spread_base_damage * (1.0 + bonus),
                 expectation: spread_base_damage * (1.0 + bonus) * (1.0 + critical_damage * critical),
-                lunar_type: MoonglareReaction::None,
-                is_heal: false,
-                is_shield: false
             } * (defensive_ratio * resistance_ratio);
             Some(dmg)
         };
@@ -346,9 +334,6 @@ impl DamageBuilder for ComplicatedDamageBuilder {
                 critical: aggravate_base_damage * (1.0 + bonus) * (1.0 + critical_damage),
                 non_critical: aggravate_base_damage * (1.0 + bonus),
                 expectation: aggravate_base_damage * (1.0 + bonus) * (1.0 + critical_damage * critical),
-                lunar_type: MoonglareReaction::None,
-                is_heal: false,
-                is_shield: false
             } * (defensive_ratio * resistance_ratio);
             Some(dmg)
         };
@@ -403,6 +388,7 @@ impl DamageBuilder for ComplicatedDamageBuilder {
             lunar_type: MoonglareReaction::None,
             is_heal: false,
             is_shield: false,
+            is_none: false,
 
             normal: damage_normal,
             melt: damage_melt,
@@ -523,9 +509,6 @@ impl DamageBuilder for ComplicatedDamageBuilder {
                 critical: charged_base * (1.0 + critical_damage),
                 non_critical: charged_base,
                 expectation: charged_base * (1.0 + critical_damage * critical),
-                lunar_type: lunar_type,
-                is_heal: false,
-                is_shield: false
             } * resistance_ratio
         };
 
@@ -576,9 +559,10 @@ impl DamageBuilder for ComplicatedDamageBuilder {
             res_minus: res_minus_comp.0,
 
             element,
-            lunar_type: damage_normal.lunar_type,
+            lunar_type,
             is_heal: false,
             is_shield: false,
+            is_none: false,
 
             normal: damage_normal,
             melt: None,
@@ -612,9 +596,6 @@ impl DamageBuilder for ComplicatedDamageBuilder {
             expectation: heal_value * (1.0 + healing_critical * healing_critical_damage),
             critical: heal_value * (1.0 + healing_critical_damage),
             non_critical: heal_value,
-            lunar_type: MoonglareReaction::None,
-            is_heal: true,
-            is_shield: false
         };
 
         return DamageAnalysis {
@@ -668,6 +649,7 @@ impl DamageBuilder for ComplicatedDamageBuilder {
             lunar_type: MoonglareReaction::None,
             is_heal: true,
             is_shield: false,
+            is_none: false,
 
             normal: damage_normal,
             melt: None,
@@ -697,9 +679,6 @@ impl DamageBuilder for ComplicatedDamageBuilder {
             expectation: shield_value,
             critical: 0.0,
             non_critical: 0.0,
-            lunar_type: MoonglareReaction::None,
-            is_heal: false,
-            is_shield: true
         };
 
         return DamageAnalysis {
@@ -753,8 +732,75 @@ impl DamageBuilder for ComplicatedDamageBuilder {
             lunar_type: MoonglareReaction::None,
             is_heal: false,
             is_shield: true,
+            is_none: false,
 
             normal: damage_normal,
+            melt: None,
+            vaporize: None,
+            spread: None,
+            aggravate: None,
+        }
+    }
+
+    fn none(&self) -> Self::Result {
+        return DamageAnalysis {
+            atk: HashMap::new(),
+            atk_ratio: HashMap::new(),
+            hp: HashMap::new(),
+            hp_ratio: HashMap::new(),
+            def: HashMap::new(),
+            def_ratio: HashMap::new(),
+            em: HashMap::new(),
+            em_ratio: HashMap::new(),
+            extra_damage: HashMap::new(),
+            spread_compose: HashMap::new(),
+            aggravate_compose: HashMap::new(),
+
+            bonus: HashMap::new(),
+            melt_bonus: HashMap::new(),
+            vaporize_bonus: HashMap::new(),
+            critical: HashMap::new(),
+            critical_damage: HashMap::new(),
+
+            melt_enhance: HashMap::new(),
+            vaporize_enhance: HashMap::new(),
+
+            // melt_critical: HashMap::new(),
+            // vaporize_critical: HashMap::new(),
+            // spread_critical: HashMap::new(),
+            // aggravate_critical: HashMap::new(),
+
+            // melt_critical_damage: HashMap::new(),
+            // vaporize_critical_damage: HashMap::new(),
+            // spread_critical_damage: HashMap::new(),
+            // aggravate_critical_damage: HashMap::new(),
+
+            lunar_charged_enhance: HashMap::new(),
+            lunar_bloom_enhance: HashMap::new(),
+
+            lunar_charged_increase: HashMap::new(),
+            lunar_bloom_increase: HashMap::new(),
+
+            lunar_charged_extra_increase: HashMap::new(),
+            lunar_bloom_extra_increase: HashMap::new(),
+
+            healing_bonus: HashMap::new(),
+            shield_strength: HashMap::new(),
+            def_minus: HashMap::new(),
+            def_penetration: HashMap::new(),
+            res_minus: HashMap::new(),
+
+            element: Element::Physical,
+            lunar_type: MoonglareReaction::None,
+            is_heal: false,
+            is_shield: false,
+            is_none: true,
+
+            normal: DamageResult {
+                expectation: 0.0,
+                critical: 0.0,
+                non_critical: 0.0,
+            },
             melt: None,
             vaporize: None,
             spread: None,

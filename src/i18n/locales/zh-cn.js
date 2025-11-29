@@ -284,6 +284,7 @@ export default {
         vaporize: "蒸发",
         heal: "治疗",
         shield: "护盾",
+        none: "无",
         spread: "蔓激化",
         aggravate: "超激化",
         bloom: "绽放",

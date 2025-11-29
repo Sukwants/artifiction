@@ -180,9 +180,6 @@ impl DamageBuilder for SimpleDamageBuilder {
             critical: base * (1.0 + bonus) * (1.0 + critical_damage),
             non_critical: base * (1.0 + bonus),
             expectation: base * (1.0 + bonus) * (1.0 + critical_damage * critical_rate),
-            lunar_type: MoonglareReaction::None,
-            is_heal: false,
-            is_shield: false
         } * (defensive_ratio * resistance_ratio);
 
         let melt_damage = if element != Element::Pyro && element != Element::Cryo {
@@ -197,9 +194,6 @@ impl DamageBuilder for SimpleDamageBuilder {
                 critical: base * (1.0 + melt_bonus) * (1.0 + melt_critical_damage),
                 non_critical: base * (1.0 + melt_bonus),
                 expectation: base * (1.0 + melt_bonus) * (1.0 + melt_critical_damage * melt_critical_rate),
-                lunar_type: MoonglareReaction::None,
-                is_heal: false,
-                is_shield: false
             } * (defensive_ratio * resistance_ratio);
 
             let reaction_ratio = if element == Element::Pyro { 2.0 } else { 1.5 };
@@ -219,9 +213,6 @@ impl DamageBuilder for SimpleDamageBuilder {
                 critical: base * (1.0 + vaporize_bonus) * (1.0 + vaporize_critical_damage),
                 non_critical: base * (1.0 + vaporize_bonus),
                 expectation: base * (1.0 + vaporize_bonus) * (1.0 + vaporize_critical_damage * vaporize_critical_rate),
-                lunar_type: MoonglareReaction::None,
-                is_heal: false,
-                is_shield: false
             } * (defensive_ratio * resistance_ratio);
 
             let reaction_ratio = if element == Element::Pyro { 1.5 } else { 2.0 };
@@ -248,9 +239,6 @@ impl DamageBuilder for SimpleDamageBuilder {
                 critical: spread_base_damage * (1.0 + bonus) * (1.0 + spread_critical_damage),
                 non_critical: spread_base_damage * (1.0 + bonus),
                 expectation: spread_base_damage * (1.0 + bonus) * (1.0 + spread_critical_damage * spread_critical_rate),
-                lunar_type: MoonglareReaction::None,
-                is_heal: false,
-                is_shield: false
             } * (defensive_ratio * resistance_ratio);
             Some(dmg)
         };
@@ -274,9 +262,6 @@ impl DamageBuilder for SimpleDamageBuilder {
                 critical: aggravate_base_damage * (1.0 + bonus) * (1.0 + aggravate_critical_damage),
                 non_critical: aggravate_base_damage * (1.0 + bonus),
                 expectation: aggravate_base_damage * (1.0 + bonus) * (1.0 + aggravate_critical_damage * aggravate_critical_rate),
-                lunar_type: MoonglareReaction::None,
-                is_heal: false,
-                is_shield: false
             } * (defensive_ratio * resistance_ratio);
             Some(dmg)
         };
@@ -290,6 +275,7 @@ impl DamageBuilder for SimpleDamageBuilder {
             lunar_type: MoonglareReaction::None,
             is_heal: false,
             is_shield: false,
+            is_none: false,
         }
     }
 
@@ -370,9 +356,6 @@ impl DamageBuilder for SimpleDamageBuilder {
                 critical: charged_base * (1.0 + critical_damage),
                 non_critical: charged_base,
                 expectation: charged_base * (1.0 + critical_damage * critical_rate),
-                lunar_type: lunar_type,
-                is_heal: false,
-                is_shield: false
             } * resistance_ratio
         };
 
@@ -385,6 +368,7 @@ impl DamageBuilder for SimpleDamageBuilder {
             lunar_type: lunar_type,
             is_heal: false,
             is_shield: false,
+            is_none: false,
         }
     }
 
@@ -404,9 +388,6 @@ impl DamageBuilder for SimpleDamageBuilder {
                 critical: heal_value * (1.0 + healing_critical_bonus),
                 non_critical: heal_value,
                 expectation: heal_value * (1.0 + healing_critical * healing_critical_bonus),
-                lunar_type: MoonglareReaction::None,
-                is_heal: true,
-                is_shield: false
             }
         };
         return SimpleDamageResult {
@@ -418,6 +399,7 @@ impl DamageBuilder for SimpleDamageBuilder {
             lunar_type: MoonglareReaction::None,
             is_heal: true,
             is_shield: false,
+            is_none: false,
         };
     }
 
@@ -435,9 +417,6 @@ impl DamageBuilder for SimpleDamageBuilder {
                 critical: shield_value,
                 non_critical: shield_value,
                 expectation: shield_value,
-                lunar_type: MoonglareReaction::None,
-                is_heal: false,
-                is_shield: true
             }
         };
         return SimpleDamageResult {
@@ -449,6 +428,25 @@ impl DamageBuilder for SimpleDamageBuilder {
             lunar_type: MoonglareReaction::None,
             is_heal: false,
             is_shield: true,
+            is_none: false,
+        };
+    }
+
+    fn none(&self) -> Self::Result {
+        return SimpleDamageResult {
+            normal: DamageResult {
+                critical: 0.0,
+                non_critical: 0.0,
+                expectation: 0.0,
+            },
+            melt: None,
+            vaporize: None,
+            spread: None,
+            aggravate: None,
+            lunar_type: MoonglareReaction::None,
+            is_heal: false,
+            is_shield: false,
+            is_none: true,
         };
     }
 }

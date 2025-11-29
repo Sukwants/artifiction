@@ -6,7 +6,7 @@ use crate::character::{CharacterConfig, CharacterName, CharacterStaticData};
 use crate::character::skill_config::CharacterSkillConfig;
 use crate::character::traits::{CharacterSkillMap, CharacterSkillMapItem, CharacterTrait};
 use crate::character::macros::{damage_enum, skill_map};
-use crate::common::{ChangeAttribute, Element, MoonglareReaction, Moonsign, SkillType, WeaponType};
+use crate::common::{ChangeAttribute, Element, MoonglareReaction, Moonsign, SkillType, WeaponType, DamageResult};
 use crate::common::i18n::{locale, hit_n_dmg, plunging_dmg, charged_dmg};
 use crate::common::item_config_type::{ItemConfig, ItemConfigType};
 use crate::damage::damage_builder::DamageBuilder;
@@ -30,8 +30,6 @@ pub struct VentiSkillType {
     pub x_dmg2: [f64; 15],
     pub x_dmg3: [f64; 15],
     pub a_dmgw_ratio: [f64; 15],
-    pub a_dmgw_c1_ratio: f64,
-    pub z_dmg_c1_ratio: f64,
     
     pub e_dmg1: [f64; 15],
     pub e_dmg2: [f64; 15],
@@ -58,8 +56,6 @@ pub const VENTI_SKILL: VentiSkillType = VentiSkillType {
     x_dmg2: [1.1363, 1.2288, 1.3213, 1.4535, 1.5459, 1.6517, 1.797, 1.9423, 2.0877, 2.2462, 2.4048, 2.5634, 2.7219, 2.8805, 3.039],
     x_dmg3: [1.4193, 1.5349, 1.6504, 1.8154, 1.931, 2.063, 2.2445, 2.4261, 2.6076, 2.8057, 3.0037, 3.2018, 3.3998, 3.5979, 3.7959],
     a_dmgw_ratio: [1.6, 1.7, 1.8, 1.9, 2.0, 2.1, 2.2, 2.3, 2.4, 2.5, 2.6, 2.7, 2.8, 2.9, 3.0],
-    a_dmgw_c1_ratio: 0.2,
-    z_dmg_c1_ratio: 0.33,
 
     // Elemental Skill: Skyward Sonnet
     e_dmg1: [2.76, 2.967, 3.174, 3.45, 3.657, 3.864, 4.14, 4.416, 4.692, 4.968, 5.244, 5.52, 5.865, 6.21, 6.555],
@@ -142,8 +138,6 @@ damage_enum!(
     X1
     X2
     X3
-    AWC1
-    ZC1
     E1
     E2
     Q
@@ -156,7 +150,7 @@ impl VentiDamageEnum {
         match *self {
             A11 | A12 | A2 | A3 | A41 | A42 | A5 | A6 => if activated_q { Element::Anemo } else { Element::Physical },
             Z1 | X1 | X2 | X3 => Element::Physical,
-            Z2 | AWC1 | ZC1 | E1 | E2 | Q => Element::Anemo,
+            Z2 | E1 | E2 | Q => Element::Anemo,
             QA => elemental_absorption.unwrap_or(Element::Anemo),
         }
     }
@@ -164,7 +158,7 @@ impl VentiDamageEnum {
     pub fn get_skill_type(&self) -> SkillType {
         use VentiDamageEnum::*;
         match *self {
-            A11 | A12 | A2 | A3 | A41 | A42 | A5 | A6 | ZC1 | AWC1 => SkillType::NormalAttack,
+            A11 | A12 | A2 | A3 | A41 | A42 | A5 | A6 => SkillType::NormalAttack,
             Z1 | Z2 => SkillType::ChargedAttack,
             X1 => SkillType::PlungingAttackInAction,
             X2 | X3 => SkillType::PlungingAttackOnGround,
@@ -201,8 +195,6 @@ impl CharacterTrait for Venti {
             X1 plunging_dmg!(1)
             X2 plunging_dmg!(2)
             X3 plunging_dmg!(3)
-            AWC1 locale!(zh_cn: "飓风箭额外箭矢伤害", en: "Windsunder Extra Arrow DMG")
-            ZC1 locale!(zh_cn: "分裂箭伤害", en: "Additional Arrow DMG")
         ),
         skill2: skill_map!(
             VentiDamageEnum
@@ -281,6 +273,10 @@ impl CharacterTrait for Venti {
             builder.add_extra_bonus("天赋3：魔女的前夜礼·颂时风若", 0.5);
         }
 
+        if s == QA && elemental_absorption == None {
+            return builder.none();
+        }
+
         let ratio = match s {
             A11 => VENTI_SKILL.a_dmg11[s1],
             A12 => VENTI_SKILL.a_dmg12[s1],
@@ -295,12 +291,10 @@ impl CharacterTrait for Venti {
             X1 => VENTI_SKILL.x_dmg1[s1],
             X2 => VENTI_SKILL.x_dmg2[s1],
             X3 => VENTI_SKILL.x_dmg3[s1],
-            AWC1 => VENTI_SKILL.a_dmgw_ratio[s1],
-            ZC1 => VENTI_SKILL.z_dmg_c1_ratio,
             E1 => VENTI_SKILL.e_dmg1[s2],
             E2 => VENTI_SKILL.e_dmg2[s2],
             Q => VENTI_SKILL.q_dmg[s3],
-            QA => if elemental_absorption != None { VENTI_SKILL.q_dmga[s3] } else { 0.0 },
+            QA => VENTI_SKILL.q_dmga[s3],
         } * match s.get_skill_type() {
             SkillType::NormalAttack => if activated_q && hexerei_secret_rite { VENTI_SKILL.a_dmgw_ratio[s1] } else { 1.0 },
             SkillType::ElementalSkill => if s == E1 && context.character_common_data.constellation >= 2 && breeze_blow { 3.0 } else { 1.0 },

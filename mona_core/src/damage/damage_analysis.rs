@@ -50,6 +50,7 @@ pub struct DamageAnalysis {
     pub lunar_type: MoonglareReaction,
     pub is_heal: bool,
     pub is_shield: bool,
+    pub is_none: bool,
 
     pub normal: DamageResult,
     pub melt: Option<DamageResult>,

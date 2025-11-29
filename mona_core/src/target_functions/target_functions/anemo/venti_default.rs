@@ -81,7 +81,7 @@ impl TargetFunction for VentiDefaultTargetFunction {
                 + get_damage(Ty::A12, &config2)
                 + get_damage(Ty::A2, &config2)
                 + get_damage(Ty::A3, &config2)
-            ) * 6.0;
+            ) * 6.0 * if context.character_common_data.constellation >= 1 { 1.4 } else { 1.0 };
 
         let dmg_e = get_damage(Ty::E1, &config1)
             + get_damage(Ty::E1, &config2)

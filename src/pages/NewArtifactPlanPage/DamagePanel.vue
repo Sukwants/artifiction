@@ -73,6 +73,9 @@ export default {
         },
 
         tableData() {
+            if (this.analysisFromWasm.is_none) {
+                return []
+            }
             let temp = []
             const NO_DATA = "无数据"
 

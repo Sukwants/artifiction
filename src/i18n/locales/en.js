@@ -282,6 +282,7 @@ export default {
         vaporize: "Vaporize",
         heal: "Regeneration",
         shield: "Absorption",
+        none: "None",
         spread: "Spread",
         aggravate: "Aggravate",
         bloom: "Bloom",

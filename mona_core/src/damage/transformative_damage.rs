@@ -233,9 +233,6 @@ pub fn critical_transformative_damage<A: Attribute>(level: usize, attribute: &A,
             critical: base_damage * (1.0 + critical_damage),
             non_critical: base_damage,
             expectation: base_damage * (1.0 + critical_damage * critical),
-            lunar_type: crate::common::MoonglareReaction::None,
-            is_heal: false,
-            is_shield: false,
         }
     }
 
