@@ -1,6 +1,6 @@
 <template>
     <el-radio-group
-        :model-value="modelValue"
+        :model-value="getValue()"
         @update:modelValue="handleChangeValue($event)"
     >
         <el-radio-button v-if="eleMap.has('None')" label="None">{{ t("ele.None") }}</el-radio-button>
@@ -23,7 +23,6 @@ export default {
     emits: ["update:modelValue"],
     props: {
         modelValue: {
-            type: String,
             required: true,
         },
         elements: {
@@ -45,6 +44,10 @@ export default {
         }
     },
     methods: {
+        getValue() {
+            if (this.modelValue == null) return "None";
+            return this.modelValue;
+        },
         handleChangeValue(value) {
             if (value === "None") value = null;
             this.$emit("update:modelValue", value);

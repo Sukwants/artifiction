@@ -1,11 +1,12 @@
 use serde::{Deserialize, Serialize};
 
-use crate::common::{Moonsign, item_config_type::ConfigElements8Multi};
+use crate::common::{Element, Moonsign, item_config_type::ConfigElements8Multi};
 
 #[derive(Serialize, Deserialize, Clone)]
 pub enum CharacterConfig {
     AetherElectro { abundance_amulet_count: usize },
     LumineElectro { abundance_amulet_count: usize },
+    Venti { hexerei_secret_rite: bool, elemental_absorption: Option<Element> },
     Ganyu { talent2_rate: f64 },
     HuTao { le_50: bool },
     KamisatoAyaka { talent1_rate: f64, talent2_rate: f64 },

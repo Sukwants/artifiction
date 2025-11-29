@@ -41,7 +41,6 @@ pub enum TargetFunctionConfig {
     ShenheDefault { recharge_demand: f64 },
     SucroseDefault { recharge_demand: f64 },
     ThomaDefault { recharge_demand: f64 },
-    VentiDefault { swirl_rate: f64 },
     XianglingDefault { recharge_demand: f64, melt_rate: f64, vaporize_rate: f64, overload_rate: f64 },
     XingqiuDefault { recharge_demand: f64 },
     XinyanDefault { recharge_demand: f64, damage_demand: f64 },

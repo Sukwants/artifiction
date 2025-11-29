@@ -3,6 +3,7 @@ use crate::common::{Element, WeaponType};
 use crate::common::i18n::I18nLocale;
 use super::character_sub_stat::CharacterSubStatFamily;
 
+#[derive(Clone)]
 pub struct CharacterStaticData {
     pub name: CharacterName,
     pub internal_name: &'static str,

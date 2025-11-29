@@ -19,6 +19,7 @@ pub enum CharacterSkillConfig {
     LumineHydro { hp_above_half: bool, consumed_hp_times: usize },
     AetherPyro { gosoythoth: bool, nightsouls_blessing: bool, active: bool, activated_q: bool },
     LuminePyro { gosoythoth: bool, nightsouls_blessing: bool, active: bool, activated_q: bool },
+    Venti { activated_q: bool, active: bool, breeze_blow: bool },
     Albedo { fatal_count: usize },
     Aloy { coil_count: usize },
     AratakiItto { after_q: bool },

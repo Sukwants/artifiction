@@ -271,4 +271,5 @@ pub enum WeaponName {
     TheFirstGreatMagic,
     SilvershowerHeartstrings,
     AstralVulturesCrimsonPlumage,
+    TheDaybreakChronicles,
 }

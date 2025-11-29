@@ -6,7 +6,7 @@ use crate::common::ChangeAttribute;
 use super::characters::get_static_data;
 use crate::character::CharacterConfig;
 
-
+#[derive(Clone)]
 pub struct CharacterCommonData {
     pub name: CharacterName,
     pub level: usize,

@@ -169,6 +169,7 @@ pub enum WeaponConfig {
     FlowerWreathedFeathers { stack: f64 },
     AstralVulturesCrimsonPlumage { rate: f64, different_count: usize },
     SnareHook { reaction: bool, moonsign: Moonsign },
+    TheDaybreakChronicles { rate1: f64, rate2: f64, rate3: f64 },
 }
 
 impl Default for WeaponConfig {
