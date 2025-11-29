@@ -4,6 +4,12 @@ pub mod catalyst;
 pub mod bow;
 pub mod polearm;
 
+pub use sword::*;
+pub use claymore::*;
+pub use catalyst::*;
+pub use bow::*;
+pub use polearm::*;
+
 pub use sword::freedom_sworn::BuffFreedomSworn;
 pub use claymore::song_of_broken_pines::BuffSongOfBrokenPines;
 pub use claymore::wolfs_gravestone::BuffWolfsGravestone;

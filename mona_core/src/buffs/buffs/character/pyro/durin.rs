@@ -19,11 +19,9 @@ impl<A: Attribute> Buff<A> for BuffDurinP1 {
         let ratio = if self.hexerei_secret_rite { 0.35 } else { 0.20 };
 
         if self.elements.pyro { attribute.set_value_by(AttributeName::ResMinusPyro, "杜林「光灵遵神数显现」", ratio); }
-        if self.elements.hydro { attribute.set_value_by(AttributeName::ResMinusHydro, "杜林「光灵遵神数显现」", ratio); }
         if self.elements.anemo { attribute.set_value_by(AttributeName::ResMinusAnemo, "杜林「光灵遵神数显现」", ratio); }
         if self.elements.electro { attribute.set_value_by(AttributeName::ResMinusElectro, "杜林「光灵遵神数显现」", ratio); }
         if self.elements.dendro { attribute.set_value_by(AttributeName::ResMinusDendro, "杜林「光灵遵神数显现」", ratio); }
-        if self.elements.cryo { attribute.set_value_by(AttributeName::ResMinusCryo, "杜林「光灵遵神数显现」", ratio); }
         if self.elements.geo { attribute.set_value_by(AttributeName::ResMinusGeo, "杜林「光灵遵神数显现」", ratio); }
     }
 }
@@ -55,7 +53,7 @@ impl BuffMeta for BuffDurinP1 {
                 en: "Reaction Elements"
             ),
             config: ItemConfigType::ElementMulti {
-                elements: &[Element::Pyro, Element::Hydro, Element::Anemo, Element::Electro, Element::Dendro, Element::Cryo, Element::Geo],
+                elements: &[Element::Pyro, Element::Anemo, Element::Electro, Element::Dendro, Element::Geo],
                 default: ConfigElements8Multi {
                     pyro: true,
                     hydro: false,
@@ -73,7 +71,7 @@ impl BuffMeta for BuffDurinP1 {
     fn create<A: Attribute>(b: &BuffConfig) -> Box<dyn Buff<A>> {
         let (hexerei_secret_rite, elements) = match *b {
             BuffConfig::DurinP1 { hexerei_secret_rite, elements } => (hexerei_secret_rite, elements),
-            _ => (false, ConfigElements8Multi { pyro: false, electro: false, dendro: false, cryo: false, anemo: false, geo: false, hydro: false, physical: false })
+            _ => (false, ConfigElements8Multi::default())
         };
         Box::new(BuffDurinP1 {
             hexerei_secret_rite,
@@ -132,6 +130,74 @@ impl BuffMeta for BuffDurinC1 {
         };
         Box::new(BuffDurinC1 {
             atk,
+        })
+    }
+}
+
+pub struct BuffDurinC2 {
+    pub elements: ConfigElements8Multi,
+}
+
+impl<A: Attribute> Buff<A> for BuffDurinC2 {
+    fn change_attribute(&self, attribute: &mut A) {
+        if self.elements.pyro { attribute.set_value_by(AttributeName::BonusPyro, "杜林「无底之想」", 0.5); }
+        if self.elements.hydro { attribute.set_value_by(AttributeName::BonusHydro, "杜林「无底之想」", 0.5); }
+        if self.elements.anemo { attribute.set_value_by(AttributeName::BonusAnemo, "杜林「无底之想」", 0.5); }
+        if self.elements.electro { attribute.set_value_by(AttributeName::BonusElectro, "杜林「无底之想」", 0.5); }
+        if self.elements.dendro { attribute.set_value_by(AttributeName::BonusDendro, "杜林「无底之想」", 0.5); }
+        if self.elements.cryo { attribute.set_value_by(AttributeName::BonusCryo, "杜林「无底之想」", 0.5); }
+        if self.elements.geo { attribute.set_value_by(AttributeName::BonusGeo, "杜林「无底之想」", 0.5); }
+    }
+}
+
+impl BuffMeta for BuffDurinC2 {
+    #[cfg(not(target_family = "wasm"))]
+    const META_DATA: BuffMetaData = BuffMetaData {
+        name: BuffName::DurinC2,
+        name_locale: locale!(
+            zh_cn: "杜林-「无底之想」",
+            en: "Durin-Unground Visions"
+        ),
+        image: BuffImage::Avatar(CharacterName::Durin),
+        genre: BuffGenre::Character,
+        description: Some(locale!(
+            zh_cn: "杜林命座2：杜林施放元素爆发后的20秒内，队伍中附近的角色对敌人触发蒸发、融化、燃烧、超载、火元素扩散或火元素结晶反应后，或对处于燃烧状态下的敌人造成火元素伤害或草元素伤害时，队伍中附近的角色造成的火元素伤害与参与反应的对应元素伤害提升50%，持续6秒。",
+            en: "Durin C2: For 20s after Durin uses an Elemental Burst, after nearby party members trigger Vaporize, Melt, Burning, Overloaded, Pyro Swirl, or Pyro Crystallize reactions, or deal Pyro DMG or Dendro DMG to an opponent affected by Burning, all nearby party members gain a 50% increase to their Pyro DMG and to the corresponding elemental DMG involved in the reaction for 6s."
+        )),
+        from: BuffFrom::Character(CharacterName::Durin),
+    };
+
+    #[cfg(not(target_family = "wasm"))]
+    const CONFIG: Option<&'static [ItemConfig]> = Some(&[
+        ItemConfig {
+            name: "elements",
+            title: locale!(
+                zh_cn: "反应元素",
+                en: "Reaction Elements"
+            ),
+            config: ItemConfigType::ElementMulti {
+                elements: &[Element::Pyro, Element::Hydro, Element::Anemo, Element::Electro, Element::Dendro, Element::Cryo, Element::Geo],
+                default: ConfigElements8Multi {
+                    pyro: true,
+                    hydro: false,
+                    anemo: false,
+                    electro: false,
+                    dendro: false,
+                    cryo: false,
+                    geo: false,
+                    physical: false,
+                }
+            }
+        },
+    ]);
+
+    fn create<A: Attribute>(b: &BuffConfig) -> Box<dyn Buff<A>> {
+        let elements = match *b {
+            BuffConfig::DurinC2 { elements } => elements,
+            _ => ConfigElements8Multi::default()
+        };
+        Box::new(BuffDurinC2 {
+            elements,
         })
     }
 }

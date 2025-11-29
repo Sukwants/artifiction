@@ -9,7 +9,7 @@ pub use amber::BuffAmberC6;
 pub use chevreuse::{BuffChevreuseP1, BuffChevreuseP2, BuffChevreuseC6};
 pub use aether_pyro::{BuffAetherPyroC1, BuffAetherPyroC2};
 pub use lumine_pyro::{BuffLuminePyroC1, BuffLuminePyroC2};
-pub use durin::{BuffDurinP1, BuffDurinC1, BuffDurinC6};
+pub use durin::{BuffDurinP1, BuffDurinC1, BuffDurinC2, BuffDurinC6};
 
 pub mod bennett;
 pub mod hu_tao;

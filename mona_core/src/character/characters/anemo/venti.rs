@@ -303,7 +303,7 @@ impl CharacterTrait for Venti {
             QA => if elemental_absorption != None { VENTI_SKILL.q_dmga[s3] } else { 0.0 },
         } * match s.get_skill_type() {
             SkillType::NormalAttack => if activated_q && hexerei_secret_rite { VENTI_SKILL.a_dmgw_ratio[s1] } else { 1.0 },
-            SkillType::ElementalSkill => if context.character_common_data.constellation >= 2 && breeze_blow { 3.0 } else { 1.0 },
+            SkillType::ElementalSkill => if s == E1 && context.character_common_data.constellation >= 2 && breeze_blow { 3.0 } else { 1.0 },
             SkillType::ElementalBurst => if hexerei_secret_rite { 1.35 } else { 1.0 }
             _ => 1.0,
         };

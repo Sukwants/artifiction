@@ -101,6 +101,7 @@ pub enum BuffConfig {
     JahodaC6 { moonsign: Moonsign },
     DurinP1 { hexerei_secret_rite: bool, elements: ConfigElements8Multi },
     DurinC1 { atk: f64 },
+    DurinC2 { elements: ConfigElements8Multi },
 
     FreedomSworn { refine: usize },
     SongOfBrokenPines { refine: usize },
@@ -120,6 +121,7 @@ pub enum BuffConfig {
     SymphonistOfScents { refine: usize },
     FracturedHalo { refine: usize },
     NightweaversLookingGlass { refine: usize },
+    AthameArtis { refine: usize, hexerei_secret_rite: bool },
 
     ResonanceCryo2 { rate: f64 },
     ResonanceGeo2 { rate1: f64, rate2: f64 },

@@ -159,6 +159,7 @@ pub enum BuffName {
     JahodaC6,
     DurinP1,
     DurinC1,
+    DurinC2,
     DurinC6,
 
     AloyTalent1,
@@ -182,6 +183,7 @@ pub enum BuffName {
     SymphonistOfScents,
     FracturedHalo,
     NightweaversLookingGlass,
+    AthameArtis,
     
 
     ResonancePyro2,
