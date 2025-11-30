@@ -58,18 +58,27 @@ impl TargetFunction for AlbedoDefaultTargetFunction {
             enemy
         };
 
-        let config1 = CharacterSkillConfig::Albedo { lower50: false, activated_q: false, fatal_count: 4, crystallize_shield: false };
-        let config2 = CharacterSkillConfig::Albedo { lower50: false, activated_q: true, fatal_count: 4, crystallize_shield: false };
+        let config1 = [
+            CharacterSkillConfig::Albedo { lower50: false, activated_q: false, fatal_count: 4, crystallize_shield: false },
+            CharacterSkillConfig::Albedo { lower50: true, activated_q: false, fatal_count: 4, crystallize_shield: false }
+        ];
+        let config2 = [
+            CharacterSkillConfig::Albedo { lower50: false, activated_q: true, fatal_count: 4, crystallize_shield: false },
+            CharacterSkillConfig::Albedo { lower50: true, activated_q: true, fatal_count: 4, crystallize_shield: false }
+        ];
 
         type Ty = <Albedo as CharacterTrait>::DamageEnumType;
 
-        let get_damage = |s: Ty, config: &CharacterSkillConfig| -> f64 {
-            Albedo::damage::<SimpleDamageBuilder>(&context, s, config, None).normal.expectation
+        let get_damage = |s: Ty, config: &[CharacterSkillConfig]| -> f64 {
+            (
+                Albedo::damage::<SimpleDamageBuilder>(&context, s, &config[0], None).normal.expectation
+                + Albedo::damage::<SimpleDamageBuilder>(&context, s, &config[1], None).normal.expectation
+            ) / 2.0
         };
 
         let dmg_e = get_damage(Ty::E1, &config1)
             + get_damage(Ty::ETransientBlossom, &config2) * 9.0;
-        
+
         let dmg_q = get_damage(Ty::Q1, &config1)
             + get_damage(Ty::QFatalBlossom, &config2) * 7.0
             + get_damage(Ty::C2, &config2) * 4.0 * 2.0;
