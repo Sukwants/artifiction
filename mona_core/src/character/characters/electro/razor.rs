@@ -1,5 +1,5 @@
 use num_derive::FromPrimitive;
-use crate::attribute::{Attribute, AttributeName};
+use crate::attribute::{Attribute, AttributeCommon, AttributeName};
 use crate::character::character_common_data::CharacterCommonData;
 use crate::character::character_sub_stat::CharacterSubStatFamily;
 use crate::character::{CharacterConfig, CharacterName, CharacterStaticData};
@@ -82,21 +82,25 @@ pub const RAZOR_STATIC_DATA: CharacterStaticData = CharacterStaticData {
 };
 
 pub struct RazorEffect {
+    pub is_hexerei: bool,
     pub stack: f64,
     pub talent2_ratio: f64,
     pub has_talent2: bool,
+    pub has_c6: bool,
 }
 
 impl RazorEffect {
     pub fn new(common_data: &CharacterCommonData, config: &CharacterConfig) -> RazorEffect {
-        let (stack, talent2_ratio) = match *config {
-            CharacterConfig::Razor { e_stack, talent2_ratio } => (e_stack, talent2_ratio),
-            _ => (0.0, 0.0)
+        let (is_hexerei, stack, talent2_ratio) = match *config {
+            CharacterConfig::Razor { is_hexerei, e_stack, talent2_ratio } => (is_hexerei, e_stack, talent2_ratio),
+            _ => (false, 0.0, 0.0)
         };
         RazorEffect {
+            is_hexerei,
             stack,
             talent2_ratio,
-            has_talent2: common_data.has_talent2
+            has_talent2: common_data.has_talent2,
+            has_c6: common_data.constellation >= 6,
         }
     }
 }
@@ -107,6 +111,11 @@ impl<A: Attribute> ChangeAttribute<A> for RazorEffect {
         attribute.set_value_by(AttributeName::Recharge, "雷泽：雷之印加成", recharge_bonus);
         if self.has_talent2 {
             attribute.set_value_by(AttributeName::Recharge, "雷泽天赋：饥饿", self.talent2_ratio * 0.3);
+        }
+
+        if self.has_c6 {
+            attribute.set_value_by(AttributeName::CriticalBase, "命座6：天狼", 0.1);
+            attribute.set_value_by(AttributeName::CriticalDamageBase, "命座6：天狼", 0.5);
         }
     }
 }
@@ -201,6 +210,8 @@ impl CharacterTrait for Razor {
 
     #[cfg(not(target_family = "wasm"))]
     const CONFIG_DATA: Option<&'static [ItemConfig]> = Some(&[
+        ItemConfig::HEXEREI_SECRET_RITE_GLOBAL(false, ItemConfig::PRIORITY_CHARACTER),
+        ItemConfig::IS_HEXEREI(true, ItemConfig::PRIORITY_CHARACTER),
         ItemConfig {
             name: "e_stack",
             title: locale!(
@@ -223,7 +234,18 @@ impl CharacterTrait for Razor {
         let s: RazorDamageEnum = num::FromPrimitive::from_usize(s).unwrap();
         let (s1, s2, s3) = context.character_common_data.get_3_skill();
 
+        let is_hexerei = match &context.character_common_data.config {
+            CharacterConfig::Razor { is_hexerei, .. } => *is_hexerei,
+            _ => false,
+        };
+
         use RazorDamageEnum::*;
+        let mut builder = D::new();
+
+        if is_hexerei {
+            builder.add_extra_atk("天赋3：魔女的前夜礼·苍雷奔涌", context.attribute.get_atk() * 0.7);
+        }
+
         let ratio = match s {
             Normal1 => RAZOR_SKILL.normal_dmg1[s1],
             Normal2 => RAZOR_SKILL.normal_dmg2[s1],
@@ -242,7 +264,7 @@ impl CharacterTrait for Razor {
             QNormal3 => RAZOR_SKILL.elemental_burst_dmg2[s3] * RAZOR_SKILL.normal_dmg3[s1],
             QNormal4 => RAZOR_SKILL.elemental_burst_dmg2[s3] * RAZOR_SKILL.normal_dmg4[s1],
         };
-        let mut builder = D::new();
+
         builder.add_atk_ratio("技能倍率", ratio);
         builder.damage(
             &context.attribute,

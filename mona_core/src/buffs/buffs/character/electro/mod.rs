@@ -12,6 +12,7 @@ pub use ororon::BuffOroronC6;
 pub use iansan::{BuffIansanQ, BuffIansanC2, BuffIansanC6};
 pub use aether_electro::BuffAetherElectroC2;
 pub use lumine_electro::BuffLumineElectroC2;
+pub use fischl::BuffFischlP3;
 
 pub mod beidou;
 pub mod dori;
@@ -27,3 +28,4 @@ pub mod ororon;
 pub mod iansan;
 pub mod aether_electro;
 pub mod lumine_electro;
+pub mod fischl;
