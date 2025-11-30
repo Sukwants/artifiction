@@ -19,6 +19,7 @@ pub enum CharacterSkillConfig {
     LumineHydro { hp_above_half: bool, consumed_hp_times: usize },
     AetherPyro { gosoythoth: bool, nightsouls_blessing: bool, active: bool, activated_q: bool },
     LuminePyro { gosoythoth: bool, nightsouls_blessing: bool, active: bool, activated_q: bool },
+    Mona { omen: bool, after_z: bool, bonus_z: usize },
     Venti { activated_q: bool, active: bool, breeze_blow: bool },
     Albedo { lower50: bool, activated_q: bool, fatal_count: usize, crystallize_shield: bool },
     Klee { boom_badge: usize, active: bool, activated_q: bool, activated_c1: bool },

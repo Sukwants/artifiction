@@ -6,6 +6,7 @@ use crate::common::{Element, Moonsign, item_config_type::ConfigElements8Multi};
 pub enum CharacterConfig {
     AetherElectro { abundance_amulet_count: usize },
     LumineElectro { abundance_amulet_count: usize },
+    Mona { is_hexerei: bool },
     Venti { hexerei_secret_rite: bool, elemental_absorption: Option<Element> },
     Klee { hexerei_secret_rite: bool },
     Albedo { hexerei_secret_rite: bool, is_hexerei: bool },
