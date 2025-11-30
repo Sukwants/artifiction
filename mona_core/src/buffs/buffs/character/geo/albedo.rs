@@ -21,7 +21,7 @@ impl BuffMeta for BuffAlbedoTalent2 {
         name: BuffName::AlbedoTalent2,
         name_locale: locale!(
             zh_cn: "阿贝多-「瓶中人的天慧」",
-            en: "Albedo-「Homuncular Nature」",
+            en: "Albedo-Homuncular Nature",
         ),
         image: BuffImage::Avatar(CharacterName::Albedo),
         genre: BuffGenre::Character,
@@ -62,8 +62,8 @@ impl BuffMeta for BuffAlbedoTalent3 {
     const META_DATA: BuffMetaData = BuffMetaData {
         name: BuffName::AlbedoTalent3,
         name_locale: locale!(
-            zh_cn: "阿贝多-「瓶中人的天慧」",
-            en: "Albedo-「Homuncular Nature」",
+            zh_cn: "阿贝多-「魔女的前夜礼·白芒之书」",
+            en: "Albedo-Witch's Eve Rite: Book of Blinding Light",
         ),
         image: BuffImage::Avatar(CharacterName::Albedo),
         genre: BuffGenre::Character,
@@ -173,7 +173,7 @@ impl BuffMeta for BuffAlbedoC6 {
         name: BuffName::AlbedoC6,
         name_locale: locale!(
             zh_cn: "阿贝多-「无垢之土」",
-            en: "Albedo-「Dust of Purification」",
+            en: "Albedo-Dust of Purification",
         ),
         image: BuffImage::Avatar(CharacterName::Albedo),
         genre: BuffGenre::Character,
