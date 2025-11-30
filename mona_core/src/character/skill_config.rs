@@ -20,7 +20,7 @@ pub enum CharacterSkillConfig {
     AetherPyro { gosoythoth: bool, nightsouls_blessing: bool, active: bool, activated_q: bool },
     LuminePyro { gosoythoth: bool, nightsouls_blessing: bool, active: bool, activated_q: bool },
     Venti { activated_q: bool, active: bool, breeze_blow: bool },
-    Albedo { fatal_count: usize },
+    Albedo { lower50: bool, activated_q: bool, fatal_count: usize, crystallize_shield: bool },
     Aloy { coil_count: usize },
     AratakiItto { after_q: bool },
     Diluc { pyro: bool },
