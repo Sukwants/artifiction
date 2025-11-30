@@ -3,7 +3,7 @@ pub use jean::BuffJeanC4;
 pub use kaedehara_kazuha::{BuffKaedeharaKazuhaC2, BuffKaedeharaKazuhaTalent2};
 pub use shikanoin_heizou::BuffShikanoinHeizouTalent2;
 pub use sucrose::{BuffSucroseC6, BuffSucroseTalent1, BuffSucroseTalent2};
-pub use venti::{BuffVentiC2, BuffVentiC6};
+pub use venti::{BuffVentiP3, BuffVentiC2, BuffVentiC4, BuffVentiC6};
 pub use xianyun::{BuffXianyunTalent1, BuffXianyunTalent2};
 pub use yumemizuki_mizuki::{BuffYumemizukiMizukiC1, BuffYumemizukiMizukiC2};
 pub use lynette::BuffLynetteP1;

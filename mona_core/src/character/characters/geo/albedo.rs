@@ -104,7 +104,11 @@ impl<A: Attribute> ChangeAttribute<A> for AlbedoEffect {
         }
 
         if self.common_data.constellation >= 4 {
-            attribute.set_value_by(AttributeName::BonusPlungingAttack, "命座4：神性之陨", 0.6);
+            if self.hexerei_secret_rite {
+                attribute.set_value_by(AttributeName::BonusPlungingAttack, "命座4：神性之陨", 0.6);
+            } else {
+                attribute.set_value_by(AttributeName::BonusPlungingAttack, "命座4：神性之陨", 0.3);
+            }
         }
     }
 }

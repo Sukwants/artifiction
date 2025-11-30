@@ -4,7 +4,6 @@ use crate::buffs::buff::BuffMeta;
 use crate::buffs::buff_meta::{BuffFrom, BuffGenre, BuffImage, BuffMetaData};
 use crate::buffs::buff_name::BuffName;
 use crate::character::CharacterName;
-#[cfg(not(target_family = "wasm"))]
 use crate::common::Element;
 use crate::common::i18n::locale;
 use crate::common::item_config_type::{ConfigElements8Multi, ItemConfig, ItemConfigType};
