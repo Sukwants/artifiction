@@ -260,6 +260,7 @@ pub enum WeaponName {
     ChainBreaker,
     SequenceOfSolitude,
     SnareHook,
+    RainbowSerpentsRainBow,
     // 5 star
     SkywardHarp,
     AmosBow,
