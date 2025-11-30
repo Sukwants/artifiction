@@ -18,6 +18,8 @@ pub enum CharacterConfig {
     Ningguang { talent2_rate: f64 },
     Rosaria { e_from_behind: bool },
     Razor { is_hexerei: bool, e_stack: f64, talent2_ratio: f64 },
+    Sucrose { },
+    Fischl { },
     Yelan { team_element_count: usize },
     Yoimiya { talent1_level: f64 },
     Collei { background: bool },
