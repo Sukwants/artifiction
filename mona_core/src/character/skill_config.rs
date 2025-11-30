@@ -21,6 +21,7 @@ pub enum CharacterSkillConfig {
     LuminePyro { gosoythoth: bool, nightsouls_blessing: bool, active: bool, activated_q: bool },
     Venti { activated_q: bool, active: bool, breeze_blow: bool },
     Albedo { lower50: bool, activated_q: bool, fatal_count: usize, crystallize_shield: bool },
+    Klee { boom_badge: usize, active: bool, activated_q: bool, activated_c1: bool },
     Aloy { coil_count: usize },
     AratakiItto { after_q: bool },
     Diluc { pyro: bool },
