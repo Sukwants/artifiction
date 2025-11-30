@@ -88,14 +88,7 @@ impl BuffMeta for BuffAlbedoTalent3 {
             ),
             config: ItemConfigType::FloatInput { default: 0.0 }
         },
-        ItemConfig {
-            name: "is_hexerei",
-            title: locale!(
-                zh_cn: "当前角色为魔导角色",
-                en: "Current character is Hexerei party",
-            ),
-            config: ItemConfigType::Bool { default: false }
-        },
+        ItemConfig::IS_HEXEREI(false, ItemConfig::PRIORITY_BUFF),
     ]);
 
     fn create<A: Attribute>(_b: &BuffConfig) -> Box<dyn Buff<A>> {

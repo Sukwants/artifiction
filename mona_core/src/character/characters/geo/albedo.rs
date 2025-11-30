@@ -86,17 +86,31 @@ const ALBEDO_STATIC_DATA: CharacterStaticData = CharacterStaticData {
 
 pub struct AlbedoEffect {
     pub hexerei_secret_rite: bool,
+    pub is_hexerei: bool,
     pub common_data: CharacterCommonData,
 }
 
 impl<A: Attribute> ChangeAttribute<A> for AlbedoEffect {
     fn change_attribute(&self, attribute: &mut A) {
         if self.hexerei_secret_rite {
-            attribute.add_edge1(AttributeName::DEF, AttributeName::BonusNormalAttack, Box::new(move |def, _| { (def / 1000.0 * 0.14).min(0.42) }), Box::new(move |def, _, grad| (0.0, 0.0)), "天赋3：魔女的前夜礼·白芒之书");
-            attribute.add_edge1(AttributeName::DEF, AttributeName::BonusChargedAttack, Box::new(move |def, _| { (def / 1000.0 * 0.14).min(0.42) }), Box::new(move |def, _, grad| (0.0, 0.0)), "天赋3：魔女的前夜礼·白芒之书");
-            attribute.add_edge1(AttributeName::DEF, AttributeName::BonusPlungingAttack, Box::new(move |def, _| { (def / 1000.0 * 0.14).min(0.42) }), Box::new(move |def, _, grad| (0.0, 0.0)), "天赋3：魔女的前夜礼·白芒之书");
-            attribute.add_edge1(AttributeName::DEF, AttributeName::BonusElementalSkill, Box::new(move |def, _| { (def / 1000.0 * 0.14).min(0.42) }), Box::new(move |def, _, grad| (0.0, 0.0)), "天赋3：魔女的前夜礼·白芒之书");
-            attribute.add_edge1(AttributeName::DEF, AttributeName::BonusElementalBurst, Box::new(move |def, _| { (def / 1000.0 * 0.14).min(0.42) }), Box::new(move |def, _, grad| (0.0, 0.0)), "天赋3：魔女的前夜礼·白芒之书");
+            let mut add_effect = |at: AttributeName| {
+                attribute.add_edge1(
+                    AttributeName::DEF,
+                    AttributeName::BonusNormalAttack,
+                    if self.is_hexerei {
+                        Box::new(move |def, _| { (def / 1000.0 * 0.14).min(0.42) })
+                    } else {
+                        Box::new(move |def, _| { (def / 1000.0 * 0.04).min(0.12) })
+                    },
+                    Box::new(move |def, _, grad| (0.0, 0.0)),
+                    "天赋3：魔女的前夜礼·白芒之书"
+                );
+            };
+            add_effect(AttributeName::BonusNormalAttack);
+            add_effect(AttributeName::BonusChargedAttack);
+            add_effect(AttributeName::BonusPlungingAttack);
+            add_effect(AttributeName::BonusElementalSkill);
+            add_effect(AttributeName::BonusElementalBurst);
         }
 
         if self.common_data.constellation >= 1 {
@@ -201,6 +215,7 @@ impl CharacterTrait for Albedo {
     #[cfg(not(target_family = "wasm"))]
     const CONFIG_DATA: Option<&'static [ItemConfig]> = Some(&[
         ItemConfig::HEXEREI_SECRET_RITE_GLOBAL(false, ItemConfig::PRIORITY_CHARACTER),
+        ItemConfig::IS_HEXEREI(true, ItemConfig::PRIORITY_CHARACTER),
     ]);
 
     #[cfg(not(target_family = "wasm"))]
@@ -246,9 +261,9 @@ impl CharacterTrait for Albedo {
         let s2 = context.character_common_data.skill2;
         let s3 = context.character_common_data.skill3;
 
-        let hexerei_secret_rite = match &context.character_common_data.config {
-            CharacterConfig::Albedo { hexerei_secret_rite } => *hexerei_secret_rite,
-            _ => false,
+        let (hexerei_secret_rite, is_hexerei) = match &context.character_common_data.config {
+            CharacterConfig::Albedo { hexerei_secret_rite, is_hexerei } => (*hexerei_secret_rite, *is_hexerei),
+            _ => (false, false),
         };
 
         let (lower50, activated_q, fatal_count, crystallize_shield) = match *config {
@@ -327,12 +342,13 @@ impl CharacterTrait for Albedo {
     }
 
     fn new_effect<A: Attribute>(common_data: &CharacterCommonData, config: &CharacterConfig) -> Option<Box<dyn ChangeAttribute<A>>> {
-        let hexerei_secret_rite = match *config {
-            CharacterConfig::Albedo { hexerei_secret_rite } => hexerei_secret_rite,
-            _ => false,
+        let (hexerei_secret_rite, is_hexerei) = match *config {
+            CharacterConfig::Albedo { hexerei_secret_rite, is_hexerei } => (hexerei_secret_rite, is_hexerei),
+            _ => (false, false),
         };
         Some(Box::new(AlbedoEffect {
             hexerei_secret_rite: hexerei_secret_rite,
+            is_hexerei: is_hexerei,
             common_data: common_data.clone(),
         }))
     }

@@ -268,4 +268,7 @@ impl ItemConfig {
     pub const fn HEXEREI_SECRET_RITE_GLOBAL(default: bool, priority: usize) -> ItemConfig {
         return ItemConfig { name: "hexerei_secret_rite", title: locale!(zh_cn: "魔导·秘仪", en: "Hexerei Secret Rite"), config: ItemConfigType::GlobalLinkBool { default, global_link: GlobalLinkConfig { key: "hexerei_secret_rite", priority, team_shared: true } } };
     }
+    pub const fn IS_HEXEREI(default: bool, priority: usize) -> ItemConfig {
+        return ItemConfig { name: "is_hexerei", title: locale!(zh_cn: "当前角色为魔导角色", en: "Current Character Is Hexerei Character"), config: ItemConfigType::GlobalLinkBool { default, global_link: GlobalLinkConfig { key: "is_hexerei", priority, team_shared: false } } };
+    }
 }

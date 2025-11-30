@@ -211,6 +211,7 @@ impl CharacterTrait for Venti {
     #[cfg(not(target_family = "wasm"))]
     const CONFIG_DATA: Option<&'static [ItemConfig]> = Some(&[
         ItemConfig::HEXEREI_SECRET_RITE_GLOBAL(false, ItemConfig::PRIORITY_CHARACTER),
+        ItemConfig::IS_HEXEREI(true, ItemConfig::PRIORITY_CHARACTER),
         ItemConfig {
             name: "elemental_absorption",
             title: locale!(
