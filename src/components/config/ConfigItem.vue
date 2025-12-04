@@ -160,11 +160,27 @@
                     @update:modelValue="handleChangeValue"
                 ></ConfigItem>
                 <el-tooltip
-                    :content="'key: ' + params.key + '<br>' + 'prioirty: ' + params.priority"
                     :placement="'top'"
                     :show-after="1000"
-                    raw-content
                 >
+                    <template #content>
+                        <div style="position: relative; padding-right: 8px;">
+                            <el-link
+                                :icon="QuestionFilled"
+                                :underline="false"
+                                style="position: absolute; top: 0px; right: -5px; font-size: 10px;"
+                                href="/help/calculate#global-config"
+                            ></el-link>
+                            <div style="display: flex; justify-content: space-between; height: 28px; gap: 16px; align-items: center;">
+                                <span><b>{{ "Key" }}</b></span>
+                                <span>{{ params.key }}</span>
+                            </div>
+                            <div style="display: flex; justify-content: space-between; height: 28px; gap: 16px; align-items: center;">
+                                <span><b>{{ "Priority" }}</b></span>
+                                <span>{{ params.priority }}</span>
+                            </div>
+                        </div>
+                    </template>
                     <el-switch
                         class="unlinked"
                         :modelValue="unlinked"
@@ -183,7 +199,7 @@ import SelectSkillType from "@c/select/SelectSkillType"
 import SelectMoonsignType from "@c/select/SelectMoonsignType"
 import { useI18n } from "@/i18n/i18n"
 
-import { Connection } from '@element-plus/icons-vue'
+import { Connection, QuestionFilled } from '@element-plus/icons-vue'
 
 export default {
     name: "ConfigItem",
@@ -223,6 +239,9 @@ export default {
         },
         Connection() {
             return Connection;
+        },
+        QuestionFilled() {
+            return QuestionFilled;
         },
     },
     methods: {
