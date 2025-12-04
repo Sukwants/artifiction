@@ -18,6 +18,8 @@ pub enum TargetFunctionConfig {
     ExpectVaporize { t: usize, skill: SkillType },
     ExpectMelt { t: usize, skill: SkillType },
 
+    AetherPyroDefault { vaporize_rate: f64, melt_rate: f64, gosoythoth: bool },
+    LuminePyroDefault { vaporize_rate: f64, melt_rate: f64, gosoythoth: bool },
     BennettDefault { recharge_demand: f64 },
     GanyuDefault { melt_rate: f64 },
     GorouDefault { recharge_demand: f64 },

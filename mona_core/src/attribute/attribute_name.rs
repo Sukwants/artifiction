@@ -12,6 +12,7 @@ pub enum AttributeName {
     // 不参与精通转换的计算，例如草神天赋不被船桨计算
     ElementalMasteryExtra,
     Recharge,
+    RechargeExtra,
     ShieldStrength,
 
     DefMinus,
@@ -36,7 +37,7 @@ pub enum AttributeName {
 
     ATKBase,
     ATKFixed,
-    ATKPercentage,
+    ATKPercentage, // 并非攻击力百分比，如需添加百分比攻击请使用 add_edge: ATKBase -> ATKPercentage 或 add_atk_percentage
     ATK,
 
     DEFBase,

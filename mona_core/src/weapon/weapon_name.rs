@@ -149,6 +149,7 @@ pub enum WeaponName {
     FootprintOfTheRainbow,
     TamayurateiNoOhanashi,
     ProspectorsShovel,
+    SacrificersStaff,
     // 5 star
     PrimordialJadeWingedSpear,
     SkywardSpine,
@@ -199,6 +200,7 @@ pub enum WeaponName {
     RingOfYaxche,
     BlackmarrowLantern,
     EtherlightSpindlelute,
+    DawningFrost,
     // 5 star
     SkywardAtlas,
     LostPrayerToTheSacredWinds,
@@ -216,6 +218,7 @@ pub enum WeaponName {
     SunnyMorningSleepIn,
     VividNotions,
     NightweaversLookingGlass,
+    ReliquaryOfTruth,
 
     // bows
     // 1 star

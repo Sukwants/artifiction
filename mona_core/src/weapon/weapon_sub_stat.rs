@@ -21,6 +21,7 @@ pub enum WeaponSubStatFamily {
     CriticalDamage144,
     CriticalDamage192,
 
+    CriticalRate20,
     CriticalRate24,
     CriticalRate34,
     CriticalRate40,
@@ -92,6 +93,7 @@ pub fn get_stat_name_from_family(family: WeaponSubStatFamily) -> StatName {
         WeaponSubStatFamily::CriticalDamage144 => StatName::CriticalDamage,
         WeaponSubStatFamily::CriticalDamage192 => StatName::CriticalDamage,
 
+        WeaponSubStatFamily::CriticalRate20 => StatName::CriticalRate,
         WeaponSubStatFamily::CriticalRate24 => StatName::CriticalRate,
         WeaponSubStatFamily::CriticalRate34 => StatName::CriticalRate,
         WeaponSubStatFamily::CriticalRate40 => StatName::CriticalRate,
@@ -164,6 +166,7 @@ pub fn get_value_array(family: WeaponSubStatFamily) -> [f64; 8] {
         WeaponSubStatFamily::CriticalDamage144 => [0.144, 0.254, 0.371, 0.429, 0.487, 0.545, 0.603, 0.662],
         WeaponSubStatFamily::CriticalDamage192 => [0.192, 0.339, 0.494, 0.572, 0.65, 0.727, 0.804, 0.882],
 
+        WeaponSubStatFamily::CriticalRate20 => [0.020, 0.0353, 0.0515, 0.0596, 0.0677, 0.0757, 0.0838, 0.0919],
         WeaponSubStatFamily::CriticalRate24 => [0.024, 0.0424, 0.0618, 0.0715, 0.0812, 0.0909, 0.1006, 0.1103],
         WeaponSubStatFamily::CriticalRate34 => [0.034, 0.06, 0.088, 0.101, 0.115, 0.129, 0.142, 0.156],
         WeaponSubStatFamily::CriticalRate40 => [0.04, 0.0707, 0.103, 0.1192, 0.1353, 0.1514, 0.1676, 0.1838],

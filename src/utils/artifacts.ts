@@ -17,6 +17,7 @@ import { hash, hashExceptValue } from "@/utils/artifactHash"
 import { positions } from "@/constants/artifact"
 import {useI18n} from "@/i18n/i18n";
 import {useKumiStore} from "@/store/pinia/kumi";
+import { getObjectConfig } from "@/composables/globalConfig"
 
 
 const artifactStore = useArtifactStore()
@@ -32,7 +33,7 @@ export function howManyUpgradeCount(value: number, tagName: ArtifactStatName, st
 
 
 // create new default artifact config
-export function newDefaultArtifactConfigForWasm(): any {
+export function newDefaultArtifactConfig(): any {
     let configs: any = {}
 
     for (let name in artifactsData) {
@@ -44,7 +45,11 @@ export function newDefaultArtifactConfigForWasm(): any {
         if (configAll.length > 0) {
             let c: any = {}
             for (let item of configAll) {
-                c[item.name] = deepCopy(item.default)
+                c[item.name] = {
+                    config: deepCopy(item.default),
+                    configValue: deepCopy(item.default),
+                    unlinked: deepCopy(item.unlinked)
+                }
             }
 
             const snake = toSnakeCase(name2)
@@ -100,7 +105,7 @@ interface ImportJsonResult {
     add: number,
 }
 
-export function importMonaJson(rawObj: any, removeNonExisting: boolean, backupImportDir: boolean): ImportJsonResult {
+export function importMonaJson(rawObj: any, removeNonExisting: boolean, backupImportDir: boolean, importKumi: boolean): ImportJsonResult {
     // hash of level, main stat, sub stats, rarity, set name, slot
     let hashAll: Record<string, IArtifact> = {}
     // hash of level, main stat without value, sub stats without value, rarity, set name, slot
@@ -120,6 +125,8 @@ export function importMonaJson(rawObj: any, removeNonExisting: boolean, backupIm
     let skipCount = 0
     let upgradeCount = 0
     let newCount = 0
+
+    let artifactsId: Map<number, number> = new Map()
 
     let importFlat: any[] = [].concat(rawObj.flower ?? []).concat(rawObj.feather ?? []).concat(rawObj.sand ?? []).concat(rawObj.cup ?? []).concat(rawObj.head ?? [])
     for (let artifact of importFlat) {
@@ -148,6 +155,7 @@ export function importMonaJson(rawObj: any, removeNonExisting: boolean, backupIm
             newCount += 1
             artifactId = newArtifact(artifact, !!artifact.omit)
         }
+        artifactsId.set(artifact.id, artifactId)
 
         if (artifact.equip && artifact.equip !== "") {
             // artifact has equip data
@@ -188,6 +196,17 @@ export function importMonaJson(rawObj: any, removeNonExisting: boolean, backupIm
            }
         }   
     }
+    if (importKumi && parseInt(rawObj.version) >= 2) {
+        const kumi = rawObj.kumi ?? []
+        for (const item of kumi) {
+            if (item.dir) {
+                kumiStore.importDir(item)
+            }
+            else {
+                kumiStore.importKumi(item, artifactsId)
+            }
+        }
+    }
 
     return {
         skip: skipCount,
@@ -218,7 +237,7 @@ export function getArtifactThumbnail(name: ArtifactSetName): string {
 // otherwise, use default value
 export function upgradeArtifactConfig(oldConfig: any) {
     if (!oldConfig) {
-        return newDefaultArtifactConfigForWasm()
+        return getObjectConfig(newDefaultArtifactConfig())
     }
 
     let newConfig: any = {}
@@ -358,7 +377,7 @@ export function getArtifactAllConfigsByName(name: ArtifactSetName): any {
 /// merge configs into a legit config
 /// note: there may be circumstances where a merging config is not complete (e.g. lacking some config2 fields)
 export function mergeArtifactConfig(config: any): any {
-    const defaultConfig = newDefaultArtifactConfigForWasm()
+    const defaultConfig = newDefaultArtifactConfig()
     for (const key in config) {
         if (key in defaultConfig) {
             for (const configKey in config[key]) {

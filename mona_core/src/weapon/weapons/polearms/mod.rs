@@ -37,6 +37,7 @@ pub use symphonist_of_scents::SymphonistOfScents;
 pub use fractured_halo::FracturedHalo;
 pub use prospectors_shovel::ProspectorsShovel;
 pub use bloodsoaked_ruins::BloodsoakedRuins;
+pub use sacrificers_staff::SacrificersStaff;
 
 pub mod engulfing_lightning;
 pub mod skyward_spine;
@@ -77,3 +78,4 @@ pub mod symphonist_of_scents;
 pub mod fractured_halo;
 pub mod prospectors_shovel;
 pub mod bloodsoaked_ruins;
+pub mod sacrificers_staff;

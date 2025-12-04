@@ -44,6 +44,7 @@ fn main() {
     let character_file = Path::new(&args.dir).join("_gen_character.js");
     let pf_file = Path::new(&args.dir).join("_gen_pf.js");
     let tf_file = Path::new(&args.dir).join("_gen_tf.js");
+    let gc_file = Path::new(&args.dir).join("_gen_gc.js");
 
     let get_file = |path: &PathBuf| {
         OpenOptions::new()
@@ -71,7 +72,6 @@ fn main() {
 
     let mut file_tf = OpenOptions::new().write(true).create(true).truncate(true).open(&tf_file).expect("cannot open/create tf file");
     file_tf.write_all(gen_tf_meta_as_js_file().as_bytes());
-
 
     for loc in ["zh-cn", "en"] {
         let mut file = get_file(&Path::new(&args.i18n_dir).join(format!("{}.json", loc)));

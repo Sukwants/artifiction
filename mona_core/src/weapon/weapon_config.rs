@@ -98,6 +98,7 @@ pub enum WeaponConfig {
     FracturedHalo { electrifying_edict: bool },
     ProspectorsShovel { moonsign: Moonsign },
     BloodsoakedRuins { rate: f64, requiem_of_ruin: bool },
+    SacrificersStaff { stack: f64 },
 
     // Catalyst
     LostPrayerToTheSacredWinds { stack: f64 },
@@ -132,6 +133,8 @@ pub enum WeaponConfig {
     VividNotions { rate1: f64, rate2: f64 },
     NightweaversLookingGlass { effect1: bool, effect2: bool },
     BlackmarrowLantern { moonsign: Moonsign },
+    ReliquaryOfTruth { effect1: bool, effect2: bool },
+    DawningFrost { rate1: f64, rate2: f64 },
 
     // Bow
     PolarStar { stack: usize },

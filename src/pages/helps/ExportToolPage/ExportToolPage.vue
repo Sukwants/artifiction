@@ -33,12 +33,12 @@ import IconFa6BrandsGithub from "~icons/fa6-brands/github"
 const items = [
     {
         name: "yas",
-        description: "来自莫娜占卜铺原作者的导出器：Yet Another Scanner，state-of-the-art（速度上）导出器",
+        description: "继承自莫娜占卜铺原作者、叶师傅维护的导出器：Yet Another Scanner，state-of-the-art（速度上）导出器",
         buttons: [
             {
                 label: "项目地址",
                 primary: true,
-                link: "https://github.com/wormtql/yas",
+                link: "https://github.com/2745518585/yas",
                 icon: IconFa6BrandsGithub
             }
         ]
@@ -58,6 +58,18 @@ const items = [
 ]
 
 const nonActiveItems = [
+    {
+        name: "yas",
+        description: "来自莫娜占卜铺原作者的导出器：Yet Another Scanner，state-of-the-art（速度上）导出器",
+        buttons: [
+            {
+                label: "项目地址",
+                primary: true,
+                link: "https://github.com/wormtql/yas",
+                icon: IconFa6BrandsGithub
+            }
+        ]
+    },
     {
         name: "Genshin Art Scanner（已停更）",
         description: "本地识别，基本实现全自动，无UI模式，速度大致每分钟100-200个",

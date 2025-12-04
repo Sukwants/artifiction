@@ -25,6 +25,8 @@ pub enum TargetFunctionName {
     ExpectVaporize,
     ExpectMelt,
 
+    AetherPyroDefault,
+    LuminePyroDefault,
     AlbedoDefault,
     AloyDefault,
     AmberDefault,
@@ -119,4 +121,5 @@ pub enum TargetFunctionName {
     LaumaDefault,
     AinoDefault,
     FlinsDefault,
+    NeferDefault,
 }

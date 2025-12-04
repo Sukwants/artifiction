@@ -1,12 +1,17 @@
 pub use beidou::BuffBeidouC6;
 pub use dori::BuffDoriC4;
-pub use flins::BuffFlinsC6;
+pub use flins::{BuffFlinsC6, BuffFlinsP3};
 pub use ineffa::BuffIneffa;
 pub use kujou_sara::BuffKujouSaraEOrQ;
 pub use lisa::BuffLisaTalent2;
 pub use raiden_shogun::{BuffRaidenShogunC4, BuffRaidenShogunE};
 pub use razor::BuffRazorC4;
 pub use yae_miko::BuffYaeMikoC4;
+pub use sethos::BuffSethosC4;
+pub use ororon::BuffOroronC6;
+pub use iansan::{BuffIansanQ, BuffIansanC2, BuffIansanC6};
+pub use aether_electro::BuffAetherElectroC2;
+pub use lumine_electro::BuffLumineElectroC2;
 
 pub mod beidou;
 pub mod dori;
@@ -17,3 +22,8 @@ pub mod lisa;
 pub mod raiden_shogun;
 pub mod razor;
 pub mod yae_miko;
+pub mod sethos;
+pub mod ororon;
+pub mod iansan;
+pub mod aether_electro;
+pub mod lumine_electro;

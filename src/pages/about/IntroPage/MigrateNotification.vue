@@ -18,7 +18,7 @@ export default {
     name: "MigrateNotification",
     data() {
         return {
-            url: "https://www.mona-uranai.com",
+            url: "https://artifiction.pond.ink",
             host: location.hostname,
         }
     }

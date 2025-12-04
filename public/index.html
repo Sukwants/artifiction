@@ -42,10 +42,49 @@
 <noscript>
     <strong>好家伙，这年头还有不开启javascript的人吗</strong>
 </noscript>
+<div id="top-banner">
+    此站点已开启实验性功能，如出现问题请前往<a href="https://stable.artifiction.pond.ink/">稳定版站点</a>。
+</div>
+<style>
+    #top-banner {
+        position: fixed;
+        top: 0;
+        left: 0;
+        width: 100%;
+        background-color: #fff8c5;
+        color: #24292f;
+        border-bottom: 1px solid rgba(0, 0, 0, 0.1);
+        font-size: 14px;
+        font-weight: bold;
+        line-height: 1.5;
+        padding: 8px 16px;
+        text-align: center;
+        z-index: 9999;
+        font-family: "Helvetica Neue", Helvetica, "PingFang SC", "Hiragino Sans GB", "Microsoft YaHei", "微软雅黑", Arial, sans-serif;
+        transition: opacity 0.5s ease, transform 0.5s ease;
+        pointer-events: auto;
+    }
+
+    body {
+        padding-top: 0;
+    }
+</style>
+
+<script>
+    setTimeout(() => {
+        const banner = document.getElementById("top-banner");
+        if (!banner) return;
+
+        banner.style.opacity = "0";
+        banner.style.transform = "translateY(-10px)";
+
+        setTimeout(() => {
+            banner.remove();
+        }, 500);
+    }, 3000);
+</script>
 <div id="app">
-    <div class="loading"
-         style="display: flex; flex-direction: column; align-items: center"
-    >
+    <div class="loading" style="display: flex; flex-direction: column; align-items: center">
         <p style="margin-top: 12px">师傅正在仰望星空，请稍安勿躁（滚滚头）</p>
     </div>
 </div>

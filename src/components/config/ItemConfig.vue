@@ -1,20 +1,38 @@
 <template>
     <div class="config-root" :style="styleRoot">
 <!--        {{ configs }}-->
-        <ConfigItem
-            class="config"
-            v-for="config in configs"
-            :key="config.name"
-            :params="config"
-            :title="ta(config.title)"
-            :type="config.type"
-            :modelValue="value2[config.name]"
-            @update:modelValue="handleInput(config.name, $event)"
-        ></ConfigItem>
+        <div v-for="config in configs">
+            <ConfigItem
+                class="config"
+                v-if="config.type === 'globalLink'"
+                :key="config.name"
+                :params="config"
+                :title="ta(config.config.title)"
+                :type="config.type"
+                :modelValue="value2[config.name].config"
+                @update:modelValue="handleInput(config.name, $event)"
+                :name="config.name"
+                :globalValue="value2[config.name].configValue"
+                :updateGlobalConfig="updateGlobalConfig"
+                :unlinked="value2[config.name].unlinked"
+                @update:unlinked="handleUnlinked(config.name, $event)"
+            ></ConfigItem>
+            <ConfigItem
+                class="config"
+                v-if="config.type !== 'globalLink'"
+                :key="config.name"
+                :params="config"
+                :title="ta(config.title)"
+                :type="config.type"
+                :modelValue="value2[config.name].config"
+                @update:modelValue="handleInput(config.name, $event)"
+            ></ConfigItem>
+        </div>
     </div>
 </template>
 
 <script>
+import { update } from "lodash";
 import ConfigItem from "./ConfigItem"
 import {useI18n} from "@/i18n/i18n"
 
@@ -28,6 +46,10 @@ export default {
         itemName: {},
         configs: {
             type: Array
+        },
+        updateGlobalConfig: {
+            type: Function,
+            required: false
         },
         bg: {
             default: "rgb(239, 246, 253)"
@@ -57,14 +79,29 @@ export default {
         handleInput(name, value) {
             if (this.needItemName) {
                 let obj = Object.assign({}, this.modelValue[this.itemName])
-                obj[name] = value
+                obj[name].config = value
 
                 this.$emit("update:modelValue", {
                     [this.itemName]: obj
                 })
             } else {
                 let obj = Object.assign({}, this.modelValue)
-                obj[name] = value
+                obj[name].config = value
+                this.$emit("update:modelValue", obj)
+            }
+        },
+
+        handleUnlinked(name, value) {
+            if (this.needItemName) {
+                let obj = Object.assign({}, this.modelValue[this.itemName])
+                obj[name].unlinked = value
+
+                this.$emit("update:modelValue", {
+                    [this.itemName]: obj
+                })
+            } else {
+                let obj = Object.assign({}, this.modelValue)
+                obj[name].unlinked = value
                 this.$emit("update:modelValue", obj)
             }
         }

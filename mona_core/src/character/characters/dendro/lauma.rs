@@ -76,7 +76,7 @@ pub const LAUMA_STATIC_DATA: CharacterStaticData = CharacterStaticData {
     hp: [829, 2151, 2863, 4283, 4789, 5509, 6183, 6911, 7416, 8151, 8657, 9400, 9905, 10654, 11411],
     atk: [20, 51, 69, 103, 115, 132, 148, 165, 177, 195, 207, 225, 237, 255, 313],
     def: [52, 135, 180, 269, 301, 346, 388, 434, 465, 512, 543, 590, 622, 669, 716],
-    sub_stat: CharacterSubStatFamily::ElementalMastery315,
+    sub_stat: CharacterSubStatFamily::ElementalMastery115,
     weapon_type: WeaponType::Catalyst,
     star: 5,
     skill_name1: locale!(
@@ -111,8 +111,10 @@ pub struct LaumaEffect {
 
 impl<A: Attribute> ChangeAttribute<A> for LaumaEffect {
     fn change_attribute(&self, attribute: &mut A) {
+        attribute.set_value_by(AttributeName::ElementalMastery, "初始精通", 200.0);
+
         if self.has_p1 {
-            if self.moonsign.is_nascent() {
+            if self.moonsign == Moonsign::Nascent {
                 attribute.set_value_by(AttributeName::CriticalDamageBloom, "天赋：奉向霜夜的明光", 1.0);
                 attribute.set_value_by(AttributeName::CriticalDamageHyperbloom, "天赋：奉向霜夜的明光", 1.0);
                 attribute.set_value_by(AttributeName::CriticalDamageBurgeon , "天赋：奉向霜夜的明光", 1.0);
@@ -120,7 +122,7 @@ impl<A: Attribute> ChangeAttribute<A> for LaumaEffect {
                 attribute.set_value_to(AttributeName::CriticalBloom, "天赋：奉向霜夜的明光", 0.15);
                 attribute.set_value_to(AttributeName::CriticalHyperbloom, "天赋：奉向霜夜的明光", 0.15);
                 attribute.set_value_to(AttributeName::CriticalBurgeon , "天赋：奉向霜夜的明光", 0.15);
-            } else if self.moonsign.is_ascendant() {
+            } else if self.moonsign == Moonsign::Ascendant {
                 attribute.set_value_by(AttributeName::CriticalDamageLunarBloom, "天赋：奉向霜夜的明光", 0.2);
 
                 attribute.set_value_by(AttributeName::CriticalLunarBloom, "天赋：奉向霜夜的明光", 0.1);
@@ -305,7 +307,7 @@ impl CharacterTrait for Lauma {
             ),
             config: ItemConfigType::Bool { default: false },
         },
-        ItemConfig::MOONSIGN2
+        ItemConfig::MOONSIGN_GLOBAL(Moonsign::Nascent, ItemConfig::PRIORITY_CHARACTER, true),
     ]);
 
     #[cfg(not(target_family = "wasm"))]

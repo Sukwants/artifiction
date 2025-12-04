@@ -1,5 +1,5 @@
 use serde::{Deserialize, Serialize};
-use crate::common::Moonsign;
+use crate::common::{Element, Moonsign};
 
 fn default_true() -> bool {
     true
@@ -11,10 +11,17 @@ fn default_false() -> bool {
 
 #[derive(Serialize, Deserialize, Debug)]
 pub enum CharacterSkillConfig {
+    AetherAnemo { elemental_absorption: Element },
+    LumineAnemo { elemental_absorption: Element },
+    AetherDendro { overflowing_lotuslight_count: usize },
+    LumineDendro { overflowing_lotuslight_count: usize },
+    AetherHydro { hp_above_half: bool, consumed_hp_times: usize },
+    LumineHydro { hp_above_half: bool, consumed_hp_times: usize },
+    AetherPyro { gosoythoth: bool, nightsouls_blessing: bool, active: bool, activated_q: bool },
+    LuminePyro { gosoythoth: bool, nightsouls_blessing: bool, active: bool, activated_q: bool },
     Albedo { fatal_count: usize },
     Aloy { coil_count: usize },
     AratakiItto { after_q: bool },
-
     Diluc { pyro: bool },
     Eula { lightfall_stack: usize },
     Ganyu { talent1_rate: f64 },
@@ -54,7 +61,7 @@ pub enum CharacterSkillConfig {
     Xilonen { nightsoul: bool },
     Chasca { element_count: usize, c6_rate: f64 },
     Mavuika { after_q: bool },
-    Skirk { cunning_stacks: i32, seven_phase_mode: bool, death_crossing_stacks: i32, void_rift_count: i32 },
-    Escoffier { hydro_cryo_count: usize, after_burst: bool },
+    Skirk { cunning_stacks: i32, seven_phase_mode: bool, havoc_extinction: bool, death_crossing_stacks: i32, void_rift_count: i32 },
+    Nefer { veil_of_falsehood: usize, shadow_dance: bool },
     NoConfig,
 }

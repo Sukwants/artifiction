@@ -44,7 +44,7 @@
             <el-col :xs="24" :sm="12" class="mb16">
                 <use-case-item text="Yas" :icon="IconFa6BrandsGithub"
                                :description="t('intro.opensourceYasDescription')"
-                               @click="newPage('https://github.com/wormtql/yas')"
+                               @click="newPage('https://github.com/2745518585/yas')"
                 ></use-case-item>
             </el-col>
         </el-row>

@@ -251,3 +251,6 @@ pub use moonsign::BuffMoonsignElectro;
 pub use moonsign::BuffMoonsignDendro;
 pub use moonsign::BuffMoonsignCryo;
 pub use moonsign::BuffMoonsignGeo;
+
+mod fantastical_blessings;
+pub use fantastical_blessings::BuffFantasticalBlessings;

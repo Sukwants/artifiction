@@ -3,7 +3,8 @@ export interface IWeapon {
     level: number,
     ascend: boolean,
     params: any,
-    refine: number
+    refine: number,
+    configUnlinked: any
 }
 
 export type WeaponType = "Bow" | "Claymore" | "Sword" | "Catalyst" | "Polearm"

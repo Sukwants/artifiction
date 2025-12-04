@@ -6,6 +6,8 @@ pub use ningguang::BuffNingguangTalent2;
 pub use xilonen::{BuffXilonenC2, BuffXilonenC4, BuffXilonenE};
 pub use yunjin::{BuffYunjinC2, BuffYunjinQ};
 pub use zhongli::BuffZhongliShield;
+pub use aether_geo::BuffAetherGeoC1;
+pub use lumine_geo::BuffLumineGeoC1;
 
 pub mod albedo;
 pub mod arataki_itto;
@@ -15,3 +17,5 @@ pub mod ningguang;
 pub mod xilonen;
 pub mod yunjin;
 pub mod zhongli;
+pub mod aether_geo;
+pub mod lumine_geo;

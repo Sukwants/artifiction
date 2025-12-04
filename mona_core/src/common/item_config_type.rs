@@ -134,6 +134,12 @@ impl<'de> Deserialize<'de> for ConfigElements8Multi {
     }
 }
 
+pub struct GlobalLinkConfig {
+    pub key: &'static str,
+    pub priority: usize,
+    pub team_shared: bool,
+}
+
 pub enum ItemConfigType {
     Float {
         min: f64,
@@ -173,6 +179,10 @@ pub enum ItemConfigType {
     FloatInput {
         default: f64,
     },
+    Element {
+        elements: &'static [Element],
+        default: Element
+    },
     Element4 {      // cryo, pyro, electro, hydro
         default: Element
     },
@@ -191,6 +201,20 @@ pub enum ItemConfigType {
     Moonsign3 {
         default: Moonsign
     },
+    GlobalLinkBool {
+        default: bool,
+        global_link: GlobalLinkConfig,
+    },
+    GlobalLinkFloat {
+        min: f64,
+        max: f64,
+        default: f64,
+        global_link: GlobalLinkConfig,
+    },
+    GlobalLinkMoonsign3 {
+        default: Moonsign,
+        global_link: GlobalLinkConfig,
+    }
 }
 
 pub struct ItemConfig {
@@ -200,136 +224,6 @@ pub struct ItemConfig {
 }
 
 impl ItemConfigType {
-    pub fn to_json(&self, title: &str, name: &str) -> String {
-        let j = match self {
-            ItemConfigType::Skill4 { default } => {
-                json!({
-                    "type": "skill4",
-                    "title": title,
-                    "name": name,
-                    "default": default
-                })
-            },
-            ItemConfigType::IntInput { min, max, default } => {
-                json!({
-                    "type": "intInput",
-                    "title": title,
-                    "name": name,
-                    "min": min,
-                    "max": max,
-                    "default": default
-                })
-            },
-            ItemConfigType::Element4 { default } => {
-                json!({
-                    "type": "element4",
-                    "title": title,
-                    "name": name,
-                    "default": default
-                })
-            },
-            ItemConfigType::Element8 { default } => {
-                json!({
-                    "type": "element8",
-                    "title": title,
-                    "name": name,
-                    "default": default
-                })
-            },
-            ItemConfigType::FloatPercentageInput { default } => {
-                json!({
-                    "type": "floatPercentageInput",
-                    "title": title,
-                    "name": name,
-                    "default": default
-                })
-            },
-            ItemConfigType::FloatInput { default } => {
-                json!({
-                    "type": "floatInput",
-                    "title": title,
-                    "name": name,
-                    "default": default
-                })
-            }
-            ItemConfigType::Float { min, max, default } => {
-                json!({
-                    "type": "float",
-                    "title": title,
-                    "name": name,
-                    "min": min,
-                    "max": max,
-                    "default": default
-                })
-            },
-            ItemConfigType::Int { min, max, default } => {
-                json!({
-                    "type": "int",
-                    "title": title,
-                    "name": name,
-                    "min": min,
-                    "max": max,
-                    "default": default
-                })
-            },
-            ItemConfigType::Bool { default } => {
-                json!({
-                    "type": "bool",
-                    "title": title,
-                    "name": name,
-                    "default": default
-                })
-            },
-            ItemConfigType::Option { options, default } => {
-                let temp: Vec<&str> = options.split(",").collect();
-                json!({
-                    "type": "option",
-                    "title": title,
-                    "name": name,
-                    "default": default,
-                    "options": temp
-                })
-            },
-            ItemConfigType::Option2 { options_zh, options_en, default } => {
-                let temp_zh: Vec<&str> = options_zh.split(",").collect();
-                let temp_en: Vec<&str> = options_en.split(",").collect();
-                json!({
-                    "type": "option2",
-                    "title": title,
-                    "name": name,
-                    "default": default,
-                    "options_zh": temp_zh,
-                    "options_en": temp_en
-                })
-            },
-            ItemConfigType::Element8Multi { default } => {
-                json!({
-                    "type": "element8multi",
-                    "title": title,
-                    "name": name,
-                    "default": default
-                })
-            },
-            ItemConfigType::Moonsign2 { default } => {
-                json!({
-                    "type": "moonsign2",
-                    "title": title,
-                    "name": name,
-                    "default": default
-                })
-            },
-            ItemConfigType::Moonsign3 { default } => {
-                json!({
-                    "type": "moonsign3",
-                    "title": title,
-                    "name": name,
-                    "default": default
-                })
-            },
-        };
-
-        j.to_string()
-    }
 }
 
 impl ItemConfig {
@@ -351,4 +245,16 @@ impl ItemConfig {
 
     pub const MOONSIGN2: ItemConfig = ItemConfig { name: "moonsign", title: locale!(zh_cn: "月兆", en: "Moonsign"), config: ItemConfigType::Moonsign2 { default: Moonsign::Nascent } };
     pub const MOONSIGN3: ItemConfig = ItemConfig { name: "moonsign", title: locale!(zh_cn: "月兆", en: "Moonsign"), config: ItemConfigType::Moonsign3 { default: Moonsign::None } };
+
+    pub const PRIORITY_DEFAULT: usize = 0;
+    pub const PRIORITY_CHARACTERSKILL: usize = 1;
+    pub const PRIORITY_ARTIFACT: usize = 2;
+    pub const PRIORITY_TARGETFUNCTION: usize = 3;
+    pub const PRIORITY_BUFF: usize = 4;
+    pub const PRIORITY_WEAPON: usize = 5;
+    pub const PRIORITY_CHARACTER: usize = 6;
+
+    pub const fn MOONSIGN_GLOBAL(default: Moonsign, priority: usize, team_shared: bool) -> ItemConfig {
+        return ItemConfig { name: "moonsign", title: locale!(zh_cn: "月兆", en: "Moonsign"), config: ItemConfigType::GlobalLinkMoonsign3 { default, global_link: GlobalLinkConfig { key: "moonsign", priority, team_shared } } };
+    }
 }

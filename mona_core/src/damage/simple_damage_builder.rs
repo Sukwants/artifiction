@@ -390,12 +390,14 @@ impl DamageBuilder for SimpleDamageBuilder {
         let base = self.ratio_def * def + self.ratio_hp * hp + self.ratio_atk * atk + self.extra_damage;
 
         let healing_bonus = attribute.get_value(AttributeName::HealingBonus);
+        let healing_critical = self.extra_critical_rate.clamp(0.0, 1.0);
+        let healing_critical_bonus = self.extra_critical_damage;
         let heal_value = base * (1.0 + healing_bonus);
         let result = {
             DamageResult {
-                critical: heal_value,
+                critical: heal_value * (1.0 + healing_critical_bonus),
                 non_critical: heal_value,
-                expectation: heal_value,
+                expectation: heal_value * (1.0 + healing_critical * healing_critical_bonus),
                 lunar_type: MoonglareReaction::None,
                 is_heal: true,
                 is_shield: false

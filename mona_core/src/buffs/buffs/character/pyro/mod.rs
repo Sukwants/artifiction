@@ -5,6 +5,10 @@ pub use thoma::{BuffThomaC6, BuffThomaTalent1};
 pub use xiangling::{BuffXianglingC1, BuffXianglingC6, BuffXianglingTalent2};
 pub use xinyan::{BuffXinyanC4, BuffXinyanTalent2};
 pub use yoimiya::BuffYoimiyaTalent2;
+pub use amber::BuffAmberC6;
+pub use chevreuse::{BuffChevreuseP1, BuffChevreuseP2, BuffChevreuseC6};
+pub use aether_pyro::{BuffAetherPyroC1, BuffAetherPyroC2};
+pub use lumine_pyro::{BuffLuminePyroC1, BuffLuminePyroC2};
 
 pub mod bennett;
 pub mod hu_tao;
@@ -13,3 +17,7 @@ pub mod thoma;
 pub mod xiangling;
 pub mod xinyan;
 pub mod yoimiya;
+pub mod amber;
+pub mod chevreuse;
+pub mod aether_pyro;
+pub mod lumine_pyro;

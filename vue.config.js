@@ -85,7 +85,7 @@ module.exports = {
         proxy: {
             "^/api/compute_result/analysis": {
                 // target: "http://localhost:8000"
-                target: "https://www.mona-uranai.com/"
+                target: "https://artifiction.pond.ink/"
             },
             "^/api": {
                 target: "http://localhost:8000/",
@@ -139,6 +139,7 @@ module.exports = {
                 "@targetFunction": path.resolve(__dirname, "src/assets/target_function"),
                 "@potentialFunction": path.resolve(__dirname, "src/assets/potential_function"),
                 "@buff": path.resolve(__dirname, "src/assets/buff"),
+                "@globalConfig": path.resolve(__dirname, "src/assets/global_config"),
                 "@image": path.resolve(__dirname, "src/images"),
                 "@artifact": path.resolve(__dirname, "src/assets/artifacts"),
                 // "genshin_panel": path.resolve(__dirname, "../../ts/genshin/dist"),

@@ -8,6 +8,56 @@ use crate::common::i18n::locale;
 use crate::common::item_config_type::{ItemConfig, ItemConfigType};
 use crate::common::Moonsign;
 
+pub struct BuffFlinsP3 {
+    pub atk: f64,
+}
+
+impl<A: Attribute> Buff<A> for BuffFlinsP3 {
+    fn change_attribute(&self, attribute: &mut A) {
+        attribute.set_value_by(AttributeName::IncreaseLunarCharged, "菲林斯「月兆祝赐·旧世潜藏」", (self.atk * 0.00007).min(0.14));
+    }
+}
+
+impl BuffMeta for BuffFlinsP3 {
+    #[cfg(not(target_family = "wasm"))]
+    const META_DATA: BuffMetaData = BuffMetaData {
+        name: BuffName::FlinsP3,
+        name_locale: locale!(
+            zh_cn: "菲林斯-「月兆祝赐·旧世潜藏」",
+            en: "Flins-Moonsign Benediction: Old World Secrets"
+        ),
+        image: BuffImage::Avatar(CharacterName::Flins),
+        genre: BuffGenre::Character,
+        description: Some(locale!(
+            zh_cn: "队伍中的角色触发感电反应时，将转为触发月感电反应，且基于菲林斯的攻击力，提升月感电反应的基础伤害：每100点攻击力都将提升0.7%基础伤害，至多通过这种方式提升14%伤害。",
+            en: "When a party member triggers an Electro-Charged reaction, it will be converted into the Lunar-Charged reaction, with every 100 ATK that Flins has increasing Lunar-Charged's Base DMG by 0.7%, up to a maximum of 14%."
+        )),
+        from: BuffFrom::Character(CharacterName::Flins),
+    };
+
+    #[cfg(not(target_family = "wasm"))]
+    const CONFIG: Option<&'static [ItemConfig]> = Some(&[
+        ItemConfig {
+            name: "atk",
+            title: locale!(
+                zh_cn: "攻击力",
+                en: "ATK"
+            ),
+            config: ItemConfigType::FloatInput { default: 0.0 }
+        },
+    ]);
+
+    fn create<A: Attribute>(b: &BuffConfig) -> Box<dyn Buff<A>> {
+        let atk = match *b {
+            BuffConfig::FlinsP3 { atk } => atk,
+            _ => 0.0
+        };
+        Box::new(BuffFlinsP3 {
+            atk,
+        })
+    }
+}
+
 pub struct BuffFlinsC6 {
     pub moonsign: Moonsign,
 }
@@ -40,7 +90,7 @@ impl BuffMeta for BuffFlinsC6 {
 
     #[cfg(not(target_family = "wasm"))]
     const CONFIG: Option<&'static [ItemConfig]> = Some(&[
-        ItemConfig::MOONSIGN2
+        ItemConfig::MOONSIGN_GLOBAL(Moonsign::Nascent, ItemConfig::PRIORITY_BUFF, true),
     ]);
 
     fn create<A: Attribute>(b: &BuffConfig) -> Box<dyn Buff<A>> {

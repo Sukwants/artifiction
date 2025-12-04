@@ -1,6 +1,6 @@
 # 介绍
 
-[叶师傅开锁铺](https://www.mona-uranai.com) 主要是一个游戏《原神》内的各项数值计算以及优化系统。包括圣遗物配装优化、基于搜索的圣遗物潜力期望、多人配装优化等  
+[叶师傅开锁铺](https://artifiction.pond.ink) 主要是一个游戏《原神》内的各项数值计算以及优化系统。包括圣遗物配装优化、基于搜索的圣遗物潜力期望、多人配装优化等  
 
 ## 圣遗物优化
 ### 为什么需要圣遗物优化？
@@ -33,10 +33,10 @@ DSL即Domain Specific Language，为特定领域使用的语言
 
 MONA-DSL可以帮助你灵活地定制不同的优化目标，你可以使用内置的优化目标，也可以选择使用DSL自定义优化目标，也可以使用其他人贡献的DSL优化目标
 
-可在 [MONA-DSL Playground](https://mona-uranai.com/playground) 实验不同的代码
+可在 [MONA-DSL Playground](https://artifiction.pond.ink/playground) 实验不同的代码
 
 
 ## 圣遗物扫描
 通过深度学习驱动的字符识别程序，以及Rust的高性能，你可以方便快速地将游戏中的圣遗物数据导出，且基本不需要担心封号风险。（唯一的风险来自于模拟鼠标操作）
 
-[Yas 下载](https://github.com/wormtql/yas/releases)
+[Yas 下载](https://github.com/2745518585/yas/releases)

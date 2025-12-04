@@ -109,10 +109,10 @@ impl TargetFunction for EscoffierDefaultTargetFunction {
         
         // 爱可菲的标准战斗循环：21次冻霜芭菲伤害 + 1次大招伤害
         // 冻霜芭菲是元素战技，可以吃到战技伤害加成
-        let dmg_frosty = Escoffier::damage::<SimpleDamageBuilder>(&context, S::EFrostyParfait, &config, None);
-        let dmg_q1 = Escoffier::damage::<SimpleDamageBuilder>(&context, S::Q1, &config, None);
+        let dmg_e = Escoffier::damage::<SimpleDamageBuilder>(&context, S::ECon, &config, None);
+        let dmg_q = Escoffier::damage::<SimpleDamageBuilder>(&context, S::Q, &config, None);
 
         // 一轮伤害期望：21次冻霜芭菲 + 1次大招
-        dmg_frosty.normal.expectation * 21.0 + dmg_q1.normal.expectation * 1.0
+        dmg_e.normal.expectation * 21.0 + dmg_q.normal.expectation * 1.0
     }
 }

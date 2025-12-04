@@ -35,6 +35,7 @@
             @update:modelValue="handleChangeConfig"
             :item-name="props.buff.name"
             :configs="data.config"
+            :updateGlobalConfig="updateGlobalConfig"
         ></item-config>
     </div>
 </template>
@@ -54,13 +55,15 @@ const { t, ta } = useI18n()
 
 interface Props {
     buff: BuffEntry,
-    buffConfig: any
+    buffConfig: any,
+    updateGlobalConfig: any,
 }
 
 const props = defineProps<Props>()
 
 interface Emits {
     (e: "update:buffConfig", v: any): void,
+    (e: "update:unlinked", v: any): void,
     (e: "delete"): void,
     (e: "toggle"): void,
 }

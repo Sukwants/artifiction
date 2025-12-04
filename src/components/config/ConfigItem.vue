@@ -1,7 +1,7 @@
 <template>
     <div>
 <!--        <h3 class="config-title">{{ // params.title }}</h3>-->
-        <h3 class="config-title">{{ title }}</h3>
+        <h3 class="config-title" v-if="type !== 'globalLink'">{{ title }}</h3>
         <template v-if="type === 'float'">
             <el-slider
                 :modelValue="modelValue"
@@ -51,6 +51,13 @@
                 @update:modelValue="handleInputValue"
             >
             </el-input>
+        </template>
+        <template v-if="type === 'element'">
+            <select-element-type
+                :modelValue="modelValue"
+                @update:modelValue="handleChangeValue"
+                :elements=params.elements
+            ></select-element-type>
         </template>
         <template v-if="type === 'element4'">
             <select-element-type
@@ -116,6 +123,43 @@
                 :moonsigns="['None', 'Nascent', 'Ascendant']"
             ></select-moonsign-type>
         </template>
+        <template v-if="type === 'globalLink'">
+            <div class="global-config-item">
+                <ConfigItem
+                    class="config"
+                    v-if="type === 'globalLink' && !unlinked"
+                    :key="'[global]' + name"
+                    :params="params.config"
+                    :title="title"
+                    :type="params.config.type"
+                    :modelValue="globalValue"
+                    @update:modelValue="updateGlobalConfig(params.key, $event)"
+                ></ConfigItem>
+                <ConfigItem
+                    class="config"
+                    v-if="type === 'globalLink' && unlinked"
+                    :key="'[local]' + name"
+                    :params="params.config"
+                    :title="title"
+                    :type="params.config.type"
+                    :modelValue="modelValue"
+                    @update:modelValue="handleChangeValue"
+                ></ConfigItem>
+                <el-tooltip
+                    :content="'key: ' + params.key + '<br>' + 'prioirty: ' + params.priority"
+                    :placement="'top'"
+                    :show-after="1000"
+                    raw-content
+                >
+                    <el-switch
+                        class="unlinked"
+                        :modelValue="unlinked"
+                        @update:modelValue="$emit('update:unlinked', $event)"
+                        :inactive-icon="Connection"
+                    ></el-switch>
+                </el-tooltip>
+            </div>
+        </template>
     </div>
 </template>
 
@@ -125,6 +169,8 @@ import SelectSkillType from "@c/select/SelectSkillType"
 import SelectMoonsignType from "@c/select/SelectMoonsignType"
 import { useI18n } from "@/i18n/i18n"
 
+import { Connection } from '@element-plus/icons-vue'
+
 export default {
     name: "ConfigItem",
     components: { SelectSkillType, SelectElementType, SelectMoonsignType },
@@ -133,8 +179,21 @@ export default {
         type: {},
         params: {},
         title: {},
+        name: {
+            type: String,
+            required: false
+        },
+        globalValue: {},
+        updateGlobalConfig: {
+            type: Function,
+            required: false
+        },
+        unlinked: {
+            type: Boolean,
+            required: false
+        }
     },
-    emits: ["update:modelValue"],
+    emits: ["update:modelValue", "update:unlinked"],
     computed: {
         currentLocale() {
             const { locale } = useI18n()
@@ -147,7 +206,10 @@ export default {
             } else {
                 return this.params.options_en;
             }
-        }
+        },
+        Connection() {
+            return Connection;
+        },
     },
     methods: {
         handleInputValue(value) {
@@ -176,6 +238,20 @@ export default {
     font-size: 12px;
     color: #666666;
     margin: 0 0 12px 0;
+}
+
+.global-config-item {
+    position: relative;
+}
+
+.unlinked {
+    position: absolute;
+    top: -15%;
+    right: -5px;
+}
+
+.unlinked :deep(.el-switch__core) {
+    display: none;
 }
 
 // .config-item {

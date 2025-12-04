@@ -1,5 +1,5 @@
 # Myyes's Divination Shop
-Genshin Impact artifacts automatic combination, the website is [here](https://www.mona-uranai.com)  
+Genshin Impact artifacts automatic combination, the website is [here](https://artifiction.pond.ink)  
 This README is also available in:  
 [中文](./README.md)
 <!-- [日本語](./README_jp.md) -->

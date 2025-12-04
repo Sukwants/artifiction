@@ -1,55 +1,65 @@
-use num_derive::FromPrimitive;
-use crate::character::{CharacterConfig, CharacterName, CharacterStaticData};
-use crate::common::{Element, WeaponType, ChangeAttribute, SkillType};
-use crate::character::character_sub_stat::CharacterSubStatFamily;
+use crate::attribute::{Attribute, AttributeName, AttributeCommon};
 use crate::character::character_common_data::CharacterCommonData;
-use crate::attribute::{Attribute, AttributeName};
+use crate::character::character_sub_stat::CharacterSubStatFamily;
+use crate::character::{CharacterConfig, CharacterName, CharacterStaticData};
 use crate::character::skill_config::CharacterSkillConfig;
 use crate::character::traits::{CharacterSkillMap, CharacterSkillMapItem, CharacterTrait};
+use crate::character::macros::{damage_enum, skill_map};
+use crate::common::{ChangeAttribute, Element, MoonglareReaction, SkillType, WeaponType};
+use crate::common::i18n::{locale, hit_n_dmg, plunging_dmg, charged_dmg};
+use crate::common::item_config_type::{ItemConfig, ItemConfigType};
 use crate::damage::damage_builder::DamageBuilder;
 use crate::damage::DamageContext;
+// use crate::target_functions::target_functions::EscoffierDefaultTargetFunction;
 use crate::target_functions::TargetFunction;
 use crate::team::TeamQuantization;
 use crate::weapon::weapon_common_data::WeaponCommonData;
-use strum::EnumCount;
-use strum_macros::{EnumCount as EnumCountMacro, EnumString};
-use crate::common::i18n::locale;
 
 pub struct EscoffierSkillType {
-    pub normal_dmg1: [f64; 15],
-    pub normal_dmg2: [f64; 15],
-    pub normal_dmg3: [f64; 15],
-    pub charged_dmg1: [f64; 15],
-    pub plunging_dmg1: [f64; 15],
-    pub plunging_dmg2: [f64; 15],
-    pub plunging_dmg3: [f64; 15],
+    pub a_dmg1: [f64; 15],
+    pub a_dmg2: [f64; 15],
+    pub a_dmg31: [f64; 15],
+    pub a_dmg32: [f64; 15],
+    pub z_dmg: [f64; 15],
+    pub x_dmg1: [f64; 15],
+    pub x_dmg2: [f64; 15],
+    pub x_dmg3: [f64; 15],
 
-    pub elemental_skill_dmg1: [f64; 15],
-    pub elemental_skill_frosty_parfait_dmg: [f64; 15],
+    pub e_dmg: [f64; 15],
+    pub e_con_dmg: [f64; 15],
 
-    pub elemental_burst_dmg1: [f64; 15],
-    pub elemental_burst_healing_atk_ratio: [f64; 15],
-    pub elemental_burst_healing_base: [f64; 15],
+    pub q_dmg: [f64; 15],
+    pub q_heal_atk: [f64; 15],
+    pub q_heal: [f64; 15],
+
+    pub p1_heal: f64,
+
+    pub c6_dmg: f64,
 }
 
 pub const ESCOFFIER_SKILL: EscoffierSkillType = EscoffierSkillType {
     // Normal Attack: Kitchen Skills
-    normal_dmg1: [0.5155, 0.5575, 0.5994, 0.6594, 0.7013, 0.7493, 0.8152, 0.8812, 0.9471, 1.019, 1.091, 1.1629, 1.2348, 1.3068, 1.3787],
-    normal_dmg2: [0.4759, 0.5147, 0.5534, 0.6088, 0.6475, 0.6918, 0.7526, 0.8135, 0.8744, 0.9408, 1.0072, 1.0736, 1.14, 1.2064, 1.2728],
-    normal_dmg3: [0.7333, 0.7931, 0.8527, 0.9380, 0.9976, 1.0658, 1.1597, 1.2535, 1.3473, 1.4496, 1.552, 1.6542, 1.7566, 1.8589, 1.9612],
-    charged_dmg1: [1.1541, 1.2481, 1.342, 1.4762, 1.5701, 1.6775, 1.8251, 1.9727, 2.1204, 2.2814, 2.4424, 2.6035, 2.7645, 2.9256, 3.0866],
-    plunging_dmg1: [0.6393, 0.6914, 0.7434, 0.8177, 0.8698, 0.9293, 1.011, 1.0928, 1.1746, 1.2638, 1.353, 1.4422, 1.5314, 1.6206, 1.7098],
-    plunging_dmg2: [1.2784, 1.3824, 1.4865, 1.6351, 1.7392, 1.8581, 2.0216, 2.1851, 2.3486, 2.527, 2.7054, 2.8838, 3.0622, 3.2405, 3.4189],
-    plunging_dmg3: [1.5968, 1.7267, 1.8567, 2.0424, 2.1723, 2.3209, 2.525, 2.7291, 2.9333, 3.1564, 3.3795, 3.6026, 3.8257, 4.0488, 4.2719],
+    a_dmg1: [0.51551, 0.55747, 0.59943, 0.659373, 0.701333, 0.749287, 0.815225, 0.881162, 0.947099, 1.019031, 1.090963, 1.162894, 1.234826, 1.306757, 1.378689],
+    a_dmg2: [0.475933, 0.514671, 0.55341, 0.608751, 0.64749, 0.691762, 0.752638, 0.813513, 0.874388, 0.940797, 1.007206, 1.073615, 1.140025, 1.206434, 1.272843],
+    a_dmg31: [0.33, 0.356855, 0.383715, 0.422087, 0.448947, 0.479644, 0.521852, 0.564061, 0.60627, 0.652316, 0.698361, 0.744407, 0.790453, 0.836499, 0.882544],
+    a_dmg32: [0.403327, 0.436156, 0.468985, 0.515884, 0.548712, 0.586231, 0.63782, 0.689408, 0.740996, 0.797274, 0.853553, 0.909831, 0.966109, 1.022387, 1.078666],
+    z_dmg: [1.15412, 1.24806, 1.342, 1.4762, 1.57014, 1.6775, 1.82512, 1.97274, 2.12036, 2.2814, 2.44244, 2.60348, 2.76452, 2.92556, 3.0866],
+    x_dmg1: [0.639324, 0.691362, 0.7434, 0.81774, 0.869778, 0.92925, 1.011024, 1.092798, 1.174572, 1.26378, 1.352988, 1.442196, 1.531404, 1.620612, 1.70982],
+    x_dmg2: [1.278377, 1.382431, 1.486485, 1.635134, 1.739187, 1.858106, 2.02162, 2.185133, 2.348646, 2.527025, 2.705403, 2.883781, 3.062159, 3.240537, 3.418915],
+    x_dmg3: [1.596762, 1.726731, 1.8567, 2.04237, 2.172339, 2.320875, 2.525112, 2.729349, 2.933586, 3.15639, 3.379194, 3.601998, 3.824802, 4.047606, 4.27041],
 
     // Elemental Skill: Low-Temperature Cooking
-    elemental_skill_dmg1: [0.504, 0.5418, 0.5796, 0.63, 0.6678, 0.7056, 0.756, 0.8064, 0.8568, 0.9072, 0.9576, 1.008, 1.071, 1.134, 1.197],
-    elemental_skill_frosty_parfait_dmg: [1.2, 1.29, 1.38, 1.5, 1.59, 1.68, 1.8, 1.92, 2.04, 2.16, 2.28, 2.4, 2.55, 2.7, 2.85],
+    e_dmg: [0.504, 0.5418, 0.5796, 0.63, 0.6678, 0.7056, 0.756, 0.8064, 0.8568, 0.9072, 0.9576, 1.008, 1.071, 1.134, 1.197],
+    e_con_dmg: [1.2, 1.29, 1.38, 1.5, 1.59, 1.68, 1.8, 1.92, 2.04, 2.16, 2.28, 2.4, 2.55, 2.7, 2.85],
 
     // Elemental Burst: Scoring Cuts
-    elemental_burst_dmg1: [5.928, 6.3726, 6.8172, 7.41, 7.8546, 8.2992, 8.892, 9.4848, 10.0776, 10.6704, 11.2632, 11.856, 12.597, 13.338, 14.079],
-    elemental_burst_healing_atk_ratio: [1.7203, 1.8493, 1.9784, 2.1504, 2.2794, 2.4084, 2.5805, 2.7525, 2.9245, 3.0966, 3.2686, 3.4406, 3.6563, 3.872, 4.0877],
-    elemental_burst_healing_base: [1078.53, 1186.39, 1303.25, 1429.1, 1563.93, 1707.75, 1860.57, 2022.37, 2193.16, 2372.95, 2561.73, 2759.5, 2966.27, 3182.04, 3406.8],
+    q_dmg: [5.928, 6.3726, 6.8172, 7.41, 7.8546, 8.2992, 8.892, 9.4848, 10.0776, 10.6704, 11.2632, 11.856, 12.597, 13.338, 14.079],
+    q_heal_atk: [1.72032, 1.849344, 1.978368, 2.1504, 2.279424, 2.408448, 2.58048, 2.752512, 2.924544, 3.096576, 3.268608, 3.44064, 3.65568, 3.87072, 4.08576],
+    q_heal: [1078.5255, 1186.3931, 1303.2495, 1429.095, 1563.9294, 1707.7528, 1860.5652, 2022.3665, 2193.1567, 2372.936, 2561.704, 2759.4614, 2966.2075, 3181.9426, 3406.6665],
+
+    p1_heal: 1.3824,
+
+    c6_dmg: 5.0,
 };
 
 pub const ESCOFFIER_STATIC_DATA: CharacterStaticData = CharacterStaticData {
@@ -65,111 +75,78 @@ pub const ESCOFFIER_STATIC_DATA: CharacterStaticData = CharacterStaticData {
     skill_name1: locale!(
         zh_cn: "后厨手艺",
         en: "Normal Attack: Kitchen Skills",
-        ja: "通常攻撃・料理技術",
     ),
     skill_name2: locale!(
         zh_cn: "低温烹饪",
         en: "Low-Temperature Cooking",
-        ja: "低温調理",
     ),
     skill_name3: locale!(
         zh_cn: "花刀技法",
         en: "Scoring Cuts",
-        ja: "スコアリングカット",
     ),
     name_locale: locale!(
         zh_cn: "爱可菲",
         en: "Escoffier",
-        ja: "エスコフィエ",
     ),
 };
 
 pub struct EscoffierEffect {
     pub hydro_cryo_count: usize,
-    pub after_burst: bool,
-}
-
-impl EscoffierEffect {
-    pub fn new(common_data: &CharacterCommonData, config: &CharacterConfig) -> Self {
-        let (hydro_cryo_count, after_burst) = match config {
-            CharacterConfig::Escoffier { hydro_cryo_count, after_burst } => (*hydro_cryo_count, *after_burst),
-            _ => (0, false)
-        };
-        EscoffierEffect {
-            hydro_cryo_count,
-            after_burst,
-        }
-    }
+    pub has_p2: bool,
+    pub has_c1: bool,
+    pub has_c4: bool,
 }
 
 impl<A: Attribute> ChangeAttribute<A> for EscoffierEffect {
     fn change_attribute(&self, attribute: &mut A) {
-        // Passive 2: 美食胜过良药 - 元素爆发后的康复食疗效果
-        if self.after_burst {
-            // 这个效果是持续治疗，在实际游戏中体现为持续恢复生命值
-            // 在伤害计算系统中可以体现为攻击力加成（因为治疗基于攻击力）
-            attribute.set_value_by(AttributeName::ATKPercentage, "爱可菲天赋：美食胜过良药", 0.1382);
-        }
-        
-        // Passive 3: 灵感浸入调味 - 根据队伍水/冰角色数量降低敌人抗性
-        if self.hydro_cryo_count > 0 {
-            let resistance_reduction = match self.hydro_cryo_count {
-                1 => 0.05,
-                2 => 0.10,
-                3 => 0.15,
-                4 => 0.55, // 特殊的4人满水/冰队伍加成
-                _ => 0.0,
-            };
-            if resistance_reduction > 0.0 {
-                attribute.set_value_by(AttributeName::ResMinusCryo, "爱可菲天赋：灵感浸入调味", resistance_reduction);
-                attribute.set_value_by(AttributeName::ResMinusHydro, "爱可菲天赋：灵感浸入调味", resistance_reduction);
+        if self.has_p2 {
+            attribute.set_value_by(AttributeName::ResMinusHydro, "爱可菲「灵感浸入调味」", [0.00, 0.05, 0.10, 0.15, 0.55][self.hydro_cryo_count]);
+            attribute.set_value_by(AttributeName::ResMinusCryo, "爱可菲「灵感浸入调味」", [0.00, 0.05, 0.10, 0.15, 0.55][self.hydro_cryo_count]);
+
+            if self.has_c1 && self.hydro_cryo_count >= 4 {
+                attribute.set_value_by(AttributeName::CriticalDamageCryo, "爱可菲「味蕾绽放的餐前旋舞」", 0.6);
             }
         }
     }
 }
 
-#[derive(Copy, Clone)]
-#[derive(FromPrimitive, EnumString, EnumCountMacro)]
-pub enum EscoffierDamageEnum {
-    Normal1,
-    Normal2,
-    Normal3,
-    Charged1,
-    Plunging1,
-    Plunging2,
-    Plunging3,
-    E1,
-    EFrostyParfait,
-    Q1,
-    QHeal,  // 添加治疗
-}
-
-impl Into<usize> for EscoffierDamageEnum {
-    fn into(self) -> usize {
-        self as usize
-    }
-}
+damage_enum!(
+    EscoffierDamageEnum
+    A1
+    A2
+    A31
+    A32
+    Z
+    X1
+    X2
+    X3
+    E
+    ECon
+    Q
+    QHeal
+    P1Heal
+    C6
+);
 
 impl EscoffierDamageEnum {
     pub fn get_element(&self) -> Element {
         use EscoffierDamageEnum::*;
-
         match *self {
-            E1 | EFrostyParfait | Q1 | QHeal => Element::Cryo,
-            _ => Element::Physical
+            E | ECon | Q | C6 => Element::Cryo,
+            _ => Element::Physical,
         }
     }
 
     pub fn get_skill_type(&self) -> SkillType {
         use EscoffierDamageEnum::*;
-
         match *self {
-            Charged1 => SkillType::ChargedAttack,
-            Plunging1 => SkillType::PlungingAttackInAction,
-            Plunging2 | Plunging3 => SkillType::PlungingAttackOnGround,
-            E1 | EFrostyParfait => SkillType::ElementalSkill,
-            Q1 | QHeal => SkillType::ElementalBurst,
-            _ => SkillType::NormalAttack
+            A1 | A2 | A31 | A32 => SkillType::NormalAttack,
+            Z => SkillType::ChargedAttack,
+            X1 => SkillType::PlungingAttackInAction,
+            X2 | X3 => SkillType::PlungingAttackOnGround,
+            E | ECon | C6 => SkillType::ElementalSkill,
+            Q => SkillType::ElementalBurst,
+            QHeal | P1Heal => SkillType::NoneType,
         }
     }
 }
@@ -181,124 +158,113 @@ impl CharacterTrait for Escoffier {
     type SkillType = EscoffierSkillType;
     const SKILL: Self::SkillType = ESCOFFIER_SKILL;
     type DamageEnumType = EscoffierDamageEnum;
-    type RoleEnum = EscoffierRoleEnum;
+    type RoleEnum = ();
 
     #[cfg(not(target_family = "wasm"))]
     const SKILL_MAP: CharacterSkillMap = CharacterSkillMap {
-        skill1: Some(&[
-            CharacterSkillMapItem { index: EscoffierDamageEnum::Normal1 as usize, text: locale!(zh_cn: "一段伤害", en: "1-Hit DMG") },
-            CharacterSkillMapItem { index: EscoffierDamageEnum::Normal2 as usize, text: locale!(zh_cn: "二段伤害", en: "2-Hit DMG") },
-            CharacterSkillMapItem { index: EscoffierDamageEnum::Normal3 as usize, text: locale!(zh_cn: "三段伤害", en: "3-Hit DMG") },
-            CharacterSkillMapItem { index: EscoffierDamageEnum::Charged1 as usize, text: locale!(zh_cn: "重击伤害", en: "Charged Attack DMG") },
-            CharacterSkillMapItem { index: EscoffierDamageEnum::Plunging1 as usize, text: locale!(zh_cn: "下坠期间伤害", en: "Plunging DMG") },
-            CharacterSkillMapItem { index: EscoffierDamageEnum::Plunging2 as usize, text: locale!(zh_cn: "低空坠地冲击伤害", en: "Low Plunging DMG") },
-            CharacterSkillMapItem { index: EscoffierDamageEnum::Plunging3 as usize, text: locale!(zh_cn: "高空坠地冲击伤害", en: "High Plunging DMG") },
-        ]),
-        skill2: Some(&[
-            CharacterSkillMapItem { index: EscoffierDamageEnum::E1 as usize, text: locale!(zh_cn: "技能伤害", en: "Skill DMG") },
-            CharacterSkillMapItem { index: EscoffierDamageEnum::EFrostyParfait as usize, text: locale!(zh_cn: "冻霜芭菲伤害", en: "Frosty Parfait DMG") },
-        ]),
-        skill3: Some(&[
-            CharacterSkillMapItem { index: EscoffierDamageEnum::Q1 as usize, text: locale!(zh_cn: "技能伤害", en: "Skill DMG") },
-            CharacterSkillMapItem { index: EscoffierDamageEnum::QHeal as usize, text: locale!(zh_cn: "治疗量", en: "Healing") },
-        ]),
+        skill1: skill_map!(
+            EscoffierDamageEnum
+            A1 hit_n_dmg!(1)
+            A2 hit_n_dmg!(2)
+            A31 hit_n_dmg!(3, 1)
+            A32 hit_n_dmg!(3, 2)
+            Z charged_dmg!()
+            X1 plunging_dmg!(1)
+            X2 plunging_dmg!(2)
+            X3 plunging_dmg!(3)
+        ),
+        skill2: skill_map!(
+            EscoffierDamageEnum
+            E locale!(zh_cn: "技能伤害", en: "Skill DMG")
+            ECon locale!(zh_cn: "冻霜芭菲伤害", en: "Frosty Parfait DMG")
+            C6 locale!(zh_cn: "六命额外伤害", en: "C6 extra DMG")
+        ),
+        skill3: skill_map!(
+            EscoffierDamageEnum
+            Q locale!(zh_cn: "技能伤害", en: "Skill DMG")
+            QHeal locale!(zh_cn: "技能治疗量", en: "Skill Heal Amount")
+            P1Heal locale!(zh_cn: "「康复食疗」治疗量", en: "Recovery Effect Heal Amount")
+        )
     };
 
     #[cfg(not(target_family = "wasm"))]
-    const CONFIG_DATA: Option<&'static [crate::common::item_config_type::ItemConfig]> = Some(&[
-        crate::common::item_config_type::ItemConfig {
+    const CONFIG_DATA: Option<&'static [ItemConfig]> = Some(&[
+        ItemConfig {
             name: "hydro_cryo_count",
-            title: crate::common::i18n::locale!(
-                zh_cn: "队伍中水/冰角色数量",
-                en: "Hydro/Cryo Characters Count",
-                ja: "チーム内の水/氷キャラクター数",
+            title: locale!(
+                zh_cn: "队伍中冰水元素角色数量",
+                en: "Count of Hydro/Cryo characters in the team",
             ),
-            config: crate::common::item_config_type::ItemConfigType::Int { min: 0, max: 4, default: 2 }
-        },
-        crate::common::item_config_type::ItemConfig {
-            name: "after_burst",
-            title: crate::common::i18n::locale!(
-                zh_cn: "元素爆发后（康复食疗）",
-                en: "After Elemental Burst (Recovery Effect)",
-                ja: "元素爆発後（康復食療）",
-            ),
-            config: crate::common::item_config_type::ItemConfigType::Bool { default: false }
+            config: ItemConfigType::Int { min: 1, max: 4, default: 1 },
         }
     ]);
 
-    fn damage_internal<D: DamageBuilder>(
-        context: &DamageContext<'_, D::AttributeType>,
-        s: usize,
-        config: &CharacterSkillConfig,
-        fumo: Option<Element>,
-    ) -> D::Result {
+    fn damage_internal<D: DamageBuilder>(context: &DamageContext<'_, D::AttributeType>, s: usize, config: &CharacterSkillConfig, fumo: Option<Element>) -> D::Result {
         let s: EscoffierDamageEnum = num::FromPrimitive::from_usize(s).unwrap();
         let (s1, s2, s3) = context.character_common_data.get_3_skill();
 
         use EscoffierDamageEnum::*;
         let mut builder = D::new();
 
-        match s {
-            Normal1 => {
-                builder.add_atk_ratio("技能倍率", ESCOFFIER_SKILL.normal_dmg1[s1]);
-            }
-            Normal2 => {
-                builder.add_atk_ratio("技能倍率", ESCOFFIER_SKILL.normal_dmg2[s1]);
-            }
-            Normal3 => {
-                builder.add_atk_ratio("技能倍率", ESCOFFIER_SKILL.normal_dmg3[s1]);
-            }
-            Charged1 => {
-                builder.add_atk_ratio("技能倍率", ESCOFFIER_SKILL.charged_dmg1[s1]);
-            }
-            Plunging1 => {
-                builder.add_atk_ratio("技能倍率", ESCOFFIER_SKILL.plunging_dmg1[s1]);
-            }
-            Plunging2 => {
-                builder.add_atk_ratio("技能倍率", ESCOFFIER_SKILL.plunging_dmg2[s1]);
-            }
-            Plunging3 => {
-                builder.add_atk_ratio("技能倍率", ESCOFFIER_SKILL.plunging_dmg3[s1]);
-            }
-            E1 => {
-                builder.add_atk_ratio("技能倍率", ESCOFFIER_SKILL.elemental_skill_dmg1[s2]);
-            }
-            EFrostyParfait => {
-                builder.add_atk_ratio("技能倍率", ESCOFFIER_SKILL.elemental_skill_frosty_parfait_dmg[s2]);
-            }
-            Q1 => {
-                builder.add_atk_ratio("技能倍率", ESCOFFIER_SKILL.elemental_burst_dmg1[s3]);
-            }
-            QHeal => {
-                builder.add_atk_ratio("治疗量攻击力加成", ESCOFFIER_SKILL.elemental_burst_healing_atk_ratio[s3]);
-                builder.add_extra_damage("治疗量基础值", ESCOFFIER_SKILL.elemental_burst_healing_base[s3]);
-                return builder.heal(&context.attribute);
-            }
-        }
+        if s == QHeal || s == P1Heal {
+            if s == QHeal {
+                builder.add_atk_ratio("额外治疗量", ESCOFFIER_SKILL.q_heal_atk[s3]);
+                builder.add_extra_damage("基础治疗量", ESCOFFIER_SKILL.q_heal[s3]);
+            } else if s == P1Heal {
+                if context.character_common_data.constellation >= 4 {
+                    builder.add_extra_critical("爱可菲「迷迭生香的配比秘方」", context.attribute.get_value(AttributeName::CriticalBase));
+                    builder.add_extra_critical_damage("爱可菲「迷迭生香的配比秘方」", 1.0);
+                }
 
-        builder.damage(
-            &context.attribute,
-            &context.enemy,
-            s.get_element(),
-            s.get_skill_type(),
-            context.character_common_data.level,
-            fumo,
-        )
+                builder.add_atk_ratio("额外治疗量", ESCOFFIER_SKILL.p1_heal);
+            }
+
+            builder.heal(
+                &context.attribute,
+            )
+        } else {
+            let ratio = match s {
+                A1 => ESCOFFIER_SKILL.a_dmg1[s1],
+                A2 => ESCOFFIER_SKILL.a_dmg2[s1],
+                A31 => ESCOFFIER_SKILL.a_dmg31[s1],
+                A32 => ESCOFFIER_SKILL.a_dmg32[s1],
+                Z => ESCOFFIER_SKILL.z_dmg[s1],
+                X1 => ESCOFFIER_SKILL.x_dmg1[s1],
+                X2 => ESCOFFIER_SKILL.x_dmg2[s1],
+                X3 => ESCOFFIER_SKILL.x_dmg3[s1],
+                E => ESCOFFIER_SKILL.e_dmg[s2],
+                ECon => ESCOFFIER_SKILL.e_con_dmg[s2],
+                Q => ESCOFFIER_SKILL.q_dmg[s3],
+                C6 => ESCOFFIER_SKILL.c6_dmg,
+                _ => 0.0
+            };
+
+            builder.add_atk_ratio("技能倍率", ratio);
+
+            builder.damage(
+                &context.attribute,
+                &context.enemy,
+                s.get_element(),
+                s.get_skill_type(),
+                context.character_common_data.level,
+                fumo,
+            )
+        }
     }
 
     fn new_effect<A: Attribute>(common_data: &CharacterCommonData, config: &CharacterConfig) -> Option<Box<dyn ChangeAttribute<A>>> {
-        Some(Box::new(EscoffierEffect::new(common_data, config)))
+        Some(Box::new(EscoffierEffect {
+            hydro_cryo_count: match config {
+                    CharacterConfig::Escoffier { hydro_cryo_count } => *hydro_cryo_count,
+                    _ => 0,
+                },
+            has_p2: common_data.has_talent2,
+            has_c1: common_data.constellation >= 1,
+            has_c4: common_data.constellation >= 4,
+        }))
     }
 
     fn get_target_function_by_role(role_index: usize, _team: &TeamQuantization, _c: &CharacterCommonData, _w: &WeaponCommonData) -> Box<dyn TargetFunction> {
-        let role: EscoffierRoleEnum = num::FromPrimitive::from_usize(role_index).unwrap();
-        match role {
-            EscoffierRoleEnum::Default => Box::new(crate::target_functions::target_functions::cryo::EscoffierDefaultTargetFunction)
-        }
+        unimplemented!()
     }
-}
-
-#[derive(Copy, Clone, FromPrimitive)]
-pub enum EscoffierRoleEnum {
-    Default,
 }

@@ -247,6 +247,7 @@
             <h3 class="common-title2">{{ t("calcPage.artEffect") }}</h3>
             <artifact-config
                 v-model="artifactConfig"
+                :updateGlobalConfig="updateGlobalConfig"
             ></artifact-config>
         </el-dialog>
 
@@ -314,6 +315,7 @@
                                 v-model="characterConfig"
                                 :item-name="characterName"
                                 :configs="characterConfigConfig"
+                                :updateGlobalConfig="updateGlobalConfig"
                             ></item-config>
                         </div>
                     </div>
@@ -361,6 +363,7 @@
                                 v-model="weaponConfig"
                                 :item-name="weaponName"
                                 :configs="weaponConfigConfig"
+                                :updateGlobalConfig="updateGlobalConfig"
                             ></item-config>
                         </div>
                     </div>
@@ -433,6 +436,7 @@
                                     v-model="targetFunctionConfig"
                                     :item-name="targetFunctionName"
                                     :configs="targetFunctionConfigConfig"
+                                    :updateGlobalConfig="updateGlobalConfig"
                                 ></item-config>
                             </div>
 
@@ -497,6 +501,7 @@
                             :key="buff.id"
                             :buff="buff"
                             v-model:buffConfig="buff.config"
+                            :updateGlobalConfig="updateGlobalConfig"
                             @delete="handleClickDeleteBuff(buff.id)"
                             @toggle="handleClickToggleBuff(buff.id)"
                         ></buff-item>
@@ -557,31 +562,12 @@
                     </div>
                 </div>
 
-                <div v-if="artifactNeedConfig2" style="margin-top: 16px">
-                    <p class="common-description">
-                        <span class="effect2">{{ t("calcPage.effect2") }}</span>
-                        <span v-html="artifactEffect2Text"></span>
-                    </p>
-                    <item-config
-                        v-if="artifactSingleConfig"
-                        v-model="artifactSingleConfig"
-                        :item-name="artifactConfigItemName"
-                        :configs="artifactConfig2Configs"
-                    ></item-config>
-                </div>
-
-                <div v-if="artifactNeedConfig4" style="margin-top: 16px">
-                    <p class="common-description">
-                        <span class="effect4">{{ t("calcPage.effect4") }}</span>
-                        <span v-html="artifactEffect4Text"></span>
-                    </p>
-                    <item-config
-                        v-if="artifactSingleConfig"
-                        v-model="artifactSingleConfig"
-                        :item-name="artifactConfigItemName"
-                        :configs="artifactConfig4Configs"
-                    ></item-config>
-                </div>
+                <artifact-config
+                    v-model="artifactSingleConfig"
+                    :enableSearch="false"
+                    :artifactSetCount="artifactSetCount"
+                    :updateGlobalConfig="updateGlobalConfig"
+                ></artifact-config>
 
                 <el-divider></el-divider>
 
@@ -613,6 +599,7 @@
                         v-model="characterSkillConfig"
                         :item-name="characterName"
                         :configs="characterSkillConfigConfig"
+                        :updateGlobalConfig="updateGlobalConfig"
                     ></item-config>
                 </div>
                 <div class="damage-analysis-div">
@@ -658,8 +645,8 @@
 
 <script setup lang="ts">
 import {convertArtifact} from "@util/converter"
-import {mergeArtifactConfig, newDefaultArtifactConfigForWasm} from "@util/artifacts"
-import {deepCopy} from "@/utils/common"
+import {mergeArtifactConfig, newDefaultArtifactConfig} from "@util/artifacts"
+import {deepCopy, deepMerge, toSnakeCase} from "@/utils/common"
 import {wasmSingleOptimize} from "@/wasm/single_optimize"
 import {createComputeResult} from "@/api/misc"
 import {deviceIsPC} from "@util/device"
@@ -678,6 +665,7 @@ import DamagePanel from "./DamagePanel"
 import AttributePanel from "@c/display/AttributePanel"
 import ItemConfig from "@c/config/ItemConfig"
 import BuffItem from "./BuffItem"
+import { buffData } from "@buff"
 import WeaponDisplay from "@/components/display/WeaponDisplay.vue"
 import SaveAsKumi from "./SaveAsKumi.vue"
 import TransformativeDamage from "./TransformativeDamage"
@@ -687,11 +675,13 @@ import EnemyConfigComponent from "./EnemyConfig"
 import SelectArtifactMainStat from "@c/select/SelectArtifactMainStat"
 import ArtifactConfig from "./ArtifactConfig.vue"
 import DamageAnalysis from "@/components/display/DamageAnalysis"
-import {useCharacter, useCharacterSkill} from "@/composables/character"
+import {getObjectConfigUnlinked, useGlobalConfig} from "@/composables/globalConfig"
+import {getDefaultCharacterConfig, useCharacter, useCharacterSkill} from "@/composables/character"
 import {useEnemy} from "@/composables/enemy"
-import {useWeapon} from "@/composables/weapon"
-import {useTargetFunction} from "@/composables/targetFunction"
+import {getDefaultWeaponConfig, useWeapon} from "@/composables/weapon"
+import {getDefaultTargetFunctionConfig, useTargetFunction} from "@/composables/targetFunction"
 import type {ArtifactPosition, IArtifact, IArtifactWasm} from "@/types/artifact"
+import {getObjectConfig, getObjectConfigValue, restoreObjectConfig} from "@/composables/globalConfig"
 import IconEpCaretRight from "~icons/ep/caret-right"
 import IconEpTools from "~icons/ep/tools"
 import IconEpPlus from "~icons/ep/plus"
@@ -705,9 +695,9 @@ import {useComputeConstraint} from "@/composables/constraint"
 import {BuffEntry, useBuff} from "@/composables/buff"
 import {type PresetEntry, usePresetStore} from "@/store/pinia/preset"
 import {useArtifactStore} from "@/store/pinia/artifact"
-import type {IPreset} from "@/types/preset"
+import type {IBuff, IPreset} from "@/types/preset"
 import {RandomIDProvider} from "@/utils/idProvider"
-import {use5Artifacts} from "@/composables/artifact"
+import {use5Artifacts, useArtifactConfig} from "@/composables/artifact"
 import {positions} from "@/constants/artifact"
 import {positionToIndex} from "@/utils/artifacts"
 import {useMona} from "@/wasm/mona"
@@ -722,6 +712,7 @@ import {artifactsData} from "@/assets/artifacts"
 import {ElMessage} from "element-plus"
 import "element-plus/es/components/message/style/css"
 import SelectElementType from "@/components/select/SelectElementType.vue";
+import { add, get } from "lodash"
 
 // stores
 const presetStore = usePresetStore()
@@ -839,18 +830,11 @@ watch(() => miscTargetFunctionTab.value, v => {
 const {
     artifactIds,
     artifactCount,
-    artifactSingleConfig,
-    artifactWasmFormat,
-
-    artifactItems,
     artifactSetCount,
-    artifactNeedConfig4,
-    artifactNeedConfig2,
-    artifactConfigItemName,
-    artifactEffect4Text,
-    artifactEffect2Text,
-    artifactConfig4Configs,
-    artifactConfig2Configs,
+    artifactItems,
+    artifactWasmFormat,
+    
+    artifactSingleConfig,
     artifactConfigForCalculator,
 
     setArtifact,
@@ -924,13 +908,13 @@ function handleClickSetupOptimization() {
 
 //////////////////////////////////////////////////////////////
 // artifact config
-const showConfigArtifactDialog = ref(false)
-const artifactEffectMode = ref<"auto" | "custom">("auto")
-const artifactConfig = ref(newDefaultArtifactConfigForWasm())
-
-function handleClickArtifactConfig() {
-    showConfigArtifactDialog.value = true
-}
+const {
+    artifactConfig,
+    artifactConfigValue,
+    artifactEffectMode,
+    showConfigArtifactDialog,
+    handleClickArtifactConfig
+} = useArtifactConfig()
 
 
 ///////////////////////////////////////////////////////////////
@@ -988,22 +972,37 @@ function handleClickSaveOptimizeConfig() {
 }
 
 function getPresetItem() {
-    type BuffType = Omit<BuffEntry, "id">
-    let buffsToBeSaved: BuffType[] = []
+    let characterToBeSaved = deepCopy(characterInterface.value)
+    characterToBeSaved.params = getObjectConfig(characterConfig.value)
+    characterToBeSaved.configUnlinked = getObjectConfigUnlinked(characterConfig.value)
+
+    let weaponToBeSaved = deepCopy(weaponInterface.value)
+    weaponToBeSaved.params = getObjectConfig(weaponConfig.value)
+    weaponToBeSaved.configUnlinked = getObjectConfigUnlinked(weaponConfig.value)
+
+    let targetFunctionToBeSaved = deepCopy(targetFunctionInterface.value)
+    targetFunctionToBeSaved.params = getObjectConfig(targetFunctionConfig.value)
+    targetFunctionToBeSaved.configUnlinked = getObjectConfigUnlinked(targetFunctionConfig.value)
+
+    let buffsToBeSaved = []
     for (let buff of buffs.value) {
         buffsToBeSaved.push({
             name: buff.name,
-            config: deepCopy(buff.config),
+            config: getObjectConfig(buff.config),
+            configUnlinked: getObjectConfigUnlinked(buff.config),
             lock: buff.lock
         })
     }
 
+    let artifactConfigToBeSaved = getObjectConfig(artifactConfig.value)
+    let artifactConfigUnlinkedToBeSaved = getObjectConfigUnlinked(artifactConfig.value)
+
     const item = {
         // buffs: deepCopy(config.buffs),
         buffs: buffsToBeSaved,
-        character: deepCopy(characterInterface.value),
-        weapon: deepCopy(weaponInterface.value),
-        targetFunction: deepCopy(targetFunctionInterface.value),
+        character: characterToBeSaved,
+        weapon: weaponToBeSaved,
+        targetFunction: targetFunctionToBeSaved,
         constraint: {
             setNames: deepCopy(constraintArtifactSet.value),
             minRecharge: constraintMinRecharge.value,
@@ -1016,7 +1015,8 @@ function getPresetItem() {
             gobletMainStats: deepCopy(constraintGobletMainStats.value),
             headMainStats: deepCopy(constraintHeadMainStats.value),
         },
-        artifactConfig: deepCopy(artifactConfig.value),
+        artifactConfig: artifactConfigToBeSaved,
+        artifactConfigUnlinked: artifactConfigUnlinkedToBeSaved,
         algorithm: algorithm.value,
         artifactEffectMode: artifactEffectMode.value,
         useDSL: miscTargetFunctionTab.value === "dsl",
@@ -1043,7 +1043,11 @@ function usePreset(name: string) {
             const newBuff: BuffEntry = {
                 id: idGenerator.generateId(),
                 name: buff.name,
-                config: buff.config,
+                config: restoreObjectConfig(
+                    buff.config,
+                    buff.config,
+                    buff.configUnlinked ?? {}
+                ),
                 lock: buff.lock
             }
             newBuffs.push(newBuff)
@@ -1061,7 +1065,7 @@ function usePreset(name: string) {
         characterSkill1.value = c.skill1 + 1
         characterSkill2.value = c.skill2 + 1
         characterSkill3.value = c.skill3 + 1
-        characterConfig.value = c.params
+        characterConfig.value = deepMerge(restoreObjectConfig(c.params, c.params, c.configUnlinked ?? {}), getDefaultCharacterConfig(c.name))
     }
 
     // use weapon
@@ -1070,14 +1074,14 @@ function usePreset(name: string) {
         weaponName.value = w.name
         weaponLevel.value = w.level.toString() + (w.ascend ? "+" : "-")
         weaponRefine.value = w.refine
-        weaponConfig.value = w.params
+        weaponConfig.value = deepMerge(restoreObjectConfig(w.params, w.params, w.configUnlinked ?? {}), getDefaultWeaponConfig(w.name) )
     }
 
     // use target function
     const tf = item.targetFunction
     if (tf) {
         targetFunctionName.value = tf.name
-        targetFunctionConfig.value = tf.params
+        targetFunctionConfig.value = deepMerge(restoreObjectConfig(tf.params, tf.params, tf.configUnlinked ?? {}), getDefaultTargetFunctionConfig(tf.name) )
     }
 
     // is DSL?
@@ -1119,10 +1123,10 @@ function usePreset(name: string) {
     artifactEffectMode.value = item.artifactEffectMode ?? "auto"
 
     // use artifact config
-    if (item.artifactConfig) {
-        artifactConfig.value = mergeArtifactConfig(item.artifactConfig)
-    } else {
-        artifactConfig.value = newDefaultArtifactConfigForWasm()
+    const art = item.artifactConfig
+    const artUnlinked = item.artifactConfigUnlinked
+    if (art) {
+        artifactConfig.value = deepMerge(restoreObjectConfig(art, art, artUnlinked ?? {}), newDefaultArtifactConfig() )
     }
 
     miscCurrentPresetName.value = name
@@ -1157,6 +1161,58 @@ function handleSelectBuff(name: string) {
     showSelectBuffDialog.value = false
     addBuff(name)
 }
+
+
+///////////////////////////////////////////////////////////
+// global config
+
+const {
+    setGlobalConfig,
+    updateGlobalConfig
+} = useGlobalConfig()
+
+watchEffect(() => {
+    setGlobalConfig([
+        {
+            configConfig: characterConfigConfig.value,
+            config: characterConfig.value[characterName.value]
+        },
+        {
+            configConfig: weaponConfigConfig.value,
+            config: weaponConfig.value[weaponName.value]
+        },
+        {
+            configConfig: targetFunctionConfigConfig.value,
+            config: targetFunctionConfig.value[targetFunctionName.value]
+        },
+        ...buffs.value.map(buff => ({
+            configConfig: buffData[buff.name].config,
+            config: buff.config[buff.name]
+        })),
+        {
+            configConfig: characterSkillConfigConfig.value,
+            config: characterSkillConfig.value[characterName.value]
+        },
+        ...Object.entries(artifactsData).map(([key, artifact]) => ({
+            configConfig: artifactsData[key].config2,
+            config: artifactConfig.value["config_" + toSnakeCase(artifactsData[key].name2)]
+        })),
+        ...Object.entries(artifactsData).map(([key, artifact]) => ({
+            configConfig: artifactsData[key].config4,
+            config: artifactConfig.value["config_" + toSnakeCase(artifactsData[key].name2)]
+        })),
+        ...Object.entries(artifactsData).map(([key, artifact]) => ({
+            configConfig: artifactsData[key].config2,
+            config: artifactSingleConfig.value["config_" + toSnakeCase(artifactsData[key].name2)]
+        })),
+        ...Object.entries(artifactsData).map(([key, artifact]) => ({
+            configConfig: artifactsData[key].config4,
+            config: artifactSingleConfig.value["config_" + toSnakeCase(artifactsData[key].name2)]
+        })),
+    ])
+}, {
+    flush: "post"
+})
 
 
 ////////////////////////////////////////////////////////////////////////
@@ -1420,7 +1476,7 @@ function handleUseNthOptimizationResult(n: number) {
 function getOptimizeArtifactWasmInterface() {
     let artifact_config: any = null
     if (artifactEffectMode.value === "custom") {
-        artifact_config = artifactConfig.value
+        artifact_config = artifactConfigValue.value
     }
 
     const i = {

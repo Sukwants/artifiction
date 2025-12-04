@@ -1,4 +1,4 @@
-const DEFAULT_CHARACTER = "Flins";
+const DEFAULT_CHARACTER = "Nefer";
 
 import type {WeaponType} from "@/types/weapon"
 // @ts-ignore
@@ -6,8 +6,9 @@ import { characterData } from "@character"
 import {type Ref} from "vue"
 import type {CharacterName} from "@/types/character"
 import {useI18n} from "@/i18n/i18n"
+import { getObjectConfigValue } from "@/composables/globalConfig";
 
-function getDefaultCharacterConfig(name: string) {
+export function getDefaultCharacterConfig(name: string) {
     let res: any;
 
     const hasConfigData = characterData[name].config.length > 0;
@@ -18,7 +19,11 @@ function getDefaultCharacterConfig(name: string) {
 
         let defaultConfig: any = {}
         for (let c of configs) {
-            defaultConfig[c.name] = c.default
+            defaultConfig[c.name] = {
+                config: c.default,
+                configValue: c.default,
+                unlinked: c.unlinked,
+            }
         }
         res = {
             [name]: defaultConfig
@@ -82,7 +87,7 @@ export function useCharacter() {
             skill1: characterSkill1.value - 1,
             skill2: characterSkill2.value - 1,
             skill3: characterSkill3.value - 1,
-            params: characterConfig.value
+            params: getObjectConfigValue(characterConfig.value)
         }
         return i
     })
@@ -122,7 +127,11 @@ function getDefaultCharacterSkillConfig(name: string) {
     if (hasConfigSkill) {
         let defaultConfig: any = {}
         for (let c of characterData[name].configSkill) {
-            defaultConfig[c.name] = c.default
+            defaultConfig[c.name] = {
+                config: c.default,
+                configValue: c.default,
+                unlinked: c.unlinked,
+            }
         }
         res = {
             [name]: defaultConfig
@@ -150,7 +159,7 @@ export function useCharacterSkill(characterName: Ref<CharacterName>) {
     const characterSkillInterface = computed(() => {
         return {
             index: characterSkillIndex.value,
-            config: characterSkillConfig.value
+            config: getObjectConfigValue(characterSkillConfig.value)
         }
     })
 

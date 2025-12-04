@@ -25,6 +25,7 @@
             <import-block ref="fileUploader" accept="application/json"></import-block>
             <el-checkbox v-model="importDeleteUnseen" style="margin-top: 12px">{{ t("artPage.deleteUnseen") }}</el-checkbox>
             <el-checkbox v-model="importBackupKumiDir" style="margin-top: 12px">{{ t("artPage.backupKumiDir") }}</el-checkbox>
+            <el-checkbox v-model="importImportKumi" style="margin-top: 12px">{{ t("artPage.importKumi") }}</el-checkbox>
 
             <template #footer>
                 <el-button @click="showImportDialog = false">{{ t("misc.cancel") }}</el-button>
@@ -206,6 +207,7 @@ import {createRepo} from "@/api/repo"
 import {type Ref} from "vue"
 import {useArtifactStore} from "@/store/pinia/artifact"
 import {usePresetStore} from "@/store/pinia/preset"
+import {useKumiStore} from "@/store/pinia/kumi"
 import {getArtifactsRecommendation} from "@/utils/artifactRecommendation"
 
 import flowerIcon from '@image/misc/flower.png';
@@ -256,6 +258,7 @@ const pageSize = 20;
 
 const artifactStore = useArtifactStore()
 const presetStore = usePresetStore()
+const kumiStore = useKumiStore()
 
 ///////////////////////////////////////////////////////////////////
 // artifact crud
@@ -373,8 +376,8 @@ function shareArtifact() {
         if (response.status === 200) {
             // console.log("success")
             const code = response.data.code
-            // shareLink.value = `https://mona-uranai.com/artifacts?code=${code}`
-            shareLink.value = `https://mona-uranai.com/import?type=artifact&code=${code}`
+            // shareLink.value = `https://artifiction.pond.ink/artifacts?code=${code}`
+            shareLink.value = `https://artifiction.pond.ink/import?type=artifact&code=${code}`
             showOutputShareDialog.value = true
         }
     })
@@ -387,15 +390,16 @@ const showImportDialog = ref(false)
 const fileUploader: Ref<InstanceType<typeof ImportBlock> | null> = ref(null)
 const importDeleteUnseen = ref(false)
 const importBackupKumiDir = ref(false)
+const importImportKumi = ref(false)
 
 function handleImportJsonClicked() {
     showImportDialog.value = true;
 }
 
-async function importJson(text: string, deleteUnseen: boolean, backupKumiDir: boolean) {
+async function importJson(text: string, deleteUnseen: boolean, backupKumiDir: boolean, importKumi: boolean) {
     try {
         const rawObj = JSON.parse(text)
-        await importMonaJson(rawObj, deleteUnseen, backupKumiDir)
+        await importMonaJson(rawObj, deleteUnseen, backupKumiDir, importKumi)
     } catch (e) {
         ElMessage({
             message: t("artPage.wrongFormat"),
@@ -419,7 +423,7 @@ function handleImportJson() {
         fileUploader.value
             .getReadPromise()
             .then((text: string) => {
-                importJson(text, importDeleteUnseen.value, importBackupKumiDir.value)
+                importJson(text, importDeleteUnseen.value, importBackupKumiDir.value, importImportKumi.value)
             })
             .catch((e: any) => {
                 ElMessage({
@@ -436,16 +440,21 @@ function handleImportJson() {
 
 function getArtifactString(): string {
     let temp = {
-        version: '1',
+        version: '2',
         flower: [],
         sand: [],
         feather: [],
         cup: [],
-        head: []
+        head: [],
+        kumi: [],
     } as any
 
     for (let position of positions) {
         temp[position] = artifactStore.artifactsByPosition.value[position]
+    }
+
+    for (let kumi of kumiStore.kumi.value) {
+        temp.kumi.push(kumi)
     }
 
     return JSON.stringify(temp)

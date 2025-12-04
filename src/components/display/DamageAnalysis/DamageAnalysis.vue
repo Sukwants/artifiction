@@ -207,6 +207,22 @@
             </div>
         </div>
     </div>
+
+    <div v-if="isHeal" class="header-row" style="overflow: auto; margin-bottom: 16px; min-height: 200px;">
+        <div>
+            <div class="big-title critical-region" :title="Math.round(this.critical * this.criticalDamage * 1000)/1000">暴击区</div>
+            <div class="header-row">
+                <damage-analysis-util
+                    :arr="criticalState"
+                    title="暴击率"
+                ></damage-analysis-util>
+                <damage-analysis-util
+                    :arr="criticalDamageState"
+                    title="暴击伤害"
+                ></damage-analysis-util>
+            </div>
+        </div>
+    </div>
 </template>
 
 <script>
@@ -561,7 +577,7 @@ export default {
         damageNormal() {
             let d
             if (this.isHeal) {
-                d = this.baseDamage * (1 + this.healingBonus)
+                d = this.baseDamage * (1 + this.healingBonus) * (1 + this.critical * this.criticalDamage)
             } else if (this.isShield){
                 d  = this.baseDamage
             } else if (this.isLunar) {

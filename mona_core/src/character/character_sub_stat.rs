@@ -21,7 +21,6 @@ pub enum CharacterSubStatFamily {
 
     ElementalMastery96,
     ElementalMastery115,
-    ElementalMastery315,
 
     HP240,
     HP288,
@@ -45,7 +44,6 @@ pub fn get_value_array(family: CharacterSubStatFamily) -> [f64; 5] {
         CharacterSubStatFamily::DEF360 => [0.09, 0.18, 0.18, 0.27, 0.36],
         CharacterSubStatFamily::ElementalMastery96 => [24.0, 48.0, 48.0, 72.0, 96.0],
         CharacterSubStatFamily::ElementalMastery115 => [29.0, 58.0, 58.0, 86.0, 115.0],
-        CharacterSubStatFamily::ElementalMastery315 => [229.0, 258.0, 258.0, 286.0, 315.0],
         CharacterSubStatFamily::HP240 => [0.06, 0.12, 0.12, 0.18, 0.24],
         CharacterSubStatFamily::HP288 => [0.072, 0.144, 0.144, 0.216, 0.288],
         CharacterSubStatFamily::Recharge267 => [0.067, 0.133, 0.133, 0.2, 0.267],
@@ -67,7 +65,6 @@ pub fn get_stat_name_from_family(family: CharacterSubStatFamily) -> StatName {
         DEF360 => StatName::DEFPercentage,
         ElementalMastery96 => StatName::ElementalMastery,
         ElementalMastery115 => StatName::ElementalMastery,
-        ElementalMastery315 => StatName::ElementalMastery,
         HP240 | HP288 => StatName::HPPercentage,
         Recharge267 => StatName::Recharge,
         Recharge320 => StatName::Recharge,

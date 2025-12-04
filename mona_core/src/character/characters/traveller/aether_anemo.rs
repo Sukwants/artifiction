@@ -1,244 +1,280 @@
-use num_derive::FromPrimitive;
-use crate::attribute::{Attribute, AttributeName};
+use crate::attribute::{Attribute, AttributeName, AttributeCommon};
 use crate::character::character_common_data::CharacterCommonData;
-use crate::character::{CharacterConfig, CharacterName, CharacterStaticData};
 use crate::character::character_sub_stat::CharacterSubStatFamily;
-use crate::character::characters::geo::albedo::AlbedoRoleEnum;
+use crate::character::{CharacterConfig, CharacterName, CharacterStaticData};
 use crate::character::skill_config::CharacterSkillConfig;
 use crate::character::traits::{CharacterSkillMap, CharacterSkillMapItem, CharacterTrait};
-use crate::common::{ChangeAttribute, Element, SkillType, WeaponType};
+use crate::character::macros::{damage_enum, skill_map};
+use crate::common::{ChangeAttribute, Element, MoonglareReaction, Moonsign, SkillType, WeaponType};
+use crate::common::i18n::{locale, hit_n_dmg, plunging_dmg, charged_dmg};
+use crate::common::item_config_type::{ItemConfig, ItemConfigType};
 use crate::damage::damage_builder::DamageBuilder;
 use crate::damage::DamageContext;
 use crate::target_functions::TargetFunction;
 use crate::team::TeamQuantization;
 use crate::weapon::weapon_common_data::WeaponCommonData;
-use strum_macros::{EnumCount as EnumCountMacro, EnumString};
-use strum::EnumCount;
-use std::str::FromStr;
-use crate::common::i18n::{hit_n_dmg, locale, plunging_dmg};
 
 pub struct AetherAnemoSkillType {
-    pub normal_dmg1: [f64; 15],
-    pub normal_dmg2: [f64; 15],
-    pub normal_dmg3: [f64; 15],
-    pub normal_dmg4: [f64; 15],
-    pub normal_dmg5: [f64; 15],
-    pub charged_dmg11: [f64; 15],
-    pub charged_dmg12: [f64; 15],
-    pub plunging_dmg1: [f64; 15],
-    pub plunging_dmg2: [f64; 15],
-    pub plunging_dmg3: [f64; 15],
+    pub a_dmg1: [f64; 15],
+    pub a_dmg2: [f64; 15],
+    pub a_dmg3: [f64; 15],
+    pub a_dmg4: [f64; 15],
+    pub a_dmg5: [f64; 15],
+    pub z_dmg1: [f64; 15],
+    pub z_dmg2: [f64; 15],
+    pub x_dmg1: [f64; 15],
+    pub x_dmg2: [f64; 15],
+    pub x_dmg3: [f64; 15],
 
-    pub elemental_skill_dmg1: [f64; 15],
-    pub elemental_skill_dmg2: [f64; 15],
-    pub elemental_skill_dmg3: [f64; 15],
-    pub elemental_skill_dmg4: [f64; 15],
+    pub e_dmgc1: [f64; 15], // Initial Cutting DMG
+    pub e_dmgc2: [f64; 15], // Max Cutting DMG
+    pub e_dmgs1: [f64; 15], // Initial Storm DMG
+    pub e_dmgs2: [f64; 15], // Max Storm DMG
+    pub e_dmga_rate: f64,   // The ratio for Elemental Absorpted DMG to Anemo DMG
 
-    pub elemental_burst_dmg1: [f64; 15],
-    pub elemental_burst_dmg2: [f64; 15],
+    pub q_dmg: [f64; 15],
+    pub q_dmga: [f64; 15], // Additional Elemental DMG
+
+    pub p2_dmg: f64,
 }
 
-const AETHER_ANEMO_SKILL: AetherAnemoSkillType = AetherAnemoSkillType {
-    normal_dmg1: [0.4446, 0.4808, 0.517, 0.5687, 0.6049, 0.6463, 0.7031, 0.76, 0.8169, 0.8789, 0.9409, 1.003, 1.065, 1.1271, 1.1891],
-    normal_dmg2: [0.4343, 0.4697, 0.505, 0.5555, 0.5909, 0.6313, 0.6868, 0.7423, 0.7979, 0.8585, 0.9191, 0.9797, 1.0403, 1.1009, 1.1615],
-    normal_dmg3: [0.5298, 0.5729, 0.616, 0.6776, 0.7207, 0.77, 0.8378, 0.9055, 0.9733, 1.0472, 1.1211, 1.195, 1.269, 1.3429, 1.4168],
-    normal_dmg4: [0.5831, 0.6305, 0.678, 0.7458, 0.7933, 0.8475, 0.9221, 0.9967, 1.0712, 1.1526, 1.234, 1.3153, 1.3967, 1.478, 1.5594],
-    normal_dmg5: [0.7078, 0.7654, 0.823, 0.9053, 0.9629, 1.0288, 1.1193, 1.2098, 1.3003, 1.3991, 1.4979, 1.5966, 1.6954, 1.7941, 1.8929],
-    charged_dmg11: [0.559, 0.6045, 0.65, 0.715, 0.7605, 0.8125, 0.884, 0.9555, 1.027, 1.105, 1.183, 1.261, 1.339, 1.417, 1.495],
-    charged_dmg12: [0.6072, 0.6566, 0.706, 0.7766, 0.826, 0.8825, 0.9602, 1.0378, 1.1155, 1.2002, 1.2849, 1.3696, 1.4544, 1.5391, 1.6238],
-    plunging_dmg1: [0.6393, 0.6914, 0.7434, 0.8177, 0.8698, 0.9293, 1.011, 1.0928, 1.1746, 1.2638, 1.353, 1.4422, 1.5314, 1.6206, 1.7098],
-    plunging_dmg2: [1.2784, 1.3824, 1.4865, 1.6351, 1.7392, 1.8581, 2.0216, 2.1851, 2.3486, 2.527, 2.7054, 2.8838, 3.0622, 3.2405, 3.4189],
-    plunging_dmg3: [1.5968, 1.7267, 1.8567, 2.0424, 2.1723, 2.3209, 2.5251, 2.7293, 2.9336, 3.1564, 3.3792, 3.602, 3.8248, 4.0476, 4.2704],
-    elemental_skill_dmg1: [0.12, 0.129, 0.138, 0.15, 0.159, 0.168, 0.18, 0.192, 0.204, 0.216, 0.228, 0.24, 0.255, 0.27, 0.285],
-    elemental_skill_dmg2: [0.168, 0.1806, 0.1932, 0.21, 0.2226, 0.2352, 0.252, 0.2688, 0.2856, 0.3024, 0.3192, 0.336, 0.357, 0.378, 0.399],
-    elemental_skill_dmg3: [1.76, 1.892, 2.024, 2.2, 2.332, 2.464, 2.64, 2.816, 2.992, 3.168, 3.344, 3.52, 3.74, 3.96, 4.18],
-    elemental_skill_dmg4: [1.92, 2.064, 2.208, 2.4, 2.544, 2.688, 2.88, 3.072, 3.264, 3.456, 3.648, 3.84, 4.08, 4.32, 4.56],
-    elemental_burst_dmg1: [0.808, 0.8686, 0.9292, 1.01, 1.0706, 1.1312, 1.212, 1.2928, 1.3736, 1.4544, 1.5352, 1.616, 1.717, 1.818, 1.919],
-    elemental_burst_dmg2: [0.248, 0.2666, 0.2852, 0.31, 0.3286, 0.3472, 0.372, 0.3968, 0.4216, 0.4464, 0.4712, 0.496, 0.527, 0.558, 0.589]
+pub const AETHERANEMO_SKILL: AetherAnemoSkillType = AetherAnemoSkillType {
+    // Normal Attack: Foreign Ironwind
+    a_dmg1: [0.44462, 0.48081, 0.517, 0.5687, 0.60489, 0.64625, 0.70312, 0.76, 0.81686, 0.8789, 0.94094, 1.00298, 1.06502, 1.12706, 1.1891],
+    a_dmg2: [0.4343, 0.46965, 0.505, 0.5555, 0.59085, 0.63125, 0.6868, 0.74235, 0.7979, 0.8585, 0.9191, 0.9797, 1.0403, 1.1009, 1.1615],
+    a_dmg3: [0.52976, 0.57288, 0.616, 0.6776, 0.72072, 0.77, 0.83776, 0.90552, 0.97328, 1.0472, 1.12112, 1.19504, 1.26896, 1.34288, 1.4168],
+    a_dmg4: [0.58308, 0.63054, 0.678, 0.7458, 0.79326, 0.8475, 0.92208, 0.99666, 1.07124, 1.1526, 1.23396, 1.31532, 1.39668, 1.47804, 1.5594],
+    a_dmg5: [0.70778, 0.76539, 0.823, 0.9053, 0.96291, 1.02875, 1.11928, 1.20981, 1.30034, 1.3991, 1.49786, 1.59662, 1.69538, 1.79414, 1.8929],
+    z_dmg1: [0.559, 0.6045, 0.65, 0.715, 0.7605, 0.8125, 0.884, 0.9555, 1.027, 1.105, 1.183, 1.261, 1.339, 1.417, 1.495],
+    z_dmg2: [0.60716, 0.65658, 0.706, 0.7766, 0.82602, 0.8825, 0.96016, 1.03782, 1.11548, 1.2002, 1.28492, 1.36964, 1.45436, 1.53908, 1.6238],
+    x_dmg1: [0.639324, 0.691362, 0.7434, 0.81774, 0.869778, 0.92925, 1.011024, 1.092798, 1.174572, 1.26378, 1.352988, 1.442196, 1.531404, 1.620612, 1.70982],
+    x_dmg2: [1.278377, 1.382431, 1.486485, 1.635134, 1.739187, 1.858106, 2.02162, 2.185133, 2.348646, 2.527025, 2.705403, 2.883781, 3.062159, 3.240537, 3.418915],
+    x_dmg3: [1.596762, 1.726731, 1.8567, 2.04237, 2.172339, 2.320875, 2.525112, 2.729349, 2.933586, 3.15639, 3.379194, 3.601998, 3.824802, 4.047606, 4.27041],
+
+    // Elemental Skill: Palm Vortex
+    e_dmgc1: [0.12, 0.129, 0.138, 0.15, 0.159, 0.168, 0.18, 0.192, 0.204, 0.216, 0.228, 0.24, 0.255, 0.27, 0.285],
+    e_dmgc2: [0.168, 0.1806, 0.1932, 0.21, 0.2226, 0.2352, 0.252, 0.2688, 0.2856, 0.3024, 0.3192, 0.336, 0.357, 0.378, 0.399],
+    e_dmgs1: [1.76, 1.892, 2.024, 2.2, 2.332, 2.464, 2.64, 2.816, 2.992, 3.168, 3.344, 3.52, 3.74, 3.96, 4.18],
+    e_dmgs2: [1.92, 2.064, 2.208, 2.4, 2.544, 2.688, 2.88, 3.072, 3.264, 3.456, 3.648, 3.84, 4.08, 4.32, 4.56],
+    e_dmga_rate: 0.25, // 天赋描述中无相关倍率，根据实测数据推断染色伤害为风元素伤害的 1/4
+
+    // Elemental Burst: Gust Surge
+    q_dmg: [0.808, 0.8686, 0.9292, 1.01, 1.0706, 1.1312, 1.212, 1.2928, 1.3736, 1.4544, 1.5352, 1.616, 1.717, 1.818, 1.919],
+    q_dmga: [0.248, 0.2666, 0.2852, 0.31, 0.3286, 0.3472, 0.372, 0.3968, 0.4216, 0.4464, 0.4712, 0.496, 0.527, 0.558, 0.589],
+
+    p2_dmg: 0.6,
+};
+
+pub const AETHERANEMO_STATIC_DATA: CharacterStaticData = CharacterStaticData {
+    name: CharacterName::AetherAnemo,
+    internal_name: "AetherAnemo",
+    element: Element::Anemo,
+    hp: [912, 2342, 3024, 4529, 5031, 5766, 6411, 7164, 7648, 8401, 8885, 9638, 10122, 10875, 11627],
+    atk: [18, 46, 59, 88, 98, 113, 125, 140, 149, 164, 174, 188, 198, 212, 266],
+    def: [57, 147, 190, 284, 315, 362, 402, 450, 480, 527, 558, 605, 635, 683, 730],
+    sub_stat: CharacterSubStatFamily::ATK240,
+    weapon_type: WeaponType::Sword,
+    star: 5,
+    skill_name1: locale!(
+        zh_cn: "异邦铁风",
+        en: "Foreign Ironwind",
+    ),
+    skill_name2: locale!(
+        zh_cn: "风涡剑",
+        en: "Palm Vortex",
+    ),
+    skill_name3: locale!(
+        zh_cn: "风息激荡",
+        en: "Gust Surge",
+    ),
+    name_locale: locale!(
+        zh_cn: "空-风",
+        en: "Aether-Anemo",
+    )
 };
 
 pub struct AetherAnemoEffect {
-    pub c2: bool
+    pub has_c2: bool,
+    pub has_c6: bool,
 }
 
 impl<A: Attribute> ChangeAttribute<A> for AetherAnemoEffect {
     fn change_attribute(&self, attribute: &mut A) {
-        if self.c2 {
-            attribute.set_value_by(AttributeName::Recharge, "命座2革新的旋风", 0.16);
+        if self.has_c2 {
+            attribute.set_value_by(AttributeName::Recharge, "二命：革新的旋风", 0.16);
+        }
+
+        if self.has_c6 {
+            attribute.set_value_by(AttributeName::ResMinusAnemo, "六命：革新的旋风", 0.2);
         }
     }
 }
 
-#[derive(Copy, Clone, Eq, PartialEq)]
-#[derive(FromPrimitive, EnumCountMacro, EnumString)]
-pub enum AetherAnemoDamageEnum {
-    Normal1,
-    Normal2,
-    Normal3,
-    Normal4,
-    Normal5,
-    Charged11,
-    Charged12,
-    Plunging1,
-    Plunging2,
-    Plunging3,
-    E1,
-    E2,
-    E3,
-    E4,
-    Q1,
-    Q2Pyro,
-    Q2Cryo,
-    Q2Electro,
-    Q2Hydro
-}
-
-impl Into<usize> for AetherAnemoDamageEnum {
-    fn into(self) -> usize {
-        self as usize
-    }
-}
+damage_enum!(
+    AetherAnemoDamageEnum
+    A1
+    A2
+    A3
+    A4
+    A5
+    Z1
+    Z2
+    X1
+    X2
+    X3
+    EC1
+    EC2
+    ES1
+    ES2
+    EC1A
+    EC2A
+    ES1A
+    ES2A
+    Q
+    QA
+    P2
+);
 
 impl AetherAnemoDamageEnum {
-    pub fn get_element(&self) -> Element {
+    pub fn get_element(&self, elemental_absorption: Element) -> Element {
         use AetherAnemoDamageEnum::*;
-
         match *self {
-            Normal1 | Normal2 | Normal3 | Normal4 | Normal5 | Charged11 | Charged12 | Plunging1 | Plunging2 | Plunging3 => Element::Physical,
-            E1 | E2 | E3 | E4 | Q1 => Element::Anemo,
-            Q2Pyro => Element::Pyro,
-            Q2Electro => Element::Electro,
-            Q2Cryo => Element::Cryo,
-            Q2Hydro => Element::Hydro
+            EC1 | EC2 | ES1 | ES2 | Q | P2 => Element::Anemo,
+            EC1A | EC2A | ES1A | ES2A | QA => elemental_absorption,
+            _ => Element::Physical,
         }
     }
 
     pub fn get_skill_type(&self) -> SkillType {
         use AetherAnemoDamageEnum::*;
-
         match *self {
-            Normal1 | Normal2 | Normal3 | Normal4 | Normal5 => SkillType::NormalAttack,
-            Charged11 | Charged12 => SkillType::ChargedAttack,
-            Plunging1 => SkillType::PlungingAttackInAction,
-            Plunging2 | Plunging3 => SkillType::PlungingAttackOnGround,
-            E1 | E2 | E3 | E4 => SkillType::ElementalSkill,
-            Q1 | Q2Hydro | Q2Cryo | Q2Electro | Q2Pyro => SkillType::ElementalBurst
+            A1 | A2 | A3 | A4 | A5 | P2 => SkillType::NormalAttack,
+            Z1 | Z2 => SkillType::ChargedAttack,
+            X1 => SkillType::PlungingAttackInAction,
+            X2 | X3 => SkillType::PlungingAttackOnGround,
+            EC1 | EC2 | ES1 | ES2 | EC1A | EC2A | ES1A | ES2A => SkillType::ElementalSkill,
+            Q | QA => SkillType::ElementalBurst,
         }
     }
-}
-
-pub enum AetherAnemoRoleEnum {
-    Sub
 }
 
 pub struct AetherAnemo;
 
 impl CharacterTrait for AetherAnemo {
-    const STATIC_DATA: CharacterStaticData = CharacterStaticData {
-        name: CharacterName::AetherAnemo,
-        internal_name: "PlayerBoy",
-        element: Element::Anemo,
-        hp: [912, 2342, 3024, 4529, 5031, 5766, 6411, 7164, 7648, 8401, 8885, 9638, 10122, 10875, 11627],
-        atk: [18, 46, 59, 88, 98, 113, 125, 140, 149, 164, 174, 188, 198, 212, 266],
-        def: [57, 147, 190, 284, 315, 362, 402, 450, 480, 527, 558, 605, 635, 683, 730],
-        sub_stat: CharacterSubStatFamily::ATK240,
-        weapon_type: WeaponType::Sword,
-        star: 5,
-        skill_name1: locale!(
-            zh_cn: "异邦铁风",
-            en: "Normal Attack: Foreign Ironwind",
-        ),
-        skill_name2: locale!(
-            zh_cn: "风涡剑",
-            en: "Palm Vortex",
-        ),
-        skill_name3: locale!(
-            zh_cn: "风息激荡",
-            en: "Gust Surge",
-        ),
-        name_locale: locale!(
-            zh_cn: "空-风",
-            en: "Aether(Anemo)",
-        )
-    };
+    const STATIC_DATA: CharacterStaticData = AETHERANEMO_STATIC_DATA;
     type SkillType = AetherAnemoSkillType;
-    const SKILL: Self::SkillType = AETHER_ANEMO_SKILL;
+    const SKILL: Self::SkillType = AETHERANEMO_SKILL;
     type DamageEnumType = AetherAnemoDamageEnum;
-    type RoleEnum = AlbedoRoleEnum;
+    type RoleEnum = ();
 
     #[cfg(not(target_family = "wasm"))]
     const SKILL_MAP: CharacterSkillMap = CharacterSkillMap {
-        skill1: Some(&[
-            CharacterSkillMapItem { index: AetherAnemoDamageEnum::Normal1 as usize, text: hit_n_dmg!(1) },
-            CharacterSkillMapItem { index: AetherAnemoDamageEnum::Normal2 as usize, text: hit_n_dmg!(2) },
-            CharacterSkillMapItem { index: AetherAnemoDamageEnum::Normal3 as usize, text: hit_n_dmg!(3) },
-            CharacterSkillMapItem { index: AetherAnemoDamageEnum::Normal4 as usize, text: hit_n_dmg!(4) },
-            CharacterSkillMapItem { index: AetherAnemoDamageEnum::Normal5 as usize, text: hit_n_dmg!(5) },
-            CharacterSkillMapItem { index: AetherAnemoDamageEnum::Charged11 as usize, text: locale!(zh_cn: "重击伤害-1", en: "Charged Attack-1") },
-            CharacterSkillMapItem { index: AetherAnemoDamageEnum::Charged12 as usize, text: locale!(zh_cn: "重击伤害-2", en: "Charged Attack-2") },
-            CharacterSkillMapItem { index: AetherAnemoDamageEnum::Plunging1 as usize, text: plunging_dmg!(1) },
-            CharacterSkillMapItem { index: AetherAnemoDamageEnum::Plunging2 as usize, text: plunging_dmg!(2) },
-            CharacterSkillMapItem { index: AetherAnemoDamageEnum::Plunging3 as usize, text: plunging_dmg!(3) },
-        ]),
-        skill2: Some(&[
-            CharacterSkillMapItem { index: AetherAnemoDamageEnum::E1 as usize, text: locale!(zh_cn: "初始切割伤害", en: "Initial Cutting DMG") },
-            CharacterSkillMapItem { index: AetherAnemoDamageEnum::E2 as usize, text: locale!(zh_cn: "最大切割伤害", en: "Max Cutting DMG") },
-            CharacterSkillMapItem { index: AetherAnemoDamageEnum::E3 as usize, text: locale!(zh_cn: "初始爆风伤害", en: "Initial Storm DMG") },
-            CharacterSkillMapItem { index: AetherAnemoDamageEnum::E4 as usize, text: locale!(zh_cn: "最大爆风伤害", en: "Max Storm DMG") },
-        ]),
-        skill3: Some(&[
-            CharacterSkillMapItem { index: AetherAnemoDamageEnum::Q1 as usize, text: locale!(zh_cn: "龙卷风伤害", en: "Tornado DMG") },
-            CharacterSkillMapItem { index: AetherAnemoDamageEnum::Q2Pyro as usize, text: locale!(zh_cn: "附加火元素伤害", en: "Additional Pyro DMG") },
-            CharacterSkillMapItem { index: AetherAnemoDamageEnum::Q2Hydro as usize, text: locale!(zh_cn: "附加水元素伤害", en: "Additional Hydro DMG") },
-            CharacterSkillMapItem { index: AetherAnemoDamageEnum::Q2Electro as usize, text: locale!(zh_cn: "附加雷元素伤害", en: "Additional Electro DMG") },
-            CharacterSkillMapItem { index: AetherAnemoDamageEnum::Q2Cryo as usize, text: locale!(zh_cn: "附加冰元素伤害", en: "Additional Cryo DMG") },
-        ])
+        skill1: skill_map!(
+            AetherAnemoDamageEnum
+            A1 hit_n_dmg!(1)
+            A2 hit_n_dmg!(2)
+            A3 hit_n_dmg!(3)
+            A4 hit_n_dmg!(4)
+            A5 hit_n_dmg!(5)
+            Z1 charged_dmg!(1)
+            Z2 charged_dmg!(2)
+            X1 plunging_dmg!(1)
+            X2 plunging_dmg!(2)
+            X3 plunging_dmg!(3)
+            P2 locale!(zh_cn: "裂空之风", en: "Slitting Wind")
+        ),
+        skill2: skill_map!(
+            AetherAnemoDamageEnum
+            EC1 locale!(zh_cn: "初始切割伤害", en: "Initial Cutting DMG")
+            EC2 locale!(zh_cn: "最大切割伤害", en: "Max Cutting DMG")
+            ES1 locale!(zh_cn: "初始爆风伤害", en: "Initial Storm DMG")
+            ES2 locale!(zh_cn: "最大爆风伤害", en: "Max Storm DMG")
+            EC1A locale!(zh_cn: "初始切割染色伤害", en: "Initial Cutting DMG (Absorbed)")
+            EC2A locale!(zh_cn: "最大切割染色伤害", en: "Max Cutting DMG (Absorbed)")
+            ES1A locale!(zh_cn: "初始爆风染色伤害", en: "Initial Storm DMG (Absorbed)")
+            ES2A locale!(zh_cn: "最大爆风染色伤害", en: "Max Storm DMG (Absorbed)")
+        ),
+        skill3: skill_map!(
+            AetherAnemoDamageEnum
+            Q locale!(zh_cn: "龙卷风伤害", en: "Tornado DMG")
+            QA locale!(zh_cn: "附加元素伤害", en: "Additional Elemental DMG")
+        )
     };
+
+    #[cfg(not(target_family = "wasm"))]
+    const CONFIG_DATA: Option<&'static [ItemConfig]> = Some(&[
+    ]);
+
+    #[cfg(not(target_family = "wasm"))]
+    const CONFIG_SKILL: Option<&'static [ItemConfig]> = Some(&[
+        ItemConfig {
+            name: "elemental_absorption",
+            title: locale!(zh_cn: "元素吸收类型", en: "Elemental Absorption Type"),
+            config: ItemConfigType::Element4 { default: Element::Cryo }
+        }
+    ]);
 
     fn damage_internal<D: DamageBuilder>(context: &DamageContext<'_, D::AttributeType>, s: usize, config: &CharacterSkillConfig, fumo: Option<Element>) -> D::Result {
         let s: AetherAnemoDamageEnum = num::FromPrimitive::from_usize(s).unwrap();
         let (s1, s2, s3) = context.character_common_data.get_3_skill();
 
-        use AetherAnemoDamageEnum::*;
-        let ratio = match s {
-            Normal1 => AETHER_ANEMO_SKILL.normal_dmg1[s1],
-            Normal2 => AETHER_ANEMO_SKILL.normal_dmg2[s1],
-            Normal3 => AETHER_ANEMO_SKILL.normal_dmg3[s1],
-            Normal4 => AETHER_ANEMO_SKILL.normal_dmg4[s1],
-            Normal5 => AETHER_ANEMO_SKILL.normal_dmg5[s1],
-            Charged11 => AETHER_ANEMO_SKILL.charged_dmg11[s1],
-            Charged12 => AETHER_ANEMO_SKILL.charged_dmg12[s1],
-            Plunging1 => AETHER_ANEMO_SKILL.plunging_dmg1[s1],
-            Plunging2 => AETHER_ANEMO_SKILL.plunging_dmg2[s1],
-            Plunging3 => AETHER_ANEMO_SKILL.plunging_dmg3[s1],
-            E1 => AETHER_ANEMO_SKILL.elemental_skill_dmg1[s2],
-            E2 => AETHER_ANEMO_SKILL.elemental_skill_dmg2[s2],
-            E3 => AETHER_ANEMO_SKILL.elemental_skill_dmg3[s2],
-            E4 => AETHER_ANEMO_SKILL.elemental_skill_dmg4[s2],
-            Q1 => AETHER_ANEMO_SKILL.elemental_burst_dmg1[s3],
-            Q2Cryo | Q2Electro | Q2Pyro | Q2Hydro => AETHER_ANEMO_SKILL.elemental_burst_dmg2[s3]
+        let elemental_absorption = match *config {
+            CharacterSkillConfig::AetherAnemo { elemental_absorption } => elemental_absorption,
+            _ => Element::Cryo,
         };
 
+        use AetherAnemoDamageEnum::*;
         let mut builder = D::new();
+
+        if context.character_common_data.constellation >= 6 && s.get_element(elemental_absorption) != Element::Anemo {
+            builder.add_extra_res_minus("六命：革新的旋风", 0.2);
+        }
+
+        let ratio = match s {
+            A1 => AETHERANEMO_SKILL.a_dmg1[s1],
+            A2 => AETHERANEMO_SKILL.a_dmg2[s1],
+            A3 => AETHERANEMO_SKILL.a_dmg3[s1],
+            A4 => AETHERANEMO_SKILL.a_dmg4[s1],
+            A5 => AETHERANEMO_SKILL.a_dmg5[s1],
+            Z1 => AETHERANEMO_SKILL.z_dmg1[s1],
+            Z2 => AETHERANEMO_SKILL.z_dmg2[s1],
+            X1 => AETHERANEMO_SKILL.x_dmg1[s1],
+            X2 => AETHERANEMO_SKILL.x_dmg2[s1],
+            X3 => AETHERANEMO_SKILL.x_dmg3[s1],
+            EC1 => AETHERANEMO_SKILL.e_dmgc1[s2],
+            EC2 => AETHERANEMO_SKILL.e_dmgc2[s2],
+            ES1 => AETHERANEMO_SKILL.e_dmgs1[s2],
+            ES2 => AETHERANEMO_SKILL.e_dmgs2[s2],
+            EC1A => AETHERANEMO_SKILL.e_dmgc1[s2] * AETHERANEMO_SKILL.e_dmga_rate,
+            EC2A => AETHERANEMO_SKILL.e_dmgc2[s2] * AETHERANEMO_SKILL.e_dmga_rate,
+            ES1A => AETHERANEMO_SKILL.e_dmgs1[s2] * AETHERANEMO_SKILL.e_dmga_rate,
+            ES2A => AETHERANEMO_SKILL.e_dmgs2[s2] * AETHERANEMO_SKILL.e_dmga_rate,
+            Q => AETHERANEMO_SKILL.q_dmg[s3],
+            QA => AETHERANEMO_SKILL.q_dmga[s3],
+            P2 => AETHERANEMO_SKILL.p2_dmg,
+            _ => 0.0
+        };
+
         builder.add_atk_ratio("技能倍率", ratio);
 
         builder.damage(
             &context.attribute,
             &context.enemy,
-            s.get_element(),
+            s.get_element(elemental_absorption),
             s.get_skill_type(),
             context.character_common_data.level,
             fumo,
         )
     }
 
-    fn new_effect<A: Attribute>(common_data: &CharacterCommonData, _config: &CharacterConfig) -> Option<Box<dyn ChangeAttribute<A>>> {
+    fn new_effect<A: Attribute>(common_data: &CharacterCommonData, config: &CharacterConfig) -> Option<Box<dyn ChangeAttribute<A>>> {
         Some(Box::new(AetherAnemoEffect {
-            c2: common_data.constellation >= 2
+            has_c2: common_data.constellation >= 2,
+            has_c6: common_data.constellation >= 6,
         }))
     }
 
-    fn get_target_function_by_role(role_index: usize, team: &TeamQuantization, c: &CharacterCommonData, w: &WeaponCommonData) -> Box<dyn TargetFunction> {
+    fn get_target_function_by_role(role_index: usize, _team: &TeamQuantization, _c: &CharacterCommonData, _w: &WeaponCommonData) -> Box<dyn TargetFunction> {
         unimplemented!()
     }
 }
