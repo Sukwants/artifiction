@@ -29,8 +29,8 @@ impl TargetFunctionMetaTrait for AlbedoDefaultTargetFunction {
             en: "Albedo-Kreideprinz"
         ),
         description: crate::common::i18n::locale!(
-            zh_cn: "普通副C阿贝多",
-            en: "Sub DPS Albedo"
+            zh_cn: "阿贝多后台一轮输出总伤害",
+            en: "Albedo off-field total damage output"
         ),
         tags: "输出",
         four: TargetFunctionFor::SomeWho(CharacterName::Albedo),
@@ -44,84 +44,45 @@ impl TargetFunctionMetaTrait for AlbedoDefaultTargetFunction {
 
 impl TargetFunction for AlbedoDefaultTargetFunction {
     fn get_target_function_opt_config(&self) -> TargetFunctionOptConfig {
-        // TargetFunctionOptConfig {
-        //     atk_fixed: 0.1,
-        //     atk_percentage: 1.0,
-        //     hp_fixed: 0.0,
-        //     hp_percentage: 0.0,
-        //     def_fixed: 0.0,
-        //     def_percentage: 0.0,
-        //     recharge: 0.2,
-        //     elemental_mastery: 0.3,
-        //     critical: 1.0,
-        //     critical_damage: 1.0,
-        //     healing_bonus: 0.0,
-        //     bonus_electro: 0.0,
-        //     bonus_pyro: 0.0,
-        //     bonus_hydro: 0.0,
-        //     bonus_anemo: 0.0,
-        //     bonus_cryo: 0.0,
-        //     bonus_geo: 2.0,
-        //     bonus_dendro: 0.0,
-        //     bonus_physical: 0.0,
-        //     sand_main_stats: vec![
-        //         StatName::ATKPercentage,
-        //         StatName::DEFPercentage,
-        //     ],
-        //     goblet_main_stats: vec![
-        //         StatName::GeoBonus,
-        //         StatName::ATKPercentage,
-        //         StatName::DEFPercentage,
-        //     ],
-        //     head_main_stats: vec![
-        //         StatName::CriticalRate,
-        //         StatName::CriticalDamage,
-        //         StatName::DEFPercentage,
-        //         StatName::ATKPercentage,
-        //     ],
-        //     set_names: Some(vec![
-        //         ArtifactSetName::HuskOfOpulentDreams,
-        //         ArtifactSetName::DefendersWill,
-        //         ArtifactSetName::Gambler,
-        //         ArtifactSetName::ArchaicPetra,
-        //     ]),
-        //     very_critical_set_names: None,
-        //     normal_threshold: TargetFunctionOptConfig::DEFAULT_NORMAL_THRESHOLD,
-        //     critical_threshold: TargetFunctionOptConfig::DEFAULT_CRITICAL_THRESHOLD,
-        //     very_critical_threshold: TargetFunctionOptConfig::DEFAULT_VERY_CRITICAL_THRESHOLD
-        // }
         unimplemented!()
     }
 
     fn get_default_artifact_config(&self, _team_config: &TeamQuantization) -> ArtifactEffectConfig {
-        ArtifactEffectConfigBuilder::new()
-            .husk_of_opulent_dreams(4.0)
-            .build()
+        Default::default()
     }
 
-    fn target(
-        &self,
-        attribute: &SimpleAttributeGraph2,
-        character: &Character<SimpleAttributeGraph2>,
-        _weapon: &Weapon<SimpleAttributeGraph2>,
-        _artifacts: &[&Artifact],
-        enemy: &Enemy) -> f64 {
-        let context = DamageContext {
+    fn target(&self, attribute: &SimpleAttributeGraph2, character: &Character<SimpleAttributeGraph2>, weapon: &Weapon<SimpleAttributeGraph2>, artifacts: &[&Artifact], enemy: &Enemy) -> f64 {
+        let context: DamageContext<'_, SimpleAttributeGraph2> = DamageContext {
             character_common_data: &character.common_data,
             attribute,
             enemy
         };
 
-        type SkillEnum = <Albedo as CharacterTrait>::DamageEnumType;
+        let config1 = [
+            CharacterSkillConfig::Albedo { lower50: false, activated_q: false, fatal_count: 4, crystallize_shield: false },
+            CharacterSkillConfig::Albedo { lower50: true, activated_q: false, fatal_count: 4, crystallize_shield: false }
+        ];
+        let config2 = [
+            CharacterSkillConfig::Albedo { lower50: false, activated_q: true, fatal_count: 4, crystallize_shield: false },
+            CharacterSkillConfig::Albedo { lower50: true, activated_q: true, fatal_count: 4, crystallize_shield: false }
+        ];
 
-        let config = CharacterSkillConfig::Albedo { fatal_count: 4 };
+        type Ty = <Albedo as CharacterTrait>::DamageEnumType;
 
-        let damage_transient_blossom = Albedo::damage::<SimpleDamageBuilder>(&context, SkillEnum::ETransientBlossom, &config, None);
-        let damage_q_blossom = Albedo::damage::<SimpleDamageBuilder>(&context, SkillEnum::QFatalBlossom, &config, None);
-        let damage_q1 = Albedo::damage::<SimpleDamageBuilder>(&context, SkillEnum::Q1, &config, None);
+        let get_damage = |s: Ty, config: &[CharacterSkillConfig]| -> f64 {
+            (
+                Albedo::damage::<SimpleDamageBuilder>(&context, s, &config[0], None).normal.expectation
+                + Albedo::damage::<SimpleDamageBuilder>(&context, s, &config[1], None).normal.expectation
+            ) / 2.0
+        };
 
-        damage_transient_blossom.normal.expectation * 14.0
-        + damage_q1.normal.expectation * 1.0
-        + damage_q_blossom.normal.expectation * 7.0
+        let dmg_e = get_damage(Ty::E1, &config1)
+            + get_damage(Ty::ETransientBlossom, &config2) * 9.0;
+
+        let dmg_q = get_damage(Ty::Q1, &config1)
+            + get_damage(Ty::QFatalBlossom, &config2) * 7.0
+            + get_damage(Ty::C2, &config2) * 4.0 * 2.0;
+
+        dmg_e + dmg_q
     }
 }

@@ -7,13 +7,13 @@ use crate::common::SkillType;
 #[derive(Serialize, Deserialize, Display, FromPrimitive)]
 #[derive(Debug, Eq, PartialEq, Hash, Copy, Clone)]
 pub enum Element {
-    Electro,
     Pyro,
-    Cryo,
-    Dendro,
-    Geo,
-    Anemo,
     Hydro,
+    Anemo,
+    Electro,
+    Dendro,
+    Cryo,
+    Geo,
     Physical,
 }
 

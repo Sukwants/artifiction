@@ -122,4 +122,5 @@ pub enum TargetFunctionName {
     AinoDefault,
     FlinsDefault,
     NeferDefault,
+    DurinDefault,
 }

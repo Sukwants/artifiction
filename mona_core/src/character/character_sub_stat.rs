@@ -14,6 +14,7 @@ pub enum CharacterSubStatFamily {
 
     CriticalRate192,
 
+    HealingBonus185,
     HealingBonus222,
 
     DEF300,
@@ -39,6 +40,7 @@ pub fn get_value_array(family: CharacterSubStatFamily) -> [f64; 5] {
         CharacterSubStatFamily::Bonus300(_) => [0.75, 0.15, 0.15, 0.225, 0.3],
         CharacterSubStatFamily::CriticalDamage384 => [0.096, 0.192, 0.192, 0.288, 0.384],
         CharacterSubStatFamily::CriticalRate192 => [0.048, 0.096, 0.096, 0.144, 0.192],
+        CharacterSubStatFamily::HealingBonus185 => [0.0462, 0.0923, 0.0923, 0.1385, 0.1846],
         CharacterSubStatFamily::HealingBonus222 => [0.055, 0.111, 0.111, 0.166, 0.222],
         CharacterSubStatFamily::DEF300 => [0.075, 0.15, 0.15, 0.225, 0.3],
         CharacterSubStatFamily::DEF360 => [0.09, 0.18, 0.18, 0.27, 0.36],
@@ -60,6 +62,7 @@ pub fn get_stat_name_from_family(family: CharacterSubStatFamily) -> StatName {
         Bonus300(x) => x,
         CriticalDamage384 => StatName::CriticalDamage,
         CriticalRate192 => StatName::CriticalRate,
+        HealingBonus185 => StatName::HealingBonus,
         HealingBonus222 => StatName::HealingBonus,
         DEF300 => StatName::DEFPercentage,
         DEF360 => StatName::DEFPercentage,

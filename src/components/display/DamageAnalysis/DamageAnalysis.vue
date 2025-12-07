@@ -1,5 +1,5 @@
 <template>
-    <div style="margin-bottom: 16px;" class="flex-row">
+    <div style="margin-bottom: 16px;" class="flex-row" v-if="!isNone">
         <el-radio-group v-model="damageType" style="margin-right: 24px;">
             <el-radio-button label="normal">{{ normalDamageName }}</el-radio-button>
             <el-radio-button v-if="showMeltOption" label="melt">融化</el-radio-button>
@@ -15,7 +15,7 @@
         <span class="damage-display" v-if="damageType === 'aggravate'">{{ Math.round(damageAggravate) }}</span>
     </div>
 
-    <div class="header-row" style="overflow: auto; margin-bottom: 16px; min-height: 200px;">
+    <div class="header-row" style="overflow: auto; margin-bottom: 16px; min-height: 200px;" v-if="!isNone">
         <div v-if="lunarType !== 'LunarChargedReaction'">
             <div class="big-title base-damage-region" :title="Math.round(baseDamageSpread*1000)/1000" v-if="damageType === 'spread'">{{ baseRegionName }}</div>
             <div class="big-title base-damage-region" :title="Math.round(baseDamageAggravate*1000)/1000" v-else-if="damageType === 'aggravate'">{{ baseRegionName }}</div>
@@ -100,6 +100,17 @@
             <div class="big-title bonus-region">加成</div>
             <div class="header-row">
                 <damage-analysis-util
+                    v-if="damageType === 'melt'"
+                    :arr="meltBonusState"
+                    :title="bonusRegionName"
+                ></damage-analysis-util>
+                <damage-analysis-util
+                    v-if="damageType === 'vaporize'"
+                    :arr="vaporizeBonusState"
+                    :title="bonusRegionName"
+                ></damage-analysis-util>
+                <damage-analysis-util
+                    v-if="damageType !== 'melt' && damageType !== 'vaporize'"
                     :arr="bonusRegionState"
                     :title="bonusRegionName"
                 ></damage-analysis-util>
@@ -223,6 +234,12 @@
             </div>
         </div>
     </div>
+
+    <div v-if="isNone" style="font-size: 16px; color: gray; text-align: center; margin-top: 100px; min-height: 200px;">
+        无数据
+        <br>
+        该技能对应伤害、治疗或护盾在当前配置下不会被触发
+    </div>
 </template>
 
 <script>
@@ -280,6 +297,8 @@ export default {
             defPenetrationState: [],
             resMinusState: [],
             bonusState: [],
+            meltBonusState: [],
+            vaporizeBonusState: [],
             healingBonusState: []
         }
     },
@@ -307,6 +326,8 @@ export default {
                 "lunarChargedExtraIncreaseState": "lunar_charged_extra_increase",
                 "lunarBloomExtraIncreaseState": "lunar_bloom_extra_increase",
                 "bonusState": "bonus",
+                "meltBonusState": "melt_bonus",
+                "vaporizeBonusState": "vaporize_bonus",
                 "defMinusState": "def_minus",
                 "defPenetrationState": "def_penetration",
                 "resMinusState": "res_minus",
@@ -317,7 +338,8 @@ export default {
             this.element = analysis.element
             this.isHeal = analysis.is_heal
             this.isShield = analysis.is_shield
-            this.isDamage = !this.isHeal && !this.isShield
+            this.isNone = analysis.is_none
+            this.isDamage = !this.isHeal && !this.isShield && !this.isNone
             this.isLunar = analysis.lunar_type !== "None"
             this.lunarType = analysis.lunar_type
             this.damageType = "normal"
@@ -465,6 +487,12 @@ export default {
         bonus() {
             return sum(this.bonusState)
         },
+        meltBonus() {
+            return sum(this.meltBonusState)
+        },
+        vaporizeBonus() {
+            return sum(this.vaporizeBonusState)
+        },
 
         healingBonus() {
             return sum(this.healingBonusState)
@@ -596,12 +624,12 @@ export default {
         },
 
         damageMelt() {
-            const d = this.damageNormal * this.reactionRatio * (1 + this.meltEnhance)
+            const d = this.baseDamage * (1 + this.critical * this.criticalDamage) * (1 + this.meltBonus) * this.resRatio * this.defMultiplier * this.reactionRatio * (1 + this.meltEnhance)
             return d
         },
 
         damageVaporize() {
-            const d = this.damageNormal * this.reactionRatio * (1 + this.vaporizeEnhance)
+            const d = this.baseDamage * (1 + this.critical * this.criticalDamage) * (1 + this.vaporizeBonus) * this.resRatio * this.defMultiplier * this.reactionRatio * (1 + this.vaporizeEnhance)
             return d
         }
     }

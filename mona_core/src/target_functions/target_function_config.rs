@@ -31,7 +31,6 @@ pub enum TargetFunctionConfig {
     KaedeharaKazuhaDamage { recharge_demand: f64, other_dmg_ratio: f64, swirl_rate: f64 },
     KaedeharaKazuhaDefault { recharge_demand: f64 },
     KamisatoAyakaDefault { recharge_demand: f64 },
-    KleeDefault { recharge_demand: f64 },
     LisaDefault { recharge_demand: f64 },
     MonaDefault { recharge_demand: f64 },
     QiqiDefault { recharge_demand: f64 },
@@ -41,7 +40,6 @@ pub enum TargetFunctionConfig {
     ShenheDefault { recharge_demand: f64 },
     SucroseDefault { recharge_demand: f64 },
     ThomaDefault { recharge_demand: f64 },
-    VentiDefault { swirl_rate: f64 },
     XianglingDefault { recharge_demand: f64, melt_rate: f64, vaporize_rate: f64, overload_rate: f64 },
     XingqiuDefault { recharge_demand: f64 },
     XinyanDefault { recharge_demand: f64, damage_demand: f64 },
@@ -68,5 +66,6 @@ pub enum TargetFunctionConfig {
     IneffaDefault { lunar_charged_coefficient: f64 },
     LaumaDefault { bloom_count: usize, hyperbloom_count: usize, burgeon_count: usize },
     FlinsDefault { lunar_charged_coefficient: f64, if_thunderclouds: bool },
+    DurinDefault { vaporize_rate: f64, melt_rate: f64, atk_demand: f64 },
     NoConfig,
 }

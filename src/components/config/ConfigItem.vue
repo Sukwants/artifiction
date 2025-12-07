@@ -59,6 +59,13 @@
                 :elements=params.elements
             ></select-element-type>
         </template>
+        <template v-if="type === 'elementOptional'">
+            <select-element-type
+                :modelValue="modelValue"
+                @update:modelValue="handleChangeValue"
+                :elements="[...params.elements, 'None']"
+            ></select-element-type>
+        </template>
         <template v-if="type === 'element4'">
             <select-element-type
                 :modelValue="modelValue"
@@ -72,6 +79,13 @@
                 @update:modelValue="handleChangeValue"
                 :elements="['Pyro', 'Cryo', 'Electro', 'Hydro', 'Anemo', 'Geo', 'Dendro', 'Physical']"
             ></select-element-type>
+        </template>
+        <template v-if="type === 'elementMulti'">
+            <select-element-multi
+                :modelValue="modelValue"
+                @update:modelValue="handleChangeValue"
+                :elements=params.elements
+            ></select-element-multi>
         </template>
         <template v-if="type === 'element8multi'">
             <select-element-multi

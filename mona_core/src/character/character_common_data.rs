@@ -4,8 +4,9 @@ use super::character_sub_stat::{CharacterSubStat};
 use crate::attribute::{AttributeName, Attribute};
 use crate::common::ChangeAttribute;
 use super::characters::get_static_data;
+use crate::character::CharacterConfig;
 
-
+#[derive(Clone)]
 pub struct CharacterCommonData {
     pub name: CharacterName,
     pub level: usize,
@@ -21,6 +22,7 @@ pub struct CharacterCommonData {
     pub skill3: usize,
 
     pub static_data: CharacterStaticData,
+    pub config: CharacterConfig,
 }
 
 impl CharacterCommonData {
@@ -31,7 +33,8 @@ impl CharacterCommonData {
         constellation: i32,
         skill1: usize,
         skill2: usize,
-        skill3: usize
+        skill3: usize,
+        config: &CharacterConfig
     ) -> CharacterCommonData {
         let data = get_static_data(name);
 
@@ -49,6 +52,7 @@ impl CharacterCommonData {
             skill1,
             skill2,
             skill3,
+            config: config.clone(),
         }
     }
 

@@ -9,10 +9,6 @@ pub struct DamageResult {
     pub critical: f64,
     pub non_critical: f64,
     pub expectation: f64,
-
-    pub lunar_type: MoonglareReaction,
-    pub is_heal: bool,
-    pub is_shield: bool
 }
 
 impl Mul<f64> for DamageResult {
@@ -23,9 +19,6 @@ impl Mul<f64> for DamageResult {
             critical: self.critical * rhs,
             non_critical: self.non_critical * rhs,
             expectation: self.expectation * rhs,
-            lunar_type: self.lunar_type,
-            is_shield: false,
-            is_heal: false
         }
     }
 }
@@ -41,4 +34,5 @@ pub struct SimpleDamageResult {
     pub lunar_type: MoonglareReaction,
     pub is_heal: bool,
     pub is_shield: bool,
+    pub is_none: bool,
 }

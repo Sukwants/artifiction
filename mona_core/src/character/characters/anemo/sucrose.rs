@@ -162,6 +162,12 @@ impl CharacterTrait for Sucrose {
         ])
     };
 
+    #[cfg(not(target_family = "wasm"))]
+    const CONFIG_DATA: Option<&'static [ItemConfig]> = Some(&[
+        ItemConfig::HEXEREI_SECRET_RITE_GLOBAL(false, ItemConfig::PRIORITY_CHARACTER),
+        ItemConfig::IS_HEXEREI(true, ItemConfig::PRIORITY_CHARACTER),
+    ]);
+
     fn damage_internal<D: DamageBuilder>(context: &DamageContext<'_, D::AttributeType>, s: usize, config: &CharacterSkillConfig, fumo: Option<Element>) -> D::Result {
         let s: SucroseDamageEnum = num::FromPrimitive::from_usize(s).unwrap();
         let (s1, s2, s3) = context.character_common_data.get_3_skill();

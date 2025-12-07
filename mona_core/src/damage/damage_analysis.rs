@@ -15,6 +15,8 @@ pub struct DamageAnalysis {
     pub em_ratio: HashMap<String, f64>,
     pub extra_damage: HashMap<String, f64>,
     pub bonus: HashMap<String, f64>,
+    pub melt_bonus: HashMap<String, f64>,
+    pub vaporize_bonus: HashMap<String, f64>,
     pub critical: HashMap<String, f64>,
     pub critical_damage: HashMap<String, f64>,
     pub melt_enhance: HashMap<String, f64>,
@@ -48,6 +50,7 @@ pub struct DamageAnalysis {
     pub lunar_type: MoonglareReaction,
     pub is_heal: bool,
     pub is_shield: bool,
+    pub is_none: bool,
 
     pub normal: DamageResult,
     pub melt: Option<DamageResult>,

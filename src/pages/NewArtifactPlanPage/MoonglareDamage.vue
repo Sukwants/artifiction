@@ -44,7 +44,7 @@ export default {
                     expectation: r(this.data[name]?.expectation) ?? NO_DATA,
                     critical: r(this.data[name]?.critical) ?? NO_DATA,
                     nonCritical: r(this.data[name]?.non_critical) ?? NO_DATA,
-                    name: this.t(`dmg.${this.data[name].lunar_type}`),
+                    name: this.t(`dmg.${name}`),
                 })
             }
 

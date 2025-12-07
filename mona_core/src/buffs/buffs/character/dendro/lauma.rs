@@ -185,7 +185,7 @@ impl BuffMeta for BuffLaumaP1 {
 
     #[cfg(not(target_family = "wasm"))]
     const CONFIG: Option<&'static [ItemConfig]> = Some(&[
-        ItemConfig::MOONSIGN_GLOBAL(Moonsign::Nascent, ItemConfig::PRIORITY_BUFF, true),
+        ItemConfig::MOONSIGN_GLOBAL(Moonsign::Nascent, ItemConfig::PRIORITY_BUFF),
     ]);
 
     fn create<A: Attribute>(b: &BuffConfig) -> Box<dyn Buff<A>> {

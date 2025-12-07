@@ -68,6 +68,7 @@ pub enum WeaponName {
     Absolution,
     PeakPatrolSong,
     Azurelight,
+    AthameArtis,
 
     // claymore
     // 1 star
@@ -259,6 +260,7 @@ pub enum WeaponName {
     ChainBreaker,
     SequenceOfSolitude,
     SnareHook,
+    RainbowSerpentsRainBow,
     // 5 star
     SkywardHarp,
     AmosBow,
@@ -270,4 +272,5 @@ pub enum WeaponName {
     TheFirstGreatMagic,
     SilvershowerHeartstrings,
     AstralVulturesCrimsonPlumage,
+    TheDaybreakChronicles,
 }

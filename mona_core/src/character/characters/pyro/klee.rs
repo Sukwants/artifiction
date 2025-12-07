@@ -1,21 +1,19 @@
-use num_derive::FromPrimitive;
-use crate::attribute::Attribute;
+use num_traits::FromPrimitive;
+use crate::attribute::{Attribute, AttributeName, AttributeCommon};
 use crate::character::character_common_data::CharacterCommonData;
 use crate::character::character_sub_stat::CharacterSubStatFamily;
 use crate::character::{CharacterConfig, CharacterName, CharacterStaticData};
 use crate::character::skill_config::CharacterSkillConfig;
 use crate::character::traits::{CharacterSkillMap, CharacterSkillMapItem, CharacterTrait};
-use crate::common::{ChangeAttribute, Element, SkillType, StatName, WeaponType};
-use crate::common::item_config_type::ItemConfig;
+use crate::character::macros::{damage_enum, skill_map};
+use crate::common::{ChangeAttribute, Element, MoonglareReaction, Moonsign, SkillType, StatName, WeaponType};
+use crate::common::i18n::{locale, hit_n_dmg, plunging_dmg, charged_dmg};
+use crate::common::item_config_type::{ItemConfig, ItemConfigType};
 use crate::damage::damage_builder::DamageBuilder;
 use crate::damage::DamageContext;
-use crate::target_functions::target_functions::KleeDefaultTargetFunction;
 use crate::target_functions::TargetFunction;
 use crate::team::TeamQuantization;
 use crate::weapon::weapon_common_data::WeaponCommonData;
-use strum::EnumCount;
-use strum_macros::{EnumCount as EnumCountMacro, EnumString};
-use crate::common::i18n::{charged_dmg, hit_n_dmg, locale, plunging_dmg};
 
 pub struct KleeSkillType {
     pub normal_dmg1: [f64; 15],
@@ -30,6 +28,9 @@ pub struct KleeSkillType {
     pub elemental_skill_dmg2: [f64; 15],
 
     pub elemental_burst_dmg1: [f64; 15],
+
+    pub c1_dmg_ratio: f64,
+    pub c4_dmg: f64,
 }
 
 pub const KLEE_SKILL: KleeSkillType = KleeSkillType {
@@ -43,6 +44,9 @@ pub const KLEE_SKILL: KleeSkillType = KleeSkillType {
     elemental_skill_dmg1: [0.952, 1.0234, 1.0948, 1.19, 1.2614, 1.3328, 1.428, 1.5232, 1.6184, 1.7136, 1.8088, 1.904, 2.023, 2.142, 2.261],
     elemental_skill_dmg2: [0.328, 0.3526, 0.3772, 0.41, 0.4346, 0.4592, 0.492, 0.5248, 0.5576, 0.5904, 0.6232, 0.656, 0.697, 0.738, 0.779],
     elemental_burst_dmg1: [0.4264, 0.4584, 0.4904, 0.533, 0.565, 0.597, 0.6396, 0.6822, 0.7249, 0.7675, 0.8102, 0.8528, 0.9061, 0.9594, 1.0127],
+
+    c1_dmg_ratio: 1.2,
+    c4_dmg: 5.55,
 };
 
 pub const KLEE_STATIC_DATA: CharacterStaticData = CharacterStaticData {
@@ -57,7 +61,7 @@ pub const KLEE_STATIC_DATA: CharacterStaticData = CharacterStaticData {
     star: 5,
     skill_name1: locale!(
         zh_cn: "砰砰",
-        en: "Normal Attack: Kaboom!",
+        en: "Kaboom!",
     ),
     skill_name2: locale!(
         zh_cn: "蹦蹦炸弹",
@@ -73,41 +77,44 @@ pub const KLEE_STATIC_DATA: CharacterStaticData = CharacterStaticData {
     )
 };
 
-pub struct Klee;
-
-#[derive(Copy, Clone, FromPrimitive, Eq, PartialEq)]
-#[derive(EnumString, EnumCountMacro)]
-pub enum KleeDamageEnum {
-    Normal1,
-    Normal2,
-    Normal3,
-    Charged,
-    ChargedWithTalent,
-    Plunging1,
-    Plunging2,
-    Plunging3,
-    E1,
-    E2,
-    Q1
+pub struct KleeEffect {
+    pub hexerei_secret_rite: bool,
+    pub common_data: CharacterCommonData,
 }
+
+impl<A: Attribute> ChangeAttribute<A> for KleeEffect {
+    fn change_attribute(&self, attribute: &mut A) {
+    }
+}
+
+damage_enum!(
+    KleeDamageEnum
+    Normal1
+    Normal2
+    Normal3
+    Charged
+    ChargedWithTalent
+    Plunging1
+    Plunging2
+    Plunging3
+    E1
+    E2
+    Q1
+    C1
+    C4
+);
 
 impl KleeDamageEnum {
     pub fn get_skill_type(&self) -> SkillType {
         use KleeDamageEnum::*;
         match *self {
             Normal1 | Normal2 | Normal3 => SkillType::NormalAttack,
-            Charged | ChargedWithTalent => SkillType::ChargedAttack,
+            Charged | ChargedWithTalent | C1 => SkillType::ChargedAttack,
             Plunging1 => SkillType::PlungingAttackInAction,
             Plunging2 | Plunging3 => SkillType::PlungingAttackOnGround,
             E1 | E2 => SkillType::ElementalSkill,
-            Q1 => SkillType::ElementalBurst
+            Q1 | C4 => SkillType::ElementalBurst
         }
-    }
-}
-
-impl Into<usize> for KleeDamageEnum {
-    fn into(self) -> usize {
-        self as usize
     }
 }
 
@@ -115,6 +122,8 @@ impl Into<usize> for KleeDamageEnum {
 pub enum KleeRoleEnum {
     MainPyro
 }
+
+pub struct Klee;
 
 impl CharacterTrait for Klee {
     const STATIC_DATA: CharacterStaticData = KLEE_STATIC_DATA;
@@ -130,43 +139,122 @@ impl CharacterTrait for Klee {
             CharacterSkillMapItem { index: KleeDamageEnum::Normal2 as usize, text: hit_n_dmg!(2) },
             CharacterSkillMapItem { index: KleeDamageEnum::Normal3 as usize, text: hit_n_dmg!(3) },
             CharacterSkillMapItem { index: KleeDamageEnum::Charged as usize, text: charged_dmg!() },
-            CharacterSkillMapItem { index: KleeDamageEnum::ChargedWithTalent as usize, text: locale!(zh_cn: "重击伤害（带天赋）", en: "Charged Attack DMG(With talent)") },
+            CharacterSkillMapItem { index: KleeDamageEnum::ChargedWithTalent as usize, text: locale!(zh_cn: "嘭嘭轰击伤害", en: "Boom-Boom Strike DMG") },
             CharacterSkillMapItem { index: KleeDamageEnum::Plunging1 as usize, text: plunging_dmg!(1) },
             CharacterSkillMapItem { index: KleeDamageEnum::Plunging2 as usize, text: plunging_dmg!(2) },
             CharacterSkillMapItem { index: KleeDamageEnum::Plunging3 as usize, text: plunging_dmg!(3) },
+            CharacterSkillMapItem { index: KleeDamageEnum::C1 as usize, text: locale!(zh_cn: "连环轰隆火花伤害", en: "Bombard Opponents DMG") },
         ]),
         skill2: Some(&[
             CharacterSkillMapItem { index: KleeDamageEnum::E1 as usize, text: locale!(zh_cn: "蹦蹦炸弹伤害", en: "Jumpy Dumpty DMG") },
             CharacterSkillMapItem { index: KleeDamageEnum::E2 as usize, text: locale!(zh_cn: "诡雷伤害", en: "Mine DMG") },
         ]),
         skill3: Some(&[
-            CharacterSkillMapItem { index: KleeDamageEnum::Q1 as usize, text: locale!(zh_cn: "轰轰火花伤害", en: "Sparks 'n' Splash DMG") }
+            CharacterSkillMapItem { index: KleeDamageEnum::Q1 as usize, text: locale!(zh_cn: "轰轰火花伤害", en: "Sparks 'n' Splash DMG") },
+            CharacterSkillMapItem { index: KleeDamageEnum::C4 as usize, text: locale!(zh_cn: "轰轰火花结束伤害", en: "Sparks 'n' Splash End DMG") },
         ])
     };
+
+    #[cfg(not(target_family = "wasm"))]
+    const CONFIG_DATA: Option<&'static [ItemConfig]> = Some(&[
+        ItemConfig::HEXEREI_SECRET_RITE_GLOBAL(false, ItemConfig::PRIORITY_CHARACTER),
+        ItemConfig::IS_HEXEREI(true, ItemConfig::PRIORITY_CHARACTER),
+    ]);
+
+    #[cfg(not(target_family = "wasm"))]
+    const CONFIG_SKILL: Option<&'static [ItemConfig]> = Some(&[
+        ItemConfig {
+            name: "boom_badge",
+            title: locale!(
+                zh_cn: "「轰轰勋章」数量",
+                en: "Boom Badge Count"
+            ),
+            config: ItemConfigType::Int { min: 0, max: 3, default: 0 }
+        },
+        ItemConfig {
+            name: "active",
+            title: locale!(
+                zh_cn: "位于场上",
+                en: "Is active"
+            ),
+            config: ItemConfigType::Bool { default: true }
+        },
+        ItemConfig {
+            name: "activated_q",
+            title: locale!(
+                zh_cn: "施放轰轰火花后",
+                en: "After Sparks 'n' Splash"
+            ),
+            config: ItemConfigType::Bool { default: true }
+        },
+        ItemConfig {
+            name: "activated_c1",
+            title: locale!(
+                zh_cn: "触发连环轰隆火花攻击后",
+                en: "After Bombard Opponents Attack"
+            ),
+            config: ItemConfigType::Bool { default: false }
+        },
+    ]);
 
     fn damage_internal<D: DamageBuilder>(context: &DamageContext<'_, D::AttributeType>, s: usize, config: &CharacterSkillConfig, fumo: Option<Element>) -> D::Result {
         let s: KleeDamageEnum = num::FromPrimitive::from_usize(s).unwrap();
         let (s1, s2, s3) = context.character_common_data.get_3_skill();
 
+        let hexerei_secret_rite = match &context.character_common_data.config {
+            CharacterConfig::Klee { hexerei_secret_rite } => *hexerei_secret_rite,
+            _ => false,
+        };
+
+        let (boom_badge, active, activated_q, activated_c1) = match *config {
+            CharacterSkillConfig::Klee { boom_badge, active, activated_q, activated_c1 } => (boom_badge, active, activated_q, activated_c1),
+            _ => (0, false, false, false)
+        };
+
         use KleeDamageEnum::*;
+        let mut builder = D::new();
+
+        if s == C1 && context.character_common_data.constellation < 1 {
+            return builder.none();
+        }
+        if s == C4 && context.character_common_data.constellation < 4 {
+            return builder.none();
+        }
+
+        if (s == ChargedWithTalent || s == C1) && context.character_common_data.has_talent1 {
+            builder.add_extra_bonus("天赋1：砰砰礼物", 0.5);
+        }
+
+        if context.character_common_data.constellation >= 1 && activated_c1 {
+            builder.add_extra_atk("命座1：连环轰隆", context.attribute.get_atk() * 0.6);
+        }
+
+        if context.character_common_data.constellation >= 6 && activated_q {
+            builder.add_extra_bonus("命座6：火力全开", 0.5);
+        }
+
+        let z_ratio = if hexerei_secret_rite {
+            [1.0, 1.15, 1.30, 1.50][boom_badge as usize]
+        } else { 1.0 };
+
         let ratio = match s {
             Normal1 => KLEE_SKILL.normal_dmg1[s1],
             Normal2 => KLEE_SKILL.normal_dmg2[s1],
             Normal3 => KLEE_SKILL.normal_dmg3[s1],
             Charged => KLEE_SKILL.charged_dmg1[s1],
-            ChargedWithTalent => KLEE_SKILL.charged_dmg1[s1],
+            ChargedWithTalent => KLEE_SKILL.charged_dmg1[s1] * z_ratio,
             Plunging1 => KLEE_SKILL.plunging_dmg1[s1],
             Plunging2 => KLEE_SKILL.plunging_dmg2[s1],
             Plunging3 => KLEE_SKILL.plunging_dmg3[s1],
             E1 => KLEE_SKILL.elemental_skill_dmg1[s2],
             E2 => KLEE_SKILL.elemental_skill_dmg2[s2],
-            Q1 => KLEE_SKILL.elemental_burst_dmg1[s3]
+            Q1 => KLEE_SKILL.elemental_burst_dmg1[s3],
+            C1 => KLEE_SKILL.charged_dmg1[s1] * z_ratio * KLEE_SKILL.c1_dmg_ratio,
+            C4 => KLEE_SKILL.c4_dmg * if active { 2.0 } else { 1.0 },
         };
-        let mut builder = D::new();
+
         builder.add_atk_ratio("技能倍率", ratio);
-        if s == ChargedWithTalent {
-            builder.add_extra_bonus("可莉天赋：砰砰礼物", 0.5);
-        }
+
         builder.damage(
             &context.attribute,
             &context.enemy,
@@ -177,16 +265,18 @@ impl CharacterTrait for Klee {
         )
     }
 
-    fn new_effect<A: Attribute>(_common_data: &CharacterCommonData, _config: &CharacterConfig) -> Option<Box<dyn ChangeAttribute<A>>> {
-        None
+    fn new_effect<A: Attribute>(common_data: &CharacterCommonData, config: &CharacterConfig) -> Option<Box<dyn ChangeAttribute<A>>> {
+        let hexerei_secret_rite = match *config {
+            CharacterConfig::Klee { hexerei_secret_rite } => hexerei_secret_rite,
+            _ => false,
+        };
+        Some(Box::new(KleeEffect {
+            hexerei_secret_rite: hexerei_secret_rite,
+            common_data: common_data.clone(),
+        }))
     }
 
     fn get_target_function_by_role(role_index: usize, _team: &TeamQuantization, _c: &CharacterCommonData, _w: &WeaponCommonData) -> Box<dyn TargetFunction> {
-        let role: KleeRoleEnum = num::FromPrimitive::from_usize(role_index).unwrap();
-        match role {
-            KleeRoleEnum::MainPyro => Box::new(KleeDefaultTargetFunction {
-                recharge_demand: 1.0
-            })
-        }
+        unimplemented!()
     }
 }

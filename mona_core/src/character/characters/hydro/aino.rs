@@ -204,7 +204,7 @@ impl CharacterTrait for Aino {
 
     #[cfg(not(target_family = "wasm"))]
     const CONFIG_DATA: Option<&'static [ItemConfig]> = Some(&[
-        ItemConfig::MOONSIGN_GLOBAL(Moonsign::Nascent, ItemConfig::PRIORITY_CHARACTER, true),
+        ItemConfig::MOONSIGN_GLOBAL(Moonsign::Nascent, ItemConfig::PRIORITY_CHARACTER),
     ]);
 
     #[cfg(not(target_family = "wasm"))]

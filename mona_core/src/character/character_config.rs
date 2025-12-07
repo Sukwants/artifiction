@@ -1,11 +1,15 @@
 use serde::{Deserialize, Serialize};
 
-use crate::common::Moonsign;
+use crate::common::{Element, Moonsign, item_config_type::ConfigElements8Multi};
 
-#[derive(Serialize, Deserialize)]
+#[derive(Serialize, Deserialize, Clone)]
 pub enum CharacterConfig {
     AetherElectro { abundance_amulet_count: usize },
     LumineElectro { abundance_amulet_count: usize },
+    Mona { is_hexerei: bool },
+    Venti { hexerei_secret_rite: bool, elemental_absorption: Option<Element> },
+    Klee { hexerei_secret_rite: bool },
+    Albedo { hexerei_secret_rite: bool, is_hexerei: bool },
     Ganyu { talent2_rate: f64 },
     HuTao { le_50: bool },
     KamisatoAyaka { talent1_rate: f64, talent2_rate: f64 },
@@ -13,7 +17,9 @@ pub enum CharacterConfig {
     KukiShinobu { hp_le_50: bool, use_c6: bool },
     Ningguang { talent2_rate: f64 },
     Rosaria { e_from_behind: bool },
-    Razor { e_stack: f64, talent2_ratio: f64 },
+    Razor { is_hexerei: bool, e_stack: f64, talent2_ratio: f64 },
+    Sucrose { },
+    Fischl { },
     Yelan { team_element_count: usize },
     Yoimiya { talent1_level: f64 },
     Collei { background: bool },
@@ -60,5 +66,7 @@ pub enum CharacterConfig {
     Aino { moonsign: Moonsign },
     Flins { moonsign: Moonsign },
     Nefer { moonsign: Moonsign },
+    Jahoda { max_elements: ConfigElements8Multi, moonsign: Moonsign },
+    Durin { hexerei_secret_rite: bool, essential_transmutation: usize },
     NoConfig,
 }

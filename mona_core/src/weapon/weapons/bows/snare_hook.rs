@@ -75,7 +75,7 @@ impl WeaponTrait for SnareHook {
             ),
             config: ItemConfigType::Bool { default: true }
         },
-        ItemConfig::MOONSIGN_GLOBAL(Moonsign::None, ItemConfig::PRIORITY_WEAPON, true),
+        ItemConfig::MOONSIGN_GLOBAL(Moonsign::None, ItemConfig::PRIORITY_WEAPON),
     ]);
 
     fn get_effect<A: Attribute>(character: &CharacterCommonData, config: &WeaponConfig) -> Option<Box<dyn WeaponEffect<A>>> {

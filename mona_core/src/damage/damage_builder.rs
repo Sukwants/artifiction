@@ -68,4 +68,6 @@ pub trait DamageBuilder {
     fn heal(&self, attribute: &Self::AttributeType) -> Self::Result;
 
     fn shield(&self, attribute: &Self::AttributeType, element: Element) -> Self::Result;
+
+    fn none(&self) -> Self::Result;
 }

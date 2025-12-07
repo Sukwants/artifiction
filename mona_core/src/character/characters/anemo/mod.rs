@@ -13,6 +13,7 @@ pub mod chasca;
 pub mod lanyan;
 pub mod yumemizuki_mizuki;
 pub mod ifa;
+pub mod jahoda;
 
 pub use jean::Jean;
 pub use kaedehara_kazuha::KaedeharaKazuha;
@@ -29,3 +30,4 @@ pub use chasca::Chasca;
 pub use lanyan::Lanyan;
 pub use yumemizuki_mizuki::YumemizukiMizuki;
 pub use ifa::Ifa;
+pub use jahoda::Jahoda;

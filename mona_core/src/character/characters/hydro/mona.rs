@@ -1,20 +1,19 @@
-use num_derive::FromPrimitive;
+use num_traits::FromPrimitive;
 use crate::attribute::{Attribute, AttributeName, AttributeCommon};
 use crate::character::character_common_data::CharacterCommonData;
-use crate::common::{ChangeAttribute, Element, SkillType, WeaponType};
-use crate::character::{CharacterConfig, CharacterName, CharacterStaticData};
 use crate::character::character_sub_stat::CharacterSubStatFamily;
+use crate::character::{CharacterConfig, CharacterName, CharacterStaticData};
 use crate::character::skill_config::CharacterSkillConfig;
 use crate::character::traits::{CharacterSkillMap, CharacterSkillMapItem, CharacterTrait};
+use crate::character::macros::{damage_enum, skill_map};
+use crate::common::{ChangeAttribute, Element, MoonglareReaction, Moonsign, SkillType, WeaponType};
+use crate::common::i18n::{locale, hit_n_dmg, plunging_dmg, charged_dmg};
+use crate::common::item_config_type::{ItemConfig, ItemConfigType};
 use crate::damage::damage_builder::DamageBuilder;
 use crate::damage::DamageContext;
-use crate::target_functions::target_functions::MonaDefaultTargetFunction;
 use crate::target_functions::TargetFunction;
 use crate::team::TeamQuantization;
 use crate::weapon::weapon_common_data::WeaponCommonData;
-use strum::EnumCount;
-use strum_macros::{EnumCount as EnumCountMacro, EnumString};
-use crate::common::i18n::{charged_dmg, hit_n_dmg, locale, plunging_dmg};
 
 pub struct MonaSkillType {
     pub normal_dmg1: [f64; 15],
@@ -77,12 +76,18 @@ pub const MONA_STATIC_DATA: CharacterStaticData = CharacterStaticData {
 };
 
 pub struct MonaEffect {
+    pub is_hexerei: bool,
     has_talent2: bool
 }
 
 impl MonaEffect {
     pub fn new(common_data: &CharacterCommonData) -> MonaEffect {
+        let is_hexerei = match &common_data.config {
+            CharacterConfig::Mona { is_hexerei } => *is_hexerei,
+            _ => false,
+        };
         MonaEffect {
+            is_hexerei,
             has_talent2: common_data.has_talent2,
         }
     }
@@ -104,20 +109,20 @@ impl<T: Attribute> ChangeAttribute<T> for MonaEffect {
 
 pub struct Mona;
 
-#[derive(Copy, Clone, FromPrimitive, EnumString, EnumCountMacro)]
-pub enum MonaDamageEnum {
-    Normal1,
-    Normal2,
-    Normal3,
-    Normal4,
-    Charged,
-    Plunging1,
-    Plunging2,
-    Plunging3,
-    E1,
-    E2,
+damage_enum! (
+    MonaDamageEnum
+    Normal1
+    Normal2
+    Normal3
+    Normal4
+    Charged
+    Plunging1
+    Plunging2
+    Plunging3
+    E1
+    E2
     Q1
-}
+);
 
 impl MonaDamageEnum {
     pub fn get_skill_type(&self) -> SkillType {
@@ -133,13 +138,6 @@ impl MonaDamageEnum {
     }
 }
 
-impl Into<usize> for MonaDamageEnum {
-    fn into(self) -> usize {
-        self as usize
-    }
-}
-
-#[derive(Copy, Clone, FromPrimitive)]
 pub enum MonaRoleEnum {
     General,
     Aux, // 增伤辅助
@@ -174,17 +172,87 @@ impl CharacterTrait for Mona {
         ])
     };
 
+    #[cfg(not(target_family = "wasm"))]
+    const CONFIG_DATA: Option<&'static [ItemConfig]> = Some(&[
+        ItemConfig::HEXEREI_SECRET_RITE_GLOBAL(false, ItemConfig::PRIORITY_CHARACTER),
+        ItemConfig::IS_HEXEREI(true, ItemConfig::PRIORITY_CHARACTER),
+    ]);
+
+    #[cfg(not(target_family = "wasm"))]
+    const CONFIG_SKILL: Option<&'static [ItemConfig]> = Some(&[
+        ItemConfig {
+            name: "omen",
+            title: locale!(
+                zh_cn: "处于「星异」状态下",
+                en: "Under Omen State",
+            ),
+            config: ItemConfigType::Bool { default: false },
+        },
+        ItemConfig {
+            name: "after_z",
+            title: locale!(
+                zh_cn: "重击命中后",
+                en: "After Charged Attack Hits",
+            ),
+            config: ItemConfigType::Bool { default: false },
+        },
+        ItemConfig {
+            name: "bonus_z",
+            title: locale!(
+                zh_cn: "六命重击增伤层数",
+                en: "C6 Charged Attack Bonus Stacks",
+            ),
+            config: ItemConfigType::Int { min: 0, max: 3, default: 0 },
+        },
+    ]);
+
     fn damage_internal<D: DamageBuilder>(context: &DamageContext<'_, D::AttributeType>, s: usize, config: &CharacterSkillConfig, fumo: Option<Element>) -> D::Result {
         let s: MonaDamageEnum = num::FromPrimitive::from_usize(s).unwrap();
         let (s1, s2, s3) = context.character_common_data.get_3_skill();
 
+        let is_hexerei = match &context.character_common_data.config {
+            CharacterConfig::Mona { is_hexerei } => *is_hexerei,
+            _ => false,
+        };
+
+        let (omen, after_z, bonus_z) = match *config {
+            CharacterSkillConfig::Mona { omen, after_z, bonus_z } => (omen, after_z, bonus_z),
+            _ => (false, false, 0)
+        };
+
         use MonaDamageEnum::*;
+        let mut builder = D::new();
+
+        if omen {
+            builder.add_extra_bonus("Q技能：星异", MONA_SKILL.elemental_burst_bonus[s3]);
+
+            if context.character_common_data.constellation >= 1 {
+                builder.add_extra_enhance_vaporize("命座1：沉没的预言", 0.15);
+            }
+        }
+
+        if context.character_common_data.constellation >= 2 && after_z {
+            builder.add_extra_em("命座2：星月的连珠", 80.0);
+        }
+
+        if context.character_common_data.constellation >= 4 {
+            builder.add_extra_critical("命座4：灭绝的预言", 0.15);
+
+            if is_hexerei {
+                builder.add_extra_critical_damage("命座4：灭绝的预言", 0.15);
+            }
+        }
+
+        if context.character_common_data.constellation >= 6 && s == Charged {
+            builder.add_extra_bonus("命座6：厄运的修辞", bonus_z as f64 * 0.6);
+        }
+
         let ratio = match s {
             Normal1 => MONA_SKILL.normal_dmg1[s1],
             Normal2 => MONA_SKILL.normal_dmg2[s1],
             Normal3 => MONA_SKILL.normal_dmg3[s1],
             Normal4 => MONA_SKILL.normal_dmg4[s1],
-            Charged => MONA_SKILL.charged_dmg1[s1],
+            Charged => MONA_SKILL.charged_dmg1[s1] * if context.character_common_data.constellation >= 6 && omen { 2.0 } else { 1.0 },
             Plunging1 => MONA_SKILL.plunging_dmg1[s1],
             Plunging2 => MONA_SKILL.plunging_dmg2[s1],
             Plunging3 => MONA_SKILL.plunging_dmg3[s1],
@@ -192,8 +260,9 @@ impl CharacterTrait for Mona {
             E2 => MONA_SKILL.elemental_skill_dmg2[s2],
             Q1 => MONA_SKILL.elemental_burst_dmg1[s3]
         };
-        let mut builder = D::new();
+
         builder.add_atk_ratio("技能倍率", ratio);
+
         builder.damage(
             &context.attribute,
             &context.enemy,

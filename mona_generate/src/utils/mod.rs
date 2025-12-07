@@ -39,6 +39,15 @@ pub fn config_to_json(config: &ItemConfig) -> String {
                 "default": default
             })
         },
+        ItemConfigType::ElementOptional { elements, default } => {
+            json!({
+                "type": "elementOptional",
+                "elements": elements,
+                "title": title_index,
+                "name": name,
+                "default": default
+            })
+        },
         ItemConfigType::Element4 { default } => {
             json!({
                     "type": "element4",
@@ -119,6 +128,15 @@ pub fn config_to_json(config: &ItemConfig) -> String {
                 "default": default,
                 "options_zh": temp_zh,
                 "options_en": temp_en
+            })
+        },
+        ItemConfigType::ElementMulti { elements, default } => {
+            json!({
+                "type": "elementMulti",
+                "elements": elements,
+                "title": title_index,
+                "name": name,
+                "default": default
             })
         },
         ItemConfigType::Element8Multi { default } => {

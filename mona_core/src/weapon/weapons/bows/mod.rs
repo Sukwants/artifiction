@@ -42,6 +42,8 @@ pub use flower_wreathed_feathers::FlowerWreathedFeathers;
 pub use astral_vultures_crimson_plumage::AstralVulturesCrimsonPlumage;
 pub use sequence_of_solitude::SequenceOfSolitude;
 pub use snare_hook::SnareHook;
+pub use the_daybreak_chronicles::TheDaybreakChronicles;
+pub use rainbow_serpents_rain_bow::RainbowSerpentsRainBow;
 
 pub mod polar_star;
 pub mod thundering_pulse;
@@ -87,3 +89,5 @@ pub mod flower_wreathed_feathers;
 pub mod astral_vultures_crimson_plumage;
 pub mod sequence_of_solitude;
 pub mod snare_hook;
+pub mod the_daybreak_chronicles;
+pub mod rainbow_serpents_rain_bow;

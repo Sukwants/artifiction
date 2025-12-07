@@ -1,4 +1,4 @@
-pub use albedo::{BuffAlbedoC4, BuffAlbedoC6, BuffAlbedoTalent2};
+pub use albedo::{BuffAlbedoTalent2, BuffAlbedoTalent3, BuffAlbedoC4, BuffAlbedoC6};
 pub use arataki_itto::BuffAratakiIttoC4;
 pub use gorou::{BuffGorouC6, BuffGorouE1, BuffGorouE3, BuffGorouTalent1};
 pub use kachina::BuffKachinaC4;
