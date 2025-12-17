@@ -20,7 +20,7 @@ impl<A: Attribute> WeaponEffect<A> for AthameArtisEffect {
     fn apply(&self, data: &WeaponCommonData, attribute: &mut A) {
         let refine = data.refine as f64;
 
-        attribute.set_value_by(AttributeName::CriticalDamageBase, "黑蚀被动", 0.12 + 0.04 * refine);
+        attribute.set_value_by(AttributeName::CriticalDamageElementalBurst, "黑蚀被动", 0.12 + 0.04 * refine);
 
         let rate = if self.hexerei_secret_rite { 1.75 } else { 1.0 };
 

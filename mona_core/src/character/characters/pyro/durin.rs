@@ -111,8 +111,8 @@ impl<A: Attribute> ChangeAttribute<A> for DurinEffect {
             if self.essential_transmutation == 0 {
                 attribute.set_value_by(AttributeName::ResMinusPyro, "天赋1：光灵遵神数显现", if self.hexerei_secret_rite { 0.35 } else { 0.20 });
             } else {
-                attribute.set_value_by(AttributeName::BonusMelt, "天赋1：光灵遵神数显现", if self.hexerei_secret_rite { 0.7 } else { 0.4 });
-                attribute.set_value_by(AttributeName::BonusVaporize, "天赋1：光灵遵神数显现", if self.hexerei_secret_rite { 0.7 } else { 0.4 });
+                attribute.set_value_by(AttributeName::EnhanceMelt, "天赋1：光灵遵神数显现", if self.hexerei_secret_rite { 0.7 } else { 0.4 });
+                attribute.set_value_by(AttributeName::EnhanceVaporize, "天赋1：光灵遵神数显现", if self.hexerei_secret_rite { 0.7 } else { 0.4 });
             }
         }
     }
@@ -326,7 +326,7 @@ impl CharacterTrait for Durin {
 
         let extra_ratio = if context.character_common_data.has_talent2 && primordial_fusion {
             (context.attribute.get_atk() / 100.0 * 0.03).min(0.75)
-        } else { 0.0 };
+        } else { 0.0 } * ratio;
 
         builder.add_atk_ratio("技能倍率", ratio);
         if extra_ratio > 0.0 {
