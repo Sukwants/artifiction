@@ -1,4 +1,4 @@
-use crate::attribute::{Attribute, AttributeCommon};
+use crate::attribute::*;
 use crate::character::character_common_data::CharacterCommonData;
 use crate::common::WeaponType;
 use crate::weapon::weapon_base_atk::WeaponBaseATKFamily;

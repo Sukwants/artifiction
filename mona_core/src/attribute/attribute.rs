@@ -1,61 +1,243 @@
-use crate::attribute::typing::EdgeFunctionBwd;
-use super::attribute_name::AttributeName;
-use super::typing::EdgeFunctionFwd;
+use std::sync::Arc;
+
+use super::attribute_name::{AttributeName, InvisibleAttributeType};
+use crate::attribute::{self, AttributeGraphResult, AttributeResult, AttributeResultWithCharacter};
+use crate::attribute::complicated_attribute_graph::ComplicatedAttributeGraph;
+use crate::attribute::simple_attribute_graph2::SimpleAttributeGraph2;
+use crate::attribute::typing::{EdgeFunctionBwd, EdgeFunctionFwd};
+use crate::character::team_status::{CharacterSelector, CharacterStatus};
+use crate::character::CharacterStaticData;
 use crate::common::{Element, SkillType};
 
+#[derive(Hash, Eq, PartialEq, Clone, Copy)]
+pub enum AttributeType {
+    Panel(AttributeName),
+    Invisible(InvisibleAttributeType),
+}
 
-pub trait Attribute: Default {
+#[derive(Hash, Eq, PartialEq, Clone, Copy)]
+pub struct AttributeNode {
+    pub character_id: usize,
+    pub attribute_type: AttributeType,
+}
+
+impl AttributeNode {
+    pub fn new(character_id: usize, attribute_type: AttributeType) -> Self {
+        AttributeNode {
+            character_id,
+            attribute_type,
+        }
+    }
+
+    pub fn new_panel(character_id: usize, attribute_type: AttributeName) -> Self {
+        AttributeNode {
+            character_id,
+            attribute_type: AttributeType::Panel(attribute_type),
+        }
+    }
+
+    pub fn new_invisible(character_id: usize, attribute_type: InvisibleAttributeType) -> Self {
+        AttributeNode {
+            character_id,
+            attribute_type: AttributeType::Invisible(attribute_type),
+        }
+    }
+
+    pub fn get_parents(&self) -> Vec<AttributeNode> {
+        match self.attribute_type {
+            AttributeType::Panel(attribute_type) => {
+                vec![*self]
+            }
+            AttributeType::Invisible(attribute_type) => {
+                let mut temp = Vec::new();
+                for element in if attribute_type.element == None {
+                    vec![None]
+                } else {
+                    vec![attribute_type.element, None]
+                } {
+                    for skill in if attribute_type.skill == None {
+                        vec![None]
+                    } else {
+                        vec![attribute_type.skill, None]
+                    } {
+                        for reaction in if attribute_type.reaction == None {
+                            vec![None]
+                        } else {
+                            vec![attribute_type.reaction, None]
+                        } {
+                            temp.push(AttributeNode::new_invisible(
+                                self.character_id,
+                                InvisibleAttributeType::new(
+                                    attribute_type.attribute_variable_type,
+                                    element,
+                                    skill,
+                                    reaction,
+                                ),
+                            ));
+                        }
+                    }
+                }
+
+                temp
+            }
+        }
+    }
+}
+
+pub type EdgeFunction = Arc<dyn Fn(f64, f64) -> f64>;
+
+#[derive(Hash, Eq, PartialEq, Clone, Copy, Debug)]
+pub enum EdgePriority {
+    Base,
+    Common,
+    Special,
+    Last,
+}
+
+pub trait AttributeGraph {
     type EdgeHandle: Copy;
+    type ResultType: AttributeGraphResult;
 
-    fn get_value(&self, key: AttributeName) -> f64;
+    fn set_value_to_internal(&mut self, name: AttributeNode, key: &str, value: f64);
 
-    fn set_value_to(&mut self, name: AttributeName, key: &str, value: f64);
-
-    fn set_value_by(&mut self, name: AttributeName, key: &str, value: f64);
+    fn set_value_by_internal(&mut self, name: AttributeNode, key: &str, value: f64);
 
     // fn add_edge(&mut self, from: AttributeName, to: AttributeName, edge: EdgeFunction, priority: usize, key: &str) -> Self::EdgeHandle;
 
     fn add_edge(
         &mut self,
-        from1: usize,
-        from2: usize,
-        to: usize,
-        fwd: EdgeFunctionFwd,
-        bwd: EdgeFunctionBwd,
-        key: &str
+        from1: AttributeNode,
+        from2: AttributeNode,
+        to: AttributeNode,
+        func: EdgeFunction,
+        key: &str,
+        priority: EdgePriority,
     ) -> Self::EdgeHandle;
 
     fn remove_edge(&mut self, handle: Self::EdgeHandle);
+
+    fn new_with_characters(characters: Vec<CharacterStatus>) -> Self;
+
+    fn get_characters(&self) -> &Vec<CharacterStatus>;
+
+    fn solve(&self) -> Self::ResultType;
 }
 
-pub trait AttributeCommon<T> {
-    fn get_em_all(&self) -> f64;
+pub trait Attribute {
+    type GraphTy: AttributeGraph;
+    type ResultType: AttributeResult;
 
-    fn get_atk(&self) -> f64;
+    fn new(attribute: Self::GraphTy, character_id: usize) -> Self;
 
-    fn get_hp(&self) -> f64;
+    fn set_value_to_internal(&mut self, name: AttributeNode, key: &str, value: f64);
 
-    fn get_def(&self) -> f64;
+    fn set_value_by_internal(&mut self, name: AttributeNode, key: &str, value: f64);
 
-    fn get_atk_ratio(&self, element: Element, skill: SkillType) -> f64;
+    fn add_edge(
+        &mut self,
+        from1: AttributeNode,
+        from2: AttributeNode,
+        to: AttributeNode,
+        func: EdgeFunction,
+        key: &str,
+        priority: EdgePriority,
+    ) -> <Self::GraphTy as AttributeGraph>::EdgeHandle;
 
-    fn get_def_ratio(&self, element: Element, skill: SkillType) -> f64;
+    fn remove_edge(&mut self, handle: <Self::GraphTy as AttributeGraph>::EdgeHandle);
 
-    fn get_hp_ratio(&self, element: Element, skill: SkillType) -> f64;
+    fn get_character_id(&self) -> &usize;
 
-    fn get_extra_damage(&self, element: Element, skill: SkillType) -> f64;
+    fn get_characters(&self) -> &Vec<CharacterStatus>;
 
-    fn get_bonus(&self, element: Element, skill: SkillType) -> f64;
+    fn solve(&self) -> Self::ResultType;
+}
 
-    fn get_critical_rate(&self, element: Element, skill: SkillType) -> f64;
+pub struct AttributeWithCharacter<GraphTy: AttributeGraph> {
+    pub attribute: GraphTy,
+    pub character_id: usize,
+}
 
-    fn get_critical_damage(&self, element: Element, skill: SkillType) -> f64;
+pub type SimpleAttribute = AttributeWithCharacter<SimpleAttributeGraph2>;
+pub type ComplicatedAttribute = AttributeWithCharacter<ComplicatedAttributeGraph>;
 
-    fn get_enemy_res_minus(&self, element: Element, skill: SkillType) -> f64;
+impl<GraphTy: AttributeGraph> Attribute for AttributeWithCharacter<GraphTy> {
+    type GraphTy = GraphTy;
+    type ResultType = AttributeResultWithCharacter<<Self::GraphTy as AttributeGraph>::ResultType>;
+    
+    fn new(attribute: GraphTy, character_id: usize) -> Self {
+        AttributeWithCharacter {
+            attribute,
+            character_id,
+        }
+    }
 
-    fn get_enemy_def_minus(&self, element: Element, skill: SkillType) -> f64;
+    fn set_value_by_internal(&mut self, name: AttributeNode, key: &str, value: f64) {
+        self.attribute.set_value_by_internal(name, key, value);
+    }
 
-    fn new_with_base_edge() -> T;
+    fn set_value_to_internal(&mut self, name: AttributeNode, key: &str, value: f64) {
+        self.attribute.set_value_to_internal(name, key, value);
+    }
+
+    fn add_edge(
+        &mut self,
+        from1: AttributeNode,
+        from2: AttributeNode,
+        to: AttributeNode,
+        func: EdgeFunction,
+        key: &str,
+        priority: EdgePriority,
+    ) -> GraphTy::EdgeHandle {
+        self.attribute
+            .add_edge(from1, from2, to, func, key, priority)
+    }
+
+    fn remove_edge(&mut self, handle: GraphTy::EdgeHandle) {
+        self.attribute.remove_edge(handle);
+    }
+
+    fn get_character_id(&self) -> &usize {
+        &self.character_id
+    }
+
+    fn get_characters(&self) -> &Vec<CharacterStatus> {
+        self.attribute.get_characters()
+    }
+
+    fn solve(&self) -> Self::ResultType {
+        AttributeResultWithCharacter {
+            result: self.attribute.solve(),
+            character_id: self.character_id,
+        }
+    }
+}
+
+pub trait AttributeCommon<T: Attribute> {
+    fn new_with_base_edge(characters: Vec<CharacterStatus>) -> T::GraphTy;
+
+    fn set_value_by(&mut self, name: AttributeName, key: &str, value: f64);
+
+    fn set_value_to(&mut self, name: AttributeName, key: &str, value: f64);
+
+    fn set_value_by_t(&mut self, ty: AttributeType, key: &str, value: f64);
+
+    fn set_value_to_t(&mut self, ty: AttributeType, key: &str, value: f64);
+
+    fn set_value_by_s(
+        &mut self,
+        character_selector: CharacterSelector,
+        ty: AttributeType,
+        key: &str,
+        value: f64,
+    );
+
+    fn set_value_to_s(
+        &mut self,
+        character_selector: CharacterSelector,
+        ty: AttributeType,
+        key: &str,
+        value: f64,
+    );
 
     fn add_edge1(
         &mut self,
@@ -63,7 +245,7 @@ pub trait AttributeCommon<T> {
         to: AttributeName,
         fwd: EdgeFunctionFwd,
         bwd: EdgeFunctionBwd,
-        key: &str
+        key: &str,
     );
 
     fn add_edge2(
@@ -73,7 +255,87 @@ pub trait AttributeCommon<T> {
         to: AttributeName,
         fwd: EdgeFunctionFwd,
         bwd: EdgeFunctionBwd,
-        key: &str
+        key: &str,
+    );
+
+    fn add_edge_n1(
+        &mut self,
+        from: AttributeName,
+        to: AttributeName,
+        func: EdgeFunction,
+        key: &str,
+        priority: EdgePriority,
+    );
+
+    fn add_edge_n2(
+        &mut self,
+        from1: AttributeName,
+        from2: AttributeName,
+        to: AttributeName,
+        func: EdgeFunction,
+        key: &str,
+        priority: EdgePriority,
+    );
+
+    fn add_edge_t1(
+        &mut self,
+        from: AttributeType,
+        to: AttributeType,
+        func: EdgeFunction,
+        key: &str,
+        priority: EdgePriority,
+    );
+
+    fn add_edge_t2(
+        &mut self,
+        from1: AttributeType,
+        from2: AttributeType,
+        to: AttributeType,
+        func: EdgeFunction,
+        key: &str,
+        priority: EdgePriority,
+    );
+
+    fn add_edge_s1to1(
+        &mut self,
+        character_selector: CharacterSelector,
+        from: AttributeType,
+        to: AttributeType,
+        func: EdgeFunction,
+        key: &str,
+        priority: EdgePriority,
+    );
+
+    fn add_edge_s2to1(
+        &mut self,
+        character_selector: CharacterSelector,
+        from1: AttributeType,
+        from2: AttributeType,
+        to: AttributeType,
+        func: EdgeFunction,
+        key: &str,
+        priority: EdgePriority,
+    );
+
+    fn add_edge_s1ton(
+        &mut self,
+        character_selector: CharacterSelector,
+        from: AttributeType,
+        to: AttributeType,
+        func: EdgeFunction,
+        key: &str,
+        priority: EdgePriority,
+    );
+
+    fn add_edge_s2ton(
+        &mut self,
+        character_selector: CharacterSelector,
+        from1: AttributeType,
+        from2: AttributeType,
+        to: AttributeType,
+        func: EdgeFunction,
+        key: &str,
+        priority: EdgePriority,
     );
 
     fn add_atk_percentage(&mut self, key: &str, value: f64);
@@ -86,255 +348,353 @@ pub trait AttributeCommon<T> {
 }
 
 impl<T: Attribute> AttributeCommon<T> for T {
-    fn get_em_all(&self) -> f64 {
-        self.get_value(AttributeName::ElementalMastery) + self.get_value(AttributeName::ElementalMasteryExtra)
-    }
+    fn new_with_base_edge(characters: Vec<CharacterStatus>) -> T::GraphTy {
+        let mut temp = T::GraphTy::new_with_characters(characters.clone());
 
-    fn get_atk(&self) -> f64 {
-        self.get_value(AttributeName::ATKBase)
-            + self.get_value(AttributeName::ATKPercentage)
-            + self.get_value(AttributeName::ATKFixed)
-    }
+        for character in characters {
+            temp.add_edge(
+                AttributeNode::new_panel(character.character_id, AttributeName::ATKBase),
+                AttributeNode::new_panel(character.character_id, AttributeName::ATKBase),
+                AttributeNode::new_panel(character.character_id, AttributeName::ATK),
+                Arc::new(|x1, _x2| x1),
+                "atk_base",
+                EdgePriority::Base,
+            );
+            temp.add_edge(
+                AttributeNode::new_panel(character.character_id, AttributeName::ATKPercentage),
+                AttributeNode::new_panel(character.character_id, AttributeName::ATKPercentage),
+                AttributeNode::new_panel(character.character_id, AttributeName::ATK),
+                Arc::new(|x1, _x2| x1),
+                "atk_percentage",
+                EdgePriority::Base,
+            );
+            temp.add_edge(
+                AttributeNode::new_panel(character.character_id, AttributeName::ATKFixed),
+                AttributeNode::new_panel(character.character_id, AttributeName::ATKFixed),
+                AttributeNode::new_panel(character.character_id, AttributeName::ATK),
+                Arc::new(|x1, _x2| x1),
+                "atk_fixed",
+                EdgePriority::Base,
+            );
 
-    fn get_hp(&self) -> f64 {
-        self.get_value(AttributeName::HPBase)
-            + self.get_value(AttributeName::HPPercentage)
-            + self.get_value(AttributeName::HPFixed)
-    }
+            temp.add_edge(
+                AttributeNode::new_panel(character.character_id, AttributeName::HPBase),
+                AttributeNode::new_panel(character.character_id, AttributeName::HPBase),
+                AttributeNode::new_panel(character.character_id, AttributeName::HP),
+                Arc::new(|x1, _x2| x1),
+                "hp_base",
+                EdgePriority::Base,
+            );
+            temp.add_edge(
+                AttributeNode::new_panel(character.character_id, AttributeName::HPPercentage),
+                AttributeNode::new_panel(character.character_id, AttributeName::HPPercentage),
+                AttributeNode::new_panel(character.character_id, AttributeName::HP),
+                Arc::new(|x1, _x2| x1),
+                "hp_percentage",
+                EdgePriority::Base,
+            );
+            temp.add_edge(
+                AttributeNode::new_panel(character.character_id, AttributeName::HPFixed),
+                AttributeNode::new_panel(character.character_id, AttributeName::HPFixed),
+                AttributeNode::new_panel(character.character_id, AttributeName::HP),
+                Arc::new(|x1, _x2| x1),
+                "hp_fixed",
+                EdgePriority::Base,
+            );
 
-    fn get_def(&self) -> f64 {
-        self.get_value(AttributeName::DEFBase)
-            + self.get_value(AttributeName::DEFPercentage)
-            + self.get_value(AttributeName::DEFFixed)
-    }
-
-    fn get_atk_ratio(&self, element: Element, skill: SkillType) -> f64 {
-        let key1 = AttributeName::atk_ratio_name_by_element(element);
-        let key2 = AttributeName::atk_ratio_name_by_skill_type(skill);
-
-        let value2 = if let Some(name) = key2 {
-            self.get_value(name)
-        } else {
-            0.0
-        };
-
-        self.get_value(AttributeName::ATKRatioBase)
-            + self.get_value(key1) + value2
-    }
-
-    fn get_def_ratio(&self, element: Element, skill: SkillType) -> f64 {
-        let key1 = AttributeName::def_ratio_name_by_element(element);
-        let key2 = AttributeName::def_ratio_name_by_skill_type(skill);
-
-        let value2 = if let Some(name) = key2 {
-            self.get_value(name)
-        } else {
-            0.0
-        };
-
-        self.get_value(AttributeName::DEFRatioBase)
-            + self.get_value(key1) + value2
-    }
-
-    fn get_hp_ratio(&self, element: Element, skill: SkillType) -> f64 {
-        let key1 = AttributeName::hp_ratio_name_by_element(element);
-        let key2 = AttributeName::hp_ratio_name_by_skill_type(skill);
-
-        let value2 = if let Some(name) = key2 {
-            self.get_value(name)
-        } else {
-            0.0
-        };
-
-        self.get_value(AttributeName::HPRatioBase)
-            + self.get_value(key1) + value2
-    }
-
-    fn get_extra_damage(&self, element: Element, skill: SkillType) -> f64 {
-        let key1 = AttributeName::extra_dmg_name_by_element(element);
-        let key2 = AttributeName::extra_dmg_name_by_skill_type(skill);
-
-        let value2 = if let Some(name) = key2 {
-            self.get_value(name)
-        } else {
-            0.0
-        };
-
-        self.get_value(AttributeName::ExtraDmgBase)
-            + self.get_value(key1) + value2
-    }
-
-    fn get_bonus(&self, element: Element, skill: SkillType) -> f64 {
-        let key1 = AttributeName::bonus_name_by_element(element);
-        let key2 = AttributeName::bonus_name_by_skill_type(skill);
-
-        let value2 = if let Some(name) = key2 {
-            self.get_value(name)
-        } else {
-            0.0
-        };
-
-        let mut temp = self.get_value(AttributeName::BonusBase)
-            + self.get_value(key1) + value2;
-        // todo refactor
-        if element != Element::Physical && skill == SkillType::NormalAttack {
-            temp += self.get_value(AttributeName::BonusNormalAndElemental);
+            temp.add_edge(
+                AttributeNode::new_panel(character.character_id, AttributeName::DEFBase),
+                AttributeNode::new_panel(character.character_id, AttributeName::DEFBase),
+                AttributeNode::new_panel(character.character_id, AttributeName::DEF),
+                Arc::new(|x1, _x2| x1),
+                "def_base",
+                EdgePriority::Base,
+            );
+            temp.add_edge(
+                AttributeNode::new_panel(character.character_id, AttributeName::DEFPercentage),
+                AttributeNode::new_panel(character.character_id, AttributeName::DEFPercentage),
+                AttributeNode::new_panel(character.character_id, AttributeName::DEF),
+                Arc::new(|x1, _x2| x1),
+                "def_percentage",
+                EdgePriority::Base,
+            );
+            temp.add_edge(
+                AttributeNode::new_panel(character.character_id, AttributeName::DEFFixed),
+                AttributeNode::new_panel(character.character_id, AttributeName::DEFFixed),
+                AttributeNode::new_panel(character.character_id, AttributeName::DEF),
+                Arc::new(|x1, _x2| x1),
+                "def_fixed",
+                EdgePriority::Base,
+            );
         }
-        temp
-    }
-
-    fn get_critical_rate(&self, element: Element, skill: SkillType) -> f64 {
-        let key1 = AttributeName::critical_rate_name_by_element(element);
-        let key2 = AttributeName::critical_rate_name_by_skill_type(skill);
-
-        let value2 = if let Some(name) = key2 {
-            self.get_value(name)
-        } else {
-            0.0
-        };
-
-        self.get_value(AttributeName::CriticalBase) + self.get_value(AttributeName::CriticalAttacking)
-            + self.get_value(key1) + value2
-    }
-
-    fn get_critical_damage(&self, element: Element, skill: SkillType) -> f64 {
-        let key1 = AttributeName::critical_damage_name_by_element(element);
-        let key2 = AttributeName::critical_damage_name_by_skill_name(skill);
-
-        let value2 = if let Some(name) = key2 {
-            self.get_value(name)
-        } else {
-            0.0
-        };
-
-        self.get_value(AttributeName::CriticalDamageBase)
-            + self.get_value(key1) + value2
-    }
-
-    fn get_enemy_res_minus(&self, element: Element, _skill: SkillType) -> f64 {
-        self.get_value(AttributeName::ResMinusBase)
-            + self.get_value(AttributeName::res_minus_name_by_element(element))
-    }
-
-    fn get_enemy_def_minus(&self, _element: Element, _skill: SkillType) -> f64 {
-        self.get_value(AttributeName::DefMinus)
-    }
-
-    fn new_with_base_edge() -> T {
-        let mut temp: T = Default::default();
-
-        temp.add_edge1(
-            AttributeName::ATKBase, AttributeName::ATK,
-            Box::new(|x1, _x2| x1),
-            Box::new(|grad, _x1, _x2| (grad, 0.0)),
-            "atk_base",
-        );
-        temp.add_edge1(
-            AttributeName::ATKPercentage, AttributeName::ATK,
-            Box::new(|x1, _x2| x1),
-            Box::new(|grad, _x1, _x2| (grad, 0.0)),
-            "atk_percentage"
-        );
-        temp.add_edge1(
-            AttributeName::ATKFixed, AttributeName::ATK,
-            Box::new(|x1, _x2| x1),
-            Box::new(|grad, _x1, _x2| (grad, 0.0)),
-            "atk_fixed"
-        );
-
-        temp.add_edge1(
-            AttributeName::HPBase, AttributeName::HP,
-            Box::new(|x1, _x2| x1),
-            Box::new(|grad, _x1, _x2| (grad, 0.0)),
-            "hp_base"
-        );
-        temp.add_edge1(
-            AttributeName::HPPercentage, AttributeName::HP,
-            Box::new(|x1, _x2| x1),
-            Box::new(|grad, _x1, _x2| (grad, 0.0)),
-            "hp_percentage"
-        );
-        temp.add_edge1(
-            AttributeName::HPFixed, AttributeName::HP,
-            Box::new(|x1, _x2| x1),
-            Box::new(|grad, _x1, _x2| (grad, 0.0)),
-            "hp_fixed"
-        );
-
-        temp.add_edge1(
-            AttributeName::DEFBase, AttributeName::DEF,
-            Box::new(|x1, _x2| x1),
-            Box::new(|grad, _x1, _x2| (grad, 0.0)),
-            "def_base"
-        );
-        temp.add_edge1(
-            AttributeName::DEFPercentage, AttributeName::DEF,
-            Box::new(|x1, _x2| x1),
-            Box::new(|grad, _x1, _x2| (grad, 0.0)),
-            "def_percentage"
-        );
-        temp.add_edge1(
-            AttributeName::DEFFixed, AttributeName::DEF,
-            Box::new(|x1, _x2| x1),
-            Box::new(|grad, _x1, _x2| (grad, 0.0)),
-            "def_fixed"
-        );
 
         temp
     }
 
-    fn add_edge1(&mut self, from: AttributeName, to: AttributeName, fwd: EdgeFunctionFwd, bwd: EdgeFunctionBwd, key: &str) {
-        self.add_edge(
-            from as usize,
-            usize::MAX,
-            to as usize,
-            fwd,
-            bwd,
-            key
+    fn set_value_by(&mut self, name: AttributeName, key: &str, value: f64) {
+        self.set_value_by_internal(
+            AttributeNode::new_panel(*self.get_character_id(), name),
+            key,
+            value,
         );
     }
 
-    fn add_edge2(&mut self, from1: AttributeName, from2: AttributeName, to: AttributeName, fwd: EdgeFunctionFwd, bwd: EdgeFunctionBwd, key: &str) {
-        self.add_edge(
-            from1 as usize,
-            from2 as usize,
-            to as usize,
-            fwd,
-            bwd,
-            key
+    fn set_value_to(&mut self, name: AttributeName, key: &str, value: f64) {
+        self.set_value_to_internal(
+            AttributeNode::new_panel(*self.get_character_id(), name),
+            key,
+            value,
         );
+    }
+
+    fn set_value_by_t(&mut self, ty: AttributeType, key: &str, value: f64) {
+        self.set_value_by_internal(AttributeNode::new(*self.get_character_id(), ty), key, value);
+    }
+
+    fn set_value_to_t(&mut self, ty: AttributeType, key: &str, value: f64) {
+        self.set_value_to_internal(AttributeNode::new(*self.get_character_id(), ty), key, value);
+    }
+
+    fn set_value_by_s(
+        &mut self,
+        character_selector: CharacterSelector,
+        ty: AttributeType,
+        key: &str,
+        value: f64,
+    ) {
+        let list = character_selector.get_matched_list(self.get_characters());
+        for id in list.iter() {
+            self.set_value_by_internal(AttributeNode::new(*id, ty), key, value);
+        }
+    }
+
+    fn set_value_to_s(
+        &mut self,
+        character_selector: CharacterSelector,
+        ty: AttributeType,
+        key: &str,
+        value: f64,
+    ) {
+        let list = character_selector.get_matched_list(self.get_characters());
+        for id in list.iter() {
+            self.set_value_to_internal(AttributeNode::new(*id, ty), key, value);
+        }
+    }
+
+    fn add_edge1(
+        &mut self,
+        from: AttributeName,
+        to: AttributeName,
+        fwd: EdgeFunctionFwd,
+        bwd: EdgeFunctionBwd,
+        key: &str,
+    ) {
+        T::add_edge_n1(self, from, to, Arc::from(fwd), key, EdgePriority::Common);
+    }
+
+    fn add_edge2(
+        &mut self,
+        from1: AttributeName,
+        from2: AttributeName,
+        to: AttributeName,
+        fwd: EdgeFunctionFwd,
+        bwd: EdgeFunctionBwd,
+        key: &str,
+    ) {
+        T::add_edge_n2(self, from1, from2, to, Arc::from(fwd), key, EdgePriority::Common);
+    }
+
+    fn add_edge_n1(
+        &mut self,
+        from: AttributeName,
+        to: AttributeName,
+        func: EdgeFunction,
+        key: &str,
+        priority: EdgePriority,
+    ) {
+        self.add_edge(
+            AttributeNode::new_panel(*self.get_character_id(), from),
+            AttributeNode::new_panel(*self.get_character_id(), from),
+            AttributeNode::new_panel(*self.get_character_id(), to),
+            func,
+            key,
+            priority,
+        );
+    }
+
+    fn add_edge_n2(
+        &mut self,
+        from1: AttributeName,
+        from2: AttributeName,
+        to: AttributeName,
+        func: EdgeFunction,
+        key: &str,
+        priority: EdgePriority,
+    ) {
+        self.add_edge(
+            AttributeNode::new_panel(*self.get_character_id(), from1),
+            AttributeNode::new_panel(*self.get_character_id(), from2),
+            AttributeNode::new_panel(*self.get_character_id(), to),
+            func,
+            key,
+            priority,
+        );
+    }
+
+    fn add_edge_t1(
+        &mut self,
+        from: AttributeType,
+        to: AttributeType,
+        func: EdgeFunction,
+        key: &str,
+        priority: EdgePriority,
+    ) {
+        self.add_edge(
+            AttributeNode::new(*self.get_character_id(), from),
+            AttributeNode::new(*self.get_character_id(), from),
+            AttributeNode::new(*self.get_character_id(), to),
+            func,
+            key,
+            priority,
+        );
+    }
+
+    fn add_edge_t2(
+        &mut self,
+        from1: AttributeType,
+        from2: AttributeType,
+        to: AttributeType,
+        func: EdgeFunction,
+        key: &str,
+        priority: EdgePriority,
+    ) {
+        self.add_edge(
+            AttributeNode::new(*self.get_character_id(), from1),
+            AttributeNode::new(*self.get_character_id(), from2),
+            AttributeNode::new(*self.get_character_id(), to),
+            func,
+            key,
+            priority,
+        );
+    }
+
+    fn add_edge_s1to1(
+        &mut self,
+        character_selector: CharacterSelector,
+        from: AttributeType,
+        to: AttributeType,
+        func: EdgeFunction,
+        key: &str,
+        priority: EdgePriority,
+    ) {
+        let list = character_selector.get_matched_list(self.get_characters());
+        for id in list.iter() {
+            self.add_edge(
+                AttributeNode::new(*self.get_character_id(), from),
+                AttributeNode::new(*self.get_character_id(), from),
+                AttributeNode::new(*id, to),
+                func.clone(),
+                key,
+                priority,
+            );
+        }
+    }
+
+    fn add_edge_s2to1(
+        &mut self,
+        character_selector: CharacterSelector,
+        from1: AttributeType,
+        from2: AttributeType,
+        to: AttributeType,
+        func: EdgeFunction,
+        key: &str,
+        priority: EdgePriority,
+    ) {
+        let list = character_selector.get_matched_list(self.get_characters());
+        for id in list.iter() {
+            self.add_edge(
+                AttributeNode::new(*self.get_character_id(), from1),
+                AttributeNode::new(*self.get_character_id(), from2),
+                AttributeNode::new(*id, to),
+                func.clone(),
+                key,
+                priority,
+            );
+        }
+    }
+
+    fn add_edge_s1ton(
+        &mut self,
+        character_selector: CharacterSelector,
+        from: AttributeType,
+        to: AttributeType,
+        func: EdgeFunction,
+        key: &str,
+        priority: EdgePriority,
+    ) {
+        let list = character_selector.get_matched_list(self.get_characters());
+        for id in list.iter() {
+            self.add_edge(
+                AttributeNode::new(*id, from),
+                AttributeNode::new(*id, from),
+                AttributeNode::new(*id, to),
+                func.clone(),
+                key,
+                priority,
+            );
+        }
+    }
+
+    fn add_edge_s2ton(
+        &mut self,
+        character_selector: CharacterSelector,
+        from1: AttributeType,
+        from2: AttributeType,
+        to: AttributeType,
+        func: EdgeFunction,
+        key: &str,
+        priority: EdgePriority,
+    ) {
+        let list = character_selector.get_matched_list(self.get_characters());
+        for id in list.iter() {
+            self.add_edge(
+                AttributeNode::new(*id, from1),
+                AttributeNode::new(*id, from2),
+                AttributeNode::new(*id, to),
+                func.clone(),
+                key,
+                priority,
+            );
+        }
     }
 
     fn add_atk_percentage(&mut self, key: &str, value: f64) {
-        self.add_edge(
-            AttributeName::ATKBase as usize,
-            usize::MAX,
-            AttributeName::ATKPercentage as usize,
-            Box::new(move |x, _| x * value),
-            Box::new(move |grad, _x1, _x2| (grad * value, 0.0)),
-            key
+        self.add_edge_n1(
+            AttributeName::ATKBase,
+            AttributeName::ATKPercentage,
+            Arc::new(move |x, _| x * value),
+            key,
+            EdgePriority::Common,
         );
     }
 
     fn add_def_percentage(&mut self, key: &str, value: f64) {
-        self.add_edge(
-            AttributeName::DEFBase as usize,
-            usize::MAX,
-            AttributeName::DEFPercentage as usize,
-            Box::new(move |x, _| x * value),
-            Box::new(move |grad, _x1, _x2| (grad * value, 0.0)),
-            key
+        self.add_edge_n1(
+            AttributeName::DEFBase,
+            AttributeName::DEFPercentage,
+            Arc::new(move |x, _| x * value),
+            key,
+            EdgePriority::Common,
         );
     }
 
     fn add_hp_percentage(&mut self, key: &str, value: f64) {
-        self.add_edge(
-            AttributeName::HPBase as usize,
-            usize::MAX,
-            AttributeName::HPPercentage as usize,
-            Box::new(move |x, _| x * value),
-            Box::new(move |grad, _x1, _x2| (grad * value, 0.0)),
-            key
+        self.add_edge_n1(
+            AttributeName::HPBase,
+            AttributeName::HPPercentage,
+            Arc::new(move |x, _| x * value),
+            key,
+            EdgePriority::Common,
         );
     }
 

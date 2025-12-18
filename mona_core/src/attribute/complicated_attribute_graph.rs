@@ -1,47 +1,51 @@
 use std::cell::RefCell;
 use std::collections::HashMap;
-use crate::attribute::typing::EdgeFunctionBwd;
-
 use rand::Rng;
+use crate::character::team_status::CharacterStatus;
 use crate::common::{Element, EntryType, SkillType};
+use crate::damage::ComplicatedDamageBuilder;
 
-use super::attribute_name::AttributeName;
-use super::typing::EdgeFunctionFwd;
-use super::attribute::Attribute;
+use super::attribute::{AttributeGraph, AttributeNode, EdgeFunction, EdgePriority};
+use super::AttributeGraphResult;
 
-pub struct MyEdge {
-    pub from1: usize,
-    pub from2: usize,
-    pub to: usize,
+#[derive(Clone)]
+pub struct Edge {
+    pub from1: AttributeNode,
+    pub from2: AttributeNode,
+    pub to: AttributeNode,
     pub key: String,
-    pub fwd: EdgeFunctionFwd,
-    pub bwd: EdgeFunctionBwd,
+    pub func: EdgeFunction,
+    pub priority: EdgePriority,
     pub id: usize,
 }
 
-pub struct MyNode {
-    pub value_self: HashMap<String, f64>,
-    pub value_from_edge: HashMap<String, f64>,
-    pub dirty: bool,
-    pub cache_value: f64,
+#[derive(Clone)]
+pub struct Node {
+    pub values: HashMap<String, f64>,
 }
 
-impl MyNode {
+impl Node {
+    pub fn new() -> Self {
+        Node {
+            values: HashMap::new(),
+        }
+    }
+
     pub fn sum(&self) -> f64 {
-        self.value_self.values().sum::<f64>() + self.value_from_edge.values().sum::<f64>()
+        self.values.values().sum::<f64>()
     }
 
-    pub fn set_edge_value_by(&mut self, key: &str, value: f64) {
-        *self.value_from_edge.entry(String::from(key)).or_insert(0.0) += value;
+    pub fn set_value_by(&mut self, key: &str, value: f64) {
+        *self.values.entry(String::from(key)).or_insert(0.0) += value;
     }
 
-    pub fn set_self_value_by(&mut self, key: &str, value: f64) {
-        *self.value_self.entry(String::from(key)).or_insert(0.0) += value;
+    pub fn set_value_to(&mut self, key: &str, value: f64) {
+        *self.values.entry(String::from(key)).or_insert(0.0) = value;
     }
 
     pub fn composition(&self) -> HashMap<String, f64> {
         let mut temp: HashMap<String, f64> = HashMap::new();
-        for (k, v) in self.value_self.iter().chain(self.value_from_edge.iter()) {
+        for (k, v) in self.values.iter() {
             *temp.entry(k.clone()).or_insert(0.0) += *v;
         }
 
@@ -49,77 +53,111 @@ impl MyNode {
     }
 }
 
-const MAX_ATTRIBUTE_ENTRY: usize = 200;
-
-pub struct ComplicatedAttributeGraph {
-    pub attributes: RefCell<[MyNode; MAX_ATTRIBUTE_ENTRY]>,
-    pub edges: Vec<MyEdge>,
+#[derive(Clone)]
+pub struct ComplicatedAttributeGraphResult {
+    pub map: HashMap<AttributeNode, Node>,
 }
 
-impl Default for ComplicatedAttributeGraph {
-    fn default() -> Self {
-        let ret = ComplicatedAttributeGraph {
-            attributes: RefCell::new([(); MAX_ATTRIBUTE_ENTRY].map(|_| MyNode {
-                value_self: HashMap::new(),
-                value_from_edge: HashMap::new(),
-                dirty: true,
-                cache_value: 0.0
-            })),
-            edges: Vec::new(),
-        };
+impl ComplicatedAttributeGraphResult {
+    pub fn new() -> Self {
+        ComplicatedAttributeGraphResult {
+            map: HashMap::new(),
+        }
+    }
 
-        let data = ret.attributes.as_ptr();
-        unsafe {
-            (*data)[AttributeName::CriticalBase as usize].set_self_value_by("初始值", 0.05);
-            (*data)[AttributeName::CriticalDamageBase as usize].set_self_value_by("初始值", 0.5);
-            (*data)[AttributeName::Recharge as usize].set_self_value_by("初始值", 1.0);
+    pub fn get_attribute_mut(&mut self, node: AttributeNode) -> &mut Node {
+        self.map.entry(node).or_insert(Node::new())
+    }
+
+    pub fn get_attribute(&self, node: AttributeNode) -> Node {
+        self.map.get(&node).unwrap_or(&Node::new()).clone()
+    }
+
+    pub fn get_attribute_value(&self, node: AttributeNode) -> f64 {
+        let mut temp = 0.0;
+
+        for pa in node.get_parents() {
+            temp += self.get_attribute(pa).sum();
         }
 
-        ret
+        temp
+    }
+
+    pub fn get_attribute_composition(&self, node: AttributeNode) -> EntryType {
+        let mut temp = EntryType::new();
+
+        for pa in node.get_parents() {
+            temp.merge(&EntryType(self.get_attribute(pa).composition()));
+        }
+
+        temp
+    }
+
+    pub fn get_composition_merge(&self, nodes: &[AttributeNode]) -> EntryType {
+        let mut temp = EntryType::new();
+        for node in nodes.iter() {
+            let comp = self.get_attribute_composition(*node);
+            temp.merge(&comp);
+        }
+
+        temp
     }
 }
 
-impl Attribute for ComplicatedAttributeGraph {
+impl AttributeGraphResult for ComplicatedAttributeGraphResult {
+    type ResultType = EntryType;
+    
+    fn get_attribute_value(&self, node: AttributeNode) -> f64 {
+        self.get_attribute_value(node)
+    }
+
+    fn get_attribute(&self, node: AttributeNode) -> EntryType {
+        self.get_attribute_composition(node)
+    }
+
+    fn get_attribute_merge(&self, nodes: &[AttributeNode]) -> Self::ResultType {
+        self.get_composition_merge(nodes)
+    }
+}
+
+#[derive(Clone)]
+pub struct ComplicatedAttributeGraph {
+    pub nodes: ComplicatedAttributeGraphResult,
+    pub fixed: HashMap<AttributeNode, (String, f64)>,
+    pub edges: Vec<Edge>,
+    pub characters: Vec<CharacterStatus>,
+}
+
+impl AttributeGraph for ComplicatedAttributeGraph {
     type EdgeHandle = usize;
+    type ResultType = ComplicatedAttributeGraphResult;
 
-    fn get_value(&self, key: AttributeName) -> f64 {
-        self.my_get_value(key as usize)
+    fn set_value_to_internal(&mut self, node: AttributeNode, key: &str, value: f64) {
+        self.fixed.insert(node, (String::from(key), value));
     }
 
-    fn set_value_to(&mut self, name: AttributeName, key: &str, value: f64) {
-        *self.attributes
-            .borrow_mut()[name as usize]
-            .value_self
-            .entry(String::from(key))
-            .or_insert(0.0) = value;
-    }
-
-    fn set_value_by(&mut self, name: AttributeName, key: &str, value: f64) {
-        *self.attributes
-            .borrow_mut()[name as usize]
-            .value_self
-            .entry(String::from(key))
-            .or_insert(0.0) += value;
+    fn set_value_by_internal(&mut self, node: AttributeNode, key: &str, value: f64) {
+        (*self.nodes.get_attribute_mut(node)).set_value_by(key, value);
     }
 
     fn add_edge(
         &mut self,
-        from1: usize,
-        from2: usize,
-        to: usize,
-        fwd: EdgeFunctionFwd,
-        bwd: EdgeFunctionBwd,
-        key: &str
+        from1: AttributeNode,
+        from2: AttributeNode,
+        to: AttributeNode,
+        func: EdgeFunction,
+        key: &str,
+        priority: EdgePriority,
     ) -> Self::EdgeHandle {
         let mut rng = rand::thread_rng();
         let id: usize = rng.gen();
-        let edge = MyEdge {
+        let edge = Edge {
             from1,
             from2,
             to,
             key: String::from(key),
-            fwd,
-            bwd,
+            func,
+            priority,
             id,
         };
 
@@ -138,69 +176,49 @@ impl Attribute for ComplicatedAttributeGraph {
 
         self.edges.remove(index);
     }
+
+    fn new_with_characters(characters: Vec<CharacterStatus>) -> Self {
+        ComplicatedAttributeGraph {
+            nodes: ComplicatedAttributeGraphResult::new(),
+            fixed: HashMap::new(),
+            edges: Vec::new(),
+            characters,
+        }
+    }
+
+    fn get_characters(&self) -> &Vec<CharacterStatus> {
+        &self.characters
+    }
+
+    fn solve(&self) -> Self::ResultType {
+        self.solve()
+    }
 }
 
 impl ComplicatedAttributeGraph {
-    fn my_get_value(&self, index: usize) -> f64 {
-        let data = self.attributes.as_ptr();
-        let node = unsafe {
-            &mut (*data)[index]
-        };
+    pub fn solve(&self) -> ComplicatedAttributeGraphResult {
+        let mut result = self.nodes.clone();
+        let mut temp = self.nodes.clone();
 
-        if node.dirty {
-            node.value_from_edge.clear();
-            for edge in self.edges.iter() {
-                if edge.to == index {
-                    let from_value1 = self.get_from_value(edge.from1);
-                    let from_value2 = self.get_from_value(edge.from2);
-                    let to_value: f64 = (edge.fwd)(from_value1, from_value2);
-                    node.set_edge_value_by(&edge.key, to_value);
-                }
+        let mut edge_lists = HashMap::new();
+        for edge in self.edges.iter() {
+            edge_lists.entry(edge.priority as usize).or_insert(Vec::new()).push(edge);
+        }
+        for list in edge_lists.values() {
+            for edge in list.iter() {
+                let from1_value = result.get_attribute_value(edge.from1);
+                let from2_value = result.get_attribute_value(edge.from2);
+                let value = (edge.func)(from1_value, from2_value);
+                temp.get_attribute_mut(edge.to).set_value_by(&edge.key, value);
             }
 
-            node.cache_value = node.sum();
-            node.dirty = false;
+            std::mem::swap(&mut result, &mut temp);
         }
 
-        node.cache_value
-    }
-
-    fn get_from_value(&self, index: usize) -> f64 {
-        if index == usize::MAX {
-            0.0
-        } else {
-            self.my_get_value(index)
-        }
-    }
-
-    pub fn get_attribute_composition(&self, name: AttributeName) -> EntryType {
-        // to refresh dirty
-        self.get_value(name);
-
-        EntryType(self.attributes.borrow()[name as usize].composition())
-    }
-
-    pub fn get_composition_merge(&self, names: &[AttributeName]) -> EntryType {
-        let mut temp = EntryType::new();
-        for name in names.iter() {
-            let comp = self.get_attribute_composition(*name);
-            temp.merge(&comp);
+        for (node, (key, value)) in self.fixed.iter() {
+            result.get_attribute_mut(*node).set_value_to(key, *value);
         }
 
-        temp
-    }
-
-    pub fn get_critical_composition(&self, element: Element, skill: SkillType) -> EntryType {
-        let skill_type_critical_name = AttributeName::critical_rate_name_by_skill_type(skill);
-        let mut names = vec![
-            AttributeName::CriticalBase,
-            AttributeName::CriticalAttacking,
-            AttributeName::critical_rate_name_by_element(element),
-        ];
-        if let Some(name) = skill_type_critical_name {
-            names.push(name);
-        }
-
-        self.get_composition_merge(&names)
+        result
     }
 }

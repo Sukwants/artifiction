@@ -1,12 +1,12 @@
-use crate::attribute::Attribute;
+use crate::attribute::{Attribute, AttributeResult};
 use crate::common::{DamageResult, Element, MoonglareReaction, SkillType};
 use crate::common::reaction_type::TransformativeType;
-use crate::damage::DamageAnalysis;
+use crate::damage::{DamageAnalysis, DamageBuilderResult};
 use crate::enemies::Enemy;
 
 pub trait DamageBuilder {
-    type Result;
-    type AttributeType: Attribute;
+    type Result: DamageBuilderResult;
+    type AttributeType: AttributeResult;
 
     fn new() -> Self;
 
@@ -18,6 +18,10 @@ pub trait DamageBuilder {
 
     fn add_em_ratio(&mut self, key: &str, value: f64);
 
+    fn add_base(&mut self, key: &str, value: f64); // 用于添加治疗量或护盾量的常数值
+
+    // 以下方法由于误差问题已弃用，请调用 Attribute 中的方法以获得更加准确的结果
+    // the following methods are deprecated due to accuracy issues, please use the methods in Attribute for more accurate results
     fn add_extra_em(&mut self, key: &str, value: f64);
 
     fn add_extra_atk(&mut self, key: &str, value: f64);
@@ -52,6 +56,14 @@ pub trait DamageBuilder {
         skill_type: SkillType,
         character_level: usize,
         fumo: Option<Element>
+    ) -> Self::Result;
+
+    fn transformative(
+        &self,
+        attribute: &Self::AttributeType,
+        enemy: &Enemy,
+        transformative_type: TransformativeType,
+        character_level: usize,
     ) -> Self::Result;
 
     fn moonglare(

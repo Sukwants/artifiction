@@ -1,5 +1,5 @@
 use num_traits::FromPrimitive;
-use crate::attribute::{self, Attribute, AttributeCommon, AttributeName};
+use crate::attribute::*;
 use crate::buffs::buffs::common;
 use crate::character::character_common_data::CharacterCommonData;
 use crate::character::character_sub_stat::CharacterSubStatFamily;

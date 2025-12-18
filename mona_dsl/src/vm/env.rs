@@ -1,9 +1,10 @@
 use std::cell::RefCell;
 use std::collections::HashMap;
 use std::rc::Rc;
-use mona::attribute::SimpleAttributeGraph2;
+use mona::attribute::SimpleAttributeResult;
 use mona::character::{Character, CharacterName};
 use mona::character::characters::damage;
+use mona::damage::transformative_damage::transformative_damage;
 use mona::damage::damage_result::SimpleDamageResult;
 use mona::damage::{DamageContext, SimpleDamageBuilder};
 use crate::builtin::global_function::setup_global_namespace;
@@ -76,7 +77,7 @@ impl MonaEnv {
             }
 
             let unsafe_context = self.damage_ctx.get(&name).unwrap();
-            let context: DamageContext<'_, SimpleAttributeGraph2> = unsafe {
+            let context: DamageContext<'_, SimpleAttributeResult> = unsafe {
                 DamageContext {
                     character_common_data: &*unsafe_context.character_common_data,
                     enemy: &*unsafe_context.enemy,
@@ -85,7 +86,7 @@ impl MonaEnv {
             };
 
             if damage_config.is_transformative {
-                let t_damage = context.transformative();
+                let t_damage = transformative_damage::<SimpleDamageBuilder>(context.character_common_data.level, &context.attribute, &context.enemy);
                 let obj = MonaObjectTransformativeDamage {
                     damage: t_damage
                 };
@@ -106,8 +107,6 @@ impl MonaEnv {
                     vaporize: damage.vaporize.clone(),
                     spread: damage.spread.clone(),
                     aggravate: damage.aggravate.clone(),
-                    is_heal: damage.is_heal,
-                    is_shield: damage.is_shield
                 };
                 let obj = MonaObject {
                     data: MonaObjectEnum::Damage(obj)

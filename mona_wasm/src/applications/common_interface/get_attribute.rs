@@ -1,9 +1,9 @@
 use wasm_bindgen::prelude::*;
 use serde::{Serialize, Deserialize};
-use crate::applications::common::{BuffInterface, CharacterInterface, TargetFunctionInterface, WeaponInterface};
+use crate::applications::common::{BuffInterface, CharacterInterface, SkillInterface, TargetFunctionInterface, WeaponInterface};
 use mona::artifacts::{Artifact, ArtifactList};
 use mona::artifacts::effect_config::ArtifactEffectConfig;
-use mona::attribute::{AttributeNoReactive, AttributeUtils, ComplicatedAttributeGraph, SimpleAttributeGraph2};
+use mona::attribute::*;
 use mona::buffs::{Buff, BuffConfig};
 use mona::character::Character;
 use mona::weapon::Weapon;
@@ -14,14 +14,15 @@ pub struct GetAttributeInterface {
     weapon: WeaponInterface,
     buffs: Vec<BuffInterface>,
     artifacts: Vec<Artifact>,
-    artifact_config: Option<ArtifactEffectConfig>
+    artifact_config: Option<ArtifactEffectConfig>,
+    skill: SkillInterface,
 }
 
 pub fn get_attribute(val: JsValue) -> JsValue {
     let input: GetAttributeInterface = serde_wasm_bindgen::from_value(val).unwrap();
 
-    let character: Character<ComplicatedAttributeGraph> = input.character.to_character();
-    let weapon: Weapon<ComplicatedAttributeGraph> = input.weapon.to_weapon(&character);
+    let character: Character<ComplicatedAttribute> = input.character.to_character();
+    let weapon: Weapon<ComplicatedAttribute> = input.weapon.to_weapon(&character);
 
     let artifact_config = match input.artifact_config {
         Some(x) => x,
@@ -33,12 +34,13 @@ pub fn get_attribute(val: JsValue) -> JsValue {
         artifacts: &artifacts
     };
 
-    let buffs: Vec<Box<dyn Buff<ComplicatedAttributeGraph>>> = input.buffs.iter().map(|x| x.to_buff()).collect();
+    let buffs: Vec<Box<dyn Buff<ComplicatedAttribute>>> = input.buffs.iter().map(|x| x.to_buff()).collect();
 
-    let attribute: ComplicatedAttributeGraph = AttributeUtils::create_attribute_from_big_config(
+    let attribute = AttributeUtils::create_attribute_from_big_config_with_skill_config(
         &artifact_list,
         &artifact_config,
         &character,
+        &input.skill.config,
         &weapon,
         &buffs
     );

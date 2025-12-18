@@ -1,5 +1,4 @@
-use crate::attribute::{SimpleAttributeGraph2};
-use super::target_function::TargetFunction;
+use super::target_function::{TargetFunction, TargetFunctionAttributeType};
 use super::target_function_name::TargetFunctionName;
 use super::target_function_config::TargetFunctionConfig;
 
@@ -12,8 +11,8 @@ pub struct TargetFunctionUtils {}
 impl TargetFunctionUtils {
     pub fn new_target_function(
         name: TargetFunctionName,
-        character: &Character<SimpleAttributeGraph2>,
-        weapon: &Weapon<SimpleAttributeGraph2>,
+        character: &Character<TargetFunctionAttributeType>,
+        weapon: &Weapon<TargetFunctionAttributeType>,
         config: &TargetFunctionConfig
     ) -> Box<dyn TargetFunction> {
         get_target_function(

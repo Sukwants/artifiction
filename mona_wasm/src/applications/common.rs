@@ -1,6 +1,6 @@
 use serde::{Serialize, Deserialize};
 use mona::artifacts::{Artifact, ArtifactSlotName};
-use mona::attribute::{Attribute, SimpleAttributeGraph2};
+use mona::attribute::{Attribute, SimpleAttribute};
 use mona::buffs::buff_name::BuffName;
 use mona::buffs::{Buff, BuffConfig};
 use mona::character::{Character, CharacterConfig, CharacterName};
@@ -82,7 +82,7 @@ pub struct TargetFunctionInterface {
 }
 
 impl TargetFunctionInterface {
-    pub fn to_target_function(&self, character: &Character<SimpleAttributeGraph2>, weapon: &Weapon<SimpleAttributeGraph2>) -> Box<dyn TargetFunction> {
+    pub fn to_target_function(&self, character: &Character<SimpleAttribute>, weapon: &Weapon<SimpleAttribute>) -> Box<dyn TargetFunction> {
         TargetFunctionUtils::new_target_function(
             self.name,
             character,

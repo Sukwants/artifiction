@@ -1,10 +1,11 @@
-pub use element::{Element, MoonglareReaction};
+pub use element::Element;
 pub use stat::{StatName, SUB_STAT_VALUE_5};
 pub use weapon_type::WeaponType;
 pub use change_attribute::ChangeAttribute;
 pub use skill_type::SkillType;
 pub use crate::damage::damage_result::DamageResult;
 pub use entry_type::EntryType;
+pub use reaction_type::{ReactionType, TransformativeType, MoonglareReaction};
 pub use moonsign::Moonsign;
 
 pub mod stat;

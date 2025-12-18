@@ -1,5 +1,5 @@
 use crate::artifacts::ArtifactSetName;
-use crate::attribute::{Attribute, AttributeName};
+use crate::attribute::*;
 use crate::buffs::{Buff, BuffConfig};
 use crate::buffs::buff::BuffMeta;
 use crate::buffs::buff_meta::{BuffFrom, BuffGenre, BuffImage, BuffMetaData};

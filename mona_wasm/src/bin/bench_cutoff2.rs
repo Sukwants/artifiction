@@ -1,7 +1,7 @@
 use std::time;
 
 use mona::artifacts::{Artifact, ArtifactSetName, ArtifactSlotName};
-use mona::attribute::{AttributeName, AttributeUtils, ComplicatedAttributeGraph, SimpleAttributeGraph2};
+use mona::attribute::*;
 use mona::character::{Character, CharacterName};
 use mona::character::character_config::CharacterConfig;
 use mona::character::skill_config::CharacterSkillConfig;
@@ -17,7 +17,7 @@ use mona_wasm::applications::optimize_artifacts::algorithms::cutoff_algo2::{Cuto
 use mona_wasm::applications::optimize_artifacts::algorithms::weight_heuristic::{NaiveWeightHeuristic, WeightHeuristicAlgorithm};
 use mona_wasm::applications::optimize_artifacts::inter::{ConstraintConfig, ConstraintSetMode};
 
-fn get_character() -> Character<SimpleAttributeGraph2> {
+fn get_character() -> Character<SimpleAttribute> {
     Character::new(
         CharacterName::Amber,
         90,
@@ -30,7 +30,7 @@ fn get_character() -> Character<SimpleAttributeGraph2> {
     )
 }
 
-fn get_weapon(character: &Character<SimpleAttributeGraph2>) -> Weapon<SimpleAttributeGraph2> {
+fn get_weapon(character: &Character<SimpleAttribute>) -> Weapon<SimpleAttribute> {
     Weapon::new(
         WeaponName::FesteringDesire,
         90,
@@ -41,7 +41,7 @@ fn get_weapon(character: &Character<SimpleAttributeGraph2>) -> Weapon<SimpleAttr
     )
 }
 
-fn create_target_function(character: &Character<SimpleAttributeGraph2>, weapon: &Weapon<SimpleAttributeGraph2>) -> Box<dyn TargetFunction> {
+fn create_target_function(character: &Character<SimpleAttribute>, weapon: &Weapon<SimpleAttribute>) -> Box<dyn TargetFunction> {
     get_target_function(
         TargetFunctionName::AmberDefault, &character, &weapon, &TargetFunctionConfig::NoConfig
     )

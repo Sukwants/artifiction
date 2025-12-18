@@ -1,4 +1,4 @@
-use crate::attribute::{Attribute, AttributeName};
+use crate::attribute::*;
 use crate::buffs::{Buff, BuffConfig};
 use crate::buffs::buff::BuffMeta;
 use crate::buffs::buff_meta::{BuffFrom, BuffGenre, BuffImage, BuffMetaData};
@@ -6,7 +6,7 @@ use crate::buffs::buff_name::BuffName;
 use crate::character::CharacterName;
 use crate::common::i18n::locale;
 use crate::common::item_config_type::{ItemConfig, ItemConfigType};
-use crate::common::Moonsign;
+use crate::common::{Moonsign, ReactionType};
 use crate::character::characters::dendro::lauma::LAUMA_SKILL;
 
 pub struct BuffLaumaE {
@@ -146,13 +146,25 @@ pub struct BuffLaumaP1 {
 impl<A: Attribute> Buff<A> for BuffLaumaP1 {
     fn change_attribute(&self, attribute: &mut A) {
         if self.moonsign == Moonsign::Nascent {
-            attribute.set_value_by(AttributeName::CriticalDamageBloom, "菈乌玛「奉向霜夜的明光」", 1.0);
-            attribute.set_value_by(AttributeName::CriticalDamageHyperbloom, "菈乌玛「奉向霜夜的明光」", 1.0);
-            attribute.set_value_by(AttributeName::CriticalDamageBurgeon , "菈乌玛「奉向霜夜的明光」", 1.0);
+                attribute.set_value_to_t(AttributeType::Invisible(InvisibleAttributeType::new(
+                    AttributeVariableType::CriticalDamage, None, None, Some(ReactionType::Bloom),
+                )), "菈乌玛「奉向霜夜的明光」", 1.0);
+                attribute.set_value_to_t(AttributeType::Invisible(InvisibleAttributeType::new(
+                    AttributeVariableType::CriticalDamage, None, None, Some(ReactionType::Hyperbloom),
+                )), "菈乌玛「奉向霜夜的明光」", 1.0);
+                attribute.set_value_to_t(AttributeType::Invisible(InvisibleAttributeType::new(
+                    AttributeVariableType::CriticalDamage, None, None, Some(ReactionType::Burgeon),
+                )), "菈乌玛「奉向霜夜的明光」", 1.0);
 
-            attribute.set_value_to(AttributeName::CriticalBloom, "菈乌玛「奉向霜夜的明光」", 0.15);
-            attribute.set_value_to(AttributeName::CriticalHyperbloom, "菈乌玛「奉向霜夜的明光」", 0.15);
-            attribute.set_value_to(AttributeName::CriticalBurgeon , "菈乌玛「奉向霜夜的明光」", 0.15);
+                attribute.set_value_by_t(AttributeType::Invisible(InvisibleAttributeType::new(
+                    AttributeVariableType::CriticalRate, None, None, Some(ReactionType::Bloom),
+                )), "菈乌玛「奉向霜夜的明光」", 0.15);
+                attribute.set_value_by_t(AttributeType::Invisible(InvisibleAttributeType::new(
+                    AttributeVariableType::CriticalRate, None, None, Some(ReactionType::Hyperbloom),
+                )), "菈乌玛「奉向霜夜的明光」", 0.15);
+                attribute.set_value_by_t(AttributeType::Invisible(InvisibleAttributeType::new(
+                    AttributeVariableType::CriticalRate, None, None, Some(ReactionType::Burgeon),
+                )), "菈乌玛「奉向霜夜的明光」", 0.15);
         }
         if self.moonsign == Moonsign::Ascendant {
             attribute.set_value_by(AttributeName::CriticalDamageLunarBloom, "菈乌玛「奉向霜夜的明光」", 0.2);

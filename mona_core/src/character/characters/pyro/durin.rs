@@ -1,5 +1,5 @@
 use num_traits::FromPrimitive;
-use crate::attribute::{Attribute, AttributeName, AttributeCommon};
+use crate::attribute::*;
 use crate::character::character_common_data::CharacterCommonData;
 use crate::character::character_sub_stat::CharacterSubStatFamily;
 use crate::character::{CharacterConfig, CharacterName, CharacterStaticData};
@@ -111,8 +111,8 @@ impl<A: Attribute> ChangeAttribute<A> for DurinEffect {
             if self.essential_transmutation == 0 {
                 attribute.set_value_by(AttributeName::ResMinusPyro, "天赋1：光灵遵神数显现", if self.hexerei_secret_rite { 0.35 } else { 0.20 });
             } else {
-                attribute.set_value_by(AttributeName::BonusMelt, "天赋1：光灵遵神数显现", if self.hexerei_secret_rite { 0.7 } else { 0.4 });
-                attribute.set_value_by(AttributeName::BonusVaporize, "天赋1：光灵遵神数显现", if self.hexerei_secret_rite { 0.7 } else { 0.4 });
+                attribute.set_value_by(AttributeName::EnhanceMelt, "天赋1：光灵遵神数显现", if self.hexerei_secret_rite { 0.7 } else { 0.4 });
+                attribute.set_value_by(AttributeName::EnhanceVaporize, "天赋1：光灵遵神数显现", if self.hexerei_secret_rite { 0.7 } else { 0.4 });
             }
         }
     }

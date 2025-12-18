@@ -3,7 +3,7 @@ use crate::character::{CharacterConfig, CharacterName, CharacterStaticData};
 use crate::common::{Element, WeaponType, ChangeAttribute, SkillType};
 use crate::character::character_sub_stat::CharacterSubStatFamily;
 use crate::character::character_common_data::CharacterCommonData;
-use crate::attribute::{Attribute, AttributeName};
+use crate::attribute::*;
 use crate::character::skill_config::CharacterSkillConfig;
 use crate::character::traits::{CharacterSkillMap, CharacterSkillMapItem, CharacterTrait};
 use crate::damage::damage_builder::DamageBuilder;

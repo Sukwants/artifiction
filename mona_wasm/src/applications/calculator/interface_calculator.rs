@@ -1,15 +1,18 @@
 use std::collections::HashMap;
+use mona::attribute::attribute::ComplicatedAttribute;
+use mona::damage::damage_analysis::EventAnalysis;
 use serde_json::json;
 
 use mona::artifacts::{Artifact, ArtifactList};
 use mona::artifacts::effect_config::ArtifactEffectConfig;
-use mona::attribute::{AttributeUtils, ComplicatedAttributeGraph, SimpleAttributeGraph2};
+use mona::attribute::*;
 use mona::buffs::{Buff, BuffConfig};
 use mona::character::{Character, CharacterName};
 use mona::character::characters::damage;
 use mona::character::skill_config::CharacterSkillConfig;
+use mona::character::team_status::CharacterStatus;
 use mona::character::traits::CharacterTrait;
-use mona::common::{Element, MoonglareReaction};
+use mona::common::{Element, MoonglareReaction, TransformativeType};
 use mona::damage::{ComplicatedDamageBuilder, DamageAnalysis, DamageContext, SimpleDamageBuilder};
 use mona::damage::damage_builder::DamageBuilder;
 use mona::damage::damage_result::SimpleDamageResult;
@@ -77,10 +80,10 @@ impl CalculatorInterface {
         let input: CalculatorConfigInterface = serde_wasm_bindgen::from_value(value).unwrap();
         let fumo: Option<Element> = serde_wasm_bindgen::from_value(fumo).unwrap();
 
-        let character: Character<ComplicatedAttributeGraph> = input.character.to_character();
-        let weapon = input.weapon.to_weapon(&character);
+        let character: Character<ComplicatedAttribute> = input.character.to_character();
+        let weapon: Weapon<ComplicatedAttribute> = input.weapon.to_weapon(&character);
 
-        let buffs: Vec<Box<dyn Buff<ComplicatedAttributeGraph>>> = input.buffs.iter().map(|x| x.to_buff()).collect();
+        let buffs: Vec<Box<dyn Buff<ComplicatedAttribute>>> = input.buffs.iter().map(|x| x.to_buff()).collect();
         let artifacts: Vec<&Artifact> = input.artifacts.iter().collect();
 
         // utils::log!("{:?}", default_artifact_config);
@@ -116,10 +119,10 @@ impl CalculatorInterface {
 
         let input: CalculatorConfigInterface = serde_wasm_bindgen::from_value(value).unwrap();
 
-        let character: Character<SimpleAttributeGraph2> = input.character.to_character();
+        let character: Character<ComplicatedAttribute> = input.character.to_character();
         let weapon = input.weapon.to_weapon(&character);
 
-        let buffs: Vec<_> = input.buffs.iter().map(|x| x.to_buff()).collect();
+        let buffs: Vec<Box<dyn Buff<ComplicatedAttribute>>> = input.buffs.iter().map(|x| x.to_buff()).collect();
         let artifacts: Vec<&Artifact> = input.artifacts.iter().collect();
 
         let artifact_config = match input.artifact_config {
@@ -133,26 +136,35 @@ impl CalculatorInterface {
             Default::default()
         };
 
-        let attribute = AttributeUtils::create_attribute_from_big_config(
-            &ArtifactList {
-                artifacts: &artifacts
-            },
-            &artifact_config,
+        let get_damage = |transformative_type: TransformativeType| CalculatorInterface::get_damage_transformative_internal(
             &character,
             &weapon,
-            &buffs
+            &buffs,
+            artifacts.clone(),
+            &artifact_config,
+            &input.skill.config,
+            transformative_type,
+            &enemy,
         );
 
-        let context: DamageContext<'_, SimpleAttributeGraph2> = DamageContext {
-            character_common_data: &character.common_data,
-            enemy: &enemy,
-            attribute: &attribute
-        };
-
-        let tmp_result = context.critical_transformative();
+        let result = json!({
+            "SwirlCryo": get_damage(TransformativeType::SwirlCryo),
+            "SwirlPyro": get_damage(TransformativeType::SwirlPyro),
+            "SwirlHydro": get_damage(TransformativeType::SwirlHydro),
+            "SwirlElectro": get_damage(TransformativeType::SwirlElectro),
+            "Overload": get_damage(TransformativeType::Overload),
+            "ElectroCharged": get_damage(TransformativeType::ElectroCharged),
+            "Shatter": get_damage(TransformativeType::Shatter),
+            "Superconduct": get_damage(TransformativeType::Superconduct),
+            "Bloom": get_damage(TransformativeType::Bloom),
+            "Hyperbloom": get_damage(TransformativeType::Hyperbloom),
+            "Burgeon": get_damage(TransformativeType::Burgeon),
+            "Burning": get_damage(TransformativeType::Burning),
+            "Crystallize": get_damage(TransformativeType::Crystallize),
+        });
 
         let s = serde_wasm_bindgen::Serializer::new().serialize_maps_as_objects(true);
-        tmp_result.serialize(&s).unwrap()
+        result.serialize(&s).unwrap()
     }
 
     pub fn get_moonglare_damage(value: JsValue) -> JsValue {
@@ -160,10 +172,10 @@ impl CalculatorInterface {
 
         let input: CalculatorConfigInterface = serde_wasm_bindgen::from_value(value).unwrap();
 
-        let character: Character<ComplicatedAttributeGraph> = input.character.to_character();
+        let character: Character<ComplicatedAttribute> = input.character.to_character();
         let weapon = input.weapon.to_weapon(&character);
 
-        let buffs: Vec<Box<dyn Buff<ComplicatedAttributeGraph>>> = input.buffs.iter().map(|x| x.to_buff()).collect();
+        let buffs: Vec<Box<dyn Buff<ComplicatedAttribute>>> = input.buffs.iter().map(|x| x.to_buff()).collect();
         let artifacts: Vec<&Artifact> = input.artifacts.iter().collect();
 
         let artifact_config = match input.artifact_config {
@@ -183,9 +195,10 @@ impl CalculatorInterface {
             &buffs,
             artifacts,
             &artifact_config,
+            &input.skill.config,
             lunar_type,
             &enemy,
-        ).normal;
+        );
 
         let result = json!({
             "LunarChargedReaction": get_damage(MoonglareReaction::LunarChargedReaction)
@@ -218,26 +231,27 @@ impl CalculatorInterface {
 
 impl CalculatorInterface {
     pub fn get_damage_analysis_internal(
-        character: &Character<ComplicatedAttributeGraph>,
-        weapon: &Weapon<ComplicatedAttributeGraph>,
-        buffs: &Vec<Box<dyn Buff<ComplicatedAttributeGraph>>>,
+        character: &Character<ComplicatedAttribute>,
+        weapon: &Weapon<ComplicatedAttribute>,
+        buffs: &Vec<Box<dyn Buff<ComplicatedAttribute>>>,
         artifacts: Vec<&Artifact>,
         artifact_config: &ArtifactEffectConfig,
         skill_index: usize,
         skill_config: &CharacterSkillConfig,
         enemy: &Enemy,
         fumo: Option<Element>,
-    ) -> DamageAnalysis {
+    ) -> EventAnalysis {
         // let mut ans: HashMap<String, DamageAnalysis> = HashMap::new();
 
         let artifact_list = ArtifactList {
             artifacts: &artifacts,
         };
 
-        let attribute = AttributeUtils::create_attribute_from_big_config(
+        let attribute = AttributeUtils::create_attribute_from_big_config_with_skill_config(
             &artifact_list,
             artifact_config,
             character,
+            skill_config,
             weapon,
             buffs
         );
@@ -248,28 +262,69 @@ impl CalculatorInterface {
             enemy: &enemy
         };
 
-        let damage: DamageAnalysis = damage::<ComplicatedDamageBuilder>(&context, skill_index, skill_config, fumo);
+        let damage = damage::<ComplicatedDamageBuilder>(&context, skill_index, skill_config, fumo);
         damage
     }
 
-    pub fn get_damage_moonglare_internal(
-        character: &Character<ComplicatedAttributeGraph>,
-        weapon: &Weapon<ComplicatedAttributeGraph>,
-        buffs: &Vec<Box<dyn Buff<ComplicatedAttributeGraph>>>,
+    pub fn get_damage_transformative_internal(
+        character: &Character<ComplicatedAttribute>,
+        weapon: &Weapon<ComplicatedAttribute>,
+        buffs: &Vec<Box<dyn Buff<ComplicatedAttribute>>>,
         artifacts: Vec<&Artifact>,
         artifact_config: &ArtifactEffectConfig,
-        lunar_type: MoonglareReaction,
+        skill_config: &CharacterSkillConfig,
+        transformative_type: TransformativeType,
         enemy: &Enemy,
-    ) -> DamageAnalysis {
+    ) -> EventAnalysis {
 
         let artifact_list = ArtifactList {
             artifacts: &artifacts,
         };
 
-        let attribute = AttributeUtils::create_attribute_from_big_config(
+        let attribute = AttributeUtils::create_attribute_from_big_config_with_skill_config(
             &artifact_list,
             artifact_config,
             character,
+            skill_config,
+            weapon,
+            buffs
+        );
+
+        let context = DamageContext {
+            character_common_data: &character.common_data,
+            attribute: &attribute,
+            enemy: &enemy
+        };
+
+        let damage = ComplicatedDamageBuilder::new().transformative(
+            &context.attribute,
+            &context.enemy,
+            transformative_type,
+            context.character_common_data.level,
+        );
+        damage
+    }
+
+    pub fn get_damage_moonglare_internal(
+        character: &Character<ComplicatedAttribute>,
+        weapon: &Weapon<ComplicatedAttribute>,
+        buffs: &Vec<Box<dyn Buff<ComplicatedAttribute>>>,
+        artifacts: Vec<&Artifact>,
+        artifact_config: &ArtifactEffectConfig,
+        skill_config: &CharacterSkillConfig,
+        lunar_type: MoonglareReaction,
+        enemy: &Enemy,
+    ) -> EventAnalysis {
+
+        let artifact_list = ArtifactList {
+            artifacts: &artifacts,
+        };
+
+        let attribute = AttributeUtils::create_attribute_from_big_config_with_skill_config(
+            &artifact_list,
+            artifact_config,
+            character,
+            skill_config,
             weapon,
             buffs
         );
@@ -283,7 +338,7 @@ impl CalculatorInterface {
         let damage = ComplicatedDamageBuilder::new().moonglare(
             &context.attribute,
             &context.enemy,
-            MoonglareReaction::get_element(lunar_type).unwrap(),
+            lunar_type.get_element().unwrap(),
             lunar_type,
             mona::common::SkillType::Moonglare,
             context.character_common_data.level,

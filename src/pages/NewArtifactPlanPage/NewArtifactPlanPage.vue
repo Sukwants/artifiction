@@ -1296,6 +1296,7 @@ const getAttributeWasmInterface = computed(() => {
         buffs: buffsInterface.value,
         artifacts: artifactWasmFormat.value,
         artifact_config: artifactConfigForCalculator.value,
+        skill: characterSkillInterface.value,
     }
 })
 

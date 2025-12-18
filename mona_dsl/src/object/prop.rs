@@ -1,5 +1,5 @@
 use lazy_static::lazy_static;
-use mona::attribute::{Attribute, AttributeName, SimpleAttributeGraph2, AttributeCommon};
+use mona::attribute::{Attribute, AttributeName, AttributeResult, SimpleAttributeResult, AttributeCommon};
 use mona::character::CharacterName;
 use crate::error::runtime_error::RuntimeError;
 
@@ -20,7 +20,7 @@ pub fn is_valid_prop_name(name: &str) -> bool {
     LIST.iter().position(|x| *x == name).is_some()
 }
 
-pub fn get_prop_value(attribute: &SimpleAttributeGraph2, name: &str) -> Result<f64, RuntimeError> {
+pub fn get_prop_value(attribute: &SimpleAttributeResult, name: &str) -> Result<f64, RuntimeError> {
     let v = match name {
         "recharge" => attribute.get_value(AttributeName::Recharge),
         "atk" => attribute.get_atk(),

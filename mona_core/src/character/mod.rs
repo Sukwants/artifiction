@@ -9,6 +9,7 @@ pub mod skill_config;
 pub mod traits;
 pub mod prelude;
 pub mod macros;
+pub mod team_status;
 
 pub use character_static_data::{CharacterStaticData};
 pub use character_name::CharacterName;

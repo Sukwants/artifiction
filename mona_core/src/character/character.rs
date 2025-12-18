@@ -1,6 +1,6 @@
 use super::character_common_data::CharacterCommonData;
 use crate::common::ChangeAttribute;
-use crate::attribute::{Attribute, SimpleAttributeGraph2};
+use crate::attribute::*;
 use crate::character::CharacterName;
 use crate::character::character_config::CharacterConfig;
 use crate::character::skill_config::CharacterSkillConfig;

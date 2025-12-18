@@ -2,7 +2,7 @@ extern crate web_sys;
 
 use crate::artifacts::{Artifact, ArtifactSetName};
 use crate::artifacts::effect_config::{ArtifactEffectConfig, ArtifactEffectConfigBuilder, ConfigLevel, ConfigRate};
-use crate::attribute::{Attribute, AttributeName, SimpleAttributeGraph2};
+use crate::attribute::*;
 use crate::character::{Character, character_common_data, CharacterName};
 use crate::character::character_common_data::CharacterCommonData;
 use crate::character::characters::anemo::wanderer::Wanderer;
@@ -11,13 +11,11 @@ use crate::character::traits::CharacterTrait;
 use crate::common::i18n::locale;
 use crate::common::item_config_type::{ItemConfig, ItemConfigType};
 use crate::common::StatName;
+use crate::damage::transformative_damage::transformative_damage;
 use crate::damage::{DamageContext, SimpleDamageBuilder};
 use crate::damage::damage_result::SimpleDamageResult;
 use crate::enemies::Enemy;
-use crate::target_functions::{TargetFunction, TargetFunctionConfig, TargetFunctionName};
-use crate::target_functions::target_function::TargetFunctionMetaTrait;
-use crate::target_functions::target_function_meta::{TargetFunctionFor, TargetFunctionMeta, TargetFunctionMetaImage};
-use crate::target_functions::target_function_opt_config::TargetFunctionOptConfig;
+use crate::target_functions::*;
 use crate::team::TeamQuantization;
 use crate::weapon::Weapon;
 use crate::weapon::weapon_common_data::WeaponCommonData;
@@ -229,8 +227,8 @@ impl TargetFunction for WandererDefaultTargetFunction {
             .build()
     }
 
-    fn target(&self, attribute: &SimpleAttributeGraph2, character: &Character<SimpleAttributeGraph2>, weapon: &Weapon<SimpleAttributeGraph2>, artifacts: &[&Artifact], enemy: &Enemy) -> f64 {
-        let context: DamageContext<'_, SimpleAttributeGraph2> = DamageContext {
+    fn target(&self, attribute: &TargetFunctionAttributeResultType, character: &Character<TargetFunctionAttributeType>, weapon: &Weapon<TargetFunctionAttributeType>, artifacts: &[&Artifact], enemy: &Enemy) -> f64 {
+        let context: DamageContext<'_, TargetFunctionAttributeResultType> = DamageContext {
             character_common_data: &character.common_data,
             attribute,
             enemy,
@@ -266,7 +264,7 @@ impl TargetFunction for WandererDefaultTargetFunction {
         let dmg_e = Wanderer::damage::<SimpleDamageBuilder>(&context, S::E1, &config, None);
         let dmg_q = Wanderer::damage::<SimpleDamageBuilder>(&context, S::Q1, &config, None);
         let dmg_d = Wanderer::damage::<SimpleDamageBuilder>(&context, S::Dash1, &config, None);
-        let dmg_swirl = context.transformative().swirl_pyro;
+        let dmg_swirl = transformative_damage::<SimpleDamageBuilder>(character.common_data.level, attribute, enemy).swirl_pyro.expectation;
 
         let mut dmg_c6 = 0.0;
         if context.character_common_data.constellation == 6 {

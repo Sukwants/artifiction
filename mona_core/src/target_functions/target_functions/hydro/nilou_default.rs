@@ -1,6 +1,6 @@
 use crate::artifacts::Artifact;
 use crate::artifacts::effect_config::ArtifactEffectConfig;
-use crate::attribute::{Attribute, AttributeName, SimpleAttributeGraph2};
+use crate::attribute::*;
 use crate::character::{Character, CharacterName};
 use crate::character::character_common_data::CharacterCommonData;
 use crate::character::characters::Nilou;
@@ -12,10 +12,7 @@ use crate::common::reaction_type::TransformativeType;
 use crate::damage::{DamageContext, SimpleDamageBuilder};
 use crate::damage::transformative_damage::{get_em_bonus, get_transformative_base, transformative_damage};
 use crate::enemies::Enemy;
-use crate::target_functions::target_function::TargetFunctionMetaTrait;
-use crate::target_functions::target_function_meta::{TargetFunctionFor, TargetFunctionMeta, TargetFunctionMetaImage};
-use crate::target_functions::target_function_opt_config::TargetFunctionOptConfig;
-use crate::target_functions::{TargetFunction, TargetFunctionConfig, TargetFunctionName};
+use crate::target_functions::*;
 use crate::team::TeamQuantization;
 use crate::weapon::Weapon;
 use crate::weapon::weapon_common_data::WeaponCommonData;
@@ -37,7 +34,7 @@ impl TargetFunction for NilouDefaultTargetFunction {
         Default::default()
     }
 
-    fn target(&self, attribute: &SimpleAttributeGraph2, character: &Character<SimpleAttributeGraph2>, weapon: &Weapon<SimpleAttributeGraph2>, artifacts: &[&Artifact], enemy: &Enemy) -> f64 {
+    fn target(&self, attribute: &TargetFunctionAttributeResultType, character: &Character<TargetFunctionAttributeType>, weapon: &Weapon<TargetFunctionAttributeType>, artifacts: &[&Artifact], enemy: &Enemy) -> f64 {
         let context = DamageContext {
             character_common_data: &character.common_data,
             enemy, attribute
@@ -52,7 +49,7 @@ impl TargetFunction for NilouDefaultTargetFunction {
             &context, S::Q1, &CharacterSkillConfig::NoConfig, None
         ).normal.expectation;
 
-        let bloom = transformative_damage(character.common_data.level, attribute, enemy).bloom;
+        let bloom = transformative_damage::<SimpleDamageBuilder>(character.common_data.level, attribute, enemy).bloom.expectation;
 
         let other_bloom = {
             let bloom_base = get_transformative_base(character.common_data.level, TransformativeType::Bloom);

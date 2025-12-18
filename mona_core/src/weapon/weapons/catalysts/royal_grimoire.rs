@@ -1,4 +1,4 @@
-use crate::attribute::{Attribute, AttributeName, AttributeCommon};
+use crate::attribute::*;
 use crate::character::character_common_data::CharacterCommonData;
 use crate::common::WeaponType;
 use crate::weapon::royal_series::royal_series_critical_bonus;

@@ -2,6 +2,7 @@ pub use simple_damage_builder::SimpleDamageBuilder;
 pub use damage_analysis::DamageAnalysis;
 pub use complicated_damage_builder::ComplicatedDamageBuilder;
 pub use damage_context::DamageContext;
+pub use damage_result::{DamageResult, DamageBuilderResult};
 
 pub mod simple_damage_builder;
 pub mod complicated_damage_builder;

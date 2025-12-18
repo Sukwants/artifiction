@@ -1,7 +1,7 @@
 use strum_macros::{EnumCount as EnumCountMacro, EnumString};
 use num_derive::FromPrimitive;
 use strum::EnumCount;
-use crate::attribute::{Attribute, AttributeName};
+use crate::attribute::*;
 use crate::character::character_common_data::CharacterCommonData;
 use crate::character::{CharacterConfig, CharacterName, CharacterStaticData};
 use crate::character::character_sub_stat::CharacterSubStatFamily;

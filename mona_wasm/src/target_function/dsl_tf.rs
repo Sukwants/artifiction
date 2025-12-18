@@ -1,7 +1,7 @@
 use std::cell::RefCell;
 use mona::artifacts::Artifact;
 use mona::artifacts::effect_config::ArtifactEffectConfig;
-use mona::attribute::SimpleAttributeGraph2;
+use mona::attribute::*;
 use mona::character::Character;
 use mona::enemies::Enemy;
 use mona::target_functions::target_function_opt_config::TargetFunctionOptConfig;
@@ -25,7 +25,7 @@ impl TargetFunction for TargetFunctionDSL {
         Default::default()
     }
 
-    fn target(&self, attribute: &SimpleAttributeGraph2, character: &Character<SimpleAttributeGraph2>, _weapon: &Weapon<SimpleAttributeGraph2>, _artifacts: &[&Artifact], enemy: &Enemy) -> f64 {
+    fn target(&self, attribute: &SimpleAttributeResult, character: &Character<SimpleAttribute>, _weapon: &Weapon<SimpleAttribute>, _artifacts: &[&Artifact], enemy: &Enemy) -> f64 {
         let context_unsafe = UnsafeDamageContext {
             character_common_data: &character.common_data,
             enemy: &*enemy,

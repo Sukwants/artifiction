@@ -1,7 +1,7 @@
 use super::character_static_data::{CharacterStaticData};
 use super::character_name::CharacterName;
 use super::character_sub_stat::{CharacterSubStat};
-use crate::attribute::{AttributeName, Attribute};
+use crate::attribute::*;
 use crate::common::ChangeAttribute;
 use super::characters::get_static_data;
 use crate::character::CharacterConfig;

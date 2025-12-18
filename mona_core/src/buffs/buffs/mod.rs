@@ -1,4 +1,4 @@
-use crate::attribute::Attribute;
+use crate::attribute::*;
 use crate::buffs::{Buff, BuffConfig};
 
 pub use common::*;

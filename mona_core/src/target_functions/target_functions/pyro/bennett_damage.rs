@@ -1,19 +1,17 @@
 use crate::artifacts::{Artifact, ArtifactSetName};
 use crate::artifacts::effect_config::{ArtifactEffectConfig, ArtifactEffectConfigBuilder, ConfigLevel, ConfigRate};
-use crate::attribute::{Attribute, AttributeName, SimpleAttributeGraph2};
+use crate::attribute::*;
 use crate::character::character_common_data::CharacterCommonData;
 use crate::character::{Character, CharacterName};
 use crate::character::characters::Bennett;
+use crate::character::characters::bennett::BENNETT_SKILL;
 use crate::character::prelude::CharacterTrait;
 use crate::character::skill_config::CharacterSkillConfig;
 use crate::common::item_config_type::{ItemConfig, ItemConfigType};
 use crate::common::StatName;
 use crate::damage::{DamageContext, SimpleDamageBuilder};
 use crate::enemies::Enemy;
-use crate::target_functions::target_function::TargetFunctionMetaTrait;
-use crate::target_functions::target_function_meta::{TargetFunctionFor, TargetFunctionMeta, TargetFunctionMetaImage};
-use crate::target_functions::{TargetFunction, TargetFunctionConfig, TargetFunctionName};
-use crate::target_functions::target_function_opt_config::TargetFunctionOptConfig;
+use crate::target_functions::*;
 use crate::team::TeamQuantization;
 use crate::weapon::Weapon;
 use crate::weapon::weapon_common_data::WeaponCommonData;
@@ -130,7 +128,7 @@ impl TargetFunction for BennettDamageTargetFunction {
             .build()
     }
 
-    fn target(&self, attribute: &SimpleAttributeGraph2, character: &Character<SimpleAttributeGraph2>, _weapon: &Weapon<SimpleAttributeGraph2>, _artifacts: &[&Artifact], enemy: &Enemy) -> f64 {
+    fn target(&self, attribute: &TargetFunctionAttributeResultType, character: &Character<TargetFunctionAttributeType>, _weapon: &Weapon<TargetFunctionAttributeType>, _artifacts: &[&Artifact], enemy: &Enemy) -> f64 {
         let bonus_for_other = attribute.get_value(AttributeName::ATKBonusForOther);
         // if bonus_for_other > 1e-6 {
         //     crate::utils::log!("666 {}", bonus_for_other);
@@ -138,9 +136,15 @@ impl TargetFunction for BennettDamageTargetFunction {
         let r = attribute.get_value(AttributeName::Recharge).min(self.recharge_demand) / self.recharge_demand;
 
         const VIRTUAL_BASE_ATK: f64 = 800.0;
-        let mut atk_bonus = Bennett::atk_bonus(&character.common_data, attribute) * r + bonus_for_other * VIRTUAL_BASE_ATK;
+        let mut atk_bonus = {
+            let base_atk = attribute.get_value(AttributeName::ATKBase);
+            let s3 = character.common_data.skill3;
 
-        let context: DamageContext<'_, SimpleAttributeGraph2> = DamageContext {
+            let bonus = BENNETT_SKILL.elemental_burst_atk_bonus[s3] + (if character.common_data.constellation >= 1 { 0.2 } else { 0.0 });
+            bonus * base_atk
+        } * r + bonus_for_other * VIRTUAL_BASE_ATK;
+
+        let context: DamageContext<'_, TargetFunctionAttributeResultType> = DamageContext {
             character_common_data: &character.common_data,
             attribute,
             enemy

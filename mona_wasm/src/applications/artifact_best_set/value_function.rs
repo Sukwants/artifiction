@@ -2,7 +2,7 @@ use std::collections::HashSet;
 use mona::artifacts::{Artifact, ArtifactList, ArtifactSetName, ArtifactSlotName};
 use mona::artifacts::artifact_set_type::ArtifactSetType;
 use mona::artifacts::effect_config::ArtifactEffectConfig;
-use mona::attribute::{AttributeUtils, SimpleAttributeGraph2};
+use mona::attribute::*;
 use mona::buffs::Buff;
 use mona::character::Character;
 use mona::common::StatName;
@@ -12,11 +12,11 @@ use mona::weapon::Weapon;
 use strum::EnumCount;
 
 pub struct ValueFunction<'a> {
-    pub character: &'a Character<SimpleAttributeGraph2>,
-    pub weapon: &'a Weapon<SimpleAttributeGraph2>,
+    pub character: &'a Character<SimpleAttribute>,
+    pub weapon: &'a Weapon<SimpleAttribute>,
     pub tf: &'a Box<dyn TargetFunction>,
     pub artifact_config: &'a ArtifactEffectConfig,
-    pub buffs: &'a [Box<dyn Buff<SimpleAttributeGraph2>>],
+    pub buffs: &'a [Box<dyn Buff<SimpleAttribute>>],
     pub enemy: &'a Enemy,
 }
 

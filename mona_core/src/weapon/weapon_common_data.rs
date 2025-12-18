@@ -1,7 +1,7 @@
 use super::weapon_static_data::{WeaponStaticData};
 use super::weapon_name::WeaponName;
 use crate::common::ChangeAttribute;
-use crate::attribute::{Attribute, AttributeName};
+use crate::attribute::*;
 use crate::weapon::weapons::get_static_data;
 use super::weapon_sub_stat::{WeaponSubStat};
 

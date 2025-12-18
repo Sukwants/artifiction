@@ -11,7 +11,7 @@ use mona::weapon::{WeaponName, WeaponConfig, Weapon};
 use mona::target_functions::{TargetFunctionName, TargetFunctionConfig, TargetFunctionUtils, TargetFunction};
 use mona::buffs::{Buff, BuffConfig};
 use mona::artifacts::effect_config::ArtifactEffectConfig;
-use mona::attribute::{AttributeNoReactive, AttributeName, AttributeUtils, AttributeCommon, Attribute, ComplicatedAttributeGraph, SimpleAttributeGraph2};
+use mona::attribute::*;
 use mona::enemies::Enemy;
 use mona::{utils};
 use crate::applications::common::{CharacterInterface, TargetFunctionInterface, WeaponInterface};
@@ -41,7 +41,7 @@ impl OptimizeSingleWasm {
             input.target_function.to_target_function(&character, &weapon)
         };
         let constraint = input.constraint.unwrap_or(Default::default());
-        let buffs: Vec<Box<dyn Buff<SimpleAttributeGraph2>>> = input.buffs.iter().map(|x| x.to_buff()).collect();
+        let buffs: Vec<Box<dyn Buff<SimpleAttribute>>> = input.buffs.iter().map(|x| x.to_buff()).collect();
         let artifact_config = input.artifact_config.as_ref().map(|x| x.clone().to_config());
 
         let filtered_artifacts = input.filter.as_ref().map(|x| x.filter_artifact(&artifacts_ref));

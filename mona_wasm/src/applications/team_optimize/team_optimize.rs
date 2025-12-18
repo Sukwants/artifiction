@@ -8,7 +8,7 @@ use crate::applications::team_optimize::inter::TeamInterface;
 use crate::applications::optimize_artifacts::single_optimize::{optimize_single_interface_wasm};
 use crate::applications::team_optimize::hyper_param::TeamOptimizeHyperParam;
 use mona::artifacts::Artifact;
-use mona::attribute::SimpleAttributeGraph2;
+use mona::attribute::*;
 use mona::buffs::Buff;
 use mona::character::{Character, CharacterName};
 use mona::target_functions::TargetFunction;

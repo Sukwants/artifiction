@@ -1,5 +1,5 @@
 use crate::artifacts::effect_config::ArtifactEffectConfig;
-use crate::attribute::SimpleAttributeGraph2;
+use crate::attribute::*;
 use crate::character::Character;
 use crate::character::character_common_data::CharacterCommonData;
 use crate::character::characters::cryo::skirk::Skirk;
@@ -8,10 +8,7 @@ use crate::character::{CharacterConfig, CharacterName};
 use crate::character::skill_config::CharacterSkillConfig;
 use crate::damage::{DamageContext, SimpleDamageBuilder};
 use crate::enemies::Enemy;
-use crate::target_functions::target_function::TargetFunctionMetaTrait;
-use crate::target_functions::target_function_meta::{TargetFunctionFor, TargetFunctionMeta, TargetFunctionMetaImage};
-use crate::target_functions::target_function_opt_config::TargetFunctionOptConfig;
-use crate::target_functions::{TargetFunction, TargetFunctionConfig, TargetFunctionName};
+use crate::target_functions::*;
 use crate::team::TeamQuantization;
 use crate::weapon::Weapon;
 use crate::weapon::weapon_common_data::WeaponCommonData;
@@ -90,7 +87,7 @@ impl TargetFunction for SkirkDefaultTargetFunction {
         Default::default()
     }
 
-    fn target(&self, attribute: &SimpleAttributeGraph2, character: &Character<SimpleAttributeGraph2>, _weapon: &Weapon<SimpleAttributeGraph2>, _artifacts: &[&Artifact], _enemy: &Enemy) -> f64 {
+    fn target(&self, attribute: &TargetFunctionAttributeResultType, character: &Character<TargetFunctionAttributeType>, _weapon: &Weapon<TargetFunctionAttributeType>, _artifacts: &[&Artifact], _enemy: &Enemy) -> f64 {
         let context = DamageContext {
             character_common_data: &character.common_data,
             attribute, enemy: _enemy

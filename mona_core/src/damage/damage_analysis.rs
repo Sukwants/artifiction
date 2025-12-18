@@ -1,10 +1,13 @@
-use std::collections::HashMap;
+use std::{collections::HashMap, hash::Hash};
 use serde::{Serialize, Deserialize};
-use crate::common::{DamageResult, Element, MoonglareReaction};
+use crate::common::{DamageResult, Element, MoonglareReaction, ReactionType, TransformativeType};
+use crate::damage::damage_result::DamageBuilderResult;
 
-#[derive(Debug)]
-#[derive(Serialize, Deserialize)]
+#[derive(Debug, Serialize, Deserialize)]
 pub struct DamageAnalysis {
+    pub element: Element,
+    pub reaction_type: Option<ReactionType>,
+    
     pub atk: HashMap<String, f64>,
     pub atk_ratio: HashMap<String, f64>,
     pub hp: HashMap<String, f64>,
@@ -13,52 +16,63 @@ pub struct DamageAnalysis {
     pub def_ratio: HashMap<String, f64>,
     pub em: HashMap<String, f64>,
     pub em_ratio: HashMap<String, f64>,
-    pub extra_damage: HashMap<String, f64>,
+    pub reaction_coefficient: f64,
+
+    pub base_damage: HashMap<String, f64>,
     pub bonus: HashMap<String, f64>,
-    pub melt_bonus: HashMap<String, f64>,
-    pub vaporize_bonus: HashMap<String, f64>,
+    pub reaction_enhance: HashMap<String, f64>,
     pub critical: HashMap<String, f64>,
     pub critical_damage: HashMap<String, f64>,
-    pub melt_enhance: HashMap<String, f64>,
-    pub vaporize_enhance: HashMap<String, f64>,
-    pub healing_bonus: HashMap<String, f64>,
-    pub shield_strength: HashMap<String, f64>,
-    pub spread_compose: HashMap<String, f64>,
-    pub aggravate_compose: HashMap<String, f64>,
-    pub lunar_charged_enhance: HashMap<String, f64>,
-    pub lunar_bloom_enhance: HashMap<String, f64>,
-    pub lunar_charged_increase: HashMap<String, f64>,
-    pub lunar_bloom_increase: HashMap<String, f64>,
-    pub lunar_charged_extra_increase: HashMap<String, f64>,
-    pub lunar_bloom_extra_increase: HashMap<String, f64>,
-
-    // pub melt_critical: HashMap<String, f64>,
-    // pub vaporize_critical: HashMap<String, f64>,
-    // pub spread_critical: HashMap<String, f64>,
-    // pub aggravate_critical: HashMap<String, f64>,
-
-    // pub melt_critical_damage: HashMap<String, f64>,
-    // pub vaporize_critical_damage: HashMap<String, f64>,
-    // pub spread_critical_damage: HashMap<String, f64>,
-    // pub aggravate_critical_damage: HashMap<String, f64>,
-
+    pub res_minus: HashMap<String, f64>,
     pub def_minus: HashMap<String, f64>,
     pub def_penetration: HashMap<String, f64>,
-    pub res_minus: HashMap<String, f64>,
 
-    pub element: Element,
-    pub lunar_type: MoonglareReaction,
-    pub is_heal: bool,
-    pub is_shield: bool,
-    pub is_none: bool,
-
-    pub normal: DamageResult,
-    pub melt: Option<DamageResult>,
-    pub vaporize: Option<DamageResult>,
-    pub spread: Option<DamageResult>,
-    pub aggravate: Option<DamageResult>,
+    pub result: DamageResult,
 }
 
+#[derive(Debug, Serialize, Deserialize)]
+pub struct TransformativeDamageAnalysis {
+    pub transformative_type: TransformativeType,
+
+    pub reaction_base: f64,
+    pub reaction_coefficient: f64,
+
+    pub reaction_enhance: HashMap<String, f64>,
+    pub reaction_extra: HashMap<String, f64>,
+    pub critical: HashMap<String, f64>,
+    pub critical_damage: HashMap<String, f64>,
+    pub res_minus: HashMap<String, f64>,
+
+    pub result: DamageResult,
+}
+
+#[derive(Debug, Serialize, Deserialize)]
+pub struct MoonglareDamageAnalysis {
+    pub lunar_type: MoonglareReaction,
+    
+    pub atk: HashMap<String, f64>,
+    pub atk_ratio: HashMap<String, f64>,
+    pub hp: HashMap<String, f64>,
+    pub hp_ratio: HashMap<String, f64>,
+    pub def: HashMap<String, f64>,
+    pub def_ratio: HashMap<String, f64>,
+    pub em: HashMap<String, f64>,
+    pub em_ratio: HashMap<String, f64>,
+    pub reaction_base: f64,
+    pub reaction_coefficient: f64,
+
+    pub reaction_enhance: HashMap<String, f64>,
+    pub reaction_extra: HashMap<String, f64>,
+    pub critical: HashMap<String, f64>,
+    pub critical_damage: HashMap<String, f64>,
+    pub res_minus: HashMap<String, f64>,
+    pub moonglare_base: HashMap<String, f64>,
+    pub moonglare_elevate: HashMap<String, f64>,
+
+    pub result: DamageResult,
+}
+
+#[derive(Debug, Serialize, Deserialize)]
 pub struct HealAnalysis {
     pub atk: HashMap<String, f64>,
     pub atk_ratio: HashMap<String, f64>,
@@ -66,25 +80,63 @@ pub struct HealAnalysis {
     pub hp_ratio: HashMap<String, f64>,
     pub def: HashMap<String, f64>,
     pub def_ratio: HashMap<String, f64>,
-    pub extra_damage: HashMap<String, f64>,
+    pub em: HashMap<String, f64>,
+    pub em_ratio: HashMap<String, f64>,
+    pub base: HashMap<String, f64>,
+
+    pub healing_bonus: HashMap<String, f64>,
+    pub incoming_healing_bonus: HashMap<String, f64>,
+
+    pub result: DamageResult,
 }
 
-// #[derive(Debug)]
-// #[derive(Serialize, Deserialize)]
-// pub struct DamageAnalysis {
-//     pub atk: HashMap<String, f64>,
-//     pub atk_ratio: HashMap<String, f64>,
-//     pub hp: HashMap<String, f64>,
-//     pub hp_ratio: HashMap<String, f64>,
-//     pub def: HashMap<String, f64>,
-//     pub def_ratio: HashMap<String, f64>,
-//     pub extra_damage: HashMap<String, f64>,
-//     pub bonus: HashMap<String, f64>,
-//     pub critical: HashMap<String, f64>,
-//     pub critical_damage: HashMap<String, f64>,
-//
-//     pub def_minus: HashMap<String, f64>,
-//     pub res_minus: HashMap<String, f64>,
-//
-//     pub result: DamageResult,
-// }
+#[derive(Debug, Serialize, Deserialize)]
+pub struct ShieldAnalysis {
+    pub element: Element,
+    
+    pub atk: HashMap<String, f64>,
+    pub atk_ratio: HashMap<String, f64>,
+    pub hp: HashMap<String, f64>,
+    pub hp_ratio: HashMap<String, f64>,
+    pub def: HashMap<String, f64>,
+    pub def_ratio: HashMap<String, f64>,
+    pub em: HashMap<String, f64>,
+    pub em_ratio: HashMap<String, f64>,
+    pub base: HashMap<String, f64>,
+
+    pub shield_strength: HashMap<String, f64>,
+
+    pub result: DamageResult,
+}
+
+#[derive(Debug, Serialize, Deserialize)]
+pub struct DamageAnalysisWithPossibleReaction {
+    pub normal: DamageAnalysis,
+    pub melt: Option<DamageAnalysis>,
+    pub vaporize: Option<DamageAnalysis>,
+    pub spread: Option<DamageAnalysis>,
+    pub aggravate: Option<DamageAnalysis>,
+}
+
+#[derive(Debug, Serialize, Deserialize)]
+pub enum EventAnalysis {
+    Damage(DamageAnalysisWithPossibleReaction),
+    TransformativeDamage(TransformativeDamageAnalysis),
+    MoonglareDamage(MoonglareDamageAnalysis),
+    Heal(HealAnalysis),
+    Shield(ShieldAnalysis),
+    None,
+}
+
+impl DamageBuilderResult for EventAnalysis {
+    fn get_result(&self) -> DamageResult {
+        match self {
+            EventAnalysis::Damage(d) => d.normal.result,
+            EventAnalysis::TransformativeDamage(d) => d.result,
+            EventAnalysis::MoonglareDamage(d) => d.result,
+            EventAnalysis::Heal(d) => d.result,
+            EventAnalysis::Shield(d) => d.result,
+            EventAnalysis::None => DamageResult::default(),
+        }
+    }
+}

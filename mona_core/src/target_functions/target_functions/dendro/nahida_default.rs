@@ -1,7 +1,7 @@
 use crate::artifacts::Artifact;
 use crate::artifacts::effect_config::{ArtifactEffectConfig, ArtifactEffectConfigBuilder};
-use crate::attribute::{Attribute, AttributeCommon, SimpleAttributeGraph2};
-use crate::attribute::attribute_name::AttributeName;
+use crate::attribute::*;
+use crate::attribute::*;
 use crate::character::{Character, character_common_data, CharacterName};
 use crate::character::character_common_data::CharacterCommonData;
 use crate::character::characters::Nahida;
@@ -9,12 +9,10 @@ use crate::character::skill_config::CharacterSkillConfig;
 use crate::character::traits::CharacterTrait;
 use crate::common::i18n::locale;
 use crate::common::item_config_type::{ItemConfig, ItemConfigType};
+use crate::damage::transformative_damage::transformative_damage;
 use crate::damage::{DamageContext, SimpleDamageBuilder};
 use crate::enemies::Enemy;
-use crate::target_functions::{TargetFunction, TargetFunctionConfig, TargetFunctionName};
-use crate::target_functions::target_function::TargetFunctionMetaTrait;
-use crate::target_functions::target_function_meta::{TargetFunctionFor, TargetFunctionMeta, TargetFunctionMetaImage};
-use crate::target_functions::target_function_opt_config::TargetFunctionOptConfig;
+use crate::target_functions::*;
 use crate::team::TeamQuantization;
 use crate::weapon::Weapon;
 use crate::weapon::weapon_common_data::WeaponCommonData;
@@ -138,8 +136,8 @@ impl TargetFunction for NahidaDefaultTargetFunction {
             .build()
     }
 
-    fn target(&self, attribute: &SimpleAttributeGraph2, character: &Character<SimpleAttributeGraph2>, weapon: &Weapon<SimpleAttributeGraph2>, artifacts: &[&Artifact], enemy: &Enemy) -> f64 {
-        let context: DamageContext<'_, SimpleAttributeGraph2> = DamageContext {
+    fn target(&self, attribute: &TargetFunctionAttributeResultType, character: &Character<TargetFunctionAttributeType>, weapon: &Weapon<TargetFunctionAttributeType>, artifacts: &[&Artifact], enemy: &Enemy) -> f64 {
+        let context: DamageContext<'_, TargetFunctionAttributeResultType> = DamageContext {
             character_common_data: &character.common_data,
             attribute: &attribute,
             enemy,
@@ -159,12 +157,12 @@ impl TargetFunction for NahidaDefaultTargetFunction {
             q_bonus_count: self.pryo_teammate_count,
         };
         let dmg_e3 = Nahida::damage::<SimpleDamageBuilder>(&context, S::E3, &skill_config, None);
-        let trans = context.transformative();
+        let trans = transformative_damage::<SimpleDamageBuilder>(character.common_data.level, attribute, enemy);
 
         (dmg_e3.spread.unwrap().expectation * self.spread_rate
             + dmg_e3.normal.expectation * (1.0 - self.spread_rate)
-            + self.bloom_count * trans.bloom
-            + self.burn_duration * trans.burning * 4.0
+            + self.bloom_count * trans.bloom.expectation
+            + self.burn_duration * trans.burning.expectation * 4.0
         ) * (em_req.min(attribute.get_em_all()))
     }
 }
