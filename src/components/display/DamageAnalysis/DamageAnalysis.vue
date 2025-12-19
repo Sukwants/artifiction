@@ -1,241 +1,176 @@
 <template>
-    <div style="margin-bottom: 16px;" class="flex-row" v-if="!isNone">
+    <div style="margin-bottom: 16px;" class="flex-row" v-if="this.damageType != 'None'">
         <el-radio-group v-model="damageType" style="margin-right: 24px;">
-            <el-radio-button label="normal">{{ normalDamageName }}</el-radio-button>
-            <el-radio-button v-if="showMeltOption" label="melt">融化</el-radio-button>
-            <el-radio-button v-if="showVaporizeOption" label="vaporize">蒸发</el-radio-button>
-            <el-radio-button v-if="showSpreadOption" label="spread">蔓激化</el-radio-button>
-            <el-radio-button v-if="showAggravateOption" label="aggravate">超激化</el-radio-button>
+            <el-radio-button v-if="hasDamageNormal" label="DamageNormal">{{ get_name_from_element(this.DamageNormal.element) }}</el-radio-button>
+            <el-radio-button v-if="hasDamageMelt" label="DamageMelt">融化</el-radio-button>
+            <el-radio-button v-if="hasDamageVaporize" label="DamageVaporize">蒸发</el-radio-button>
+            <el-radio-button v-if="hasDamageSpread" label="DamageSpread">蔓激化</el-radio-button>
+            <el-radio-button v-if="hasDamageAggravate" label="DamageAggravate">超激化</el-radio-button>
+            <el-radio-button v-if="hasTransformativeDamage" label="TransformativeDamage">{{ get_name_from_transformative_type(this.TransformativeDamage.transformative_type) }}</el-radio-button>
+            <el-radio-button v-if="hasMoonglareDamage" label="MoonglareDamage">{{ get_name_from_lunar_type(this.MoonglareDamage.lunar_type) }}</el-radio-button>
+            <el-radio-button v-if="hasHeal" label="Heal">治疗</el-radio-button>
+            <el-radio-button v-if="hasShield" label="Heal">护盾</el-radio-button>
         </el-radio-group>
 
-        <span class="damage-display" v-if="damageType === 'normal'">{{ Math.round(damageNormal) }}</span>
-        <span class="damage-display" v-if="damageType === 'melt'">{{ Math.round(damageMelt) }}</span>
-        <span class="damage-display" v-if="damageType === 'vaporize'">{{ Math.round(damageVaporize) }}</span>
-        <span class="damage-display" v-if="damageType === 'spread'">{{ Math.round(damageSpread) }}</span>
-        <span class="damage-display" v-if="damageType === 'aggravate'">{{ Math.round(damageAggravate) }}</span>
+        <span class="damage-display">{{ calc_result() }}</span>
     </div>
 
-    <div class="header-row" style="overflow: auto; margin-bottom: 16px; min-height: 200px;" v-if="!isNone">
-        <div v-if="lunarType !== 'LunarChargedReaction'">
-            <div class="big-title base-damage-region" :title="Math.round(baseDamageSpread*1000)/1000" v-if="damageType === 'spread'">{{ baseRegionName }}</div>
-            <div class="big-title base-damage-region" :title="Math.round(baseDamageAggravate*1000)/1000" v-else-if="damageType === 'aggravate'">{{ baseRegionName }}</div>
-            <div class="big-title base-damage-region" :title="Math.round(baseDamage*1000)/1000" v-else>{{ baseRegionName }}</div>
+    <div v-if="this.damageType != 'None'" class="header-row" style="overflow: auto; margin-bottom: 16px; min-height: 200px;">
+
+        <div>
+            <div class="big-title base-damage-region">基础伤害</div>
             <div class="header-row">
                 <damage-analysis-util
-                    v-if="atkRatioState.length > 0"
-                    :arr="atkState"
+                    v-if="result.atk_ratio?.length > 0"
+                    :arr="result.atk"
                     title="攻击力"
                 ></damage-analysis-util>
                 <damage-analysis-util
-                    v-if="atkRatioState.length > 0"
-                    :arr="atkRatioState"
+                    v-if="result.atk_ratio?.length > 0"
+                    :arr="result.atk_ratio"
                     title="攻击力倍率"
                 ></damage-analysis-util>
                 <damage-analysis-util
-                    v-if="defRatioState.length > 0"
-                    :arr="defState"
+                    v-if="result.def_ratio?.length > 0"
+                    :arr="result.def"
                     title="防御力"
                 ></damage-analysis-util>
                 <damage-analysis-util
-                    v-if="defRatioState.length > 0"
-                    :arr="defRatioState"
+                    v-if="result.def_ratio?.length > 0"
+                    :arr="result.def_ratio"
                     title="防御力倍率"
                 ></damage-analysis-util>
                 <damage-analysis-util
-                    v-if="hpRatioState.length > 0"
-                    :arr="hpState"
+                    v-if="result.hp_ratio?.length > 0"
+                    :arr="result.hp"
                     title="生命值"
                 ></damage-analysis-util>
                 <damage-analysis-util
-                    v-if="hpRatioState.length > 0"
-                    :arr="hpRatioState"
+                    v-if="result.hp_ratio?.length > 0"
+                    :arr="result.hp_ratio"
                     title="生命值倍率"
                 ></damage-analysis-util>
                 <damage-analysis-util
-                    v-if="emRatioState.length > 0"
-                    :arr="emState"
+                    v-if="result.em_ratio?.length > 0"
+                    :arr="result.em"
                     title="元素精通"
                 ></damage-analysis-util>
                 <damage-analysis-util
-                    v-if="emRatioState.length > 0"
-                    :arr="emRatioState"
+                    v-if="result.em_ratio?.length > 0"
+                    :arr="result.em_ratio"
                     title="元素精通倍率"
                 ></damage-analysis-util>
                 <damage-analysis-util
-                    v-if="extraDamageState.length > 0"
-                    :arr="extraDamageState"
+                    v-if="result.base_damage?.length > 0"
+                    :arr="result.base_damage"
                     title="其他"
                 ></damage-analysis-util>
-                <div v-if="damageType === 'spread'" style="min-width: 100px">
-                    <div class="big-title" style="background: rgb(236, 245, 255)">蔓激化基础伤害</div>
-                    <div class="header-row" style="height: 100%; display: flex; align-items: center; justify-content: center">
-                        <span>{{ Math.round(baseDamageQuicken * 1000) / 1000 }}</span>
-                    </div>
-                </div>
-                <div v-if="damageType === 'aggravate'" style="min-width: 100px">
-                    <div class="big-title" style="background: rgb(236, 245, 255)">超激化基础伤害</div>
-                    <div class="header-row" style="height: 100%; display: flex; align-items: center; justify-content: center">
-                        <span>{{ Math.round(baseDamageQuicken * 1000) / 1000 }}</span>
+                <div v-if="result.reaction_base > 0" style="min-width: 100px">
+                    <div class="big-title" style="background: rgb(236, 245, 255)">反应基础伤害</div>
+                    <div class="header-row" style="height: 100%; display: flex; align-items: center; justify-content: center; min-height: 125px;">
+                        <span>{{ result.reaction_base }}</span>
                     </div>
                 </div>
                 <damage-analysis-util
-                    v-if="damageType === 'spread'"
-                    :arr="spreadState"
-                    title="蔓激化伤害提升"
-                ></damage-analysis-util>
-                <damage-analysis-util
-                    v-if="damageType === 'aggravate'"
-                    :arr="aggravateState"
-                    title="超激化伤害提升"
+                    v-if="result.reaction_base > 0"
+                    :arr="result.reaction_enhance"
+                    title="反应伤害提升"
                 ></damage-analysis-util>
             </div>
         </div>
-        <div v-if="lunarType == 'LunarChargedReaction'">
-            <div class="big-title base-damage-region">基础伤害</div>
-            <div class="header-row" style="height: 80%; display: flex; align-items: center; justify-content: center">
-                <span>{{ Math.round(baseDamageReaction * 1000) / 1000 }}</span>
-            </div>
-        </div>
-        <div v-if="!isLunar && !isShield">
+
+        <div>
             <div class="big-title bonus-region">加成</div>
             <div class="header-row">
                 <damage-analysis-util
-                    v-if="damageType === 'melt'"
-                    :arr="meltBonusState"
-                    :title="bonusRegionName"
+                    v-if="this.damageType == 'DamageNormal' || this.damageType == 'DamageMelt' || this.damageType == 'DamageVaporize' || this.damageType == 'DamageSpread' || this.damageType == 'DamageAggravate'"
+                    :arr="result.bonus"
+                    title="伤害加成"
                 ></damage-analysis-util>
                 <damage-analysis-util
-                    v-if="damageType === 'vaporize'"
-                    :arr="vaporizeBonusState"
-                    :title="bonusRegionName"
+                    v-if="this.damageType == 'MoonglareDamage'"
+                    :arr="result.moonglare_base"
+                    title="基础提升"
                 ></damage-analysis-util>
                 <damage-analysis-util
-                    v-if="damageType !== 'melt' && damageType !== 'vaporize'"
-                    :arr="bonusRegionState"
-                    :title="bonusRegionName"
+                    v-if="this.damageType == 'Heal'"
+                    :arr="result.healing_bonus"
+                    title="治疗加成"
+                ></damage-analysis-util>
+                <damage-analysis-util
+                    v-if="this.damageType == 'Heal'"
+                    :arr="result.incoming_healing_bonus"
+                    title="受治疗加成"
+                ></damage-analysis-util>
+                <damage-analysis-util
+                    v-if="this.damageType == 'Shield'"
+                    :arr="result.shield_strength"
+                    title="护盾强效"
                 ></damage-analysis-util>
             </div>
         </div>
-        <div v-if="isLunar">
-            <div class="big-title lunar-increase-region">基础提升</div>
-            <div v-if="this.lunarType == 'LunarChargedReaction' || this.lunarType == 'LunarCharged'" class="header-row">
-                <damage-analysis-util
-                    :arr="lunarChargedIncreaseState"
-                    title="月感电基础提升"
-                ></damage-analysis-util>
-            </div>
-            <div v-if="this.lunarType == 'LunarBloom'" class="header-row">
-                <damage-analysis-util
-                    :arr="lunarBloomIncreaseState"
-                    title="月绽放基础提升"
-                ></damage-analysis-util>
-            </div>
-        </div>
-        <div v-if="damageType === 'melt' || damageType === 'vaporize' || isLunar">
+
+        <div v-if="this.damageType === 'DamageMelt' || this.damageType === 'DamageVaporize' || this.damageType === 'TransformativeDamage' || this.damageType === 'MoonglareDamage'" >
             <div class="big-title reaction-region">反应区</div>
             <div class="header-row">
-                <div class="header-row">
-                    <div style="min-width: 100px;">
-                        <div class="header" style="display: flex; height: 32px; justify-content: center; align-items: center; background: rgb(236, 245, 255);">反应倍率</div>
-                        <div style="height: 100%; display: flex; align-items: center; justify-content: center">
-                            <span>{{ reactionRatio }}</span>
-                        </div>
+                <div style="min-width: 100px">
+                    <div class="big-title" style="background: rgb(236, 245, 255)">反应系数</div>
+                    <div class="header-row" style="height: 100%; display: flex; align-items: center; justify-content: center; min-height: 125px;">
+                        <span>{{ result.reaction_coefficient }}</span>
                     </div>
                 </div>
-                <div v-if="damageType === 'melt'" class="header-row">
-                    <damage-analysis-util
-                        :arr="meltEnhanceState"
-                        title="融化伤害加成"
-                    ></damage-analysis-util>
-                </div>
-                <div v-if="damageType === 'vaporize'" class="header-row">
-                    <damage-analysis-util
-                        :arr="vaporizeEnhanceState"
-                        title="蒸发伤害加成"
-                    ></damage-analysis-util>
-                </div>
-                <div v-if="this.lunarType == 'LunarChargedReaction' || this.lunarType == 'LunarCharged'" class="header-row">
-                    <damage-analysis-util
-                        :arr="lunarChargedEnhanceState"
-                        title="月感电伤害加成"
-                    ></damage-analysis-util>
-                </div>
-                <div v-if="this.lunarType == 'LunarBloom'" class="header-row">
-                    <damage-analysis-util
-                        :arr="lunarBloomEnhanceState"
-                        title="月绽放伤害加成"
-                    ></damage-analysis-util>
-                </div>
-            </div>
-        </div>
-        <div v-if="this.lunarType == 'LunarBloom'">
-            <div class="big-title lunar-extra-region">额外提升</div>
-            <div class="header-row">
-                <div v-if="this.lunarType == 'LunarBloom'" class="header-row">
-                    <damage-analysis-util
-                        :arr="lunarBloomExtraIncreaseState"
-                        title="月绽放额外提升"
-                    ></damage-analysis-util>
-                </div>
+                <damage-analysis-util
+                    :arr="result.reaction_enhance"
+                    title="反应伤害提升"
+                ></damage-analysis-util>
+                <damage-analysis-util
+                    v-if="result.reaction_extra?.length > 0"
+                    :arr="result.reaction_extra"
+                    title="反应额外伤害"
+                ></damage-analysis-util>
             </div>
         </div>
     </div>
 
-    <div v-if="isDamage" class="header-row" style="overflow: auto; margin-bottom: 16px; min-height: 200px;">
-        <div>
-            <div class="big-title critical-region" :title="Math.round(this.critical * this.criticalDamage * 1000)/1000">暴击区</div>
+    <div v-if="this.damageType != 'None'" class="header-row" style="overflow: auto; margin-bottom: 16px; min-height: 200px;">
+        <div v-if="this.damageType != 'Shield'">
+            <div class="big-title critical-region">暴击区</div>
             <div class="header-row">
                 <damage-analysis-util
-                    :arr="criticalState"
+                    :arr="result.critical_rate"
                     title="暴击率"
                 ></damage-analysis-util>
                 <damage-analysis-util
-                    :arr="criticalDamageState"
+                    :arr="result.critical_damage"
                     title="暴击伤害"
                 ></damage-analysis-util>
             </div>
         </div>
-        <div>
+        <div v-if="this.damageType != 'Heal' && this.damageType != 'Shield'">
             <div class="big-title res-minus">抗性区</div>
             <div class="header-row">
                 <damage-analysis-util
-                    :arr="resMinusState"
+                    :arr="result.res_minus"
                     title="减抗"
                 ></damage-analysis-util>
             </div>
         </div>
-        <div v-if="!isLunar">
+        <div v-if="this.damageType == 'DamageNormal' || this.damageType == 'DamageMelt' || this.damageType == 'DamageVaporize' || this.damageType == 'DamageSpread' || this.damageType == 'DamageAggravate'">
             <div class="big-title def-minus">防御区</div>
             <div class="header-row">
                 <damage-analysis-util
-                    :arr="defMinusState"
+                    :arr="result.def_minus"
                     title="减防"
                 ></damage-analysis-util>
                 <damage-analysis-util
-                    :arr="defPenetrationState"
+                    :arr="result.def_penetration"
                     title="穿防"
                 ></damage-analysis-util>
             </div>
         </div>
     </div>
 
-    <div v-if="isHeal" class="header-row" style="overflow: auto; margin-bottom: 16px; min-height: 200px;">
-        <div>
-            <div class="big-title critical-region" :title="Math.round(this.critical * this.criticalDamage * 1000)/1000">暴击区</div>
-            <div class="header-row">
-                <damage-analysis-util
-                    :arr="criticalState"
-                    title="暴击率"
-                ></damage-analysis-util>
-                <damage-analysis-util
-                    :arr="criticalDamageState"
-                    title="暴击伤害"
-                ></damage-analysis-util>
-            </div>
-        </div>
-    </div>
-
-    <div v-if="isNone" style="font-size: 16px; color: gray; text-align: center; margin-top: 100px; min-height: 200px;">
+    <div v-if="this.damageType == 'None'" style="font-size: 16px; color: gray; text-align: center; margin-top: 100px; min-height: 200px;">
         无数据
         <br>
         该技能对应伤害、治疗或护盾在当前配置下不会被触发
@@ -243,10 +178,40 @@
 </template>
 
 <script>
+import { get } from "lodash"
 import DamageAnalysisUtil from "./DamageAnalysisUtil"
 import { LEVEL_MULTIPLIER } from "@/constants/levelMultiplier"
 
+function init_value(result) {
+    let temp = {}
+    for (let key in result) {
+        if (key === "result") {
+            continue
+        }
+        if (typeof result[key] === "number") {
+            temp[key] = Math.round(result[key] * 1000) / 1000
+            continue
+        }
+        if (typeof result[key] === "string") {
+            temp[key] = result[key]
+            continue
+        }
+        temp[key] = []
+        for (let i in result[key]) {
+            temp[key].push({
+                name: i,
+                checked: true,
+                value: Math.round(result[key][i] * 1000) / 1000
+            })
+        }
+    }
+    return temp
+}
+
 function sum(arr) {
+    if (!arr) {
+        return 0
+    }
     let s = 0
     for (let item of arr) {
         if (item.checked) {
@@ -264,318 +229,78 @@ export default {
     props: ["enemyConfig", "characterLevel"],
     data() {
         return {
-            damageType: "normal",
-            element: "Pyro",
-            isHeal: false,
-            isShield: false,
-            isDamage: true,
-            isLunar: false,
-            lunarType: "None",
-
-            atkState: [{ name: "test", value: 1000, checked: true }],
-            atkRatioState: [{ name: "test", value: 1000, checked: true }],
-            defState: [],
-            defRatioState: [],
-            hpState: [],
-            hpRatioState: [],
-            emState: [],
-            emRatioState: [],
-            extraDamageState: [],
-            spreadState: [],
-            aggravateState: [],
-            criticalState: [],
-            criticalDamageState: [],
-            meltEnhanceState: [],
-            vaporizeEnhanceState: [],
-            lunarChargedEnhanceState: [],
-            lunarBloomEnhanceState: [],
-            lunarChargedIncreaseState: [],
-            lunarBloomIncreaseState: [],
-            lunarChargedExtraIncreaseState: [],
-            lunarBloomExtraIncreaseState: [],
-            defMinusState: [],
-            defPenetrationState: [],
-            resMinusState: [],
-            bonusState: [],
-            meltBonusState: [],
-            vaporizeBonusState: [],
-            healingBonusState: []
+            damageType: "None",
+            DamageNormal: null,
+            DamageMelt: null,
+            DamageVaporize: null,
+            DamageSpread: null,
+            DamageAggravate: null,
+            TransformativeDamage: null,
+            MoonglareDamage: null,
+            Heal: null,
+            Shield: null,
         }
     },
     methods: {
         setValue(analysis) {
             console.log(analysis)
-            let map = {
-                "atkState": "atk",
-                "atkRatioState": "atk_ratio",
-                "defState": "def",
-                "defRatioState": "def_ratio",
-                "hpState": "hp",
-                "hpRatioState": "hp_ratio",
-                "emState": "em",
-                "emRatioState": "em_ratio",
-                "extraDamageState": "extra_damage",
-                "criticalState": "critical",
-                "criticalDamageState": "critical_damage",
-                "meltEnhanceState": "melt_enhance",
-                "vaporizeEnhanceState": "vaporize_enhance",
-                "lunarChargedEnhanceState": "lunar_charged_enhance",
-                "lunarBloomEnhanceState": "lunar_bloom_enhance",
-                "lunarChargedIncreaseState": "lunar_charged_increase",
-                "lunarBloomIncreaseState": "lunar_bloom_increase",
-                "lunarChargedExtraIncreaseState": "lunar_charged_extra_increase",
-                "lunarBloomExtraIncreaseState": "lunar_bloom_extra_increase",
-                "bonusState": "bonus",
-                "meltBonusState": "melt_bonus",
-                "vaporizeBonusState": "vaporize_bonus",
-                "defMinusState": "def_minus",
-                "defPenetrationState": "def_penetration",
-                "resMinusState": "res_minus",
-                "healingBonusState": "healing_bonus",
-                "aggravateState": "aggravate_compose",
-                "spreadState": "spread_compose",
-            }
-            this.element = analysis.element
-            this.isHeal = analysis.is_heal
-            this.isShield = analysis.is_shield
-            this.isNone = analysis.is_none
-            this.isDamage = !this.isHeal && !this.isShield && !this.isNone
-            this.isLunar = analysis.lunar_type !== "None"
-            this.lunarType = analysis.lunar_type
-            this.damageType = "normal"
-            for (let key in map) {
-                let fromKey = map[key]
-                let temp = []
-                for (let i in analysis[fromKey]) {
-                    temp.push({
-                        name: i,
-                        checked: true,
-                        value: Math.round(analysis[fromKey][i] * 1000) / 1000
-                    })
-                }
-                this[key] = temp
-            }
-        }
-    },
-    computed: {
-        normalDamageName() {
-            const map = {
-                "Pyro": "火元素伤害",
-                "Electro": "雷元素伤害",
-                "Hydro": "水元素伤害",
-                "Anemo": "风元素伤害",
-                "Geo": "岩元素伤害",
-                "Dendro": "草元素伤害",
-                "Cryo": "冰元素伤害",
-                "Physical": "物理伤害"
-            }
-            const lunarMap = {
-                "LunarChargedReaction": "月感电",
-                "LunarCharged": "月感电伤害",
-                "LunarBloom": "月绽放伤害",
-            }
-            if (this.isLunar) {
-                return lunarMap[this.lunarType]
-            } else if (this.isHeal) {
-                return "治疗量"
-            } else if (this.isShield) {
-                return "护盾量"
+            
+            this.damageType = "None"
+
+            console.log(analysis)
+
+            if (analysis.Shield) {
+                this.Shield = init_value(analysis.Shield)
+                this.damageType = "Shield"
+            } else this.Shield = null
+            if (analysis.Heal) {
+                this.Heal = init_value(analysis.Heal)
+                this.damageType = "Heal"
+            } else this.Heal = null
+            if (analysis.MoonglareDamage) {
+                this.MoonglareDamage = init_value(analysis.MoonglareDamage)
+                this.damageType = "MoonglareDamage"
+            } else this.MoonglareDamage = null
+            if (analysis.TransformativeDamage) {
+                this.TransformativeDamage = init_value(analysis.TransformativeDamage)
+                this.damageType = "TransformativeDamage"
+            } else this.TransformativeDamage = null
+            if (analysis.Damage) {
+                if (analysis.Damage.aggravate) {
+                    this.DamageAggravate = init_value(analysis.Damage.aggravate)
+                    this.damageType = "DamageAggravate"
+                } else this.DamageAggravate = null
+                if (analysis.Damage.spread) {
+                    this.DamageSpread = init_value(analysis.Damage.spread)
+                    this.damageType = "DamageSpread"
+                } else this.DamageSpread = null
+                if (analysis.Damage.vaporize) {
+                    this.DamageVaporize = init_value(analysis.Damage.vaporize)
+                    this.damageType = "DamageVaporize"
+                } else this.DamageVaporize = null
+                if (analysis.Damage.melt) {
+                    this.DamageMelt = init_value(analysis.Damage.melt)
+                    this.damageType = "DamageMelt"
+                } else this.DamageMelt = null
+                if (analysis.Damage.normal) {
+                    this.DamageNormal = init_value(analysis.Damage.normal)
+                    this.damageType = "DamageNormal"
+                } else this.DamageNormal = null
             } else {
-                return map[this.element]
+                this.DamageNormal = null
+                this.DamageMelt = null
+                this.DamageVaporize = null
+                this.DamageSpread = null
+                this.DamageAggravate = null
             }
         },
 
-        showMeltOption() {
-            return (this.element === "Cryo" || this.element === "Pyro") && this.isDamage && !this.isLunar
-        },
-
-        showVaporizeOption() {
-            return (this.element === "Pyro" || this.element === "Hydro") && this.isDamage && !this.isLunar
-        },
-
-        showSpreadOption() {
-            return this.element === "Dendro" && this.isDamage && !this.isLunar
-        },
-
-        showAggravateOption() {
-            return this.element === "Electro" && this.isDamage && !this.isLunar
-        },
-        
-        baseRegionName() {
-            if (this.isHeal) {
-                return "基础治疗"
-            } else if (this.isShield) {
-                return "基础护盾"
-            } else {
-                return "基础伤害"
+        resRatio(result) {
+            if (result.element == undefined) {
+                return 1.0
             }
-        },
-
-        bonusRegionState() {
-            if (this.isHeal) {
-                return this.healingBonusState
-            } else {
-                return this.bonusState
-            }
-        },
-
-        bonusRegionName() {
-            if (this.isHeal) {
-                return "治疗加成"
-            } else {
-                return "伤害加成"
-            }
-        },
-
-        reactionRatio() {
-            if(this.lunarType !== "None") {
-                let map = {
-                    "LunarChargedReaction": 1.8,
-                    "LunarCharged": 3.0,
-                    "LunarBloom": 1.0,
-                }
-
-                return map[this.lunarType]
-            } else {
-                let map = {
-                    "Cryomelt": 1.5,
-                    "Pyromelt": 2,
-                    "Pyrovaporize": 1.5,
-                    "Hydrovaporize": 2,
-                }
-    
-                return map[this.element + this.damageType]
-            }
-        },
-
-        atk() {
-            return sum(this.atkState)
-        },
-
-        atkRatio() {
-            return sum(this.atkRatioState)
-        },
-
-        def() {
-            return sum(this.defState)
-        },
-
-        defRatio() {
-            return sum(this.defRatioState)
-        },
-
-        hp() {
-            return sum(this.hpState)
-        },
-
-        hpRatio() {
-            return sum(this.hpRatioState)
-        },
-
-        em() {
-            return sum(this.emState)
-        },
-
-        emRatio() {
-            return sum(this.emRatioState)
-        },
-
-        extraDamage() {
-            return sum(this.extraDamageState)
-        },
-
-        bonus() {
-            return sum(this.bonusState)
-        },
-        meltBonus() {
-            return sum(this.meltBonusState)
-        },
-        vaporizeBonus() {
-            return sum(this.vaporizeBonusState)
-        },
-
-        healingBonus() {
-            return sum(this.healingBonusState)
-        },
-
-        critical() {
-            return Math.min(sum(this.criticalState), 1)
-        },
-
-        criticalDamage() {
-            return sum(this.criticalDamageState)
-        },
-
-        meltEnhance() {
-            return sum(this.meltEnhanceState)
-        },
-
-        vaporizeEnhance() {
-            return sum(this.vaporizeEnhanceState)
-        },
-
-        defMinus() {
-            return sum(this.defMinusState)
-        },
-
-        defPenetration() {
-            return sum(this.defPenetrationState)
-        },
-
-        resMinus() {
-            return sum(this.resMinusState)
-        },
-
-        baseDamage() {
-            return this.atk * this.atkRatio + this.def * this.defRatio + this.hp * this.hpRatio + this.em * this.emRatio + this.extraDamage;
-        },
-
-        spreadEnhance() {
-            return sum(this.spreadState)
-        },
-
-        aggravateEnhance() {
-            return sum(this.aggravateState)
-        },
-
-        lunarChargedEnhance() {
-            return sum(this.lunarChargedEnhanceState)
-        },
-        lunarChargedIncrease() {
-            return sum(this.lunarChargedIncreaseState)
-        },
-
-        lunarBloomEnhance() {
-            return sum(this.lunarBloomEnhanceState)
-        },
-        lunarBloomIncrease() {
-            return sum(this.lunarBloomIncreaseState)
-        },
-        lunarBloomExtraIncrease() {
-            return sum(this.lunarBloomExtraIncreaseState)
-        },
-
-        baseDamageSpread() {
-            return this.baseDamage + LEVEL_MULTIPLIER[this.characterLevel - 1] * 1.25 * (1 + this.spreadEnhance)
-        },
-
-        baseDamageAggravate() {
-            return this.baseDamage + LEVEL_MULTIPLIER[this.characterLevel - 1] * 1.15 * (1 + this.aggravateEnhance)
-        },
-
-        baseDamageReaction() {
-            return LEVEL_MULTIPLIER[this.characterLevel - 1];
-        },
-
-        baseDamageQuicken() {
-            return LEVEL_MULTIPLIER[this.characterLevel - 1] * (this.damageType === "spread" ? 1.25 : 1.15)
-        },
-
-        resRatio() {
-            // default res to 0.1
-            // console.log(this.enemyConfig)
-            const originalRes = this.enemyConfig[this.element.toLowerCase() + "_res"]
-            const res = originalRes - this.resMinus
+            const originalRes = this.enemyConfig[result.element.toLowerCase() + "_res"]
+            const res = originalRes - sum(result.res_minus)
             let res_ratio
             if (res > 0.75) {
                 res_ratio = 1 / (1 + res * 4)
@@ -587,51 +312,198 @@ export default {
             return res_ratio
         },
 
-        defMultiplier() {
+        defMultiplier(result) {
             const enemyLevel = this.enemyConfig.level
             const characterLevel = this.characterLevel
             const c = 100 + characterLevel
-            return c / ((1 - this.defPenetration) * (1 - this.defMinus) * (100 + enemyLevel) + c)
+            return c / ((1 - sum(result.def_penetration)) * (1 - sum(result.def_minus)) * (100 + enemyLevel) + c)
         },
 
-        damageSpread() {
-            return this.baseDamageSpread * (1 + this.critical * this.criticalDamage) * (1 + this.bonus) * this.resRatio * this.defMultiplier
+        calc_Damage(result) {
+            let base_damage = sum(result.atk) * sum(result.atk_ratio)
+                + sum(result.hp) * sum(result.hp_ratio)
+                + sum(result.def) * sum(result.def_ratio)
+                + sum(result.em) * sum(result.em_ratio)
+                + sum(result.base_damage)
+            
+            let damage = base_damage
+                * (1 + sum(result.bonus))
+                * result.reaction_coefficient * (1 + sum(result.reaction_enhance))
+                * (1 + sum(result.critical_rate) * sum(result.critical_damage))
+                * this.resRatio(result)
+                * this.defMultiplier(result)
+
+            return damage
         },
 
-        damageAggravate() {
-            return this.baseDamageAggravate * (1 + this.critical * this.criticalDamage) * (1 + this.bonus) * this.resRatio * this.defMultiplier
+        calc_TransformativeDamage(result) {
+            let base_damage = result.reaction_base
+            
+            let damage = base_damage
+                * reaction_coefficient * (1 + sum(result.reaction_enhance))
+                * (1 + sum(result.critical_rate) * sum(result.critical_damage))
+                * this.resRatio(result)
+
+            return damage
         },
 
-        damageNormal() {
-            let d
-            if (this.isHeal) {
-                d = this.baseDamage * (1 + this.healingBonus) * (1 + this.critical * this.criticalDamage)
-            } else if (this.isShield){
-                d  = this.baseDamage
-            } else if (this.isLunar) {
-                if (this.lunarType == "LunarChargedReaction") {
-                    d = this.baseDamageReaction * (1 + this.lunarChargedIncrease) * 1.8 * (1 + this.lunarChargedEnhance) * (1 + this.critical * this.criticalDamage) * this.resRatio
-                } else if (this.lunarType == "LunarCharged") {
-                    d = this.baseDamage * (1 + this.lunarChargedIncrease) * 3.0 * (1 + this.lunarChargedEnhance) * (1 + this.critical * this.criticalDamage) * this.resRatio
-                } else if (this.lunarType == "LunarBloom") {
-                    d = (this.baseDamage * (1 + this.lunarBloomIncrease) * (1 + this.lunarBloomEnhance) + this.lunarBloomExtraIncrease) * (1 + this.critical * this.criticalDamage) * this.resRatio
+        calc_MoonglareDamage(result) {
+            let base_damage = sum(result.atk) * sum(result.atk_ratio)
+                + sum(result.hp) * sum(result.hp_ratio)
+                + sum(result.def) * sum(result.def_ratio)
+                + sum(result.em) * sum(result.em_ratio)
+                + sum(result.base)
+                + result.reaction_base;
+
+            let damage = base_damage
+                * (1 + sum(result.moonglare_base))
+                * (1 + sum(result.moonglare_elevate))
+                * result.reaction_coefficient * (1 + sum(result.reaction_enhance))
+                * (1 + sum(result.critical_rate) * sum(result.critical_damage))
+                * this.resRatio(result)
+
+            return damage
+        },
+
+        calc_Heal(result) {
+            let heal = sum(result.atk) * sum(result.atk_ratio)
+                + sum(result.hp) * sum(result.hp_ratio)
+                + sum(result.def) * sum(result.def_ratio)
+                + sum(result.em) * sum(result.em_ratio)
+                + sum(result.base)
+
+            heal = heal
+                * (1 + sum(result.heal_bonus))
+                * (1 + sum(result.incoming_healing_bonus))
+                * (1 + sum(result.critical_rate) * sum(result.critical_damage))
+
+            return heal
+        },
+
+        calc_Shield(result) {
+            let shield = sum(result.atk) * sum(result.atk_ratio)
+                + sum(result.hp) * sum(result.hp_ratio)
+                + sum(result.def) * sum(result.def_ratio)
+                + sum(result.em) * sum(result.em_ratio)
+                + sum(result.base)
+
+            shield = shield
+                * (1 + sum(result.shield_strength))
+
+            return shield
+        },
+
+        calc_result() {
+            return Math.round((() => {
+                if (this.damageType == "DamageNormal") {
+                    return this.calc_Damage(this.DamageNormal)
+                } else if (this.damageType == "DamageMelt") {
+                    return this.calc_Damage(this.DamageMelt)
+                } else if (this.damageType == "DamageVaporize") {
+                    return this.calc_Damage(this.DamageVaporize)
+                } else if (this.damageType == "DamageSpread") {
+                    return this.calc_Damage(this.DamageSpread)
+                } else if (this.damageType == "DamageAggravate") {
+                    return this.calc_Damage(this.DamageAggravate)
+                } else if (this.damageType == "TransformativeDamage") {
+                    return this.calc_TransformativeDamage(this.TransformativeDamage)
+                } else if (this.damageType == "MoonglareDamage") {
+                    return this.calc_MoonglareDamage(this.MoonglareDamage)
+                } else if (this.damageType == "Heal") {
+                    return this.calc_Heal(this.Heal)
+                } else if (this.damageType == "Shield") {
+                    return this.calc_Shield(this.Shield)
                 }
-                else d = NaN
-            } else {
-                d = this.baseDamage * (1 + this.critical * this.criticalDamage) * (1 + this.bonus) * this.resRatio * this.defMultiplier
+            })())
+        },
+        
+        get_name_from_element(element) {
+            const map = {
+                "Pyro": "火元素伤害",
+                "Electro": "雷元素伤害",
+                "Hydro": "水元素伤害",
+                "Anemo": "风元素伤害",
+                "Geo": "岩元素伤害",
+                "Dendro": "草元素伤害",
+                "Cryo": "冰元素伤害",
+                "Physical": "物理伤害"
             }
-            return d
+            return map[element]
         },
 
-        damageMelt() {
-            const d = this.baseDamage * (1 + this.critical * this.criticalDamage) * (1 + this.meltBonus) * this.resRatio * this.defMultiplier * this.reactionRatio * (1 + this.meltEnhance)
-            return d
+        get_name_from_transformative_type(transformative_type) {
+            const map = {
+                SwirlCryo: "扩散（冰）",
+                SwirlPyro: "扩散（火）",
+                SwirlHydro: "扩散（水）",
+                SwirlElectro: "扩散（雷）",
+                Overload: "超载",
+                ElectroCharged: "感电",
+                Shatter: "碎冰",
+                Superconduct: "超导",
+                Bloom: "绽放",
+                Hyperbloom: "超绽放",
+                Burgeon: "烈绽放",
+                Burning: "燃烧",
+                Crystallize: "结晶盾",
+            }
+            return map[transformative_type]
         },
 
-        damageVaporize() {
-            const d = this.baseDamage * (1 + this.critical * this.criticalDamage) * (1 + this.vaporizeBonus) * this.resRatio * this.defMultiplier * this.reactionRatio * (1 + this.vaporizeEnhance)
-            return d
-        }
+        get_name_from_lunar_type(lunar_type) {
+            const map = {
+                "LunarChargedReaction": "月感电",
+                "LunarCharged": "月感电伤害",
+                "LunarBloom": "月绽放伤害",
+            }
+            return map[lunar_type]
+        },
+    },
+    computed: {
+        hasDamageNormal() {
+            return this.DamageNormal != null
+        },
+        hasDamageMelt() {
+            return this.DamageMelt != null
+        },
+        hasDamageVaporize() {
+            return this.DamageVaporize != null
+        },
+        hasDamageSpread() {
+            return this.DamageSpread != null
+        },
+        hasDamageAggravate() {
+            return this.DamageAggravate != null
+        },
+        hasTransformativeDamage() {
+            return this.TransformativeDamage != null
+        },
+        hasMoonglareDamage() {
+            return this.MoonglareDamage != null
+        },
+        hasHeal() {
+            return this.Heal != null
+        },
+        hasShield() {
+            return this.Shield != null
+        },
+
+        result() {
+            const map = {
+                DamageNormal: this.$data.DamageNormal,
+                DamageMelt: this.$data.DamageMelt,
+                DamageVaporize: this.$data.DamageVaporize,
+                DamageSpread: this.$data.DamageSpread,
+                DamageAggravate: this.$data.DamageAggravate,
+                TransformativeDamage: this.$data.TransformativeDamage,
+                MoonglareDamage: this.$data.MoonglareDamage,
+                Heal: this.$data.Heal,
+                Shield: this.$data.Shield,
+                None: {},
+            }
+
+            return map[this.damageType]
+        },
     }
 }
 </script>

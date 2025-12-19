@@ -1,12 +1,14 @@
-use std::ops::Mul;
 use crate::common::MoonglareReaction;
-use serde::{Serialize, Deserialize};
 use crate::damage::transformative_damage::TransformativeDamage;
+use serde::{Deserialize, Serialize};
+use std::ops::Mul;
+use wasm_bindgen::prelude::*;
 
 pub trait DamageBuilderResult {
     fn get_result(&self) -> DamageResult;
 }
 
+#[wasm_bindgen]
 #[derive(Debug, Clone, Copy)]
 #[derive(Deserialize, Serialize)]
 pub struct DamageResult {

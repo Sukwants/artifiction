@@ -1,6 +1,5 @@
 use std::collections::HashMap;
 use mona::attribute::attribute::ComplicatedAttribute;
-use mona::damage::damage_analysis::EventAnalysis;
 use serde_json::json;
 
 use mona::artifacts::{Artifact, ArtifactList};
@@ -13,10 +12,10 @@ use mona::character::skill_config::CharacterSkillConfig;
 use mona::character::team_status::CharacterStatus;
 use mona::character::traits::CharacterTrait;
 use mona::common::{Element, MoonglareReaction, TransformativeType};
-use mona::damage::{ComplicatedDamageBuilder, DamageAnalysis, DamageContext, SimpleDamageBuilder};
+use mona::damage::{ComplicatedDamageBuilder, DamageAnalysis, DamageContext, DamageResult, SimpleDamageBuilder};
+use mona::damage::damage_analysis::{EventAnalysis, TransformativeDamageAnalysisForAll, MoonglareDamageAnalysisForAll};
 use mona::damage::damage_builder::DamageBuilder;
 use mona::damage::damage_result::SimpleDamageResult;
-use mona::damage::transformative_damage::TransformativeDamage;
 use mona::enemies::Enemy;
 use mona::target_functions::TargetFunction;
 use mona::team::TeamQuantization;
@@ -136,32 +135,34 @@ impl CalculatorInterface {
             Default::default()
         };
 
-        let get_damage = |transformative_type: TransformativeType| CalculatorInterface::get_damage_transformative_internal(
-            &character,
-            &weapon,
-            &buffs,
-            artifacts.clone(),
-            &artifact_config,
-            &input.skill.config,
-            transformative_type,
-            &enemy,
-        );
+        let get_damage = |transformative_type: TransformativeType| -> EventAnalysis {
+            CalculatorInterface::get_damage_transformative_internal(
+                &character,
+                &weapon,
+                &buffs,
+                artifacts.clone(),
+                &artifact_config,
+                &input.skill.config,
+                transformative_type,
+                &enemy,
+            )
+        };
 
-        let result = json!({
-            "SwirlCryo": get_damage(TransformativeType::SwirlCryo),
-            "SwirlPyro": get_damage(TransformativeType::SwirlPyro),
-            "SwirlHydro": get_damage(TransformativeType::SwirlHydro),
-            "SwirlElectro": get_damage(TransformativeType::SwirlElectro),
-            "Overload": get_damage(TransformativeType::Overload),
-            "ElectroCharged": get_damage(TransformativeType::ElectroCharged),
-            "Shatter": get_damage(TransformativeType::Shatter),
-            "Superconduct": get_damage(TransformativeType::Superconduct),
-            "Bloom": get_damage(TransformativeType::Bloom),
-            "Hyperbloom": get_damage(TransformativeType::Hyperbloom),
-            "Burgeon": get_damage(TransformativeType::Burgeon),
-            "Burning": get_damage(TransformativeType::Burning),
-            "Crystallize": get_damage(TransformativeType::Crystallize),
-        });
+        let result = TransformativeDamageAnalysisForAll {
+            swirl_cryo: get_damage(TransformativeType::SwirlCryo),
+            swirl_pyro: get_damage(TransformativeType::SwirlPyro),
+            swirl_hydro: get_damage(TransformativeType::SwirlHydro),
+            swirl_electro: get_damage(TransformativeType::SwirlElectro),
+            overload: get_damage(TransformativeType::Overload),
+            electro_charged: get_damage(TransformativeType::ElectroCharged),
+            shatter: get_damage(TransformativeType::Shatter),
+            superconduct: get_damage(TransformativeType::Superconduct),
+            bloom: get_damage(TransformativeType::Bloom),
+            hyperbloom: get_damage(TransformativeType::Hyperbloom),
+            burgeon: get_damage(TransformativeType::Burgeon),
+            burning: get_damage(TransformativeType::Burning),
+            crystallize: get_damage(TransformativeType::Crystallize),
+        };
 
         let s = serde_wasm_bindgen::Serializer::new().serialize_maps_as_objects(true);
         result.serialize(&s).unwrap()
@@ -189,44 +190,26 @@ impl CalculatorInterface {
             Default::default()
         };
 
-        let get_damage = |lunar_type: MoonglareReaction| CalculatorInterface::get_damage_moonglare_internal(
-            &character,
-            &weapon,
-            &buffs,
-            artifacts,
-            &artifact_config,
-            &input.skill.config,
-            lunar_type,
-            &enemy,
-        );
+        let get_damage = |lunar_type: MoonglareReaction| -> EventAnalysis {
+            CalculatorInterface::get_damage_moonglare_internal(
+                &character,
+                &weapon,
+                &buffs,
+                artifacts,
+                &artifact_config,
+                &input.skill.config,
+                lunar_type,
+                &enemy,
+            )
+        };
 
-        let result = json!({
-            "LunarChargedReaction": get_damage(MoonglareReaction::LunarChargedReaction)
-        });
+        let result = MoonglareDamageAnalysisForAll {
+            lunar_charged: get_damage(MoonglareReaction::LunarChargedReaction),
+        };
 
         let s = serde_wasm_bindgen::Serializer::new().serialize_maps_as_objects(true);
         result.serialize(&s).unwrap()
     }
-
-    // pub fn damage_without_attribute(value: &JsValue) -> SimpleDamageResult {
-    //     let input: DamageWithoutAttributeInterface = value.into_serde().unwrap();
-    //
-    //     let mut builder = SimpleDamageBuilder::new(input.atk_ratio, input.def_ratio, input.hp_ratio);
-    //     builder.add_extra_atk("", input.atk);
-    //     builder.add_extra_def("", input.def);
-    //     builder.add_extra_hp("", input.hp);
-    //     builder.add_extra_damage("", input.extra_damage);
-    //     builder.add_extra_bonus("", input.bonus);
-    //     builder.add_extra_critical("", input.critical);
-    //     builder.add_extra_critical_damage("", input.critical_damage);
-    //     builder.add_extra_enhance_melt("", input.melt_enhance);
-    //     builder.add_extra_enhance_vaporize("", input.vaporize_enhance);
-    //     builder.add_extra_def_minus("", input.def_minus);
-    //     builder.add_extra_def_penetration("", input.def_penetration);
-    //     builder.add_extra_res_minus("", input.res_minus);
-    //
-    //
-    // }
 }
 
 impl CalculatorInterface {

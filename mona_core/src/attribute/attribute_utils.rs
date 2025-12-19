@@ -1,4 +1,4 @@
-use crate::artifacts::ArtifactList;
+use crate::{artifacts::ArtifactList, character::team_status::CharacterStatus};
 use crate::character::Character;
 use crate::character::skill_config::CharacterSkillConfig;
 use crate::weapon::weapon::Weapon;
@@ -15,7 +15,7 @@ impl AttributeUtils {
         weapon: &Weapon<T>,
         buffs: &Vec<Box<dyn Buff<T>>>
     ) -> T::ResultType {
-        let mut attribute = T::new(T::new_with_base_edge(Vec::new()), 0);
+        let mut attribute = T::new(T::new_with_base_edge(vec![CharacterStatus::new_single(0)]), 0);
 
         character.change_attribute(&mut attribute);
         weapon.change_attribute(&mut attribute);
@@ -33,7 +33,7 @@ impl AttributeUtils {
         weapon: &Weapon<T>,
         buffs: &[Box<dyn Buff<T>>],
     ) -> T::ResultType {
-        let mut attribute = T::new(T::new_with_base_edge(Vec::new()), 0);
+        let mut attribute = T::new(T::new_with_base_edge(vec![CharacterStatus::new_single(0)]), 0);
 
         character.change_attribute(&mut attribute);
         weapon.change_attribute(&mut attribute);
@@ -53,7 +53,7 @@ impl AttributeUtils {
         weapon: &Weapon<T>,
         buffs: &[Box<dyn Buff<T>>],
     ) -> T {
-        let mut attribute = T::new(T::new_with_base_edge(Vec::new()), 0);
+        let mut attribute = T::new(T::new_with_base_edge(vec![CharacterStatus::new_single(0)]), 0);
 
         character.change_attribute(&mut attribute);
         weapon.change_attribute(&mut attribute);
@@ -74,7 +74,7 @@ impl AttributeUtils {
         weapon: &Weapon<T>,
         buffs: &[Box<dyn Buff<T>>],
     ) -> T::ResultType {
-        let mut attribute = T::new(T::new_with_base_edge(Vec::new()), 0);
+        let mut attribute = T::new(T::new_with_base_edge(vec![CharacterStatus::new_single(0)]), 0);
 
         character.change_attribute(&mut attribute);
         weapon.change_attribute(&mut attribute);

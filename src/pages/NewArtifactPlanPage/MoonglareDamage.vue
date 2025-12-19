@@ -41,9 +41,9 @@ export default {
 
             const push = (name) => {
                 temp.push({
-                    expectation: r(this.data[name]?.expectation) ?? NO_DATA,
-                    critical: r(this.data[name]?.critical) ?? NO_DATA,
-                    nonCritical: r(this.data[name]?.non_critical) ?? NO_DATA,
+                    expectation: r(this.data[name]?.MoonglareDamage?.result?.expectation) ?? NO_DATA,
+                    critical: r(this.data[name]?.MoonglareDamage?.result?.critical) ?? NO_DATA,
+                    nonCritical: r(this.data[name]?.MoonglareDamage?.result?.non_critical) ?? NO_DATA,
                     name: this.t(`dmg.${name}`),
                 })
             }

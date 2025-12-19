@@ -1276,7 +1276,7 @@ const characterMoonglareDamage = computed(() => {
 
 function handleDisplayAnalysis() {
     showDamageAnalysisDialog.value = true
-
+    
     nextTick(() => {
         if (damageAnalysisComponent.value) {
             const component = damageAnalysisComponent.value

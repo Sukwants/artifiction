@@ -16,12 +16,13 @@ pub struct DamageAnalysis {
     pub def_ratio: HashMap<String, f64>,
     pub em: HashMap<String, f64>,
     pub em_ratio: HashMap<String, f64>,
+    pub reaction_base: f64,
     pub reaction_coefficient: f64,
 
     pub base_damage: HashMap<String, f64>,
     pub bonus: HashMap<String, f64>,
     pub reaction_enhance: HashMap<String, f64>,
-    pub critical: HashMap<String, f64>,
+    pub critical_rate: HashMap<String, f64>,
     pub critical_damage: HashMap<String, f64>,
     pub res_minus: HashMap<String, f64>,
     pub def_minus: HashMap<String, f64>,
@@ -32,6 +33,7 @@ pub struct DamageAnalysis {
 
 #[derive(Debug, Serialize, Deserialize)]
 pub struct TransformativeDamageAnalysis {
+    pub element: Option<Element>,
     pub transformative_type: TransformativeType,
 
     pub reaction_base: f64,
@@ -39,7 +41,7 @@ pub struct TransformativeDamageAnalysis {
 
     pub reaction_enhance: HashMap<String, f64>,
     pub reaction_extra: HashMap<String, f64>,
-    pub critical: HashMap<String, f64>,
+    pub critical_rate: HashMap<String, f64>,
     pub critical_damage: HashMap<String, f64>,
     pub res_minus: HashMap<String, f64>,
 
@@ -48,6 +50,7 @@ pub struct TransformativeDamageAnalysis {
 
 #[derive(Debug, Serialize, Deserialize)]
 pub struct MoonglareDamageAnalysis {
+    pub element: Element,
     pub lunar_type: MoonglareReaction,
     
     pub atk: HashMap<String, f64>,
@@ -63,7 +66,7 @@ pub struct MoonglareDamageAnalysis {
 
     pub reaction_enhance: HashMap<String, f64>,
     pub reaction_extra: HashMap<String, f64>,
-    pub critical: HashMap<String, f64>,
+    pub critical_rate: HashMap<String, f64>,
     pub critical_damage: HashMap<String, f64>,
     pub res_minus: HashMap<String, f64>,
     pub moonglare_base: HashMap<String, f64>,
@@ -86,6 +89,8 @@ pub struct HealAnalysis {
 
     pub healing_bonus: HashMap<String, f64>,
     pub incoming_healing_bonus: HashMap<String, f64>,
+    pub critical_rate: HashMap<String, f64>,
+    pub critical_damage: HashMap<String, f64>,
 
     pub result: DamageResult,
 }
@@ -139,4 +144,26 @@ impl DamageBuilderResult for EventAnalysis {
             EventAnalysis::None => DamageResult::default(),
         }
     }
+}
+
+#[derive(Debug, Serialize, Deserialize)]
+pub struct TransformativeDamageAnalysisForAll {
+    pub swirl_cryo: EventAnalysis,
+    pub swirl_hydro: EventAnalysis,
+    pub swirl_pyro: EventAnalysis,
+    pub swirl_electro: EventAnalysis,
+    pub overload: EventAnalysis,
+    pub electro_charged: EventAnalysis,
+    pub shatter: EventAnalysis,
+    pub superconduct: EventAnalysis,
+    pub bloom: EventAnalysis,
+    pub hyperbloom: EventAnalysis,
+    pub burgeon: EventAnalysis,
+    pub burning: EventAnalysis,
+    pub crystallize: EventAnalysis,
+}
+
+#[derive(Debug, Serialize, Deserialize)]
+pub struct MoonglareDamageAnalysisForAll {
+    pub lunar_charged: EventAnalysis,
 }

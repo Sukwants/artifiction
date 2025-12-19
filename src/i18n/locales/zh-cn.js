@@ -291,9 +291,9 @@ export default {
         hyperbloom: "超绽放",
         burgeon: "烈绽放",
         moonglare: "月曜反应",
-        LunarChargedReaction: "月感电",
-        LunarCharged: "月感电伤害",
-        LunarBloom: "月绽放伤害",
+        lunar_charged_reaction: "月感电",
+        lunar_charged: "月感电伤害",
+        lunar_bloom: "月绽放伤害",
     },
     res: {
         Pyro: "火抗",

@@ -49,19 +49,27 @@ impl DamageBuilder for ComplicatedDamageBuilder {
     }
 
     fn add_em_ratio(&mut self, key: &str, value: f64) {
-        *self.ratio_em.0.entry(String::from(key)).or_insert(0.0) += value;
+        if value > 0.0 {
+            *self.ratio_em.0.entry(String::from(key)).or_insert(0.0) += value;
+        }
     }
     
     fn add_atk_ratio(&mut self, key: &str, value: f64) {
-        *self.ratio_atk.0.entry(String::from(key)).or_insert(0.0) += value;
+        if value > 0.0 {
+            *self.ratio_atk.0.entry(String::from(key)).or_insert(0.0) += value;
+        }
     }
 
     fn add_def_ratio(&mut self, key: &str, value: f64) {
-        *self.ratio_def.0.entry(String::from(key)).or_insert(0.0) += value;
+        if value > 0.0 {
+            *self.ratio_def.0.entry(String::from(key)).or_insert(0.0) += value;
+        }
     }
 
     fn add_hp_ratio(&mut self, key: &str, value: f64) {
-        *self.ratio_hp.0.entry(String::from(key)).or_insert(0.0) += value;
+        if value > 0.0 {
+            *self.ratio_hp.0.entry(String::from(key)).or_insert(0.0) += value;
+        }
     }
 
     fn add_base(&mut self, key: &str, value: f64) {
@@ -208,6 +216,12 @@ impl DamageBuilder for ComplicatedDamageBuilder {
             }.merge_with(&attribute.get_result_t(get_attribute_type(AttributeVariableType::ReactionEnhance)));
             let reaction_enhance = reaction_enhance_comp.sum();
 
+            let reaction_base = match reaction {
+                Some(ReactionType::Spread) => LEVEL_MULTIPLIER[character_level - 1] * 1.25,
+                Some(ReactionType::Aggravate) => LEVEL_MULTIPLIER[character_level - 1] * 1.15,
+                _ => 0.0
+            };
+
             let reaction_coefficient = match reaction {
                 Some(ReactionType::Melt) => match element {
                     Element::Pyro => 2.0,
@@ -219,8 +233,6 @@ impl DamageBuilder for ComplicatedDamageBuilder {
                     Element::Pyro => 1.5,
                     _ => panic!()
                 },
-                Some(ReactionType::Spread) => 1.25,
-                Some(ReactionType::Aggravate) => 1.15,
                 _ => 1.0
             };
 
@@ -236,7 +248,7 @@ impl DamageBuilder for ComplicatedDamageBuilder {
                     non_critical: base_damage * (1.0 + bonus),
                 } * (defensive_ratio * resistance_ratio) * reaction_coefficient * (1.0 + reaction_enhance),
                 Some(ReactionType::Spread) | Some(ReactionType::Aggravate) => {
-                    let reaction_base_damage = base_damage + LEVEL_MULTIPLIER[character_level - 1] * reaction_coefficient * (1.0 + reaction_enhance);
+                    let reaction_base_damage = base_damage + reaction_base * (1.0 + reaction_enhance);
                     DamageResult {
                         critical: reaction_base_damage * (1.0 + bonus) * (1.0 + critical_damage),
                         non_critical: reaction_base_damage * (1.0 + bonus),
@@ -258,12 +270,13 @@ impl DamageBuilder for ComplicatedDamageBuilder {
                 def_ratio: def_ratio_comp.0,
                 em: em_comp.0,
                 em_ratio: em_ratio_comp.0,
+                reaction_base: reaction_base,
                 reaction_coefficient: reaction_coefficient,
 
                 base_damage: extra_damage_comp.0,
                 bonus: bonus_comp.0,
                 reaction_enhance: reaction_enhance_comp.0,
-                critical: critical_comp.0,
+                critical_rate: critical_comp.0,
                 critical_damage: critical_damage_comp.0,
                 res_minus: res_minus_comp.0,
                 def_minus: def_minus_comp.0,
@@ -349,6 +362,7 @@ impl DamageBuilder for ComplicatedDamageBuilder {
         };
 
         EventAnalysis::TransformativeDamage(TransformativeDamageAnalysis {
+            element: element,
             transformative_type: transformative_type,
             
             reaction_base: reaction_base,
@@ -356,7 +370,7 @@ impl DamageBuilder for ComplicatedDamageBuilder {
 
             reaction_enhance: enhance_comp.0,
             reaction_extra: extra_increase_comp.0,
-            critical: critical_comp.0,
+            critical_rate: critical_comp.0,
             critical_damage: critical_damage_comp.0,
             res_minus: res_minus_comp.0,
 
@@ -457,6 +471,7 @@ impl DamageBuilder for ComplicatedDamageBuilder {
         };
 
         EventAnalysis::MoonglareDamage(MoonglareDamageAnalysis {
+            element: element,
             lunar_type: lunar_type,
 
             atk: atk_comp.0,
@@ -472,7 +487,7 @@ impl DamageBuilder for ComplicatedDamageBuilder {
 
             reaction_enhance: enhance_comp.0,
             reaction_extra: extra_damage_comp.0,
-            critical: critical_comp.0,
+            critical_rate: critical_comp.0,
             critical_damage: critical_damage_comp.0,
             res_minus: res_minus_comp.0,
             moonglare_base: increase_comp.0,
@@ -509,7 +524,7 @@ impl DamageBuilder for ComplicatedDamageBuilder {
         let incoming_healing_bonus = incoming_healing_bonus_comp.sum();
         let healing_critical_comp = &self.extra_critical_rate
             .merge_with(&attribute.get_result_t(get_attribute_type(AttributeVariableType::HealingCriticalRate)));
-        let healing_critical: f64 = healing_critical_comp.sum().clamp(0.0, 1.0);
+        let healing_critical  = healing_critical_comp.sum().clamp(0.0, 1.0);
         let healing_critical_damage_comp = &self.extra_critical_damage
             .merge_with(&attribute.get_result_t(get_attribute_type(AttributeVariableType::HealingCriticalDamage)));
         let healing_critical_damage = healing_critical_damage_comp.sum();
@@ -536,6 +551,8 @@ impl DamageBuilder for ComplicatedDamageBuilder {
 
             healing_bonus: healing_bonus_comp.0,
             incoming_healing_bonus: incoming_healing_bonus_comp.0,
+            critical_rate: healing_critical_comp.0.clone(),
+            critical_damage: healing_critical_damage_comp.0.clone(),
 
             result: heal,
         })

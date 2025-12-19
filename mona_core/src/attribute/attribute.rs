@@ -426,6 +426,10 @@ impl<T: Attribute> AttributeCommon<T> for T {
                 "def_fixed",
                 EdgePriority::Base,
             );
+
+            temp.set_value_by_internal(AttributeNode::new_panel(character.character_id, AttributeName::CriticalBase), "初始值", 0.05);
+            temp.set_value_by_internal(AttributeNode::new_panel(character.character_id, AttributeName::CriticalDamageBase), "初始值", 0.5);
+            temp.set_value_by_internal(AttributeNode::new_panel(character.character_id, AttributeName::Recharge), "初始值", 1.0);
         }
 
         temp

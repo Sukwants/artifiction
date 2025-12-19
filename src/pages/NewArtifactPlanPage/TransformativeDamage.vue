@@ -37,12 +37,12 @@ export default {
             let temp = []
 
             const r = (x) => Math.round(x)
-
+            
             const push = (name) => {
                 temp.push({
-                    expectation: r(this.data[name]?.expectation) ?? this.t('misc.noData'),
-                    critical: r(this.data[name]?.critical) ?? this.t('misc.noData'),
-                    nonCritical: r(this.data[name]?.non_critical) ?? this.t('misc.noData'),
+                    expectation: r(this.data[name]?.TransformativeDamage?.result?.expectation) ?? this.t('misc.noData'),
+                    critical: r(this.data[name]?.TransformativeDamage?.result?.critical) ?? this.t('misc.noData'),
+                    nonCritical: r(this.data[name]?.TransformativeDamage?.result?.non_critical) ?? this.t('misc.noData'),
                     name: this.t(`dmg.${name}`),
                 })
             }
