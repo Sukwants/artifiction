@@ -7,7 +7,7 @@ pub mod complicated_attribute_graph;
 pub mod simple_attribute_graph2;
 pub mod typing;
 
-pub use attribute::{Attribute, AttributeCommon, AttributeNode, AttributeType, SimpleAttribute, ComplicatedAttribute};
+pub use attribute::{Attribute, AttributeCommon, AttributeNode, AttributeType, SimpleAttribute, ComplicatedAttribute, EdgePriority};
 pub use attribute_name::{AttributeName, AttributeVariableType, InvisibleAttributeType};
 pub use attribute_result::{AttributeGraphResult, AttributeResult, AttributeResultWithCharacter, SimpleAttributeResult, ComplicatedAttributeResult};
 

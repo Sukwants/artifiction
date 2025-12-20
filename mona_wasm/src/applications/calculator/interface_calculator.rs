@@ -135,34 +135,15 @@ impl CalculatorInterface {
             Default::default()
         };
 
-        let get_damage = |transformative_type: TransformativeType| -> EventAnalysis {
-            CalculatorInterface::get_damage_transformative_internal(
-                &character,
-                &weapon,
-                &buffs,
-                artifacts.clone(),
-                &artifact_config,
-                &input.skill.config,
-                transformative_type,
-                &enemy,
-            )
-        };
-
-        let result = TransformativeDamageAnalysisForAll {
-            swirl_cryo: get_damage(TransformativeType::SwirlCryo),
-            swirl_pyro: get_damage(TransformativeType::SwirlPyro),
-            swirl_hydro: get_damage(TransformativeType::SwirlHydro),
-            swirl_electro: get_damage(TransformativeType::SwirlElectro),
-            overload: get_damage(TransformativeType::Overload),
-            electro_charged: get_damage(TransformativeType::ElectroCharged),
-            shatter: get_damage(TransformativeType::Shatter),
-            superconduct: get_damage(TransformativeType::Superconduct),
-            bloom: get_damage(TransformativeType::Bloom),
-            hyperbloom: get_damage(TransformativeType::Hyperbloom),
-            burgeon: get_damage(TransformativeType::Burgeon),
-            burning: get_damage(TransformativeType::Burning),
-            crystallize: get_damage(TransformativeType::Crystallize),
-        };
+        let result = CalculatorInterface::get_damage_transformative_internal(
+            &character,
+            &weapon,
+            &buffs,
+            artifacts.clone(),
+            &artifact_config,
+            &input.skill.config,
+            &enemy,
+        );
 
         let s = serde_wasm_bindgen::Serializer::new().serialize_maps_as_objects(true);
         result.serialize(&s).unwrap()
@@ -190,22 +171,15 @@ impl CalculatorInterface {
             Default::default()
         };
 
-        let get_damage = |lunar_type: MoonglareReaction| -> EventAnalysis {
-            CalculatorInterface::get_damage_moonglare_internal(
-                &character,
-                &weapon,
-                &buffs,
-                artifacts,
-                &artifact_config,
-                &input.skill.config,
-                lunar_type,
-                &enemy,
-            )
-        };
-
-        let result = MoonglareDamageAnalysisForAll {
-            lunar_charged: get_damage(MoonglareReaction::LunarChargedReaction),
-        };
+        let result = CalculatorInterface::get_damage_moonglare_internal(
+            &character,
+            &weapon,
+            &buffs,
+            artifacts,
+            &artifact_config,
+            &input.skill.config,
+            &enemy,
+        );
 
         let s = serde_wasm_bindgen::Serializer::new().serialize_maps_as_objects(true);
         result.serialize(&s).unwrap()
@@ -256,9 +230,8 @@ impl CalculatorInterface {
         artifacts: Vec<&Artifact>,
         artifact_config: &ArtifactEffectConfig,
         skill_config: &CharacterSkillConfig,
-        transformative_type: TransformativeType,
         enemy: &Enemy,
-    ) -> EventAnalysis {
+    ) -> TransformativeDamageAnalysisForAll {
 
         let artifact_list = ArtifactList {
             artifacts: &artifacts,
@@ -279,13 +252,34 @@ impl CalculatorInterface {
             enemy: &enemy
         };
 
-        let damage = ComplicatedDamageBuilder::new().transformative(
-            &context.attribute,
-            &context.enemy,
-            transformative_type,
-            context.character_common_data.level,
-        );
-        damage
+        let builder = ComplicatedDamageBuilder::new();
+
+        let get_damage = |transformative_type: TransformativeType| -> EventAnalysis {
+            builder.transformative(
+                &context.attribute,
+                &context.enemy,
+                transformative_type,
+                context.character_common_data.level,
+            )
+        };
+
+        let result = TransformativeDamageAnalysisForAll {
+            swirl_cryo: get_damage(TransformativeType::SwirlCryo),
+            swirl_pyro: get_damage(TransformativeType::SwirlPyro),
+            swirl_hydro: get_damage(TransformativeType::SwirlHydro),
+            swirl_electro: get_damage(TransformativeType::SwirlElectro),
+            overload: get_damage(TransformativeType::Overload),
+            electro_charged: get_damage(TransformativeType::ElectroCharged),
+            shatter: get_damage(TransformativeType::Shatter),
+            superconduct: get_damage(TransformativeType::Superconduct),
+            bloom: get_damage(TransformativeType::Bloom),
+            hyperbloom: get_damage(TransformativeType::Hyperbloom),
+            burgeon: get_damage(TransformativeType::Burgeon),
+            burning: get_damage(TransformativeType::Burning),
+            crystallize: get_damage(TransformativeType::Crystallize),
+        };
+
+        result
     }
 
     pub fn get_damage_moonglare_internal(
@@ -295,9 +289,8 @@ impl CalculatorInterface {
         artifacts: Vec<&Artifact>,
         artifact_config: &ArtifactEffectConfig,
         skill_config: &CharacterSkillConfig,
-        lunar_type: MoonglareReaction,
         enemy: &Enemy,
-    ) -> EventAnalysis {
+    ) -> MoonglareDamageAnalysisForAll {
 
         let artifact_list = ArtifactList {
             artifacts: &artifacts,
@@ -318,15 +311,24 @@ impl CalculatorInterface {
             enemy: &enemy
         };
 
-        let damage = ComplicatedDamageBuilder::new().moonglare(
-            &context.attribute,
-            &context.enemy,
-            lunar_type.get_element().unwrap(),
-            lunar_type,
-            mona::common::SkillType::Moonglare,
-            context.character_common_data.level,
-            None,
-        );
-        damage
+        let builder = ComplicatedDamageBuilder::new();
+
+        let get_damage = |lunar_type: MoonglareReaction| -> EventAnalysis {
+            builder.moonglare(
+                &context.attribute,
+                &context.enemy,
+                lunar_type.get_element().unwrap(),
+                lunar_type,
+                mona::common::SkillType::Moonglare,
+                context.character_common_data.level,
+                None,
+            )
+        };
+
+        let result = MoonglareDamageAnalysisForAll {
+            lunar_charged: get_damage(MoonglareReaction::LunarChargedReaction),
+        };
+
+        result
     }
 }

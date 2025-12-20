@@ -1,5 +1,5 @@
 use std::cell::RefCell;
-use std::collections::HashMap;
+use std::collections::{BTreeMap, HashMap};
 use rand::Rng;
 use crate::character::team_status::CharacterStatus;
 use crate::common::{Element, EntryType, SkillType};
@@ -200,19 +200,24 @@ impl ComplicatedAttributeGraph {
         let mut result = self.nodes.clone();
         let mut temp = self.nodes.clone();
 
-        let mut edge_lists = HashMap::new();
+        use crate::utils;
+        utils::log!("solve");
+
+        let mut edge_lists = BTreeMap::new();
         for edge in self.edges.iter() {
             edge_lists.entry(edge.priority as usize).or_insert(Vec::new()).push(edge);
         }
         for list in edge_lists.values() {
+            utils::log!("list {:?}", result.get_attribute_value(AttributeNode::new_panel(0, crate::attribute::AttributeName::ATK)));
             for edge in list.iter() {
                 let from1_value = result.get_attribute_value(edge.from1);
                 let from2_value = result.get_attribute_value(edge.from2);
                 let value = (edge.func)(from1_value, from2_value);
+                utils::log!("{:?} {:?} {:?} {:?}", edge.key, edge.priority, from1_value, value);
                 temp.get_attribute_mut(edge.to).set_value_by(&edge.key, value);
             }
 
-            std::mem::swap(&mut result, &mut temp);
+            result = temp.clone();
         }
 
         for (node, (key, value)) in self.fixed.iter() {

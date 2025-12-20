@@ -1,5 +1,5 @@
 use std::cell::RefCell;
-use std::collections::HashMap;
+use std::collections::{BTreeMap, HashMap};
 use rand::Rng;
 use crate::character::team_status::CharacterStatus;
 use crate::common::{Element, EntryType, SkillType};
@@ -150,7 +150,7 @@ impl SimpleAttributeGraph2 {
         let mut result = self.nodes.clone();
         let mut temp = self.nodes.clone();
 
-        let mut edge_lists = HashMap::new();
+        let mut edge_lists = BTreeMap::new();
         for edge in self.edges.iter() {
             edge_lists.entry(edge.priority as usize).or_insert(Vec::new()).push(edge);
         }
@@ -162,7 +162,7 @@ impl SimpleAttributeGraph2 {
                 *temp.get_attribute_mut(edge.to) += value;
             }
 
-            std::mem::swap(&mut result, &mut temp);
+            result = temp.clone();
         }
 
         for (node, value) in self.fixed.iter() {

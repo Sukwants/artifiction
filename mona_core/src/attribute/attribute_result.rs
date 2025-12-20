@@ -38,21 +38,15 @@ pub trait AttributeResult {
     }
 
     fn get_atk(&self) -> f64 {
-        self.get_value(AttributeName::ATKBase)
-            + self.get_value(AttributeName::ATKPercentage)
-            + self.get_value(AttributeName::ATKFixed)
+        self.get_value(AttributeName::ATK)
     }
 
     fn get_hp(&self) -> f64 {
-        self.get_value(AttributeName::HPBase)
-            + self.get_value(AttributeName::HPPercentage)
-            + self.get_value(AttributeName::HPFixed)
+        self.get_value(AttributeName::HP)
     }
 
     fn get_def(&self) -> f64 {
-        self.get_value(AttributeName::DEFBase)
-            + self.get_value(AttributeName::DEFPercentage)
-            + self.get_value(AttributeName::DEFFixed)
+        self.get_value(AttributeName::DEF)
     }
 
     fn get_atk_ratio(&self, element: Element, skill: SkillType) -> f64 {
