@@ -149,8 +149,8 @@ impl DamageBuilderResult for EventAnalysis {
 #[derive(Debug, Serialize, Deserialize)]
 pub struct TransformativeDamageAnalysisForAll {
     pub swirl_cryo: EventAnalysis,
-    pub swirl_hydro: EventAnalysis,
     pub swirl_pyro: EventAnalysis,
+    pub swirl_hydro: EventAnalysis,
     pub swirl_electro: EventAnalysis,
     pub overload: EventAnalysis,
     pub electro_charged: EventAnalysis,
@@ -165,5 +165,5 @@ pub struct TransformativeDamageAnalysisForAll {
 
 #[derive(Debug, Serialize, Deserialize)]
 pub struct MoonglareDamageAnalysisForAll {
-    pub lunar_charged: EventAnalysis,
+    pub lunar_charged_reaction: EventAnalysis,
 }

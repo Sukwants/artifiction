@@ -11,8 +11,8 @@ use crate::damage::level_coefficient::{LEVEL_MULTIPLIER, CRYSTALLIZE_BASE};
 #[derive(Serialize, Deserialize)]
 pub struct TransformativeDamage {
     pub swirl_cryo: DamageResult,
-    pub swirl_hydro: DamageResult,
     pub swirl_pyro: DamageResult,
+    pub swirl_hydro: DamageResult,
     pub swirl_electro: DamageResult,
     pub overload: DamageResult,
     pub electro_charged: DamageResult,

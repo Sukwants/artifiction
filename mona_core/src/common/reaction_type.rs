@@ -5,21 +5,17 @@ use crate::damage::level_coefficient::{LEVEL_MULTIPLIER, CRYSTALLIZE_BASE};
 #[derive(Debug, Serialize, Deserialize, Hash, Eq, PartialEq, Copy, Clone)]
 pub enum TransformativeType {
     SwirlCryo,
+    SwirlPyro,
     SwirlHydro,
     SwirlElectro,
-    SwirlPyro,
-    Superconduct,
     Overload,
-    Burning,
     ElectroCharged,
     Shatter,
-
+    Superconduct,
     Bloom,
-    // 烈绽放
     Burgeon,
-    // 超绽放
     Hyperbloom,
-
+    Burning,
     Crystallize,
 }
 

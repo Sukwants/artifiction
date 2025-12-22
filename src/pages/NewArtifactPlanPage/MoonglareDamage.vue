@@ -20,17 +20,39 @@
                 prop="nonCritical"
                 :label="t('dmg.nonCrit')"
             ></el-table-column>
+            <el-table-column width="60">
+                <template #default="scope">
+                    <el-button
+                        :icon="Histogram"
+                        :size="'small'"
+                        @click="handleDisplayAnalysis(scope.row.key)"
+                    >
+                    </el-button>
+                </template>
+            </el-table-column>
         </el-table>
     </div>
 </template>
 
 <script>
 import {useI18n} from "@/i18n/i18n";
+import { Histogram } from '@element-plus/icons-vue'
 
 export default {
     name: "MoonglareDamage",
     props: {
-        data: {}
+        data: {},
+        handleDisplayEventAnalysis: {
+            type: Function,
+            required: false
+        }
+    },
+    methods: {
+        handleDisplayAnalysis(key) {
+            if (this.handleDisplayEventAnalysis) {
+                this.handleDisplayEventAnalysis(this.data[key])
+            }
+        }
     },
     computed: {
         tableData() {
@@ -45,6 +67,7 @@ export default {
                     critical: r(this.data[name]?.MoonglareDamage?.result?.critical) ?? NO_DATA,
                     nonCritical: r(this.data[name]?.MoonglareDamage?.result?.non_critical) ?? NO_DATA,
                     name: this.t(`dmg.${name}`),
+                    key: name,
                 })
             }
 
@@ -53,7 +76,10 @@ export default {
             }
 
             return temp
-        }
+        },
+        Histogram() {
+            return Histogram
+        },
     },
     setup() {
         const { t } = useI18n()

@@ -72,14 +72,14 @@
                     </div>
                 </div>
                 <damage-analysis-util
-                    v-if="result.reaction_base > 0"
+                    v-if="this.damageType == 'DamageSpread' || this.damageType == 'DamageAggravate'"
                     :arr="result.reaction_enhance"
                     title="反应伤害提升"
                 ></damage-analysis-util>
             </div>
         </div>
 
-        <div>
+        <div v-if="this.damageType != 'TransformativeDamage'">
             <div class="big-title bonus-region">加成</div>
             <div class="header-row">
                 <damage-analysis-util
@@ -201,18 +201,17 @@ function init_value(result) {
             temp[key] = Math.round(result[key] * 1000) / 1000
             continue
         }
-        if (typeof result[key] === "string") {
-            temp[key] = result[key]
-            continue
+        if (typeof result[key] === "object") {
+            temp[key] = []
+            for (let i in result[key]) {
+                temp[key].push({
+                    name: i,
+                    checked: true,
+                    value: Math.round(result[key][i] * 1000) / 1000
+                })
+            }
         }
-        temp[key] = []
-        for (let i in result[key]) {
-            temp[key].push({
-                name: i,
-                checked: true,
-                value: Math.round(result[key][i] * 1000) / 1000
-            })
-        }
+        else temp[key] = result[key]
     }
     return temp
 }
@@ -259,8 +258,6 @@ export default {
             console.log(analysis)
             
             this.damageType = "None"
-
-            console.log(analysis)
 
             if (analysis.Shield) {
                 this.Shield = init_value(analysis.Shield)
