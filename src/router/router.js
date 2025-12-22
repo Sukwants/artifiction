@@ -23,6 +23,7 @@ const ExportToolPage = () => import(/* webpackChunkName: "help-page" */ "@page/h
 const KumiPage = () => import (/* webpackChunkName: "kumi-page" */ "@page/KumiPage")
 const ExternalLinkPage = () => import(/* webpackChunkName: "about-page" */ "@page/about/ExternalLinkPage")
 
+const InstructionPage = () => import("@page/helps/InstructionPage")
 
 const webName = process.env.MONA_TITLE;
 
@@ -89,6 +90,13 @@ const routes = [
         component: ExportToolPage,
         meta: {
             title: "导出工具汇总",
+        }
+    },
+    {
+        path: "/help/instruction",
+        component: InstructionPage,
+        meta: {
+            title: "使用说明",
         }
     },
     {

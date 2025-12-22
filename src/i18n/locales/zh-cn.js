@@ -33,6 +33,7 @@ export default {
         about: "关于本站",
         help: "帮助",
         exportTool: "导出工具",
+        instruction: "使用说明",
         link: "友情链接",
         setup: "设置",
         bestSet: "最佳圣遗物",

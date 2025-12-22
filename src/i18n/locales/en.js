@@ -33,6 +33,7 @@ export default {
         about: "About",
         help: "Help",
         exportTool: "Export Tools",
+        instruction: "Instruction",
         link: "Other Links",
         setup: "Settings",
         bestSet: "Best Set",
