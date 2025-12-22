@@ -419,11 +419,7 @@ impl DamageBuilder for ComplicatedDamageBuilder {
         let em_ratio_comp = self.get_em_ratio_composition(attribute, element, skill);
         let em_ratio = em_ratio_comp.sum();
 
-        let extra_damage_comp = self.extra_damage
-            .merge_with(&attribute.get_result_t(get_attribute_type(AttributeVariableType::BaseDamage)));
-        let extra_damage = extra_damage_comp.sum();
-
-        let base_damage = atk * atk_ratio + def * def_ratio + hp * hp_ratio + em * em_ratio + extra_damage;
+        let base_damage = atk * atk_ratio + def * def_ratio + hp * hp_ratio + em * em_ratio;
 
         let critical_comp = self.get_critical_composition(attribute, element, skill)
             .merge_with(&attribute.get_result_t(get_attribute_type(AttributeVariableType::CriticalRate)));
@@ -489,7 +485,7 @@ impl DamageBuilder for ComplicatedDamageBuilder {
             reaction_coefficient: reaction_coefficient,
 
             reaction_enhance: enhance_comp.0,
-            reaction_extra: extra_damage_comp.0,
+            reaction_extra: extra_increase_comp.0,
             critical_rate: critical_comp.0,
             critical_damage: critical_damage_comp.0,
             res_minus: res_minus_comp.0,
