@@ -1,3 +1,4 @@
+use mona::attribute::SimpleAttribute;
 use serde::{Serialize, Deserialize};
 use wasm_bindgen::JsValue;
 use wasm_bindgen::prelude::*;
@@ -53,7 +54,7 @@ impl BonusPerStat {
 
         let input: WasmInput = serde_wasm_bindgen::from_value(val).unwrap();
 
-        let character = input.character.to_character();
+        let character = input.character.to_character::<SimpleAttribute>();
         let weapon = input.weapon.to_weapon(&character);
         let artifacts_ref: Vec<&Artifact> = input.artifacts.iter().collect();
         let tf: Box<dyn TargetFunction> = if input.tf.use_dsl {

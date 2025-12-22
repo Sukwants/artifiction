@@ -1,4 +1,4 @@
-use mona::attribute::SimpleAttributeGraph2;
+use mona::attribute::SimpleAttributeResult;
 use mona::character::character_common_data::CharacterCommonData;
 use mona::enemies::Enemy;
 
@@ -25,5 +25,5 @@ impl Span {
 pub struct UnsafeDamageContext {
     pub character_common_data: *const CharacterCommonData,
     pub enemy: *const Enemy,
-    pub attribute: *const SimpleAttributeGraph2
+    pub attribute: *const SimpleAttributeResult
 }

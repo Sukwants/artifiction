@@ -99,6 +99,7 @@ pub enum BuffConfig {
     LaumaQ { em: f64, level_q: usize, has_c2: bool },
     LaumaP1 { moonsign: Moonsign },
     LaumaP3 { em: f64 },
+    LaumaC6 { moonsign: Moonsign },
     FlinsP3 { atk: f64 },
     FlinsC6 { moonsign: Moonsign },
     NeferP3 { em: f64 },

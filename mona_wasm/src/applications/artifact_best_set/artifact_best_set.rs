@@ -2,7 +2,7 @@ use std::collections::{BinaryHeap, HashSet};
 use mona::artifacts::{Artifact, ArtifactSetName};
 use mona::artifacts::artifact_set_type::ArtifactSetType;
 use mona::artifacts::effect_config::ArtifactEffectConfig;
-use mona::attribute::SimpleAttributeGraph2;
+use mona::attribute::SimpleAttribute;
 use mona::buffs::Buff;
 use mona::character::Character;
 use mona::common::StatName;
@@ -57,11 +57,11 @@ pub fn generate_artifacts(set_type: ArtifactSetType, main_stats: &[StatName], up
 }
 
 pub fn calc_artifact_best_set(
-    character: &Character<SimpleAttributeGraph2>,
-    weapon: &Weapon<SimpleAttributeGraph2>,
+    character: &Character<SimpleAttribute>,
+    weapon: &Weapon<SimpleAttribute>,
     target_function: &Box<dyn TargetFunction>,
     artifact_config: Option<&ArtifactEffectConfig>,
-    buffs: &[Box<dyn Buff<SimpleAttributeGraph2>>],
+    buffs: &[Box<dyn Buff<SimpleAttribute>>],
     enemy: &Enemy,
 ) -> BinaryHeap<UpdateItem> {
     let mut default_effect_config: ArtifactEffectConfig;

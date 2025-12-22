@@ -1,5 +1,5 @@
 use smallvec::{smallvec, SmallVec};
-use crate::attribute::{Attribute, AttributeName};
+use crate::attribute::*;
 use crate::character::character_common_data::CharacterCommonData;
 use crate::common::{WeaponType};
 use crate::common::i18n::locale;

@@ -1,6 +1,6 @@
 use crate::artifacts::Artifact;
 use crate::artifacts::effect_config::ArtifactEffectConfig;
-use crate::attribute::SimpleAttributeGraph2;
+use crate::attribute::*;
 use crate::character::{Character, CharacterName};
 use crate::character::character_common_data::CharacterCommonData;
 use crate::character::characters::Ifa;
@@ -10,10 +10,7 @@ use crate::common::i18n::locale;
 use crate::damage::{DamageContext, SimpleDamageBuilder};
 use crate::damage::transformative_damage::transformative_damage;
 use crate::enemies::Enemy;
-use crate::target_functions::target_function::TargetFunctionMetaTrait;
-use crate::target_functions::target_function_meta::{TargetFunctionFor, TargetFunctionMeta, TargetFunctionMetaImage};
-use crate::target_functions::target_function_opt_config::TargetFunctionOptConfig;
-use crate::target_functions::{TargetFunction, TargetFunctionConfig, TargetFunctionName};
+use crate::target_functions::*;
 use crate::team::TeamQuantization;
 use crate::weapon::Weapon;
 use crate::weapon::weapon_common_data::WeaponCommonData;
@@ -51,15 +48,15 @@ impl TargetFunction for IfaDefaultTargetFunction {
         Default::default()
     }
 
-    fn target(&self, attribute: &SimpleAttributeGraph2, character: &Character<SimpleAttributeGraph2>, weapon: &Weapon<SimpleAttributeGraph2>, artifacts: &[&Artifact], enemy: &Enemy) -> f64 {
-        let context: DamageContext<'_, SimpleAttributeGraph2> = DamageContext {
+    fn target(&self, attribute: &TargetFunctionAttributeResultType, character: &Character<TargetFunctionAttributeType>, weapon: &Weapon<TargetFunctionAttributeType>, artifacts: &[&Artifact], enemy: &Enemy) -> f64 {
+        let context: DamageContext<'_, TargetFunctionAttributeResultType> = DamageContext {
             character_common_data: &character.common_data,
             attribute,
             enemy
         };
 
-        let dmg = transformative_damage(character.common_data.level, attribute, enemy);
+        let dmg = transformative_damage::<SimpleDamageBuilder>(character.common_data.level, attribute, enemy);
 
-        ((dmg.swirl_cryo + dmg.swirl_hydro + dmg.swirl_pyro + dmg.swirl_electro) / 4.0 + dmg.electro_charged) / 2.0
+        ((dmg.swirl_cryo.expectation + dmg.swirl_hydro.expectation + dmg.swirl_pyro.expectation + dmg.swirl_electro.expectation) / 4.0 + dmg.electro_charged.expectation) / 2.0
     }
 }

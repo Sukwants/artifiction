@@ -2,7 +2,7 @@ use crate::artifacts::artifact_trait::{ArtifactMetaData, ArtifactTrait};
 use crate::artifacts::ArtifactSetName;
 use crate::artifacts::effect_config::ArtifactEffectConfig;
 use super::super::effect::ArtifactEffect;
-use crate::attribute::{Attribute, AttributeName};
+use crate::attribute::*;
 use crate::character::character_common_data::CharacterCommonData;
 
 pub struct MaidenBelovedEffect;

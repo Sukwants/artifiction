@@ -1,4 +1,4 @@
-use crate::attribute::{AttributeName, Attribute};
+use crate::attribute::*;
 use crate::common::{Element, WeaponType};
 use super::super::super::weapon_effect::WeaponEffect;
 use crate::weapon::weapon_common_data::WeaponCommonData;

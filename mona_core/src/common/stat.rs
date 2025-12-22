@@ -38,8 +38,7 @@ impl StatName {
                 attribute.set_value_by(AttributeName::ATKFixed, key, value)
             },
             StatName::ATKPercentage => {
-                let temp = String::from(key);
-                attribute.add_atk_percentage(key, value);
+                attribute.add_atk_percentage_base(key, value);
             },
             StatName::HealingBonus => {
                 attribute.set_value_by(AttributeName::HealingBonus, key, value);
@@ -48,13 +47,13 @@ impl StatName {
                 attribute.set_value_by(AttributeName::HPFixed, key, value);
             },
             StatName::HPPercentage => {
-                attribute.add_hp_percentage(key, value);
+                attribute.add_hp_percentage_base(key, value);
             },
             StatName::DEFFixed => {
                 attribute.set_value_by(AttributeName::DEFFixed, key, value);
             },
             StatName::DEFPercentage => {
-                attribute.add_def_percentage(key, value);
+                attribute.add_def_percentage_base(key, value);
             },
             StatName::CriticalRate => {
                 attribute.set_value_by(AttributeName::CriticalBase, key, value);

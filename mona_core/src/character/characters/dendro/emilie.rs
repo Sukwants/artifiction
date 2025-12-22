@@ -1,5 +1,5 @@
 use crate::{attribute::Attribute, character::macros::damage_enum, common::ChangeAttribute, attribute::AttributeCommon};
-use crate::attribute::AttributeName;
+use crate::attribute::*;
 use crate::character::{CharacterConfig, CharacterName, CharacterStaticData};
 use crate::character::character_common_data::CharacterCommonData;
 use crate::character::character_sub_stat::CharacterSubStatFamily;

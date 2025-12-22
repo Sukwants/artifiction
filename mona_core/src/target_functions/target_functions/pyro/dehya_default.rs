@@ -1,7 +1,7 @@
 use crate::artifacts::{Artifact, ArtifactSetName};
 use crate::artifacts::effect_config::{ArtifactEffectConfig, ArtifactEffectConfigBuilder, ConfigArchaicPetra, ConfigLevel, ConfigRate};
-use crate::attribute::{AttributeCommon, SimpleAttributeGraph2};
-use crate::attribute::attribute_name::AttributeName;
+use crate::attribute::*;
+use crate::attribute::*;
 use crate::character::{Character, character_common_data, CharacterName};
 use crate::character::character_common_data::CharacterCommonData;
 use crate::character::characters::Dehya;
@@ -12,10 +12,7 @@ use crate::common::item_config_type::{ItemConfig, ItemConfigType};
 use crate::common::skill_type::SkillType;
 use crate::damage::{DamageContext, SimpleDamageBuilder};
 use crate::enemies::Enemy;
-use crate::target_functions::{TargetFunction, TargetFunctionConfig, TargetFunctionName};
-use crate::target_functions::target_function::TargetFunctionMetaTrait;
-use crate::target_functions::target_function_meta::{TargetFunctionFor, TargetFunctionMeta, TargetFunctionMetaImage};
-use crate::target_functions::target_function_opt_config::TargetFunctionOptConfig;
+use crate::target_functions::*;
 use crate::team::TeamQuantization;
 use crate::weapon::Weapon;
 use crate::weapon::weapon_common_data::WeaponCommonData;
@@ -103,8 +100,8 @@ impl TargetFunction for DehyaDefaultTargetFunction {
             .build()
     }
 
-    fn target(&self, attribute: &SimpleAttributeGraph2, character: &Character<SimpleAttributeGraph2>, _weapon: &Weapon<SimpleAttributeGraph2>, _artifacts: &[&Artifact], enemy: &Enemy) -> f64 {
-        let context: DamageContext<'_, SimpleAttributeGraph2> = DamageContext {
+    fn target(&self, attribute: &TargetFunctionAttributeResultType, character: &Character<TargetFunctionAttributeType>, _weapon: &Weapon<TargetFunctionAttributeType>, _artifacts: &[&Artifact], enemy: &Enemy) -> f64 {
+        let context: DamageContext<'_, TargetFunctionAttributeResultType> = DamageContext {
             character_common_data: &character.common_data,
             attribute,
             enemy,

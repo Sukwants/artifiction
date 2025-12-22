@@ -1,7 +1,5 @@
-use super::target_function_config::TargetFunctionConfig;
-use super::target_function::TargetFunction;
-use super::target_function_name::TargetFunctionName;
-use crate::attribute::{Attribute, SimpleAttributeGraph2};
+use crate::target_functions::*;
+use crate::attribute::*;
 use crate::character::Character;
 use crate::weapon::Weapon;
 
@@ -25,8 +23,8 @@ pub use dendro::*;
 
 pub fn get_target_function(
     name: TargetFunctionName,
-    character: &Character<SimpleAttributeGraph2>,
-    weapon: &Weapon<SimpleAttributeGraph2>,
+    character: &Character<TargetFunctionAttributeType>,
+    weapon: &Weapon<TargetFunctionAttributeType>,
     config: &TargetFunctionConfig
 ) -> Box<dyn TargetFunction> {
     name.create(&character.common_data, &weapon.common_data, config)

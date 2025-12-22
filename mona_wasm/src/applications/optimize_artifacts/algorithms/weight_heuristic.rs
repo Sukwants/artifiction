@@ -1,7 +1,7 @@
 use std::collections::HashMap;
 use mona::artifacts::{Artifact, ArtifactList, ArtifactSetName, ArtifactSlotName};
 use mona::artifacts::eff::{ARTIFACT_EFF5, ArtifactEff};
-use mona::attribute::{AttributeUtils, SimpleAttributeGraph2};
+use mona::attribute::*;
 use mona::character::Character;
 use mona::common::StatName;
 use mona::enemies::Enemy;
@@ -30,14 +30,14 @@ pub trait WeightHeuristicAlgorithm {
 // }
 //
 // impl WeightHeuristicAlgorithm for PSOWeightHeuristic {
-//     fn generate_stat(&self, character: &Character<SimpleAttributeGraph2>, weapon: &Weapon<SimpleAttributeGraph2>, target_function: &Box<dyn TargetFunction>, enemy: &Enemy) -> HashMap<StatName, f64> {
+//     fn generate_stat(&self, character: &Character<SimpleAttribute>, weapon: &Weapon<SimpleAttribute>, target_function: &Box<dyn TargetFunction>, enemy: &Enemy) -> HashMap<StatName, f64> {
 //
 //     }
 // }
 
 pub struct NaiveWeightHeuristic<'a> {
-    pub character: &'a Character<SimpleAttributeGraph2>,
-    pub weapon: &'a Weapon<SimpleAttributeGraph2>,
+    pub character: &'a Character<SimpleAttribute>,
+    pub weapon: &'a Weapon<SimpleAttribute>,
 }
 
 impl<'a> WeightHeuristicAlgorithm for NaiveWeightHeuristic<'a> {

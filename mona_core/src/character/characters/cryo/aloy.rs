@@ -1,5 +1,5 @@
 use num_derive::FromPrimitive;
-use crate::attribute::Attribute;
+use crate::attribute::*;
 use crate::character::character_common_data::CharacterCommonData;
 use crate::character::{CharacterConfig, CharacterName, CharacterStaticData};
 use crate::common::{ChangeAttribute, Element, SkillType, StatName, WeaponType};

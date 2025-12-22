@@ -1,4 +1,4 @@
-use crate::attribute::Attribute;
+use crate::attribute::*;
 use crate::character::character_common_data::CharacterCommonData;
 use crate::common::i18n::locale;
 use crate::common::item_config_type::{ItemConfig, ItemConfigType};

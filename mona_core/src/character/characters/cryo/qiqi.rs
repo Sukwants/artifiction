@@ -1,5 +1,5 @@
 use num_derive::FromPrimitive;
-use crate::attribute::Attribute;
+use crate::attribute::*;
 use crate::character::character_common_data::CharacterCommonData;
 use crate::character::character_sub_stat::CharacterSubStatFamily;
 use crate::character::{CharacterConfig, CharacterName, CharacterStaticData};

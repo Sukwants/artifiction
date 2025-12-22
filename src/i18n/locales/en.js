@@ -289,9 +289,9 @@ export default {
         hyperbloom: "HyperBloom",
         burgeon: "Burgeon",
         moonglare: "Mooglare",
-        LunarChargedReaction: "Lunar-Charged",
-        LunarCharged: "Lunar-Charged DMG",
-        LunarBloom: "Lunar-Bloom DMG",
+        lunar_charged_reaction: "Lunar-Charged",
+        lunar_charged: "Lunar-Charged DMG",
+        lunar_bloom: "Lunar-Bloom DMG",
     },
     res: {
         Pyro: "Pyro Res",

@@ -2,7 +2,7 @@ use crate::artifacts::artifact_trait::{ArtifactMetaData, ArtifactTrait};
 use crate::artifacts::ArtifactSetName;
 use crate::artifacts::effect::ArtifactEffect;
 use crate::artifacts::effect_config::ArtifactEffectConfig;
-use crate::attribute::{Attribute, AttributeCommon, AttributeName};
+use crate::attribute::*;
 use crate::character::character_common_data::CharacterCommonData;
 use crate::common::item_config_type::{ItemConfig, ItemConfigType};
 

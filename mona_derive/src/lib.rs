@@ -300,6 +300,7 @@ pub fn derive_character_data(input: TokenStream) -> TokenStream {
 
     let mut rows_meta_data = String::new();
     let mut rows_effect = String::new();
+    let mut rows_change_attribute = String::new();
     let mut rows_damage = String::new();
     let mut rows_tf = String::new();
     let mut rows_skill_map = String::new();
@@ -311,6 +312,7 @@ pub fn derive_character_data(input: TokenStream) -> TokenStream {
     for v in vars.iter() {
         rows_meta_data.push_str(&format!("CharacterName::{n} => crate::character::characters::{n}::STATIC_DATA,\n", n=v));
         rows_effect.push_str(&format!("CharacterName::{n} => crate::character::characters::{n}::new_effect(common_data, config),\n", n=v));
+        rows_change_attribute.push_str(&format!("CharacterName::{n} => crate::character::characters::{n}::change_attribute(attribute, common_data, skill_config),\n", n=v));
         rows_damage.push_str(&format!("CharacterName::{n} => crate::character::characters::{n}::damage_internal::<D>(context, skill_index, skill_config, fumo),\n", n=v));
         rows_tf.push_str(&format!("CharacterName::{n} => crate::character::characters::{n}::get_target_function_by_role(role_index, team, character, weapon),\n", n=v));
         rows_skill_map.push_str(&format!("CharacterName::{n} => crate::character::characters::{n}::SKILL_MAP,\n", n=v));
@@ -331,6 +333,10 @@ pub fn derive_character_data(input: TokenStream) -> TokenStream {
 
             pub fn get_effect<A: Attribute>(&self, common_data: &CharacterCommonData, config: &CharacterConfig) -> Option<Box<dyn ChangeAttribute<A>>> {{
                 match *self {{ {rows_effect} }}
+            }}
+
+            pub fn change_attribute<A: Attribute>(&self, attribute: &mut A, common_data: &CharacterCommonData, skill_config: &CharacterSkillConfig) {{
+                match *self {{ {rows_change_attribute} }}
             }}
 
             pub fn damage<D: DamageBuilder>(context: &DamageContext<'_, D::AttributeType>, skill_index: usize, skill_config: &CharacterSkillConfig, fumo: Option<Element>) -> D::Result {{

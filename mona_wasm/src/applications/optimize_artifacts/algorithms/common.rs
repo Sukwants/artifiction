@@ -3,7 +3,7 @@ use std::collections::{BinaryHeap, HashMap, HashSet};
 use std::hash::{Hash, Hasher};
 use mona::artifacts::{Artifact, ArtifactList, ArtifactSetName};
 use mona::artifacts::effect_config::ArtifactEffectConfig;
-use mona::attribute::{AttributeUtils, SimpleAttributeGraph2, AttributeCommon, Attribute, AttributeName};
+use mona::attribute::*;
 use mona::buffs::Buff;
 use mona::character::Character;
 use mona::common::StatName;
@@ -56,16 +56,16 @@ impl Ord for OptimizationIntermediateResult {
 
 pub struct ValueFunction<'a> {
     pub artifact_effect_config: &'a ArtifactEffectConfig,
-    pub character: &'a Character<SimpleAttributeGraph2>,
-    pub weapon: &'a Weapon<SimpleAttributeGraph2>,
+    pub character: &'a Character<SimpleAttribute>,
+    pub weapon: &'a Weapon<SimpleAttribute>,
     pub target_function: &'a Box<dyn TargetFunction>,
-    pub buffs: &'a [Box<dyn Buff<SimpleAttributeGraph2>>],
+    pub buffs: &'a [Box<dyn Buff<SimpleAttribute>>],
     pub enemy: &'a Enemy,
     pub constraint: &'a ConstraintConfig,
 }
 
 impl<'a> ValueFunction<'a> {
-    pub fn get_attribute(&self, arts: &[&Artifact]) -> SimpleAttributeGraph2 {
+    pub fn get_attribute(&self, arts: &[&Artifact]) -> SimpleAttributeResult {
         let art_list = ArtifactList {
             artifacts: arts,
         };
@@ -79,7 +79,7 @@ impl<'a> ValueFunction<'a> {
         attribute
     }
 
-    pub fn score_attribute(&self, attribute: &SimpleAttributeGraph2, arts: &[&Artifact]) -> f64 {
+    pub fn score_attribute(&self, attribute: &SimpleAttributeResult, arts: &[&Artifact]) -> f64 {
         let score = self.target_function.target(
             &attribute,
             &self.character,
@@ -96,7 +96,7 @@ impl<'a> ValueFunction<'a> {
         self.score_attribute(&attribute, arts)
     }
 
-    pub fn check_attribute_attribute(&self, attribute: &SimpleAttributeGraph2) -> bool {
+    pub fn check_attribute_attribute(&self, attribute: &SimpleAttributeResult) -> bool {
         if attribute.get_atk() < self.constraint.atk_min.unwrap_or(0.0) {
             return false;
         }

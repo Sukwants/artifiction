@@ -1,7 +1,7 @@
 use std::f64::NAN;
 use crate::artifacts::{Artifact, ArtifactSetName};
 use crate::artifacts::effect_config::{ArtifactEffectConfig, ArtifactEffectConfigBuilder, ConfigRate};
-use crate::attribute::{Attribute, AttributeName, SimpleAttributeGraph2};
+use crate::attribute::*;
 use crate::character::{Character, CharacterName};
 use crate::character::character_common_data::CharacterCommonData;
 use crate::character::characters::electro::yae_miko::YaeMiko;
@@ -9,12 +9,10 @@ use crate::character::skill_config::CharacterSkillConfig;
 use crate::character::traits::CharacterTrait;
 use crate::common::item_config_type::{ItemConfig, ItemConfigType};
 use crate::common::StatName;
+use crate::damage::transformative_damage::transformative_damage;
 use crate::damage::{DamageContext, SimpleDamageBuilder};
 use crate::enemies::Enemy;
-use crate::target_functions::target_function::TargetFunctionMetaTrait;
-use crate::target_functions::target_function_meta::{TargetFunctionFor, TargetFunctionMeta, TargetFunctionMetaImage};
-use crate::target_functions::target_function_opt_config::TargetFunctionOptConfig;
-use crate::target_functions::{TargetFunction, TargetFunctionConfig, TargetFunctionName};
+use crate::target_functions::*;
 use crate::team::TeamQuantization;
 use crate::weapon::Weapon;
 use crate::weapon::weapon_common_data::WeaponCommonData;
@@ -73,8 +71,8 @@ impl TargetFunction for YaeMikoDefaultTargetFunction {
             .build()
     }
 
-    fn target(&self, attribute: &SimpleAttributeGraph2, character: &Character<SimpleAttributeGraph2>, _weapon: &Weapon<SimpleAttributeGraph2>, _artifacts: &[&Artifact], enemy: &Enemy) -> f64 {
-        let context: DamageContext<'_, SimpleAttributeGraph2> = DamageContext {
+    fn target(&self, attribute: &TargetFunctionAttributeResultType, character: &Character<TargetFunctionAttributeType>, _weapon: &Weapon<TargetFunctionAttributeType>, _artifacts: &[&Artifact], enemy: &Enemy) -> f64 {
+        let context: DamageContext<'_, TargetFunctionAttributeResultType> = DamageContext {
             character_common_data: &character.common_data,
             attribute,
             enemy,
@@ -103,8 +101,8 @@ impl TargetFunction for YaeMikoDefaultTargetFunction {
 
         let mut dmg_hyperbloom = 0.0;
         if self.hyperbloom_rate > 0.0 {
-            let transformative = context.transformative();
-            dmg_hyperbloom = transformative.hyperbloom;
+            let transformative = transformative_damage::<SimpleDamageBuilder>(character.common_data.level, attribute, enemy);
+            dmg_hyperbloom = transformative.hyperbloom.expectation;
         }
 
         // 一轮12s，12下E伤害、6轮A伤害

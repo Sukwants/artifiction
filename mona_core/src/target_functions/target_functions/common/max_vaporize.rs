@@ -1,6 +1,6 @@
 use crate::artifacts::{Artifact, ArtifactSetName};
 use crate::artifacts::effect_config::ArtifactEffectConfig;
-use crate::attribute::{Attribute, SimpleAttributeGraph2, AttributeCommon, AttributeName};
+use crate::attribute::*;
 use crate::character::Character;
 use crate::character::character_common_data::CharacterCommonData;
 use crate::common::{Element, SkillType, StatName};
@@ -9,10 +9,7 @@ use crate::common::item_config_type::{ItemConfig, ItemConfigType};
 use crate::damage::damage_builder::DamageBuilder;
 use crate::damage::SimpleDamageBuilder;
 use crate::enemies::Enemy;
-use crate::target_functions::target_function::TargetFunctionMetaTrait;
-use crate::target_functions::target_function_meta::{TargetFunctionFor, TargetFunctionMeta, TargetFunctionMetaImage};
-use crate::target_functions::{TargetFunction, TargetFunctionConfig, TargetFunctionName};
-use crate::target_functions::target_function_opt_config::TargetFunctionOptConfig;
+use crate::target_functions::*;
 use crate::team::TeamQuantization;
 use crate::weapon::Weapon;
 use crate::weapon::weapon_common_data::WeaponCommonData;
@@ -131,7 +128,7 @@ impl TargetFunction for MaxVaporizeTargetFunction {
         Default::default()
     }
 
-    fn target(&self, attribute: &SimpleAttributeGraph2, _character: &Character<SimpleAttributeGraph2>, _weapon: &Weapon<SimpleAttributeGraph2>, _artifacts: &[&Artifact], enemy: &Enemy) -> f64 {
+    fn target(&self, attribute: &TargetFunctionAttributeResultType, _character: &Character<TargetFunctionAttributeType>, _weapon: &Weapon<TargetFunctionAttributeType>, _artifacts: &[&Artifact], enemy: &Enemy) -> f64 {
         let element = if self.t == 0 {
             Element::Pyro
         } else {

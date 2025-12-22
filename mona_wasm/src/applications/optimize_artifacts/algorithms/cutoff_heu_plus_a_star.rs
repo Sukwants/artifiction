@@ -3,7 +3,7 @@ use crate::applications::optimize_artifacts::algorithms::cutoff_a_star::AStarCut
 use crate::applications::optimize_artifacts::inter::{ConstraintConfig, OptimizationResult};
 use mona::artifacts::Artifact;
 use mona::artifacts::effect_config::ArtifactEffectConfig;
-use mona::attribute::SimpleAttributeGraph2;
+use mona::attribute::*;
 use mona::buffs::Buff;
 use mona::character::Character;
 use mona::enemies::Enemy;
@@ -15,7 +15,7 @@ pub struct CutoffHeuristicPlusAStar;
 
 
 impl SingleOptimizeAlgorithm for CutoffHeuristicPlusAStar {
-    fn optimize(&self, artifacts: &[&Artifact], artifact_config: Option<ArtifactEffectConfig>, character: &Character<SimpleAttributeGraph2>, weapon: &Weapon<SimpleAttributeGraph2>, target_function: &Box<dyn TargetFunction>, enemy: &Enemy, buffs: &[Box<dyn Buff<SimpleAttributeGraph2>>], constraint: &ConstraintConfig, count: usize) -> Vec<OptimizationResult> {
+    fn optimize(&self, artifacts: &[&Artifact], artifact_config: Option<ArtifactEffectConfig>, character: &Character<SimpleAttribute>, weapon: &Weapon<SimpleAttribute>, target_function: &Box<dyn TargetFunction>, enemy: &Enemy, buffs: &[Box<dyn Buff<SimpleAttribute>>], constraint: &ConstraintConfig, count: usize) -> Vec<OptimizationResult> {
         let target_function_opt_config = target_function.get_target_function_opt_config();
 
         let artifacts_vec: Vec<&Artifact> = artifacts.iter().cloned().collect();

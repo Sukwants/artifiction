@@ -8,7 +8,7 @@ use crate::applications::team_optimize::hyper_param::TeamOptimizeHyperParam;
 use crate::applications::team_optimize::inter::{OptimizeTeamInterface2, OptimizeTeamObject, OptimizeTeamResult, OptimizeTeamResultEntry, TeamInterface};
 use crate::applications::team_optimize::team_optimize::{optimize_team_multi_single};
 use mona::artifacts::{Artifact, ArtifactSlotName};
-use mona::attribute::SimpleAttributeGraph2;
+use mona::attribute::*;
 use mona::buffs::Buff;
 use mona::character::Character;
 use mona::character::characters::get_target_function_by_role;

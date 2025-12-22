@@ -27,6 +27,10 @@
 <script>
 import {useI18n} from "@/i18n/i18n";
 
+function toSnake(str) {
+    return str.replace(/([a-z0-9])([A-Z])/g, "$1_$2").toLowerCase();
+}
+
 export default {
     name: "DamageList",
     props: {
@@ -35,41 +39,6 @@ export default {
     computed: {
         element() {
             return this.analysisFromWasm.element
-        },
-
-        normalDamageTitle() {
-            // if (this.analysisFromWasm.is_heal) {
-            //     return "治疗"
-            // } else {
-            //     const map = {
-            //         "Pyro": "火元素伤害",
-            //         "Hydro": "水元素伤害",
-            //         "Electro": "雷元素伤害",
-            //         "Cryo": "冰元素伤害",
-            //         "Dendro": "草元素伤害",
-            //         "Geo": "岩元素伤害",
-            //         "Anemo": "风元素伤害",
-            //         "Physical": "物理伤害",
-            //     }
-            //     return map[this.element]
-            // }
-
-            if (this.analysisFromWasm.is_heal) {
-                return this.t("dmg.heal")
-            } else if (this.analysisFromWasm.is_shield) {
-                return this.t("dmg.shield")
-            } else if (this.analysisFromWasm.lunar_type !== "None") {
-                return this.t(`dmg.${this.analysisFromWasm.lunar_type}`)
-                // if (this.analysisFromWasm.lunar_type == "LunarChargedReaction") {
-                //     return this.t(`dmg.lunarChargedReaction`)
-                // } else if (this.analysisFromWasm.lunar_type == "LunarCharged") {
-                //     return this.t(`dmg.lunarCharged`)
-                // } else if (this.analysisFromWasm.lunar_type == "LunarBloom") {
-                //     return this.t(`dmg.lunarBloom`)
-                // }
-            } else {
-                return this.t("dmg", this.element)
-            }
         },
 
         tableData() {
@@ -81,48 +50,39 @@ export default {
 
             const r = (x) => Math.round(x)
 
-            const push = (name, title) => {
+            const push = (result, title) => {
                 temp.push({
-                    expectation: r(this.analysisFromWasm[name]?.expectation) ?? NO_DATA,
-                    critical: r(this.analysisFromWasm[name]?.critical) ?? NO_DATA,
-                    nonCritical: r(this.analysisFromWasm[name]?.non_critical) ?? NO_DATA,
+                    expectation: r(result?.expectation) ?? NO_DATA,
+                    critical: r(result?.critical) ?? NO_DATA,
+                    nonCritical: r(result?.non_critical) ?? NO_DATA,
                     name: title,
                 })
             }
 
-            // temp.push({
-            //     expectation: r(this.analysisFromWasm.normal?.expectation) ?? NO_DATA,
-            //     critical: r(this.analysisFromWasm.normal?.critical) ?? NO_DATA,
-            //     nonCritical: r(this.analysisFromWasm.normal?.non_critical) ?? NO_DATA,
-            //     name: this.normalDamageTitle
-            //     // name: t("dmg", this.element)
-            // })
+            if (this.analysisFromWasm.Heal != undefined) {
+                push(this.analysisFromWasm.Heal.result, this.t("dmg.heal"))
+            } else if (this.analysisFromWasm.Shield != undefined) {
+                push(this.analysisFromWasm.Shield.result, this.t("dmg.shield"))
+            } else if (this.analysisFromWasm.TransformativeDamage != undefined) {
+                push(this.analysisFromWasm.TransformativeDamage.result, this.t(`dmg.${toSnake(this.analysisFromWasm.TransformativeDamage.transformative_type)}`))
+            } else if (this.analysisFromWasm.MoonglareDamage != undefined) {
+                push(this.analysisFromWasm.MoonglareDamage.result, this.t(`dmg.${toSnake(this.analysisFromWasm.MoonglareDamage.lunar_type)}`))
+            } else {
 
-            push("normal", this.normalDamageTitle)
+                push(this.analysisFromWasm.Damage.normal.result, this.t(`dmg.${this.analysisFromWasm.Damage.normal.element}`))
 
-            if (this.analysisFromWasm.melt) {
-                push("melt", this.t("dmg.melt"))
-                // temp.push({
-                //     expectation: r(this.analysisFromWasm.melt?.expectation) ?? NO_DATA,
-                //     critical: r(this.analysisFromWasm.melt?.critical) ?? NO_DATA,
-                //     nonCritical: r(this.analysisFromWasm.melt?.non_critical) ?? NO_DATA,
-                //     name: this.t("dmg.melt")
-                // })
-            }
-            if (this.analysisFromWasm.vaporize) {
-                push("vaporize", this.t("dmg.vaporize"))
-                // temp.push({
-                //     expectation: r(this.analysisFromWasm.vaporize?.expectation) ?? NO_DATA,
-                //     critical: r(this.analysisFromWasm.vaporize?.critical) ?? NO_DATA,
-                //     nonCritical: r(this.analysisFromWasm.vaporize?.non_critical) ?? NO_DATA,
-                //     name: this.t("dmg.vaporize")
-                // })
-            }
-            if (this.analysisFromWasm.spread) {
-                push("spread", this.t("dmg.spread"))
-            }
-            if (this.analysisFromWasm.aggravate) {
-                push("aggravate", this.t("dmg.aggravate"))
+                if (this.analysisFromWasm.Damage.melt) {
+                    push(this.analysisFromWasm.Damage.melt.result, this.t("dmg.melt"))
+                }
+                if (this.analysisFromWasm.Damage.vaporize) {
+                    push(this.analysisFromWasm.Damage.vaporize.result, this.t("dmg.vaporize"))
+                }
+                if (this.analysisFromWasm.Damage.spread) {
+                    push(this.analysisFromWasm.Damage.spread.result, this.t("dmg.spread"))
+                }
+                if (this.analysisFromWasm.Damage.aggravate) {
+                    push(this.analysisFromWasm.Damage.aggravate.result, this.t("dmg.aggravate"))
+                }
             }
 
             return temp

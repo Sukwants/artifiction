@@ -1,16 +1,13 @@
 use crate::artifacts::{Artifact, ArtifactSetName};
 use crate::artifacts::effect_config::ArtifactEffectConfig;
-use crate::attribute::{Attribute, AttributeName, SimpleAttributeGraph2, AttributeCommon};
+use crate::attribute::*;
 use crate::character::{Character, CharacterName};
 use crate::character::character_common_data::CharacterCommonData;
 use crate::common::i18n::locale;
 use crate::common::item_config_type::{ItemConfig, ItemConfigType};
 use crate::common::StatName;
 use crate::enemies::Enemy;
-use crate::target_functions::target_function_meta::{TargetFunctionFor, TargetFunctionMeta, TargetFunctionMetaImage};
-use crate::target_functions::target_function_opt_config::TargetFunctionOptConfig;
-use crate::target_functions::{TargetFunction, TargetFunctionConfig, TargetFunctionName};
-use crate::target_functions::target_function::TargetFunctionMetaTrait;
+use crate::target_functions::*;
 use crate::team::TeamQuantization;
 use crate::weapon::Weapon;
 use crate::weapon::weapon_common_data::WeaponCommonData;
@@ -108,7 +105,7 @@ impl TargetFunction for KaedeharaKazuhaDefaultTargetFunction {
         Default::default()
     }
 
-    fn target(&self, attribute: &SimpleAttributeGraph2, _character: &Character<SimpleAttributeGraph2>, _weapon: &Weapon<SimpleAttributeGraph2>, artifacts: &[&Artifact], _enemy: &Enemy) -> f64 {
+    fn target(&self, attribute: &TargetFunctionAttributeResultType, _character: &Character<TargetFunctionAttributeType>, _weapon: &Weapon<TargetFunctionAttributeType>, artifacts: &[&Artifact], _enemy: &Enemy) -> f64 {
         let mut vv_count = 0;
         for artifact in artifacts.iter() {
             if artifact.set_name == ArtifactSetName::ViridescentVenerer {
