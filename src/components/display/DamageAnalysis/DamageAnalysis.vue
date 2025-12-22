@@ -230,6 +230,10 @@ function sum(arr) {
     return s
 }
 
+function min(a, b) {
+    return a < b ? a : b
+}
+
 export default {
     name: "DamageAnalysis",
     components: {
@@ -338,7 +342,7 @@ export default {
             let damage = base_damage
                 * (1 + sum(result.bonus))
                 * result.reaction_coefficient * (1 + sum(result.reaction_enhance))
-                * (1 + sum(result.critical_rate) * sum(result.critical_damage))
+                * (1 + min(sum(result.critical_rate), 1.0) * sum(result.critical_damage))
                 * this.resRatio(result)
                 * this.defMultiplier(result)
 
@@ -351,7 +355,7 @@ export default {
             let damage = (base_damage
                 * result.reaction_coefficient * (1 + sum(result.reaction_enhance))
                 + sum(result.reaction_extra))
-                * (1 + sum(result.critical_rate) * sum(result.critical_damage))
+                * (1 + min(sum(result.critical_rate), 1.0) * sum(result.critical_damage))
                 * this.resRatio(result)
 
             return damage
@@ -370,7 +374,7 @@ export default {
                 * (1 + sum(result.moonglare_elevate))
                 * result.reaction_coefficient * (1 + sum(result.reaction_enhance))
                 + sum(result.reaction_extra))
-                * (1 + sum(result.critical_rate) * sum(result.critical_damage))
+                * (1 + min(sum(result.critical_rate), 1.0) * sum(result.critical_damage))
                 * this.resRatio(result)
 
             return damage
@@ -386,7 +390,7 @@ export default {
             heal = heal
                 * (1 + sum(result.heal_bonus))
                 * (1 + sum(result.incoming_healing_bonus))
-                * (1 + sum(result.critical_rate) * sum(result.critical_damage))
+                * (1 + min(sum(result.critical_rate), 1.0) * sum(result.critical_damage))
 
             return heal
         },
