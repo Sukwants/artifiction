@@ -5,7 +5,7 @@ use crate::character::{CharacterConfig, CharacterName, CharacterStaticData};
 use crate::character::skill_config::CharacterSkillConfig;
 use crate::character::traits::{CharacterSkillMap, CharacterSkillMapItem, CharacterTrait};
 use crate::character::macros::{damage_enum, skill_map};
-use crate::common::{ChangeAttribute, Element, MoonglareReaction, Moonsign, SkillType, WeaponType};
+use crate::common::{ChangeAttribute, Element, MoonglareReaction, Moonsign, ReactionType, SkillType, WeaponType};
 use crate::common::i18n::{locale, hit_n_dmg, plunging_dmg, charged_dmg};
 use crate::common::item_config_type::{ItemConfig, ItemConfigType};
 use crate::damage::damage_builder::DamageBuilder;
@@ -159,7 +159,12 @@ impl<A: Attribute> ChangeAttribute<A> for FlinsEffect {
         }
 
         if self.has_c6 {
-            attribute.set_value_by(AttributeName::IncreaseLunarCharged, "菲林斯命座：歌与亡者之舞", if self.moonsign.is_ascendant() { 0.45 } else { 0.35 });
+            attribute.set_value_by_t(AttributeType::Invisible(InvisibleAttributeType::new(
+                AttributeVariableType::MoonglareElevate,
+                None,
+                None,
+                Some(ReactionType::LunarCharged),
+            )), "菲林斯命座：歌与亡者之舞", if self.moonsign.is_ascendant() { 0.45 } else { 0.35 });
         }
     }
 }

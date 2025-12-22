@@ -213,7 +213,12 @@ impl<A: Attribute> ChangeAttribute<A> for LaumaEffect {
         }
 
         if self.has_c6 && self.moonsign.is_ascendant() {
-            attribute.set_value_by(AttributeName::IncreaseLunarBloom, "六命擢升", 0.25);
+            attribute.set_value_by_t(AttributeType::Invisible(InvisibleAttributeType::new(
+                AttributeVariableType::MoonglareElevate,
+                None,
+                None,
+                Some(ReactionType::LunarBloom),
+            )), "六命擢升", 0.25);
         }
     }
 }

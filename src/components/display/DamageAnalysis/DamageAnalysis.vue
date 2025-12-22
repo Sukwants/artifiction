@@ -168,6 +168,15 @@
                 ></damage-analysis-util>
             </div>
         </div>
+        <div v-if="this.damageType == 'MoonglareDamage'">
+            <div class="big-title critical-region">擢升</div>
+            <div class="header-row">
+                <damage-analysis-util
+                    :arr="result.moonglare_elevate"
+                    title="月曜反应擢升"
+                ></damage-analysis-util>
+            </div>
+        </div>
     </div>
 
     <div v-if="this.damageType == 'None'" style="font-size: 16px; color: gray; text-align: center; margin-top: 100px; min-height: 200px;">
@@ -339,8 +348,9 @@ export default {
         calc_TransformativeDamage(result) {
             let base_damage = result.reaction_base
             
-            let damage = base_damage
-                * reaction_coefficient * (1 + sum(result.reaction_enhance))
+            let damage = (base_damage
+                * result.reaction_coefficient * (1 + sum(result.reaction_enhance))
+                + sum(result.reaction_extra))
                 * (1 + sum(result.critical_rate) * sum(result.critical_damage))
                 * this.resRatio(result)
 
@@ -355,10 +365,11 @@ export default {
                 + sum(result.base)
                 + result.reaction_base;
 
-            let damage = base_damage
+            let damage = (base_damage
                 * (1 + sum(result.moonglare_base))
                 * (1 + sum(result.moonglare_elevate))
                 * result.reaction_coefficient * (1 + sum(result.reaction_enhance))
+                + sum(result.reaction_extra))
                 * (1 + sum(result.critical_rate) * sum(result.critical_damage))
                 * this.resRatio(result)
 
