@@ -1,7 +1,6 @@
 use crate::artifacts::{Artifact, ArtifactSetName};
 use crate::artifacts::effect_config::{ArtifactEffectConfig, ArtifactEffectConfigBuilder, ConfigArchaicPetra, ConfigLevel, ConfigRate};
 use crate::attribute::*;
-use crate::attribute::*;
 use crate::character::{Character, character_common_data, CharacterName};
 use crate::character::character_common_data::CharacterCommonData;
 use crate::character::characters::Dehya;
