@@ -817,7 +817,8 @@ impl ComplicatedDamageBuilder {
     }
 
     fn get_atk_composition(&self, attribute: &AttributeTy) -> EntryType {
-        let mut atk_comp = attribute.get_result(AttributeName::ATK);
+        let mut atk_comp =
+            attribute.get_result_merge(&vec![AttributeName::ATKBase, AttributeName::ATKPercentage, AttributeName::ATKFixed]);
         atk_comp.merge(&self.extra_atk);
 
         atk_comp
@@ -838,7 +839,11 @@ impl ComplicatedDamageBuilder {
     }
 
     fn get_def_composition(&self, attribute: &AttributeTy) -> EntryType {
-        let mut def_comp = attribute.get_result(AttributeName::DEF);
+        let mut def_comp = attribute.get_result_merge(&vec![
+            AttributeName::DEFBase,
+            AttributeName::DEFPercentage,
+            AttributeName::DEFFixed
+        ]);
         def_comp.merge(&self.extra_def);
 
         def_comp
@@ -859,7 +864,11 @@ impl ComplicatedDamageBuilder {
     }
 
     fn get_hp_composition(&self, attribute: &AttributeTy) -> EntryType {
-        let mut hp_comp = attribute.get_result(AttributeName::HP);
+        let mut hp_comp = attribute.get_result_merge(&vec![
+            AttributeName::HPBase,
+            AttributeName::HPPercentage,
+            AttributeName::HPFixed
+        ]);
         hp_comp.merge(&self.extra_hp);
 
         hp_comp

@@ -1,6 +1,7 @@
 use std::cell::RefCell;
 use std::collections::{BTreeMap, HashMap};
 use rand::Rng;
+use crate::attribute::SimpleAttribute;
 use crate::character::team_status::CharacterStatus;
 use crate::common::{Element, EntryType, SkillType};
 use crate::damage::SimpleDamageBuilder;
@@ -150,18 +151,41 @@ impl SimpleAttributeGraph2 {
         let mut result = self.nodes.clone();
         let mut temp = self.nodes.clone();
 
+        let solve_edge = |
+            edge: &Edge,
+            nodes_old: &SimpleAttributeGraphResult,
+            nodes_new: &mut SimpleAttributeGraphResult,
+            c: f64,
+        | {
+            let from1_value = nodes_old.get_attribute_value(edge.from1);
+            let from2_value = nodes_old.get_attribute_value(edge.from2);
+            let value = (edge.func)(from1_value, from2_value) * c;
+            *nodes_new.get_attribute_mut(edge.to) += value;
+        };
+
         let mut edge_lists = BTreeMap::new();
+        let mut edge_static = Vec::new();
         for edge in self.edges.iter() {
+            if edge.priority == EdgePriority::Static {
+                edge_static.push(edge);
+                continue;
+            }
             edge_lists.entry(edge.priority as usize).or_insert(Vec::new()).push(edge);
         }
-        for list in edge_lists.values() {
-            for edge in list.iter() {
-                let from1_value = result.get_attribute_value(edge.from1);
-                let from2_value = result.get_attribute_value(edge.from2);
-                let value = (edge.func)(from1_value, from2_value);
-                *temp.get_attribute_mut(edge.to) += value;
-            }
 
+        for edge in edge_static.iter() {
+            solve_edge(edge, &result, &mut temp, 1.0);
+        }
+        result = temp.clone();
+
+        for list in edge_lists.values() {
+            for edge in edge_static.iter() {
+                solve_edge(edge, &result, &mut temp, -1.0);
+            }
+            result = temp.clone();
+            for edge in edge_static.iter() {
+                solve_edge(edge, &result, &mut temp, 1.0);
+            }
             result = temp.clone();
         }
 

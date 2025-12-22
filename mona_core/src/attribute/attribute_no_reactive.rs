@@ -48,15 +48,21 @@ impl From<&AttributeResultWithCharacter<ComplicatedAttributeGraphResult>> for At
         let mut attribute = AttributeNoReactive::new();
 
         attribute.atk = attribute_result.get_result_merge(&vec![
-            AttributeName::ATK,
+            AttributeName::ATKBase,
+            AttributeName::ATKPercentage,
+            AttributeName::ATKFixed
         ]).0;
 
         attribute.def = attribute_result.get_result_merge(&vec![
-            AttributeName::DEF,
+            AttributeName::DEFBase,
+            AttributeName::DEFPercentage,
+            AttributeName::DEFFixed
         ]).0;
 
         attribute.hp = attribute_result.get_result_merge(&vec![
-            AttributeName::HP,
+            AttributeName::HPBase,
+            AttributeName::HPPercentage,
+            AttributeName::HPFixed
         ]).0;
 
         attribute.healing_bonus = attribute_result.get_result(AttributeName::HealingBonus).0;

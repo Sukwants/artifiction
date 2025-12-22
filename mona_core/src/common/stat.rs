@@ -35,7 +35,7 @@ impl StatName {
     pub fn apply<T: Attribute>(&self, attribute: &mut T, key: &str, value: f64) {
         match *self {
             StatName::ATKFixed => {
-                attribute.set_value_by(AttributeName::ATK, key, value)
+                attribute.set_value_by(AttributeName::ATKFixed, key, value)
             },
             StatName::ATKPercentage => {
                 attribute.add_atk_percentage_base(key, value);
@@ -44,13 +44,13 @@ impl StatName {
                 attribute.set_value_by(AttributeName::HealingBonus, key, value);
             },
             StatName::HPFixed => {
-                attribute.set_value_by(AttributeName::HP, key, value);
+                attribute.set_value_by(AttributeName::HPFixed, key, value);
             },
             StatName::HPPercentage => {
                 attribute.add_hp_percentage_base(key, value);
             },
             StatName::DEFFixed => {
-                attribute.set_value_by(AttributeName::DEF, key, value);
+                attribute.set_value_by(AttributeName::DEFFixed, key, value);
             },
             StatName::DEFPercentage => {
                 attribute.add_def_percentage_base(key, value);

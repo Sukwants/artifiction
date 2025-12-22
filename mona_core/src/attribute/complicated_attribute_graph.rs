@@ -200,23 +200,44 @@ impl ComplicatedAttributeGraph {
         let mut result = self.nodes.clone();
         let mut temp = self.nodes.clone();
 
-        use crate::utils;
-        utils::log!("solve");
+        let solve_edge = |
+            edge: &Edge,
+            nodes_old: &ComplicatedAttributeGraphResult,
+            nodes_new: &mut ComplicatedAttributeGraphResult,
+            c: f64,
+        | {
+            let from1_value = nodes_old.get_attribute_value(edge.from1);
+            let from2_value = nodes_old.get_attribute_value(edge.from2);
+            let value = (edge.func)(from1_value, from2_value) * c;
+            nodes_new.get_attribute_mut(edge.to).set_value_by(&edge.key, value);
+        };
 
         let mut edge_lists = BTreeMap::new();
+        let mut edge_static = Vec::new();
         for edge in self.edges.iter() {
+            if edge.priority == EdgePriority::Static {
+                edge_static.push(edge);
+                continue;
+            }
             edge_lists.entry(edge.priority as usize).or_insert(Vec::new()).push(edge);
         }
-        for list in edge_lists.values() {
-            utils::log!("list {:?}", result.get_attribute_value(AttributeNode::new_panel(0, crate::attribute::AttributeName::ATK)));
-            for edge in list.iter() {
-                let from1_value = result.get_attribute_value(edge.from1);
-                let from2_value = result.get_attribute_value(edge.from2);
-                let value = (edge.func)(from1_value, from2_value);
-                utils::log!("{:?} {:?} {:?} {:?}", edge.key, edge.priority, from1_value, value);
-                temp.get_attribute_mut(edge.to).set_value_by(&edge.key, value);
-            }
 
+        for edge in edge_static.iter() {
+            solve_edge(edge, &result, &mut temp, 1.0);
+        }
+        result = temp.clone();
+
+        for list in edge_lists.values() {
+            for edge in list.iter() {
+                solve_edge(edge, &result, &mut temp, 1.0);
+            }
+            for edge in edge_static.iter() {
+                solve_edge(edge, &result, &mut temp, -1.0);
+            }
+            result = temp.clone();
+            for edge in edge_static.iter() {
+                solve_edge(edge, &result, &mut temp, 1.0);
+            }
             result = temp.clone();
         }
 

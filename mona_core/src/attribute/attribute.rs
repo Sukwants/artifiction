@@ -88,6 +88,7 @@ pub type EdgeFunction = Arc<dyn Fn(f64, f64) -> f64>;
 
 #[derive(Hash, Eq, PartialEq, Clone, Copy, Debug)]
 pub enum EdgePriority {
+    Static,
     Base,
     Common,
     Special,
@@ -364,7 +365,7 @@ impl<T: Attribute> AttributeCommon<T> for T {
                 AttributeNode::new_panel(character.character_id, AttributeName::ATK),
                 Arc::new(|x1, _x2| x1),
                 "atk_base",
-                EdgePriority::Base,
+                EdgePriority::Static,
             );
             temp.add_edge(
                 AttributeNode::new_panel(character.character_id, AttributeName::ATKPercentage),
@@ -372,7 +373,7 @@ impl<T: Attribute> AttributeCommon<T> for T {
                 AttributeNode::new_panel(character.character_id, AttributeName::ATK),
                 Arc::new(|x1, _x2| x1),
                 "atk_percentage",
-                EdgePriority::Last,
+                EdgePriority::Static,
             );
             temp.add_edge(
                 AttributeNode::new_panel(character.character_id, AttributeName::ATKFixed),
@@ -380,7 +381,7 @@ impl<T: Attribute> AttributeCommon<T> for T {
                 AttributeNode::new_panel(character.character_id, AttributeName::ATK),
                 Arc::new(|x1, _x2| x1),
                 "atk_fixed",
-                EdgePriority::Last,
+                EdgePriority::Static,
             );
 
             temp.add_edge(
@@ -389,7 +390,7 @@ impl<T: Attribute> AttributeCommon<T> for T {
                 AttributeNode::new_panel(character.character_id, AttributeName::HP),
                 Arc::new(|x1, _x2| x1),
                 "hp_base",
-                EdgePriority::Base,
+                EdgePriority::Static,
             );
             temp.add_edge(
                 AttributeNode::new_panel(character.character_id, AttributeName::HPPercentage),
@@ -397,7 +398,7 @@ impl<T: Attribute> AttributeCommon<T> for T {
                 AttributeNode::new_panel(character.character_id, AttributeName::HP),
                 Arc::new(|x1, _x2| x1),
                 "hp_percentage",
-                EdgePriority::Last,
+                EdgePriority::Static,
             );
             temp.add_edge(
                 AttributeNode::new_panel(character.character_id, AttributeName::HPFixed),
@@ -405,7 +406,7 @@ impl<T: Attribute> AttributeCommon<T> for T {
                 AttributeNode::new_panel(character.character_id, AttributeName::HP),
                 Arc::new(|x1, _x2| x1),
                 "hp_fixed",
-                EdgePriority::Last,
+                EdgePriority::Static,
             );
 
             temp.add_edge(
@@ -414,7 +415,7 @@ impl<T: Attribute> AttributeCommon<T> for T {
                 AttributeNode::new_panel(character.character_id, AttributeName::DEF),
                 Arc::new(|x1, _x2| x1),
                 "def_base",
-                EdgePriority::Base,
+                EdgePriority::Static,
             );
             temp.add_edge(
                 AttributeNode::new_panel(character.character_id, AttributeName::DEFPercentage),
@@ -422,7 +423,7 @@ impl<T: Attribute> AttributeCommon<T> for T {
                 AttributeNode::new_panel(character.character_id, AttributeName::DEF),
                 Arc::new(|x1, _x2| x1),
                 "def_percentage",
-                EdgePriority::Last,
+                EdgePriority::Static,
             );
             temp.add_edge(
                 AttributeNode::new_panel(character.character_id, AttributeName::DEFFixed),
@@ -430,7 +431,7 @@ impl<T: Attribute> AttributeCommon<T> for T {
                 AttributeNode::new_panel(character.character_id, AttributeName::DEF),
                 Arc::new(|x1, _x2| x1),
                 "def_fixed",
-                EdgePriority::Last,
+                EdgePriority::Static,
             );
 
             temp.set_value_by_internal(AttributeNode::new_panel(character.character_id, AttributeName::CriticalBase), "初始值", 0.05);
@@ -691,7 +692,7 @@ impl<T: Attribute> AttributeCommon<T> for T {
     fn add_atk_percentage_base(&mut self, key: &str, value: f64) {
         self.add_edge_n1(
             AttributeName::ATKBase,
-            AttributeName::ATK,
+            AttributeName::ATKPercentage,
             Arc::new(move |x, _| x * value),
             key,
             EdgePriority::Base,
@@ -711,7 +712,7 @@ impl<T: Attribute> AttributeCommon<T> for T {
     fn add_def_percentage_base(&mut self, key: &str, value: f64) {
         self.add_edge_n1(
             AttributeName::DEFBase,
-            AttributeName::DEF,
+            AttributeName::DEFPercentage,
             Arc::new(move |x, _| x * value),
             key,
             EdgePriority::Base,
@@ -731,7 +732,7 @@ impl<T: Attribute> AttributeCommon<T> for T {
     fn add_hp_percentage_base(&mut self, key: &str, value: f64) {
         self.add_edge_n1(
             AttributeName::HPBase,
-            AttributeName::HP,
+            AttributeName::HPPercentage,
             Arc::new(move |x, _| x * value),
             key,
             EdgePriority::Base,
