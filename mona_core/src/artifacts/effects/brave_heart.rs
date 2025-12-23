@@ -1,4 +1,3 @@
-use serde::__private::de::IdentifierDeserializer;
 use crate::artifacts::artifact_trait::{ArtifactMetaData, ArtifactTrait};
 use crate::artifacts::ArtifactSetName;
 use super::super::effect::ArtifactEffect;

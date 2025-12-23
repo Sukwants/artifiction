@@ -7,7 +7,7 @@ pub struct MonaParser;
 
 pub type MonaRule = Rule;
 
-pub fn parse_to_cst(source: &str) -> Pair<MonaRule> {
+pub fn parse_to_cst(source: &str) -> Pair<'_, MonaRule> {
     // MonaParser::parse(MonaRule::expression, source).expect("cannot parse source").next().unwrap()
     MonaParser::parse(MonaRule::program, source).expect("cannot parse source").next().unwrap()
 }

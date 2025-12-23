@@ -51,14 +51,14 @@ fn expectation_helper(
                         ARTIFACT_EFF4.get_value(stat.0, i)
                     };
                     unsafe {
-                        (*artifact).sub_stats[index].1 += delta_value;
+                        (&mut (*artifact).sub_stats)[index].1 += delta_value;
                         (*artifact).level += delta_level;
                     }
 
                     result += expectation_helper(artifact, &pf, &effective_stat_names) * 0.0625;
 
                     unsafe {
-                        (*artifact).sub_stats[index].1 = old_value;
+                        (&mut (*artifact).sub_stats)[index].1 = old_value;
                         (*artifact).level = old_level;
                     }
                 }

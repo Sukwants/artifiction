@@ -1,6 +1,5 @@
 use std::cmp::{Ordering, Reverse};
 use std::collections::{BinaryHeap, HashMap};
-use serde::__private::ser::constrain;
 use mona::attribute::{Attribute, AttributeCommon, AttributeName, AttributeUtils};
 use crate::applications::optimize_artifacts::algorithm::SingleOptimizeAlgorithm;
 use crate::applications::optimize_artifacts::inter::{ConstraintConfig, ConstraintSetMode, OptimizationResult};
