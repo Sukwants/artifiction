@@ -93,6 +93,10 @@
                         <el-icon><i-ep-aim /></el-icon>
                         {{ t("nav.exportTool") }}
                     </el-menu-item>
+                    <el-menu-item index="/help/instruction">
+                        <el-icon><i-ep-notebook /></el-icon>
+                        {{ t("nav.instruction") }}
+                    </el-menu-item>
                 </el-sub-menu>
 
                 <el-menu-item index="/tomodachi">

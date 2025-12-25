@@ -1,6 +1,6 @@
 use mona::artifacts::{Artifact, ArtifactList};
 use mona::artifacts::effect_config::ArtifactEffectConfig;
-use mona::attribute::{AttributeUtils, SimpleAttributeGraph2};
+use mona::attribute::*;
 use mona::buffs::Buff;
 use mona_dsl::common::UnsafeDamageContext;
 use mona_dsl::compile_source_to_code_object;
@@ -57,9 +57,9 @@ impl DSLInterface {
         let artifacts: Vec<Artifact> = serde_wasm_bindgen::from_value(artifacts).unwrap();
 
         // get all items
-        let character = damage_env.character.to_character();
+        let character = damage_env.character.to_character::<SimpleAttribute>();
         let weapon = damage_env.weapon.to_weapon(&character);
-        let buffs: Vec<Box<dyn Buff<SimpleAttributeGraph2>>> = damage_env.buffs.iter().map(|x| x.to_buff()).collect();
+        let buffs: Vec<Box<dyn Buff<SimpleAttribute>>> = damage_env.buffs.iter().map(|x| x.to_buff()).collect();
         let artifacts_ref: Vec<&Artifact> = artifacts.iter().collect();
         let artifact_config = match damage_env.artifact_config {
             Some(x) => x,

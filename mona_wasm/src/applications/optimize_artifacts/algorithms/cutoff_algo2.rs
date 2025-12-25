@@ -3,7 +3,7 @@ use std::collections::{HashMap, HashSet};
 use mona::artifacts::{Artifact, ArtifactSetName, ArtifactSlotName};
 use mona::artifacts::eff::ARTIFACT_EFF5;
 use mona::artifacts::effect_config::ArtifactEffectConfig;
-use mona::attribute::SimpleAttributeGraph2;
+use mona::attribute::*;
 use mona::buffs::Buff;
 use mona::character::Character;
 use mona::common::StatName;
@@ -457,7 +457,7 @@ pub struct CutoffAlgo2 {
 }
 
 impl SingleOptimizeAlgorithm for CutoffAlgo2 {
-    fn optimize(&self, artifacts: &[&Artifact], artifact_config: Option<ArtifactEffectConfig>, character: &Character<SimpleAttributeGraph2>, weapon: &Weapon<SimpleAttributeGraph2>, target_function: &Box<dyn TargetFunction>, enemy: &Enemy, buffs: &[Box<dyn Buff<SimpleAttributeGraph2>>], constraint: &ConstraintConfig, count: usize) -> Vec<OptimizationResult> {
+    fn optimize(&self, artifacts: &[&Artifact], artifact_config: Option<ArtifactEffectConfig>, character: &Character<SimpleAttribute>, weapon: &Weapon<SimpleAttribute>, target_function: &Box<dyn TargetFunction>, enemy: &Enemy, buffs: &[Box<dyn Buff<SimpleAttribute>>], constraint: &ConstraintConfig, count: usize) -> Vec<OptimizationResult> {
         let (flowers, feathers, sands, goblets, heads) = get_per_slot_artifacts(&artifacts);
 
         let any_zero = vec![flowers, feathers, sands, goblets, heads].iter().any(|x| x.len() == 0);

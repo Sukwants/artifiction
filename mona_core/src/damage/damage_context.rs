@@ -1,7 +1,8 @@
-use crate::attribute::{Attribute, ComplicatedAttributeGraph};
+use crate::attribute::*;
 use crate::character::character_common_data::CharacterCommonData;
 use crate::common::Element;
-use crate::damage::transformative_damage::{TransformativeDamage, CriticalTransformativeDamage, transformative_damage, critical_transformative_damage, swirl_without_element};
+use crate::damage::damage_builder::DamageBuilder;
+use crate::damage::transformative_damage::TransformativeDamage;
 use crate::enemies::Enemy;
 
 pub struct DamageContext<'a, A> {
@@ -11,21 +12,9 @@ pub struct DamageContext<'a, A> {
 }
 
 impl<'a, A: Attribute> DamageContext<'a, A> {
-    pub fn transformative(&self) -> TransformativeDamage {
-        let level = self.character_common_data.level;
+    // pub fn transformative(&self) -> TransformativeDamage {
+    //     let level = self.character_common_data.level;
 
-        transformative_damage::<A>(level, &self.attribute, &self.enemy)
-    }
-
-    pub fn critical_transformative(&self) -> CriticalTransformativeDamage {
-        let level = self.character_common_data.level;
-
-        critical_transformative_damage::<A>(level, &self.attribute, &self.enemy)
-    }
-
-    pub fn swirl_without_element(&self) -> f64 {
-        swirl_without_element::<A>(
-            self.character_common_data.level, &self.attribute, 0.9
-        )
-    }
+    //     transformative_damage::<A>(level, &self.attribute, &self.enemy)
+    // }
 }

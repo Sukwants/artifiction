@@ -1,4 +1,4 @@
-use crate::attribute::{AttributeName, Attribute, AttributeCommon};
+use crate::attribute::*;
 use crate::character::character_common_data::CharacterCommonData;
 use crate::common::{Moonsign, WeaponType};
 use super::super::super::weapon_effect::WeaponEffect;

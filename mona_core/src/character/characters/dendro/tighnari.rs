@@ -1,4 +1,4 @@
-use crate::attribute::{Attribute, AttributeName, AttributeCommon};
+use crate::attribute::*;
 use crate::common::{ChangeAttribute, Element, SkillType, StatName, WeaponType};
 // use strum_macros::{EnumCount as EnumCountMacro, EnumString};
 // use num_derive::FromPrimitive;

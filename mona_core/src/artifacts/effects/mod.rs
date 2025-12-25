@@ -2,7 +2,7 @@ use super::artifact::{ArtifactSetName};
 use super::effect::ArtifactEffect;
 use super::effect_config::ArtifactEffectConfig;
 use crate::character::Character;
-use crate::attribute::Attribute;
+use crate::attribute::*;
 
 pub use empty::Empty;
 pub use adventurer::Adventurer;

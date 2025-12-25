@@ -1,230 +1,198 @@
-use smallvec::SmallVec;
 use std::cell::RefCell;
-use crate::attribute::typing::EdgeFunctionBwd;
+use std::collections::{BTreeMap, HashMap};
+use rand::Rng;
+use crate::attribute::SimpleAttribute;
+use crate::character::team_status::CharacterStatus;
+use crate::common::{Element, EntryType, SkillType};
+use crate::damage::SimpleDamageBuilder;
 
-use super::attribute::Attribute;
-use super::typing::EdgeFunctionFwd;
+use super::attribute::{AttributeGraph, AttributeNode, EdgeFunction, EdgePriority};
+use super::AttributeGraphResult;
 
-use super::attribute_name::AttributeName;
-
-const MAX_EDGE_COUNT: usize = 30;
-const MAX_NODE_COUNT: usize = 200;
-
-#[derive(Copy, Clone, Debug)]
-struct SimpleEntry {
-    pub value_from_edge: f64,
-    pub value_self: f64,
-    pub cached_value: f64,
-    pub dirty: bool,
-}
-
-struct SimpleEdge {
-    pub func: EdgeFunctionFwd,
-    pub from1: usize,
-    pub from2: usize,
-    pub to: usize,
+#[derive(Clone)]
+pub struct Edge {
+    pub from1: AttributeNode,
+    pub from2: AttributeNode,
+    pub to: AttributeNode,
     pub key: String,
+    pub func: EdgeFunction,
+    pub priority: EdgePriority,
+    pub id: usize,
 }
 
-pub struct SimpleAttributeGraph2 {
-    attributes: RefCell<[SimpleEntry; MAX_NODE_COUNT]>,
-    // edges: Vec<Rc<SimpleEdge>>,
-    // edges: Vec<SimpleEdge>,
-    edges: SmallVec<[SimpleEdge; MAX_EDGE_COUNT]>,
-    pub set_dirty_on_set_value: bool,
-
-    // atk_percentage: f64,
-    // def_percentage: f64,
-    // hp_percentage: f64,
+#[derive(Clone)]
+pub struct SimpleAttributeGraphResult {
+    pub map: HashMap<AttributeNode, f64>,
 }
 
-impl Default for SimpleAttributeGraph2 {
-    fn default() -> Self {
-        let temp = SimpleAttributeGraph2 {
-            attributes: RefCell::new([SimpleEntry {
-                value_from_edge: 0.0,
-                value_self: 0.0,
-                cached_value: 0.0,
-                dirty: true
-            }; MAX_NODE_COUNT]),
-            // edges: Vec::new(),
-            edges: SmallVec::new(),
-            set_dirty_on_set_value: false,
-            // atk_percentage: 0.0,
-            // def_percentage: 0.0,
-            // hp_percentage: 0.0,
-        };
+impl SimpleAttributeGraphResult {
+    pub fn new() -> Self {
+        SimpleAttributeGraphResult {
+            map: HashMap::new(),
+        }
+    }
 
-        let data = temp.attributes.as_ptr();
+    pub fn get_attribute_mut(&mut self, node: AttributeNode) -> &mut f64 {
+        self.map.entry(node).or_insert(0.0)
+    }
 
-        unsafe {
-            (*data)[AttributeName::CriticalBase as usize].value_self = 0.05;
-            (*data)[AttributeName::CriticalDamageBase as usize].value_self = 0.5;
-            (*data)[AttributeName::Recharge as usize].value_self = 1.0;
+    pub fn get_attribute(&self, node: AttributeNode) -> f64 {
+        *self.map.get(&node).unwrap_or(&0.0)
+    }
+
+    pub fn get_attribute_value(&self, node: AttributeNode) -> f64 {
+        let mut temp = 0.0;
+
+        for pa in node.get_parents() {
+            temp += self.get_attribute(pa);
         }
 
         temp
     }
 }
 
-impl Attribute for SimpleAttributeGraph2 {
-    type EdgeHandle = ();
-
-    fn get_value(&self, key: AttributeName) -> f64 {
-        self.my_get_value(key as usize)
+impl AttributeGraphResult for SimpleAttributeGraphResult {
+    type ResultType = f64;
+    
+    fn get_attribute_value(&self, node: AttributeNode) -> f64 {
+        self.get_attribute_value(node)
     }
 
-    fn set_value_to(&mut self, name: AttributeName, _key: &str, value: f64) {
-        let data = self.attributes.as_ptr();
-        unsafe {
-            (*data)[name as usize].value_self = value;
-        }
-        if self.set_dirty_on_set_value {
-            self.mark_dirty(name as usize);
-        }
+    fn get_attribute(&self, node: AttributeNode) -> f64 {
+        self.get_attribute(node)
     }
 
-    fn set_value_by(&mut self, name: AttributeName, _key: &str, value: f64) {
-        let data = self.attributes.as_ptr();
-        unsafe {
-            (*data)[name as usize].value_self += value;
+    fn get_attribute_merge(&self, nodes: &[AttributeNode]) -> f64 {
+        let mut temp = 0.0;
+        for node in nodes.iter() {
+            temp += self.get_attribute(*node);
         }
-        if self.set_dirty_on_set_value {
-            self.mark_dirty(name as usize);
-        }
+        temp
+    }
+}
+
+#[derive(Clone)]
+pub struct SimpleAttributeGraph2 {
+    pub nodes: SimpleAttributeGraphResult,
+    pub fixed: HashMap<AttributeNode, f64>,
+    pub edges: Vec<Edge>,
+    pub characters: Vec<CharacterStatus>,
+}
+
+impl AttributeGraph for SimpleAttributeGraph2 {
+    type EdgeHandle = usize;
+    type ResultType = SimpleAttributeGraphResult;
+
+    fn set_value_to_internal(&mut self, node: AttributeNode, key: &str, value: f64) {
+        self.fixed.insert(node, value);
+    }
+
+    fn set_value_by_internal(&mut self, node: AttributeNode, key: &str, value: f64) {
+        *self.nodes.get_attribute_mut(node) += value;
     }
 
     fn add_edge(
         &mut self,
-        from1: usize,
-        from2: usize,
-        to: usize,
-        fwd: EdgeFunctionFwd,
-        _bwd: EdgeFunctionBwd,
-        key: &str
+        from1: AttributeNode,
+        from2: AttributeNode,
+        to: AttributeNode,
+        func: EdgeFunction,
+        key: &str,
+        priority: EdgePriority,
     ) -> Self::EdgeHandle {
-        let edge = SimpleEdge {
-            func: fwd,
+        let mut rng = rand::thread_rng();
+        let id: usize = rng.gen();
+        let edge = Edge {
             from1,
             from2,
             to,
-            key: String::from(key)
+            key: String::from(key),
+            func,
+            priority,
+            id,
         };
-        // self.edges.push(Rc::new(edge));
+
         self.edges.push(edge);
+        id
     }
 
-    fn remove_edge(&mut self, _handle: Self::EdgeHandle) {
+    fn remove_edge(&mut self, handle: Self::EdgeHandle) {
+        let mut index = 0;
+        for (i, edge) in self.edges.iter().enumerate() {
+            if edge.id == handle {
+                index = i;
+                break;
+            }
+        }
+
+        self.edges.remove(index);
+    }
+
+    fn new_with_characters(characters: Vec<CharacterStatus>) -> Self {
+        SimpleAttributeGraph2 {
+            nodes: SimpleAttributeGraphResult::new(),
+            fixed: HashMap::new(),
+            edges: Vec::new(),
+            characters,
+        }
+    }
+
+    fn get_characters(&self) -> &Vec<CharacterStatus> {
+        &self.characters
+    }
+
+    fn solve(&self) -> Self::ResultType {
+        self.solve()
     }
 }
 
 impl SimpleAttributeGraph2 {
-    fn my_get_value(&self, index: usize) -> f64 {
-        // println!("get value: {}", index);
-        let data = self.attributes.as_ptr();
-        let node = unsafe {
-            &mut (*data)[index]
-        };
-        if node.dirty {
-            node.value_from_edge = 0.0;
-            for edge in self.edges.iter() {
-                if edge.to == index {
-                    let from_value1 = self.get_from_value(edge.from1);
-                    let from_value2 = self.get_from_value(edge.from2);
-                    // let from_value1 = 0.0;
-                    // let from_value2 = 0.0;
-                    let to_value: f64 = (edge.func)(from_value1, from_value2);
-                    node.value_from_edge += to_value;
-                }
-            }
-        }
-        node.cached_value = node.value_self + node.value_from_edge;
-        node.dirty = false;
+    pub fn solve(&self) -> SimpleAttributeGraphResult {
+        let mut result = self.nodes.clone();
+        let mut temp = self.nodes.clone();
 
-        node.cached_value
-        // 0.0
-    }
-
-    fn mark_dirty(&self, index: usize) {
-        let data = self.attributes.as_ptr();
-        let node = unsafe {
-            &mut (*data)[index]
+        let solve_edge = |
+            edge: &Edge,
+            nodes_old: &SimpleAttributeGraphResult,
+            nodes_new: &mut SimpleAttributeGraphResult,
+            c: f64,
+        | {
+            let from1_value = nodes_old.get_attribute_value(edge.from1);
+            let from2_value = nodes_old.get_attribute_value(edge.from2);
+            let value = (edge.func)(from1_value, from2_value) * c;
+            *nodes_new.get_attribute_mut(edge.to) += value;
         };
-        node.dirty = true;
+
+        let mut edge_lists = BTreeMap::new();
+        let mut edge_static = Vec::new();
         for edge in self.edges.iter() {
-            if edge.from1 == index || edge.from2 == index {
-                let to_node = unsafe { &(*data)[edge.to] };
-                if !to_node.dirty {
-                    self.mark_dirty(edge.to);
-                }
+            if edge.priority == EdgePriority::Static {
+                edge_static.push(edge);
+                continue;
             }
+            edge_lists.entry(edge.priority as usize).or_insert(Vec::new()).push(edge);
         }
-    }
 
-    fn get_from_value(&self, index: usize) -> f64 {
-        if index == usize::MAX {
-            0.0
-        } else {
-            self.my_get_value(index)
+        for edge in edge_static.iter() {
+            solve_edge(edge, &result, &mut temp, 1.0);
         }
+        result = temp.clone();
+
+        for list in edge_lists.values() {
+            for edge in edge_static.iter() {
+                solve_edge(edge, &result, &mut temp, -1.0);
+            }
+            result = temp.clone();
+            for edge in edge_static.iter() {
+                solve_edge(edge, &result, &mut temp, 1.0);
+            }
+            result = temp.clone();
+        }
+
+        for (node, value) in self.fixed.iter() {
+            *result.get_attribute_mut(*node) = *value;
+        }
+
+        result
     }
-
-    // pub fn build(&mut self) {
-    //     // let atk_base = self.attributes[AttributeName::ATKBase as usize].value_self;
-    //     // let def_base = self.attributes[AttributeName::DEFBase as usize].value_self;
-    //     // let hp_base = self.attributes[AttributeName::HPBase as usize].value_self;
-    //     //
-    //     // self.attributes[AttributeName::ATKPercentage as usize].value_from_edge += atk_base * self.atk_percentage;
-    //     // self.attributes[AttributeName::DEFPercentage as usize].value_from_edge += def_base * self.def_percentage;
-    //     // self.attributes[AttributeName::HPPercentage as usize].value_from_edge += hp_base * self.hp_percentage;
-    //
-    //     self.edges.sort_by(|x, y| x.priority.cmp(&y.priority));
-    //     for edge in self.edges.iter() {
-    //         let from_value = self.attributes[edge.from].value_self + self.attributes[edge.from].value_from_edge;
-    //         let to_value = (edge.func)(from_value).1;
-    //         self.attributes[edge.to].value_from_edge += to_value;
-    //     }
-    // }
-
-    // topological sort implementation
-    // pub fn build(&mut self) {
-    //     let mut in_degree: [usize; 150] = [0; 150];
-    //     let mut related_node: HashSet<usize> = HashSet::new();
-    //     for edge in self.edges.iter() {
-    //         in_degree[edge.to] += 1;
-    //         if edge.from2 != usize::MAX {
-    //             in_degree[edge.to] += 1;
-    //         }
-    //         related_node.insert(edge.from1);
-    //         if edge.from2 != usize::MAX {
-    //             related_node.insert(edge.from2);
-    //         }
-    //         related_node.insert(edge.to);
-    //     }
-    //
-    //     let mut queue: Vec<usize> = vec![];
-    //     for &i in related_node.iter() {
-    //         if in_degree[i] == 0 {
-    //             queue.push(i);
-    //         }
-    //     }
-    //
-    //     while !queue.is_empty() {
-    //         let p = queue.pop().unwrap();
-    //
-    //         let from_value = self.attributes[p].value_self + self.attributes[p].value_from_edge;
-    //
-    //         for edge in self.edges.iter() {
-    //             if edge.from == p {
-    //                 in_degree[edge.to] -= 1;
-    //                 if in_degree[edge.to] == 0 {
-    //                     queue.push(edge.to);
-    //                 }
-    //
-    //                 let to_value = (edge.func)(from_value).1;
-    //                 self.attributes[edge.to].value_from_edge += to_value;
-    //             }
-    //         }
-    //     }
-    // }
 }

@@ -1,10 +1,12 @@
-use crate::common::{Element, MoonglareReaction, SkillType};
+use crate::{common::{Element, MoonglareReaction, ReactionType, SkillType, TransformativeType}, damage::transformative_damage};
 
 #[derive(Hash, Eq, PartialEq, Clone, Copy, Debug)]
 pub enum AttributeName {
     // 自定义数据，应当只用在角色的特定的Effect中，否则容易使用不当，产生冲突
     USER1,
     USER2,
+
+    NULL,
 
     HealingBonus,
     IncomingHealingBonus,
@@ -94,8 +96,6 @@ pub enum AttributeName {
     BonusGeo,
     BonusDendro,
     BonusPhysical,
-    BonusMelt, // 融化反应造成的伤害的增伤区提升
-    BonusVaporize, // 蒸发反应造成的伤害的增伤区提升
     BonusNormalAndElemental, // 普通攻击&元素伤害 todo 以后应该重构掉
 
     EnhanceBurgeon,
@@ -122,50 +122,19 @@ pub enum AttributeName {
     IncreaseLunarCharged, // 天赋「月兆祝赐」给出的月曜反应基础提升
     IncreaseLunarBloom,
 
+    ElevateLunarCharged, // 月曜反应擢升
+    ElevateLunarBloom,
+
     ExtraIncreaseBurgeon, // 部分角色天赋给出的额外提升，不受益于精通和反应增伤
     ExtraIncreaseHyperBloom,
     ExtraIncreaseBloom,
     ExtraIncreaseLunarCharged, // 月曜反应额外提升，（大概）应由 add_edge 给出
     ExtraIncreaseLunarBloom,
 
-    CriticalBurgeon,
-    CriticalHyperbloom,
-    CriticalBloom,
-    CriticalOverload,
-    CriticalBurning,
-    CriticalShatter,
-    CriticalElectroCharged,
-    CriticalSuperconduct,
-    CriticalSwirlElectro,
-    CriticalSwirlPyro,
-    CriticalSwirlHydro,
-    CriticalSwirlCryo,
-    CriticalSwirlBase,
-    // CriticalVaporize,
-    // CriticalMelt,
-    // CriticalAggravate,
-    // CriticalSpread,
     CriticalMoonglare,
     CriticalLunarCharged,
     CriticalLunarBloom,
 
-    CriticalDamageBurgeon,
-    CriticalDamageHyperbloom,
-    CriticalDamageBloom,
-    CriticalDamageOverload,
-    CriticalDamageBurning,
-    CriticalDamageShatter,
-    CriticalDamageElectroCharged,
-    CriticalDamageSuperconduct,
-    CriticalDamageSwirlElectro,
-    CriticalDamageSwirlPyro,
-    CriticalDamageSwirlHydro,
-    CriticalDamageSwirlCryo,
-    CriticalDamageSwirlBase,
-    // CriticalDamageVaporize,
-    // CriticalDamageMelt,
-    // CriticalDamageAggravate,
-    // CriticalDamageSpread,
     CriticalDamageMoonglare,
     CriticalDamageLunarCharged,
     CriticalDamageLunarBloom,
@@ -235,6 +204,54 @@ pub enum AttributeName {
     SwirlExtraDmg,
 }
 
+#[derive(Hash, Eq, PartialEq, Clone, Copy)]
+pub enum AttributeVariableType {
+    BaseDamage, // 基础提升
+    Bonus, // 伤害加成
+    ReactionEnhance, // 反应系数提升
+    CriticalRate, // 暴击率
+    CriticalDamage, // 暴击伤害
+    ResMinus, // 减抗
+    DefMinus, // 减防
+    DefPenetration, // 穿防
+
+    ReactionExtra, // 反应额外提升
+
+    MoonglareBase, // 月曜反应基础提升
+    MoonglareElevate, // 月曜反应擢升
+
+    HealingBonus, // 治疗加成
+    IncomingHealingBonus, // 受治疗加成
+    HealingCriticalRate, // 治疗暴击率
+    HealingCriticalDamage, // 治疗暴击伤害
+
+    ShieldStrength, // 护盾强效
+}
+
+#[derive(Hash, Eq, PartialEq, Clone, Copy)]
+pub struct InvisibleAttributeType {
+    pub attribute_variable_type: AttributeVariableType,
+    pub element: Option<Element>,
+    pub skill: Option<SkillType>,
+    pub reaction: Option<ReactionType>,
+}
+
+impl InvisibleAttributeType {
+    pub fn new(
+        attribute_variable_type: AttributeVariableType,
+        element: Option<Element>,
+        skill: Option<SkillType>,
+        reaction: Option<ReactionType>,
+    ) -> Self {
+        InvisibleAttributeType {
+            attribute_variable_type,
+            element,
+            skill,
+            reaction,
+        }
+    }
+}
+
 impl AttributeName {
     pub fn bonus_name_by_element(element: Element) -> AttributeName {
         match element {
@@ -256,6 +273,44 @@ impl AttributeName {
             SkillType::PlungingAttackOnGround | SkillType::PlungingAttackInAction => Some(AttributeName::BonusPlungingAttack),
             SkillType::ElementalSkill => Some(AttributeName::BonusElementalSkill),
             SkillType::ElementalBurst => Some(AttributeName::BonusElementalBurst),
+            _ => None,
+        }
+    }
+
+    pub fn enhance_name_by_moonglare_reaction(lunar_type: MoonglareReaction) -> Option<AttributeName> {
+        match lunar_type {
+            MoonglareReaction::None => None,
+            MoonglareReaction::LunarChargedReaction | MoonglareReaction::LunarCharged => Some(AttributeName::EnhanceLunarCharged),
+            MoonglareReaction::LunarBloom => Some(AttributeName::EnhanceLunarBloom),
+            _ => None,
+        }
+    }
+
+    pub fn increase_name_by_moonglare_reaction(lunar_type: MoonglareReaction) -> Option<AttributeName> {
+        match lunar_type {
+            MoonglareReaction::None => None,
+            MoonglareReaction::LunarChargedReaction | MoonglareReaction::LunarCharged => Some(AttributeName::IncreaseLunarCharged),
+            MoonglareReaction::LunarBloom => Some(AttributeName::IncreaseLunarBloom),
+            _ => None,
+        }
+    }
+
+    pub fn elevate_name_by_moonglare_reaction(lunar_type: MoonglareReaction) -> Option<AttributeName> {
+        match lunar_type {
+            MoonglareReaction::None => None,
+            MoonglareReaction::LunarChargedReaction | MoonglareReaction::LunarCharged => Some(AttributeName::ElevateLunarCharged),
+            MoonglareReaction::LunarBloom => Some(AttributeName::ElevateLunarBloom),
+            _ => None,
+        }
+    }
+
+    pub fn extra_increase_name_by_reaction(reaction_type: ReactionType) -> Option<AttributeName> {
+        match reaction_type {
+            ReactionType::Burgeon => Some(AttributeName::ExtraIncreaseBurgeon),
+            ReactionType::Hyperbloom => Some(AttributeName::ExtraIncreaseHyperBloom),
+            ReactionType::Bloom => Some(AttributeName::ExtraIncreaseBloom),
+            ReactionType::LunarCharged => Some(AttributeName::ExtraIncreaseLunarCharged),
+            ReactionType::LunarBloom => Some(AttributeName::ExtraIncreaseLunarBloom),
             _ => None,
         }
     }
@@ -284,8 +339,8 @@ impl AttributeName {
         }
     }
 
-    pub fn critical_rate_name_by_moonglare_reaction(skill_type: MoonglareReaction) -> Option<AttributeName> {
-        match skill_type {
+    pub fn critical_rate_name_by_moonglare_reaction(lunar_type: MoonglareReaction) -> Option<AttributeName> {
+        match lunar_type {
             MoonglareReaction::None => None,
             MoonglareReaction::LunarChargedReaction | MoonglareReaction::LunarCharged => Some(AttributeName::CriticalLunarCharged),
             MoonglareReaction::LunarBloom => Some(AttributeName::CriticalLunarBloom),
@@ -317,8 +372,8 @@ impl AttributeName {
         }
     }
 
-    pub fn critical_damage_name_by_moonglare_reaction(skill_type: MoonglareReaction) -> Option<AttributeName> {
-        match skill_type {
+    pub fn critical_damage_name_by_moonglare_reaction(lunar_type: MoonglareReaction) -> Option<AttributeName> {
+        match lunar_type {
             MoonglareReaction::None => None,
             MoonglareReaction::LunarChargedReaction | MoonglareReaction::LunarCharged => Some(AttributeName::CriticalDamageLunarCharged),
             MoonglareReaction::LunarBloom => Some(AttributeName::CriticalDamageLunarBloom),

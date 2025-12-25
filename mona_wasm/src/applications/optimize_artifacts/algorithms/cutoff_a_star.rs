@@ -9,7 +9,7 @@ use crate::applications::optimize_artifacts::algorithms::cutoff_heuristic::Cutof
 use crate::applications::optimize_artifacts::inter::{ConstraintConfig, ConstraintSetMode, OptimizationResult};
 use mona::artifacts::{Artifact, ArtifactList, ArtifactSetName, ArtifactSlotName};
 use mona::artifacts::effect_config::ArtifactEffectConfig;
-use mona::attribute::{SimpleAttributeGraph2, AttributeCommon, Attribute, AttributeName, AttributeUtils};
+use mona::attribute::*;
 use mona::buffs::Buff;
 use mona::character::Character;
 use mona::common::StatName;
@@ -44,7 +44,7 @@ impl Ord for OptimizationIntermediateResult {
 }
 
 // #[inline]
-fn check_attribute(attribute: &SimpleAttributeGraph2, constraint: &ConstraintConfig) -> bool {
+fn check_attribute(attribute: &SimpleAttributeResult, constraint: &ConstraintConfig) -> bool {
     if attribute.get_atk() < constraint.atk_min.unwrap_or(0.0) {
         return false;
     }
@@ -77,23 +77,23 @@ struct ResultRecorder<'a> {
     result_set: FxHashSet<u64>,
 
     artifact_config: ArtifactEffectConfig,
-    character: &'a Character<SimpleAttributeGraph2>,
-    weapon: &'a Weapon<SimpleAttributeGraph2>,
+    character: &'a Character<SimpleAttribute>,
+    weapon: &'a Weapon<SimpleAttribute>,
     target_function: &'a Box<dyn TargetFunction>,
     constraint: &'a ConstraintConfig,
-    buffs: &'a [Box<dyn Buff<SimpleAttributeGraph2>>],
+    buffs: &'a [Box<dyn Buff<SimpleAttribute>>],
     enemy: Enemy,
 }
 
 impl<'a> ResultRecorder<'a> {
     pub fn new(
         artifact_config: Option<ArtifactEffectConfig>,
-        character: &'a Character<SimpleAttributeGraph2>,
-        weapon: &'a Weapon<SimpleAttributeGraph2>,
+        character: &'a Character<SimpleAttribute>,
+        weapon: &'a Weapon<SimpleAttribute>,
         target_function: &'a Box<dyn TargetFunction>,
         enemy: &'a Enemy,
         constraint: &'a ConstraintConfig,
-        buffs: &'a [Box<dyn Buff<SimpleAttributeGraph2>>],
+        buffs: &'a [Box<dyn Buff<SimpleAttribute>>],
         result_count: usize
     ) -> Self {
         let mut enemy = enemy.clone();
@@ -615,7 +615,7 @@ impl<'a> SingleOptimizer<'a> {
 pub struct AStarCutoff;
 
 impl SingleOptimizeAlgorithm for AStarCutoff {
-    fn optimize(&self, artifacts: &[&Artifact], artifact_config: Option<ArtifactEffectConfig>, character: &Character<SimpleAttributeGraph2>, weapon: &Weapon<SimpleAttributeGraph2>, target_function: &Box<dyn TargetFunction>, enemy: &Enemy, buffs: &[Box<dyn Buff<SimpleAttributeGraph2>>], constraint: &ConstraintConfig, count: usize) -> Vec<OptimizationResult> {
+    fn optimize(&self, artifacts: &[&Artifact], artifact_config: Option<ArtifactEffectConfig>, character: &Character<SimpleAttribute>, weapon: &Weapon<SimpleAttribute>, target_function: &Box<dyn TargetFunction>, enemy: &Enemy, buffs: &[Box<dyn Buff<SimpleAttribute>>], constraint: &ConstraintConfig, count: usize) -> Vec<OptimizationResult> {
         let (flowers, feathers, sands, goblets, heads) = get_per_slot_artifacts(&artifacts);
 
         let any_zero = vec![flowers, feathers, sands, goblets, heads].iter().any(|x| x.len() == 0);

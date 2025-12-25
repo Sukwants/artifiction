@@ -1,10 +1,11 @@
 use std::cmp::max;
-use crate::attribute::{Attribute, AttributeName};
+use crate::attribute::*;
 use crate::buffs::{Buff, BuffConfig};
 use crate::buffs::buff::BuffMeta;
 use crate::buffs::buff_meta::{BuffFrom, BuffGenre, BuffImage, BuffMetaData};
 use crate::buffs::buff_name::BuffName;
 use crate::character::CharacterName;
+use crate::common::ReactionType;
 use crate::common::i18n::locale;
 use crate::common::item_config_type::{ItemConfig, ItemConfigType};
 use crate::enemies::Enemy;
@@ -70,15 +71,31 @@ impl<A: Attribute> Buff<A> for BuffNahidaC2 {
             attribute.set_value_by(AttributeName::DefMinus, "纳西妲「正等善见之根」", 0.3);
         }
 
-        attribute.set_value_by(AttributeName::CriticalDamageBloom, "纳西妲「正等善见之根」", 1.0);
-        attribute.set_value_by(AttributeName::CriticalDamageHyperbloom, "纳西妲「正等善见之根」", 1.0);
-        attribute.set_value_by(AttributeName::CriticalDamageBurgeon, "纳西妲「正等善见之根」", 1.0);
-        attribute.set_value_by(AttributeName::CriticalDamageBurning, "纳西妲「正等善见之根」", 1.0);
+        attribute.set_value_to_t(AttributeType::Invisible(InvisibleAttributeType::new(
+            AttributeVariableType::CriticalDamage, None, None, Some(ReactionType::Bloom),
+        )), "纳西妲「正等善见之根」", 1.0);
+        attribute.set_value_to_t(AttributeType::Invisible(InvisibleAttributeType::new(
+            AttributeVariableType::CriticalDamage, None, None, Some(ReactionType::Hyperbloom),
+        )), "纳西妲「正等善见之根」", 1.0);
+        attribute.set_value_to_t(AttributeType::Invisible(InvisibleAttributeType::new(
+            AttributeVariableType::CriticalDamage, None, None, Some(ReactionType::Burgeon),
+        )), "纳西妲「正等善见之根」", 1.0);
+        attribute.set_value_to_t(AttributeType::Invisible(InvisibleAttributeType::new(
+            AttributeVariableType::CriticalDamage, None, None, Some(ReactionType::Burning),
+        )), "纳西妲「正等善见之根」", 1.0);
 
-        attribute.set_value_to(AttributeName::CriticalBloom, "纳西妲「正等善见之根」", 0.2);
-        attribute.set_value_to(AttributeName::CriticalHyperbloom, "纳西妲「正等善见之根」", 0.2);
-        attribute.set_value_to(AttributeName::CriticalBurgeon, "纳西妲「正等善见之根」", 0.2);
-        attribute.set_value_to(AttributeName::CriticalBurning, "纳西妲「正等善见之根」", 0.2);
+        attribute.set_value_by_t(AttributeType::Invisible(InvisibleAttributeType::new(
+            AttributeVariableType::CriticalRate, None, None, Some(ReactionType::Bloom),
+        )), "纳西妲「正等善见之根」", 0.2);
+        attribute.set_value_by_t(AttributeType::Invisible(InvisibleAttributeType::new(
+            AttributeVariableType::CriticalRate, None, None, Some(ReactionType::Hyperbloom),
+        )), "纳西妲「正等善见之根」", 0.2);
+        attribute.set_value_by_t(AttributeType::Invisible(InvisibleAttributeType::new(
+            AttributeVariableType::CriticalRate, None, None, Some(ReactionType::Burgeon),
+        )), "纳西妲「正等善见之根」", 0.2);
+        attribute.set_value_by_t(AttributeType::Invisible(InvisibleAttributeType::new(
+            AttributeVariableType::CriticalRate, None, None, Some(ReactionType::Burning),
+        )), "纳西妲「正等善见之根」", 0.2);
 
         attribute.set_value_by(AttributeName::CriticalDamageLunarBloom, "纳西妲「正等善见之根」", 0.2);
         attribute.set_value_by(AttributeName::CriticalLunarBloom, "纳西妲「正等善见之根」", 0.1);

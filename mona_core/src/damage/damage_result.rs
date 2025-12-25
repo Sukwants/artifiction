@@ -1,8 +1,14 @@
-use std::ops::Mul;
 use crate::common::MoonglareReaction;
-use serde::{Serialize, Deserialize};
 use crate::damage::transformative_damage::TransformativeDamage;
+use serde::{Deserialize, Serialize};
+use std::ops::Mul;
+use wasm_bindgen::prelude::*;
 
+pub trait DamageBuilderResult {
+    fn get_result(&self) -> DamageResult;
+}
+
+#[wasm_bindgen]
 #[derive(Debug, Clone, Copy)]
 #[derive(Deserialize, Serialize)]
 pub struct DamageResult {
@@ -23,6 +29,16 @@ impl Mul<f64> for DamageResult {
     }
 }
 
+impl Default for DamageResult {
+    fn default() -> Self {
+        DamageResult {
+            critical: 0.0,
+            non_critical: 0.0,
+            expectation: 0.0,
+        }
+    }
+}
+
 #[derive(Debug)]
 #[derive(Serialize, Deserialize)]
 pub struct SimpleDamageResult {
@@ -31,8 +47,31 @@ pub struct SimpleDamageResult {
     pub vaporize: Option<DamageResult>,
     pub spread: Option<DamageResult>,
     pub aggravate: Option<DamageResult>,
-    pub lunar_type: MoonglareReaction,
-    pub is_heal: bool,
-    pub is_shield: bool,
-    pub is_none: bool,
+}
+
+impl SimpleDamageResult {
+    pub fn new_normal(normal: DamageResult) -> Self {
+        SimpleDamageResult {
+            normal,
+            melt: None,
+            vaporize: None,
+            spread: None,
+            aggravate: None,
+        }
+    }
+
+    pub fn new(normal: DamageResult,
+        melt: Option<DamageResult>,
+        vaporize: Option<DamageResult>,
+        spread: Option<DamageResult>,
+        aggravate: Option<DamageResult>
+    ) -> Self {
+        SimpleDamageResult { normal, melt, vaporize, spread, aggravate }
+    }
+}
+
+impl DamageBuilderResult for SimpleDamageResult {
+    fn get_result(&self) -> DamageResult {
+        self.normal
+    }
 }

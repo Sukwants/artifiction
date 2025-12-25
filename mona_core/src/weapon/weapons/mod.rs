@@ -10,7 +10,7 @@ pub use polearms::*;
 pub use catalysts::*;
 pub use bows::*;
 
-use crate::attribute::Attribute;
+use crate::attribute::*;
 use super::weapon_name::WeaponName;
 use super::weapon_config::WeaponConfig;
 use super::weapon_effect::WeaponEffect;

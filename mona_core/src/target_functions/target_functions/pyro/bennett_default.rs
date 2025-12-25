@@ -1,19 +1,17 @@
 use crate::artifacts::{Artifact, ArtifactSetName};
 use crate::artifacts::effect_config::ArtifactEffectConfig;
-use crate::attribute::{Attribute, AttributeName, SimpleAttributeGraph2};
+use crate::attribute::*;
 use crate::character::{Character, CharacterName};
 use crate::character::character_common_data::CharacterCommonData;
 use crate::character::characters::Bennett;
+use crate::character::characters::bennett::BENNETT_SKILL;
 use crate::character::skill_config::CharacterSkillConfig;
 use crate::character::traits::CharacterTrait;
 use crate::common::item_config_type::{ItemConfig, ItemConfigType};
 use crate::common::StatName;
 use crate::damage::{DamageContext, SimpleDamageBuilder};
 use crate::enemies::Enemy;
-use crate::target_functions::target_function_meta::{TargetFunctionFor, TargetFunctionMeta, TargetFunctionMetaImage};
-use crate::target_functions::target_function_opt_config::TargetFunctionOptConfig;
-use crate::target_functions::{TargetFunction, TargetFunctionConfig, TargetFunctionName};
-use crate::target_functions::target_function::TargetFunctionMetaTrait;
+use crate::target_functions::*;
 use crate::team::TeamQuantization;
 use crate::weapon::Weapon;
 use crate::weapon::weapon_common_data::WeaponCommonData;
@@ -110,7 +108,7 @@ impl TargetFunction for BennettDefaultTargetFunction {
         Default::default()
     }
 
-    fn target(&self, attribute: &SimpleAttributeGraph2, character: &Character<SimpleAttributeGraph2>, _weapon: &Weapon<SimpleAttributeGraph2>, artifacts: &[&Artifact], enemy: &Enemy) -> f64 {
+    fn target(&self, attribute: &TargetFunctionAttributeResultType, character: &Character<TargetFunctionAttributeType>, _weapon: &Weapon<TargetFunctionAttributeType>, artifacts: &[&Artifact], enemy: &Enemy) -> f64 {
         let mut noblesse_count = 0;
         for artifact in artifacts.iter() {
             if artifact.set_name == ArtifactSetName::NoblesseOblige {
@@ -118,13 +116,19 @@ impl TargetFunction for BennettDefaultTargetFunction {
             }
         }
 
-        let mut atk_bonus = Bennett::atk_bonus(&character.common_data, attribute);
+        let mut atk_bonus = {
+            let base_atk = attribute.get_value(AttributeName::ATKBase);
+            let s3 = character.common_data.skill3;
+
+            let bonus = BENNETT_SKILL.elemental_burst_atk_bonus[s3] + (if character.common_data.constellation >= 1 { 0.2 } else { 0.0 });
+            bonus * base_atk
+        };
         const VIRTUAL_BASE_ATK: f64 = 700.0;
         if noblesse_count >= 4 {
             atk_bonus += VIRTUAL_BASE_ATK * 0.2;
         }
 
-        let context: DamageContext<'_, SimpleAttributeGraph2> = DamageContext {
+        let context: DamageContext<'_, TargetFunctionAttributeResultType> = DamageContext {
             character_common_data: &character.common_data,
             attribute,
             enemy

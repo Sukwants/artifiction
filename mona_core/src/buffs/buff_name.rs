@@ -157,6 +157,7 @@ pub enum BuffName {
     LaumaQ,
     LaumaP1,
     LaumaP3,
+    LaumaC6,
     FlinsP3,
     FlinsC6,
     NeferP3,

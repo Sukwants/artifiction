@@ -1,16 +1,17 @@
 use num_traits::FromPrimitive;
-use crate::attribute::{Attribute, AttributeName, AttributeCommon};
+use crate::attribute::*;
 use crate::character::character_common_data::CharacterCommonData;
 use crate::character::character_sub_stat::CharacterSubStatFamily;
 use crate::character::{CharacterConfig, CharacterName, CharacterStaticData};
 use crate::character::skill_config::CharacterSkillConfig;
 use crate::character::traits::{CharacterSkillMap, CharacterSkillMapItem, CharacterTrait};
 use crate::character::macros::{damage_enum, skill_map};
-use crate::common::{ChangeAttribute, Element, MoonglareReaction, Moonsign, SkillType, WeaponType};
+use crate::common::{ChangeAttribute, Element, MoonglareReaction, ReactionType, Moonsign, SkillType, WeaponType};
 use crate::common::i18n::{locale, hit_n_dmg, plunging_dmg, charged_dmg};
 use crate::common::item_config_type::{ItemConfig, ItemConfigType};
 use crate::damage::damage_builder::DamageBuilder;
 use crate::damage::DamageContext;
+use crate::damage::reaction::Reaction;
 // use crate::target_functions::target_functions::LaumaDefaultTargetFunction;
 use crate::target_functions::TargetFunction;
 use crate::team::TeamQuantization;
@@ -115,13 +116,25 @@ impl<A: Attribute> ChangeAttribute<A> for LaumaEffect {
 
         if self.has_p1 {
             if self.moonsign == Moonsign::Nascent {
-                attribute.set_value_by(AttributeName::CriticalDamageBloom, "天赋：奉向霜夜的明光", 1.0);
-                attribute.set_value_by(AttributeName::CriticalDamageHyperbloom, "天赋：奉向霜夜的明光", 1.0);
-                attribute.set_value_by(AttributeName::CriticalDamageBurgeon , "天赋：奉向霜夜的明光", 1.0);
+                attribute.set_value_to_t(AttributeType::Invisible(InvisibleAttributeType::new(
+                    AttributeVariableType::CriticalDamage, None, None, Some(ReactionType::Bloom),
+                )), "天赋：奉向霜夜的明光", 1.0);
+                attribute.set_value_to_t(AttributeType::Invisible(InvisibleAttributeType::new(
+                    AttributeVariableType::CriticalDamage, None, None, Some(ReactionType::Hyperbloom),
+                )), "天赋：奉向霜夜的明光", 1.0);
+                attribute.set_value_to_t(AttributeType::Invisible(InvisibleAttributeType::new(
+                    AttributeVariableType::CriticalDamage, None, None, Some(ReactionType::Burgeon),
+                )), "天赋：奉向霜夜的明光", 1.0);
 
-                attribute.set_value_to(AttributeName::CriticalBloom, "天赋：奉向霜夜的明光", 0.15);
-                attribute.set_value_to(AttributeName::CriticalHyperbloom, "天赋：奉向霜夜的明光", 0.15);
-                attribute.set_value_to(AttributeName::CriticalBurgeon , "天赋：奉向霜夜的明光", 0.15);
+                attribute.set_value_by_t(AttributeType::Invisible(InvisibleAttributeType::new(
+                    AttributeVariableType::CriticalRate, None, None, Some(ReactionType::Bloom),
+                )), "天赋：奉向霜夜的明光", 0.15);
+                attribute.set_value_by_t(AttributeType::Invisible(InvisibleAttributeType::new(
+                    AttributeVariableType::CriticalRate, None, None, Some(ReactionType::Hyperbloom),
+                )), "天赋：奉向霜夜的明光", 0.15);
+                attribute.set_value_by_t(AttributeType::Invisible(InvisibleAttributeType::new(
+                    AttributeVariableType::CriticalRate, None, None, Some(ReactionType::Burgeon),
+                )), "天赋：奉向霜夜的明光", 0.15);
             } else if self.moonsign == Moonsign::Ascendant {
                 attribute.set_value_by(AttributeName::CriticalDamageLunarBloom, "天赋：奉向霜夜的明光", 0.2);
 
@@ -200,7 +213,12 @@ impl<A: Attribute> ChangeAttribute<A> for LaumaEffect {
         }
 
         if self.has_c6 && self.moonsign.is_ascendant() {
-            attribute.set_value_by(AttributeName::IncreaseLunarBloom, "六命擢升", 0.25);
+            attribute.set_value_by_t(AttributeType::Invisible(InvisibleAttributeType::new(
+                AttributeVariableType::MoonglareElevate,
+                None,
+                None,
+                Some(ReactionType::LunarBloom),
+            )), "六命擢升", 0.25);
         }
     }
 }

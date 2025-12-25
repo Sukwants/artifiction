@@ -3,7 +3,7 @@ use crate::artifacts::artifact_trait::{ArtifactMetaData, ArtifactTrait};
 use crate::artifacts::ArtifactSetName;
 use crate::artifacts::effect::ArtifactEffect;
 use crate::artifacts::effect_config::ArtifactEffectConfig;
-use crate::attribute::{Attribute, AttributeName};
+use crate::attribute::*;
 use crate::character::character_common_data::CharacterCommonData;
 use crate::common::Element;
 use crate::common::i18n::locale;

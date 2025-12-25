@@ -2,7 +2,7 @@ use std::cell::RefCell;
 use std::fmt::Display;
 use std::fs;
 use std::rc::Rc;
-use mona::attribute::{AttributeUtils, SimpleAttributeGraph2};
+use mona::attribute::*;
 use mona::character::{Character, CharacterConfig, CharacterName};
 use mona::damage::DamageContext;
 use mona::enemies::Enemy;
@@ -54,7 +54,7 @@ fn main() {
     println!("{}", code);
 
     // println!("{}", code);
-    let character: Character<SimpleAttributeGraph2> = Character::new(
+    let character: Character<SimpleAttribute> = Character::new(
         CharacterName::Yelan,
         90,
         false,

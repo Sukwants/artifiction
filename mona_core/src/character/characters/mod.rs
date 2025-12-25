@@ -1,7 +1,7 @@
 use crate::character::{CharacterConfig, CharacterName, CharacterStaticData};
 use crate::character::character_common_data::CharacterCommonData;
 use crate::common::{ChangeAttribute, Element};
-use crate::attribute::Attribute;
+use crate::attribute::*;
 
 use crate::character::skill_config::CharacterSkillConfig;
 use crate::damage::damage_builder::DamageBuilder;

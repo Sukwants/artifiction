@@ -3,7 +3,7 @@ use crate::artifacts::ArtifactSetName;
 use crate::artifacts::effect_config::ArtifactEffectConfig;
 use super::super::effect::ArtifactEffect;
 use crate::character::Character;
-use crate::attribute::{Attribute, AttributeName, AttributeCommon};
+use crate::attribute::*;
 use crate::character::character_common_data::CharacterCommonData;
 use crate::common::WeaponType;
 

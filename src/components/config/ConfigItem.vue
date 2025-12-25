@@ -169,7 +169,7 @@
                                 :icon="QuestionFilled"
                                 :underline="false"
                                 style="position: absolute; top: 0px; right: -5px; font-size: 10px;"
-                                href="/help/calculate#global-config"
+                                href="/help/instruction#全局配置"
                             ></el-link>
                             <div style="display: flex; justify-content: space-between; height: 28px; gap: 16px; align-items: center;">
                                 <span><b>{{ "Key" }}</b></span>

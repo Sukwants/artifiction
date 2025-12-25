@@ -617,11 +617,13 @@
                 <h3 class="common-title2" style="margin-top: 24px">{{ t("calcPage.dmg2") }}</h3>
                 <transformative-damage
                     :data="characterTransformativeDamage"
+                    :handleDisplayEventAnalysis="handleDisplayEventAnalysis"
                 ></transformative-damage>
 
                 <h3 class="common-title2" style="margin-top: 24px">{{ t("calcPage.dmg3") }}</h3>
                 <moonglare-damage
                     :data="characterMoonglareDamage"
+                    :handleDisplayEventAnalysis="handleDisplayEventAnalysis"
                 ></moonglare-damage>
             </el-col>
 
@@ -1276,12 +1278,24 @@ const characterMoonglareDamage = computed(() => {
 
 function handleDisplayAnalysis() {
     showDamageAnalysisDialog.value = true
-
+    
     nextTick(() => {
         if (damageAnalysisComponent.value) {
             const component = damageAnalysisComponent.value
 
             component.setValue(characterDamageAnalysis.value)
+        }
+    })
+}
+
+function handleDisplayEventAnalysis(eventAnalysis: any) {
+    showDamageAnalysisDialog.value = true
+    
+    nextTick(() => {
+        if (damageAnalysisComponent.value) {
+            const component = damageAnalysisComponent.value
+
+            component.setValue(eventAnalysis)
         }
     })
 }
@@ -1296,6 +1310,7 @@ const getAttributeWasmInterface = computed(() => {
         buffs: buffsInterface.value,
         artifacts: artifactWasmFormat.value,
         artifact_config: artifactConfigForCalculator.value,
+        skill: characterSkillInterface.value,
     }
 })
 

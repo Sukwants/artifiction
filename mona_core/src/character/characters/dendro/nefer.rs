@@ -1,12 +1,12 @@
 use num_traits::FromPrimitive;
-use crate::attribute::{Attribute, AttributeName, AttributeCommon};
+use crate::attribute::*;
 use crate::character::character_common_data::CharacterCommonData;
 use crate::character::character_sub_stat::CharacterSubStatFamily;
 use crate::character::{CharacterConfig, CharacterName, CharacterStaticData};
 use crate::character::skill_config::CharacterSkillConfig;
 use crate::character::traits::{CharacterSkillMap, CharacterSkillMapItem, CharacterTrait};
 use crate::character::macros::{damage_enum, skill_map};
-use crate::common::{ChangeAttribute, Element, MoonglareReaction, Moonsign, SkillType, WeaponType};
+use crate::common::{ChangeAttribute, Element, MoonglareReaction, Moonsign, ReactionType, SkillType, WeaponType};
 use crate::common::i18n::{locale, hit_n_dmg, plunging_dmg, charged_dmg};
 use crate::common::item_config_type::{ItemConfig, ItemConfigType};
 use crate::damage::damage_builder::DamageBuilder;
@@ -124,7 +124,12 @@ impl<A: Attribute> ChangeAttribute<A> for ReferEffect {
         );
 
         if self.has_c6 && self.moonsign.is_ascendant() {
-            attribute.set_value_by(AttributeName::IncreaseLunarBloom, "六命：决胜于逆转之时", 0.15);
+            attribute.set_value_by_t(AttributeType::Invisible(InvisibleAttributeType::new(
+                AttributeVariableType::MoonglareElevate,
+                None,
+                None,
+                Some(ReactionType::LunarBloom),
+            )), "六命：决胜于逆转之时", 0.15);
         }
     }
 }

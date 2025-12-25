@@ -1,9 +1,7 @@
 use std::collections::HashMap;
 
 use serde::{Serialize, Deserialize};
-use super::complicated_attribute_graph::ComplicatedAttributeGraph;
-
-use super::attribute_name::AttributeName;
+use crate::attribute::*;
 
 
 type AttributeEntryType = HashMap<String, f64>;
@@ -45,49 +43,49 @@ impl AttributeNoReactive {
     }
 }
 
-impl From<&ComplicatedAttributeGraph> for AttributeNoReactive {
-    fn from(graph: &ComplicatedAttributeGraph) -> Self {
+impl From<&AttributeResultWithCharacter<ComplicatedAttributeGraphResult>> for AttributeNoReactive {
+    fn from(attribute_result: &AttributeResultWithCharacter<ComplicatedAttributeGraphResult>) -> Self {
         let mut attribute = AttributeNoReactive::new();
 
-        attribute.atk = graph.get_composition_merge(&vec![
+        attribute.atk = attribute_result.get_result_merge(&vec![
             AttributeName::ATKBase,
             AttributeName::ATKPercentage,
             AttributeName::ATKFixed
         ]).0;
 
-        attribute.def = graph.get_composition_merge(&vec![
+        attribute.def = attribute_result.get_result_merge(&vec![
             AttributeName::DEFBase,
             AttributeName::DEFPercentage,
             AttributeName::DEFFixed
         ]).0;
 
-        attribute.hp = graph.get_composition_merge(&vec![
+        attribute.hp = attribute_result.get_result_merge(&vec![
             AttributeName::HPBase,
             AttributeName::HPPercentage,
             AttributeName::HPFixed
         ]).0;
 
-        attribute.healing_bonus = graph.get_attribute_composition(AttributeName::HealingBonus).0;
-        attribute.elemental_mastery = graph.get_composition_merge(&vec![
+        attribute.healing_bonus = attribute_result.get_result(AttributeName::HealingBonus).0;
+        attribute.elemental_mastery = attribute_result.get_result_merge(&vec![
             AttributeName::ElementalMastery,
             AttributeName::ElementalMasteryExtra
         ]).0;
-        attribute.recharge = graph.get_composition_merge(&vec![
+        attribute.recharge = attribute_result.get_result_merge(&vec![
             AttributeName::Recharge,
             AttributeName::RechargeExtra
         ]).0;
-        attribute.shield_strength = graph.get_attribute_composition(AttributeName::ShieldStrength).0;
-        attribute.critical = graph.get_attribute_composition(AttributeName::CriticalBase).0;
-        attribute.critical_damage = graph.get_attribute_composition(AttributeName::CriticalDamageBase).0;
+        attribute.shield_strength = attribute_result.get_result(AttributeName::ShieldStrength).0;
+        attribute.critical = attribute_result.get_result(AttributeName::CriticalBase).0;
+        attribute.critical_damage = attribute_result.get_result(AttributeName::CriticalDamageBase).0;
 
-        attribute.bonus_electro = graph.get_attribute_composition(AttributeName::BonusElectro).0;
-        attribute.bonus_pyro = graph.get_attribute_composition(AttributeName::BonusPyro).0;
-        attribute.bonus_anemo = graph.get_attribute_composition(AttributeName::BonusAnemo).0;
-        attribute.bonus_cryo = graph.get_attribute_composition(AttributeName::BonusCryo).0;
-        attribute.bonus_hydro = graph.get_attribute_composition(AttributeName::BonusHydro).0;
-        attribute.bonus_geo = graph.get_attribute_composition(AttributeName::BonusGeo).0;
-        attribute.bonus_dendro = graph.get_attribute_composition(AttributeName::BonusDendro).0;
-        attribute.bonus_physical = graph.get_attribute_composition(AttributeName::BonusPhysical).0;
+        attribute.bonus_electro = attribute_result.get_result(AttributeName::BonusElectro).0;
+        attribute.bonus_pyro = attribute_result.get_result(AttributeName::BonusPyro).0;
+        attribute.bonus_anemo = attribute_result.get_result(AttributeName::BonusAnemo).0;
+        attribute.bonus_cryo = attribute_result.get_result(AttributeName::BonusCryo).0;
+        attribute.bonus_hydro = attribute_result.get_result(AttributeName::BonusHydro).0;
+        attribute.bonus_geo = attribute_result.get_result(AttributeName::BonusGeo).0;
+        attribute.bonus_dendro = attribute_result.get_result(AttributeName::BonusDendro).0;
+        attribute.bonus_physical = attribute_result.get_result(AttributeName::BonusPhysical).0;
 
         // todo other attributes
 

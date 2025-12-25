@@ -1,7 +1,9 @@
 pub use target_function_name::TargetFunctionName;
 pub use target_function_config::TargetFunctionConfig;
-pub use target_function::TargetFunction;
+pub use target_function::{TargetFunction, TargetFunctionAttributeType, TargetFunctionAttributeResultType, TargetFunctionMetaTrait};
 pub use target_function_utils::TargetFunctionUtils;
+pub use target_function_meta::{TargetFunctionFor, TargetFunctionMeta, TargetFunctionMetaImage};
+pub use target_function_opt_config::TargetFunctionOptConfig;
 
 pub mod target_function;
 pub mod target_functions;

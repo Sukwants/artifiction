@@ -1,12 +1,11 @@
 use std::cmp::{Ordering, Reverse};
 use std::collections::{BinaryHeap, HashMap};
-use serde::__private::ser::constrain;
 use mona::attribute::{Attribute, AttributeCommon, AttributeName, AttributeUtils};
 use crate::applications::optimize_artifacts::algorithm::SingleOptimizeAlgorithm;
 use crate::applications::optimize_artifacts::inter::{ConstraintConfig, ConstraintSetMode, OptimizationResult};
 use mona::artifacts::{Artifact, ArtifactList, ArtifactSlotName};
 use mona::artifacts::effect_config::ArtifactEffectConfig;
-use mona::attribute::SimpleAttributeGraph2;
+use mona::attribute::*;
 use mona::buffs::Buff;
 use mona::character::Character;
 use mona::enemies::Enemy;
@@ -92,7 +91,7 @@ fn check_artifact_set(list: &[&Artifact], constraint: &ConstraintConfig) -> bool
     5 - list.len() >= count
 }
 
-fn check_attribute(attribute: &SimpleAttributeGraph2, constraint: &ConstraintConfig) -> bool {
+fn check_attribute(attribute: &SimpleAttributeResult, constraint: &ConstraintConfig) -> bool {
     if attribute.get_atk() < constraint.atk_min.unwrap_or(0.0) {
         return false;
     }
@@ -126,7 +125,7 @@ pub struct CutoffAlgorithmHeuristic {
 }
 
 impl SingleOptimizeAlgorithm for CutoffAlgorithmHeuristic {
-    fn optimize(&self, artifacts: &[&Artifact], artifact_config: Option<ArtifactEffectConfig>, character: &Character<SimpleAttributeGraph2>, weapon: &Weapon<SimpleAttributeGraph2>, target_function: &Box<dyn TargetFunction>, enemy: &Enemy, buffs: &[Box<dyn Buff<SimpleAttributeGraph2>>], constraint: &ConstraintConfig, count: usize) -> Vec<OptimizationResult> {
+    fn optimize(&self, artifacts: &[&Artifact], artifact_config: Option<ArtifactEffectConfig>, character: &Character<SimpleAttribute>, weapon: &Weapon<SimpleAttribute>, target_function: &Box<dyn TargetFunction>, enemy: &Enemy, buffs: &[Box<dyn Buff<SimpleAttribute>>], constraint: &ConstraintConfig, count: usize) -> Vec<OptimizationResult> {
         let need_constraint = !constraint.is_any();
 
         let mut enemy = enemy.clone();

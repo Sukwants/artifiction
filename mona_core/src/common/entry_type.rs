@@ -14,6 +14,16 @@ impl EntryType {
         }
     }
 
+    pub fn merge_with(&self, other: &EntryType) -> Self {
+        let mut temp = self.clone();
+
+        for (k, v) in other.0.iter() {
+            *temp.0.entry(k.clone()).or_insert(0.0) += *v;
+        }
+
+        temp
+    }
+
     pub fn sum(&self) -> f64 {
         self.0.values().sum::<f64>()
     }

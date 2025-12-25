@@ -1,6 +1,6 @@
 use crate::artifacts::Artifact;
 use crate::artifacts::effect_config::ArtifactEffectConfig;
-use crate::attribute::SimpleAttributeGraph2;
+use crate::attribute::*;
 use crate::character::{Character, CharacterName};
 use crate::character::character_common_data::CharacterCommonData;
 use crate::character::characters::Lauma;
@@ -12,10 +12,7 @@ use crate::common::{moonsign, Moonsign};
 use crate::damage::{DamageContext, SimpleDamageBuilder};
 use crate::damage::transformative_damage::transformative_damage;
 use crate::enemies::Enemy;
-use crate::target_functions::target_function::TargetFunctionMetaTrait;
-use crate::target_functions::target_function_meta::{TargetFunctionFor, TargetFunctionMeta, TargetFunctionMetaImage};
-use crate::target_functions::target_function_opt_config::TargetFunctionOptConfig;
-use crate::target_functions::{TargetFunction, TargetFunctionConfig, TargetFunctionName};
+use crate::target_functions::*;
 use crate::team::TeamQuantization;
 use crate::weapon::Weapon;
 use crate::weapon::weapon_common_data::WeaponCommonData;
@@ -94,8 +91,8 @@ impl TargetFunction for LaumaDefaultTargetFunction {
         Default::default()
     }
 
-    fn target(&self, attribute: &SimpleAttributeGraph2, character: &Character<SimpleAttributeGraph2>, weapon: &Weapon<SimpleAttributeGraph2>, artifacts: &[&Artifact], enemy: &Enemy) -> f64 {
-        let context: DamageContext<'_, SimpleAttributeGraph2> = DamageContext {
+    fn target(&self, attribute: &TargetFunctionAttributeResultType, character: &Character<TargetFunctionAttributeType>, weapon: &Weapon<TargetFunctionAttributeType>, artifacts: &[&Artifact], enemy: &Enemy) -> f64 {
+        let context: DamageContext<'_, TargetFunctionAttributeResultType> = DamageContext {
             character_common_data: &character.common_data,
             attribute,
             enemy
@@ -115,10 +112,11 @@ impl TargetFunction for LaumaDefaultTargetFunction {
         let dmg_c6a = if context.character_common_data.constellation >= 6 {
             Lauma::damage::<SimpleDamageBuilder>(&context, <Lauma as CharacterTrait>::DamageEnumType::C6A, &config, None).normal.expectation
         } else { 0.0 } * 18.0; // 12s 内共计六轮普攻
+        let trans = transformative_damage::<SimpleDamageBuilder>(character.common_data.level, attribute, enemy);
         let dmg_bloom = 
-            transformative_damage(character.common_data.level, attribute, enemy).bloom * self.bloom_count as f64
-            + transformative_damage(character.common_data.level, attribute, enemy).hyperbloom * self.hyperbloom_count as f64
-            + transformative_damage(character.common_data.level, attribute, enemy).burgeon * self.burgeon_count as f64;
+            trans.bloom.expectation * self.bloom_count as f64
+            + trans.hyperbloom.expectation * self.hyperbloom_count as f64
+            + trans.burgeon.expectation * self.burgeon_count as f64;
 
         dmg_e + dmg_frostgrove_sanctuary + dmg_c6a + dmg_bloom
     }

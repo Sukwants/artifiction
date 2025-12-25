@@ -93,14 +93,19 @@ pub fn mona_abs(params: ParamVecType, _env: &mut MonaEnv) -> FunctionReturnType 
     Ok(Some(Rc::new(RefCell::new(obj))))
 }
 
-macro insert_global($m:ident, $name:expr, $func:ident) {
-    let t = MonaObjectBuiltinFunction {
-        name: String::from($name),
-        handler: Box::new($func)
-    };
-    ($m).insert(String::from($name), Rc::new(RefCell::new(MonaObject {
-        data: MonaObjectEnum::BuiltinFunction(t)
-    })));
+macro_rules! insert_global {
+    ($m:expr, $name:expr, $func:expr) => {{
+        let t = MonaObjectBuiltinFunction {
+            name: String::from($name),
+            handler: Box::new($func),
+        };
+        ($m).insert(
+            String::from($name),
+            Rc::new(RefCell::new(MonaObject {
+                data: MonaObjectEnum::BuiltinFunction(t),
+            })),
+        );
+    }};
 }
 
 pub fn setup_global_namespace() -> Namespace {

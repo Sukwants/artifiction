@@ -1,4 +1,4 @@
-use crate::attribute::{Attribute, AttributeName, AttributeCommon};
+use crate::attribute::*;
 use crate::character::{CharacterConfig, CharacterName, CharacterStaticData};
 // use strum_macros::{EnumCount as EnumCountMacro, EnumString};
 // use num_derive::FromPrimitive;

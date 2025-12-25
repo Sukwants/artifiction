@@ -1,5 +1,19 @@
-use crate::{target_functions::{TargetFunction, TargetFunctionConfig, TargetFunctionName, target_function::TargetFunctionMetaTrait, target_function_meta::{TargetFunctionMeta, TargetFunctionFor, TargetFunctionMetaImage}}, damage::{DamageContext, SimpleDamageBuilder}, attribute::SimpleAttributeGraph2, character::{characters::Alhaitham, traits::CharacterTrait, skill_config::CharacterSkillConfig, CharacterName}, common::item_config_type::{ItemConfig, ItemConfigType}};
+use crate::artifacts::effect_config::ArtifactEffectConfig;
+use crate::artifacts::Artifact;
+use crate::attribute::*;
+use crate::character::character_common_data::CharacterCommonData;
+use crate::character::characters::Alhaitham;
+use crate::character::skill_config::CharacterSkillConfig;
+use crate::character::traits::CharacterTrait;
+use crate::character::{Character, CharacterName};
 use crate::common::i18n::locale;
+use crate::common::item_config_type::{ItemConfig, ItemConfigType};
+use crate::damage::{DamageContext, SimpleDamageBuilder};
+use crate::enemies::Enemy;
+use crate::target_functions::*;
+use crate::team::TeamQuantization;
+use crate::weapon::weapon_common_data::WeaponCommonData;
+use crate::weapon::Weapon;
 
 pub struct AlhaithamDefaultTargetFunction {
     pub charged_ratio: f64,
@@ -17,15 +31,9 @@ impl TargetFunction for AlhaithamDefaultTargetFunction {
         unimplemented!()
     }
 
-    fn target(
-            &self,
-            attribute: &crate::attribute::SimpleAttributeGraph2,
-            character: &crate::character::Character<crate::attribute::SimpleAttributeGraph2>,
-            weapon: &crate::weapon::Weapon<crate::attribute::SimpleAttributeGraph2>,
-            artifacts: &[&crate::artifacts::Artifact],
-            enemy: &crate::enemies::Enemy
-        ) -> f64 {
-        let context: DamageContext<'_, SimpleAttributeGraph2> = DamageContext {
+
+    fn target(&self, attribute: &TargetFunctionAttributeResultType, character: &Character<TargetFunctionAttributeType>, weapon: &Weapon<TargetFunctionAttributeType>, artifacts: &[&Artifact], enemy: &Enemy) -> f64 {
+        let context: DamageContext<'_, TargetFunctionAttributeResultType> = DamageContext {
             character_common_data: &character.common_data,
             enemy: enemy,
             attribute: &attribute,

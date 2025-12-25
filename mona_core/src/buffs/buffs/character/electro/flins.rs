@@ -1,4 +1,4 @@
-use crate::attribute::{Attribute, AttributeName};
+use crate::attribute::*;
 use crate::buffs::{Buff, BuffConfig};
 use crate::buffs::buff::BuffMeta;
 use crate::buffs::buff_meta::{BuffFrom, BuffGenre, BuffImage, BuffMetaData};
@@ -6,7 +6,7 @@ use crate::buffs::buff_name::BuffName;
 use crate::character::CharacterName;
 use crate::common::i18n::locale;
 use crate::common::item_config_type::{ItemConfig, ItemConfigType};
-use crate::common::Moonsign;
+use crate::common::{Moonsign, ReactionType};
 
 pub struct BuffFlinsP3 {
     pub atk: f64,
@@ -66,7 +66,12 @@ impl<A: Attribute> Buff<A> for BuffFlinsC6 {
     fn change_attribute(&self, attribute: &mut A) {
 
         if self.moonsign.is_ascendant() {
-            attribute.set_value_by(AttributeName::IncreaseLunarCharged, "菲林斯「歌与亡者之舞」", 0.1);
+            attribute.set_value_by_t(AttributeType::Invisible(InvisibleAttributeType::new(
+                AttributeVariableType::MoonglareElevate,
+                None,
+                None,
+                Some(ReactionType::LunarCharged),
+            )), "菲林斯「歌与亡者之舞」", 0.1);
         }
     }
 }

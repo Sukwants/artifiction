@@ -1,4 +1,4 @@
-use crate::attribute::{Attribute, AttributeName};
+use crate::attribute::*;
 use crate::buffs::{Buff, BuffConfig};
 use crate::buffs::buff::BuffMeta;
 use crate::buffs::buff_meta::{BuffFrom, BuffGenre, BuffImage, BuffMetaData};
@@ -6,7 +6,7 @@ use crate::buffs::buff_name::BuffName;
 use crate::character::CharacterName;
 use crate::common::i18n::locale;
 use crate::common::item_config_type::{ItemConfig, ItemConfigType};
-use crate::common::Moonsign;
+use crate::common::{Moonsign, ReactionType};
 use crate::character::characters::dendro::lauma::LAUMA_SKILL;
 
 pub struct BuffLaumaE {
@@ -146,13 +146,25 @@ pub struct BuffLaumaP1 {
 impl<A: Attribute> Buff<A> for BuffLaumaP1 {
     fn change_attribute(&self, attribute: &mut A) {
         if self.moonsign == Moonsign::Nascent {
-            attribute.set_value_by(AttributeName::CriticalDamageBloom, "菈乌玛「奉向霜夜的明光」", 1.0);
-            attribute.set_value_by(AttributeName::CriticalDamageHyperbloom, "菈乌玛「奉向霜夜的明光」", 1.0);
-            attribute.set_value_by(AttributeName::CriticalDamageBurgeon , "菈乌玛「奉向霜夜的明光」", 1.0);
+                attribute.set_value_to_t(AttributeType::Invisible(InvisibleAttributeType::new(
+                    AttributeVariableType::CriticalDamage, None, None, Some(ReactionType::Bloom),
+                )), "菈乌玛「奉向霜夜的明光」", 1.0);
+                attribute.set_value_to_t(AttributeType::Invisible(InvisibleAttributeType::new(
+                    AttributeVariableType::CriticalDamage, None, None, Some(ReactionType::Hyperbloom),
+                )), "菈乌玛「奉向霜夜的明光」", 1.0);
+                attribute.set_value_to_t(AttributeType::Invisible(InvisibleAttributeType::new(
+                    AttributeVariableType::CriticalDamage, None, None, Some(ReactionType::Burgeon),
+                )), "菈乌玛「奉向霜夜的明光」", 1.0);
 
-            attribute.set_value_to(AttributeName::CriticalBloom, "菈乌玛「奉向霜夜的明光」", 0.15);
-            attribute.set_value_to(AttributeName::CriticalHyperbloom, "菈乌玛「奉向霜夜的明光」", 0.15);
-            attribute.set_value_to(AttributeName::CriticalBurgeon , "菈乌玛「奉向霜夜的明光」", 0.15);
+                attribute.set_value_by_t(AttributeType::Invisible(InvisibleAttributeType::new(
+                    AttributeVariableType::CriticalRate, None, None, Some(ReactionType::Bloom),
+                )), "菈乌玛「奉向霜夜的明光」", 0.15);
+                attribute.set_value_by_t(AttributeType::Invisible(InvisibleAttributeType::new(
+                    AttributeVariableType::CriticalRate, None, None, Some(ReactionType::Hyperbloom),
+                )), "菈乌玛「奉向霜夜的明光」", 0.15);
+                attribute.set_value_by_t(AttributeType::Invisible(InvisibleAttributeType::new(
+                    AttributeVariableType::CriticalRate, None, None, Some(ReactionType::Burgeon),
+                )), "菈乌玛「奉向霜夜的明光」", 0.15);
         }
         if self.moonsign == Moonsign::Ascendant {
             attribute.set_value_by(AttributeName::CriticalDamageLunarBloom, "菈乌玛「奉向霜夜的明光」", 0.2);
@@ -245,6 +257,54 @@ impl BuffMeta for BuffLaumaP3 {
         };
         Box::new(BuffLaumaP3 {
             em,
+        })
+    }
+}
+
+pub struct BuffLaumaC6 {
+    pub moonsign: Moonsign,
+}
+
+impl<A: Attribute> Buff<A> for BuffLaumaC6 {
+    fn change_attribute(&self, attribute: &mut A) {
+        attribute.set_value_by_t(AttributeType::Invisible(InvisibleAttributeType::new(
+            AttributeVariableType::MoonglareElevate,
+            None,
+            None,
+            Some(ReactionType::LunarBloom),
+        )), "菈乌玛-「『我愿将这血与泪奉予月明』」", 0.25);
+    }
+}
+
+impl BuffMeta for BuffLaumaC6 {
+    #[cfg(not(target_family = "wasm"))]
+    const META_DATA: BuffMetaData = BuffMetaData {
+        name: BuffName::LaumaC6,
+        name_locale: locale!(
+            zh_cn: "菈乌玛-「『我愿将这血与泪奉予月明』」",
+            en: "Lauma-\"I Offer Blood and Tears to the Moonlight\""
+        ),
+        image: BuffImage::Avatar(CharacterName::Lauma),
+        genre: BuffGenre::Character,
+        description: Some(locale!(
+            zh_cn: "菈乌玛命座6：月兆·满辉：队伍中附近的所有角色造成的月绽放反应伤害擢升25%。",
+            en: "Lauma C6: Moonsign: Ascendant Gleam: All nearby party members' Lunar-Bloom DMG is elevated by 25%."
+        )),
+        from: BuffFrom::Character(CharacterName::Lauma),
+    };
+
+    #[cfg(not(target_family = "wasm"))]
+    const CONFIG: Option<&'static [ItemConfig]> = Some(&[
+        ItemConfig::MOONSIGN_GLOBAL(Moonsign::Nascent, ItemConfig::PRIORITY_BUFF),
+    ]);
+
+    fn create<A: Attribute>(b: &BuffConfig) -> Box<dyn Buff<A>> {
+        let moonsign = match *b {
+            BuffConfig::LaumaC6 { moonsign } => moonsign,
+            _ => Moonsign::None
+        };
+        Box::new(BuffLaumaC6 {
+            moonsign,
         })
     }
 }

@@ -1,6 +1,6 @@
 use crate::artifacts::Artifact;
 use crate::artifacts::effect_config::ArtifactEffectConfig;
-use crate::attribute::SimpleAttributeGraph2;
+use crate::attribute::*;
 use crate::character::Character;
 use crate::character::character_common_data::CharacterCommonData;
 use crate::common::item_config_type::ItemConfig;
@@ -22,16 +22,20 @@ pub trait TargetFunctionMetaTrait: TargetFunction {
     fn create(character: &CharacterCommonData, weapon: &WeaponCommonData, config: &TargetFunctionConfig) -> Box<dyn TargetFunction>;
 }
 
+pub type TargetFunctionAttributeType = SimpleAttribute;
+pub type TargetFunctionAttributeResultType = SimpleAttributeResult;
+
 pub trait TargetFunction {
+    
     fn get_target_function_opt_config(&self) -> TargetFunctionOptConfig;
 
     fn get_default_artifact_config(&self, team_config: &TeamQuantization) -> ArtifactEffectConfig;
 
     fn target(
         &self,
-        attribute: &SimpleAttributeGraph2,
-        character: &Character<SimpleAttributeGraph2>,
-        weapon: &Weapon<SimpleAttributeGraph2>,
+        attribute: &SimpleAttributeResult,
+        character: &Character<SimpleAttribute>,
+        weapon: &Weapon<SimpleAttribute>,
         artifacts: &[&Artifact],
         enemy: &Enemy
     ) -> f64;

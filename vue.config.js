@@ -11,6 +11,11 @@ const Components = require("unplugin-vue-components/webpack")
 const { ElementPlusResolver } = require("unplugin-vue-components/resolvers")
 const IconsResolver = require("unplugin-icons/resolver")
 const Icons = require("unplugin-icons/webpack")
+const Markdown = require('unplugin-vue-markdown/webpack')
+const prism = require('markdown-it-prism')
+const katex = require('markdown-it-katex')
+const markdownItAnchor = require('markdown-it-anchor')
+const markdownItTOC = require('markdown-it-toc-done-right')
 
 const revision = execSync("git rev-parse HEAD").toString().trim().substring(0, 7)
 console.log("revision: ", revision)
@@ -156,6 +161,28 @@ module.exports = {
             .use("i18n-loader")
                 .loader("./loaders/i18n_loader.js")
 
+
+        // use markdown loader
+        config.module
+            .rule('vue')
+            .test(/\.(vue|md)$/)
+        config
+            .plugin('markdown')
+            .use(Markdown({
+                markdownItSetup(md) {
+                    md.use(prism)
+                    md.use(katex)
+                    md.use(markdownItAnchor, {
+                        permalink: false,
+                    })
+                    md.use(markdownItTOC, {
+                        level: [1, 2, 3],
+                        listType: 'ul',
+                        containerClass: 'markdown-toc'
+                    })
+                }
+            }))
+
         // merge custom env
         config.plugin("define").tap(definitions => {
             const definePluginConverted = convertKVToDefinePlugin(customEnv)
@@ -222,4 +249,5 @@ module.exports = {
         }
     },
     productionSourceMap: false,
+    parallel: false,
 }

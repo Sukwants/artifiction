@@ -12,8 +12,6 @@ pub struct MonaObjectDamage {
     pub vaporize: Option<DamageResult>,
     pub spread: Option<DamageResult>,
     pub aggravate: Option<DamageResult>,
-    pub is_heal: bool,
-    pub is_shield: bool,
 }
 
 impl MonaObjectTrait for MonaObjectDamage {
@@ -138,7 +136,7 @@ impl MonaObjectTrait for MonaObjectTransformativeDamage {
             }
         };
 
-        let obj = MonaObject::new_number(value);
+        let obj = MonaObject::new_number(value.expectation);
         Ok(Rc::new(RefCell::new(obj)))
     }
 }

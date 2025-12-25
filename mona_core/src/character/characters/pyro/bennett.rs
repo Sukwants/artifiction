@@ -1,5 +1,5 @@
 use num_derive::FromPrimitive;
-use crate::attribute::{Attribute, AttributeName};
+use crate::attribute::*;
 use crate::character::character_common_data::CharacterCommonData;
 use crate::character::character_sub_stat::CharacterSubStatFamily;
 use crate::character::{CharacterConfig, CharacterName, CharacterStaticData};
@@ -93,16 +93,6 @@ pub const BENNETT_STATIC_DATA: CharacterStaticData = CharacterStaticData {
 };
 
 pub struct Bennett;
-
-impl Bennett {
-    pub fn atk_bonus<A: Attribute>(common_data: &CharacterCommonData, attribute: &A) -> f64 {
-        let base_atk = attribute.get_value(AttributeName::ATKBase);
-        let s3 = common_data.skill3;
-
-        let bonus = BENNETT_SKILL.elemental_burst_atk_bonus[s3] + (if common_data.constellation >= 1 { 0.2 } else { 0.0 });
-        bonus * base_atk
-    }
-}
 
 #[derive(Copy, Clone, Eq, PartialEq)]
 #[derive(FromPrimitive, EnumCountMacro, EnumString)]
