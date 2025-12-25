@@ -1,8 +1,8 @@
+use super::{AttributeName, AttributeNode, AttributeType};
 use crate::attribute::{ComplicatedAttributeGraphResult, SimpleAttributeGraphResult};
+use crate::character::team_status::CharacterStatus;
 use crate::common::{Element, SkillType};
 use crate::damage::damage_builder::DamageBuilder;
-use super::{AttributeName, AttributeType, AttributeNode};
-use crate::character::team_status::CharacterStatus;
 
 pub trait AttributeGraphResult {
     type ResultType;
@@ -24,7 +24,7 @@ pub type ComplicatedAttributeResult = AttributeResultWithCharacter<ComplicatedAt
 
 pub trait AttributeResult {
     type ResultType;
-    
+
     fn get_value(&self, name: AttributeName) -> f64;
 
     fn get_result(&self, name: AttributeName) -> Self::ResultType;
@@ -34,7 +34,8 @@ pub trait AttributeResult {
     fn get_result_merge(&self, names: &[AttributeName]) -> Self::ResultType;
 
     fn get_em_all(&self) -> f64 {
-        self.get_value(AttributeName::ElementalMastery) + self.get_value(AttributeName::ElementalMasteryExtra)
+        self.get_value(AttributeName::ElementalMastery)
+            + self.get_value(AttributeName::ElementalMasteryExtra)
     }
 
     fn get_atk(&self) -> f64 {
@@ -65,8 +66,7 @@ pub trait AttributeResult {
             0.0
         };
 
-        self.get_value(AttributeName::ATKRatioBase)
-            + self.get_value(key1) + value2
+        self.get_value(AttributeName::ATKRatioBase) + self.get_value(key1) + value2
     }
 
     fn get_def_ratio(&self, element: Element, skill: SkillType) -> f64 {
@@ -79,8 +79,7 @@ pub trait AttributeResult {
             0.0
         };
 
-        self.get_value(AttributeName::DEFRatioBase)
-            + self.get_value(key1) + value2
+        self.get_value(AttributeName::DEFRatioBase) + self.get_value(key1) + value2
     }
 
     fn get_hp_ratio(&self, element: Element, skill: SkillType) -> f64 {
@@ -93,8 +92,7 @@ pub trait AttributeResult {
             0.0
         };
 
-        self.get_value(AttributeName::HPRatioBase)
-            + self.get_value(key1) + value2
+        self.get_value(AttributeName::HPRatioBase) + self.get_value(key1) + value2
     }
 
     fn get_extra_damage(&self, element: Element, skill: SkillType) -> f64 {
@@ -113,8 +111,7 @@ pub trait AttributeResult {
             0.0
         };
 
-        self.get_value(AttributeName::ExtraDmgBase)
-            + self.get_value(key1) + value2 + value3
+        self.get_value(AttributeName::ExtraDmgBase) + self.get_value(key1) + value2 + value3
     }
 
     fn get_bonus(&self, element: Element, skill: SkillType) -> f64 {
@@ -127,8 +124,7 @@ pub trait AttributeResult {
             0.0
         };
 
-        let mut temp = self.get_value(AttributeName::BonusBase)
-            + self.get_value(key1) + value2;
+        let mut temp = self.get_value(AttributeName::BonusBase) + self.get_value(key1) + value2;
         // todo refactor
         if element != Element::Physical && skill == SkillType::NormalAttack {
             temp += self.get_value(AttributeName::BonusNormalAndElemental);
@@ -146,8 +142,10 @@ pub trait AttributeResult {
             0.0
         };
 
-        self.get_value(AttributeName::CriticalBase) + self.get_value(AttributeName::CriticalAttacking)
-            + self.get_value(key1) + value2
+        self.get_value(AttributeName::CriticalBase)
+            + self.get_value(AttributeName::CriticalAttacking)
+            + self.get_value(key1)
+            + value2
     }
 
     fn get_critical_damage(&self, element: Element, skill: SkillType) -> f64 {
@@ -160,8 +158,7 @@ pub trait AttributeResult {
             0.0
         };
 
-        self.get_value(AttributeName::CriticalDamageBase)
-            + self.get_value(key1) + value2
+        self.get_value(AttributeName::CriticalDamageBase) + self.get_value(key1) + value2
     }
 
     fn get_enemy_res_minus(&self, element: Element, _skill: SkillType) -> f64 {
@@ -178,21 +175,25 @@ impl<ResultTy: AttributeGraphResult> AttributeResult for AttributeResultWithChar
     type ResultType = ResultTy::ResultType;
 
     fn get_value(&self, name: AttributeName) -> f64 {
-        self.result.get_attribute_value(AttributeNode::new_panel(self.character_id, name))
+        self.result
+            .get_attribute_value(AttributeNode::new_panel(self.character_id, name))
     }
 
     fn get_result(&self, name: AttributeName) -> Self::ResultType {
-        self.result.get_attribute(AttributeNode::new_panel(self.character_id, name))
+        self.result
+            .get_attribute(AttributeNode::new_panel(self.character_id, name))
     }
 
     fn get_result_t(&self, ty: AttributeType) -> Self::ResultType {
-        self.result.get_attribute(AttributeNode::new(self.character_id, ty))
+        self.result
+            .get_attribute(AttributeNode::new(self.character_id, ty))
     }
 
     fn get_result_merge(&self, names: &[AttributeName]) -> Self::ResultType {
-        let nodes: Vec<AttributeNode> = names.iter().map(|&name| {
-            AttributeNode::new_panel(self.character_id, name)
-        }).collect();
+        let nodes: Vec<AttributeNode> = names
+            .iter()
+            .map(|&name| AttributeNode::new_panel(self.character_id, name))
+            .collect();
         self.result.get_attribute_merge(nodes.as_slice())
     }
 }

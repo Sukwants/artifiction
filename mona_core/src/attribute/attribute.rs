@@ -1,10 +1,10 @@
 use std::sync::Arc;
 
 use super::attribute_name::{AttributeName, InvisibleAttributeType};
-use crate::attribute::{self, AttributeGraphResult, AttributeResult, AttributeResultWithCharacter};
 use crate::attribute::complicated_attribute_graph::ComplicatedAttributeGraph;
 use crate::attribute::simple_attribute_graph2::SimpleAttributeGraph2;
 use crate::attribute::typing::{EdgeFunctionBwd, EdgeFunctionFwd};
+use crate::attribute::{self, AttributeGraphResult, AttributeResult, AttributeResultWithCharacter};
 use crate::character::team_status::{CharacterSelector, CharacterStatus};
 use crate::character::CharacterStaticData;
 use crate::common::{Element, SkillType};
@@ -164,7 +164,7 @@ pub type ComplicatedAttribute = AttributeWithCharacter<ComplicatedAttributeGraph
 impl<GraphTy: AttributeGraph> Attribute for AttributeWithCharacter<GraphTy> {
     type GraphTy = GraphTy;
     type ResultType = AttributeResultWithCharacter<<Self::GraphTy as AttributeGraph>::ResultType>;
-    
+
     fn new(attribute: GraphTy, character_id: usize) -> Self {
         AttributeWithCharacter {
             attribute,
@@ -434,9 +434,21 @@ impl<T: Attribute> AttributeCommon<T> for T {
                 EdgePriority::Static,
             );
 
-            temp.set_value_by_internal(AttributeNode::new_panel(character.character_id, AttributeName::CriticalBase), "初始值", 0.05);
-            temp.set_value_by_internal(AttributeNode::new_panel(character.character_id, AttributeName::CriticalDamageBase), "初始值", 0.5);
-            temp.set_value_by_internal(AttributeNode::new_panel(character.character_id, AttributeName::Recharge), "初始值", 1.0);
+            temp.set_value_by_internal(
+                AttributeNode::new_panel(character.character_id, AttributeName::CriticalBase),
+                "初始值",
+                0.05,
+            );
+            temp.set_value_by_internal(
+                AttributeNode::new_panel(character.character_id, AttributeName::CriticalDamageBase),
+                "初始值",
+                0.5,
+            );
+            temp.set_value_by_internal(
+                AttributeNode::new_panel(character.character_id, AttributeName::Recharge),
+                "初始值",
+                1.0,
+            );
         }
 
         temp
@@ -512,7 +524,15 @@ impl<T: Attribute> AttributeCommon<T> for T {
         bwd: EdgeFunctionBwd,
         key: &str,
     ) {
-        T::add_edge_n2(self, from1, from2, to, Arc::from(fwd), key, EdgePriority::Common);
+        T::add_edge_n2(
+            self,
+            from1,
+            from2,
+            to,
+            Arc::from(fwd),
+            key,
+            EdgePriority::Common,
+        );
     }
 
     fn add_edge_n1(
