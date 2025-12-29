@@ -123,4 +123,6 @@ pub enum TargetFunctionName {
     FlinsDefault,
     NeferDefault,
     DurinDefault,
+    ColumbinaOffField,
+    ColumbinaOnField,
 }

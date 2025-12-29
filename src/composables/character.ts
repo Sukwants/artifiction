@@ -1,4 +1,4 @@
-const DEFAULT_CHARACTER = "Durin";
+const DEFAULT_CHARACTER = "Columbina";
 
 import type {WeaponType} from "@/types/weapon"
 // @ts-ignore

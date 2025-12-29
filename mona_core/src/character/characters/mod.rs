@@ -10,6 +10,8 @@ use crate::target_functions::TargetFunction;
 use crate::team::TeamQuantization;
 use crate::weapon::weapon_common_data::WeaponCommonData;
 
+pub mod prelude;
+
 pub mod traveller;
 pub mod pyro;
 pub mod electro;

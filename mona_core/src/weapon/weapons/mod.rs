@@ -4,6 +4,8 @@ pub mod polearms;
 pub mod catalysts;
 pub mod bows;
 
+pub mod prelude;
+
 pub use swords::*;
 pub use claymores::*;
 pub use polearms::*;

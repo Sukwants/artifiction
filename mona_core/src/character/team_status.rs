@@ -58,4 +58,28 @@ impl CharacterSelector {
         }
         list
     }
+
+    pub fn select_self(character_id: usize) -> Self {
+        CharacterSelector {
+            selector: Arc::new(move |status: &CharacterStatus| status.character_id == character_id ),
+        }
+    }
+
+    pub fn select_onfield(team_id: usize) -> Self {
+        CharacterSelector {
+            selector: Arc::new(move |status: &CharacterStatus| status.on_field && status.team_id == team_id ),
+        }
+    }
+
+    pub fn select_team(team_id: usize) -> Self {
+        CharacterSelector {
+            selector: Arc::new(move |status: &CharacterStatus| status.team_id == team_id ),
+        }
+    }
+
+    pub fn select_all() -> Self {
+        CharacterSelector {
+            selector: Arc::new(move |status: &CharacterStatus| true ),
+        }
+    }
 }

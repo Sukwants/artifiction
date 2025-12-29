@@ -220,6 +220,7 @@ pub enum WeaponName {
     VividNotions,
     NightweaversLookingGlass,
     ReliquaryOfTruth,
+    NocturnesCurtainCall,
 
     // bows
     // 1 star

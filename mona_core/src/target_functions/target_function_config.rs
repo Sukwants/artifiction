@@ -67,5 +67,7 @@ pub enum TargetFunctionConfig {
     LaumaDefault { bloom_count: usize, hyperbloom_count: usize, burgeon_count: usize },
     FlinsDefault { lunar_charged_coefficient: f64, if_thunderclouds: bool },
     DurinDefault { vaporize_rate: f64, melt_rate: f64, atk_demand: f64 },
+    ColumbinaOffField { lunar_charged_coefficient: f64, lunar_crystallize_coefficient: f64, hp_demand: f64 },
+    ColumbinaOnField {},
     NoConfig,
 }

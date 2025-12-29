@@ -47,6 +47,7 @@ pub use blackmarrow_lantern::BlackmarrowLantern;
 pub use etherlight_spindlelute::EtherlightSpindlelute;
 pub use reliquary_of_truth::ReliquaryOfTruth;
 pub use dawning_frost::DawningFrost;
+pub use nocturnes_curtain_call::NocturnesCurtainCall;
 
 pub mod lost_prayer_to_the_sacred_winds;
 pub mod skyward_atlas;
@@ -97,3 +98,4 @@ pub mod blackmarrow_lantern;
 pub mod etherlight_spindlelute;
 pub mod reliquary_of_truth;
 pub mod dawning_frost;
+pub mod nocturnes_curtain_call;
