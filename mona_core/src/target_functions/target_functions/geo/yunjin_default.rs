@@ -113,7 +113,8 @@ impl TargetFunction for YunjinDefaultTargetFunction {
             .build()
     }
 
-    fn target(&self, attribute: &TargetFunctionAttributeResultType, _character: &Character<TargetFunctionAttributeType>, _weapon: &Weapon<TargetFunctionAttributeType>, _artifacts: &[&Artifact], _enemy: &Enemy) -> f64 {
+    fn target(&self, attribute: &TargetFunctionAttributeType, _character: &Character<TargetFunctionAttributeType>, _weapon: &Weapon<TargetFunctionAttributeType>, _artifacts: &[&Artifact], _enemy: &Enemy) -> f64 {
+        let attribute = &attribute.solve();
         let def = attribute.get_value(AttributeName::DEF);
         let r = attribute.get_value(AttributeName::Recharge).min(self.recharge_demand);
 

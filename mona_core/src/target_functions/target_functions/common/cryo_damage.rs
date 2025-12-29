@@ -111,7 +111,8 @@ impl TargetFunction for CryoDamageTargetFunction {
         Default::default()
     }
 
-    fn target(&self, attribute: &TargetFunctionAttributeResultType, _character: &Character<TargetFunctionAttributeType>, _weapon: &Weapon<TargetFunctionAttributeType>, _artifacts: &[&Artifact], _enemy: &Enemy) -> f64 {
+    fn target(&self, attribute: &TargetFunctionAttributeType, _character: &Character<TargetFunctionAttributeType>, _weapon: &Weapon<TargetFunctionAttributeType>, _artifacts: &[&Artifact], _enemy: &Enemy) -> f64 {
+        let attribute = &attribute.solve();
         let atk = attribute.get_atk();
         let crit = attribute.get_value(AttributeName::CriticalBase) + attribute.get_value(AttributeName::CriticalCryo)
             + attribute.get_value(AttributeName::CriticalAttacking);

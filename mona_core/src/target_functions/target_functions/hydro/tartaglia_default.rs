@@ -93,7 +93,8 @@ impl TargetFunction for TartagliaDefaultTargetFunction {
             .build()
     }
 
-    fn target(&self, attribute: &TargetFunctionAttributeResultType, character: &Character<TargetFunctionAttributeType>, _weapon: &Weapon<TargetFunctionAttributeType>, _artifacts: &[&Artifact], enemy: &Enemy) -> f64 {
+    fn target(&self, attribute: &TargetFunctionAttributeType, character: &Character<TargetFunctionAttributeType>, _weapon: &Weapon<TargetFunctionAttributeType>, _artifacts: &[&Artifact], enemy: &Enemy) -> f64 {
+        let attribute = &attribute.solve();
         let context: DamageContext<'_, TargetFunctionAttributeResultType> = DamageContext {
             character_common_data: &character.common_data,
             attribute, enemy

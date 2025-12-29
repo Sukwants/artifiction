@@ -138,7 +138,8 @@ impl TargetFunction for KaedeharaKazuhaDamageTargetFunction {
         Default::default()
     }
 
-    fn target(&self, attribute: &TargetFunctionAttributeResultType, character: &Character<TargetFunctionAttributeType>, _weapon: &Weapon<TargetFunctionAttributeType>, _artifacts: &[&Artifact], enemy: &Enemy) -> f64 {
+    fn target(&self, attribute: &TargetFunctionAttributeType, character: &Character<TargetFunctionAttributeType>, _weapon: &Weapon<TargetFunctionAttributeType>, _artifacts: &[&Artifact], enemy: &Enemy) -> f64 {
+        let attribute = &attribute.solve();
         let r = attribute.get_value(AttributeName::Recharge).min(self.recharge_demand) / self.recharge_demand;
         // let em = attribute.get_value(AttributeName::ElementalMastery);
         let em = attribute.get_em_all();

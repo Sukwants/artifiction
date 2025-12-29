@@ -65,7 +65,7 @@ pub struct ValueFunction<'a> {
 }
 
 impl<'a> ValueFunction<'a> {
-    pub fn get_attribute(&self, arts: &[&Artifact]) -> SimpleAttributeResult {
+    pub fn get_attribute(&self, arts: &[&Artifact]) -> SimpleAttribute {
         let art_list = ArtifactList {
             artifacts: arts,
         };
@@ -79,7 +79,7 @@ impl<'a> ValueFunction<'a> {
         attribute
     }
 
-    pub fn score_attribute(&self, attribute: &SimpleAttributeResult, arts: &[&Artifact]) -> f64 {
+    pub fn score_attribute(&self, attribute: &SimpleAttribute, arts: &[&Artifact]) -> f64 {
         let score = self.target_function.target(
             &attribute,
             &self.character,
@@ -126,7 +126,7 @@ impl<'a> ValueFunction<'a> {
     pub fn check_attribute(&self, arts: &[&Artifact]) -> bool {
         let attribute = self.get_attribute(arts);
 
-        self.check_attribute_attribute(&attribute)
+        self.check_attribute_attribute(&attribute.solve())
     }
 }
 

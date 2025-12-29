@@ -107,7 +107,8 @@ impl TargetFunction for SucroseDefaultTargetFunction {
         Default::default()
     }
 
-    fn target(&self, attribute: &TargetFunctionAttributeResultType, _character: &Character<TargetFunctionAttributeType>, _weapon: &Weapon<TargetFunctionAttributeType>, artifacts: &[&Artifact], _enemy: &Enemy) -> f64 {
+    fn target(&self, attribute: &TargetFunctionAttributeType, _character: &Character<TargetFunctionAttributeType>, _weapon: &Weapon<TargetFunctionAttributeType>, artifacts: &[&Artifact], _enemy: &Enemy) -> f64 {
+        let attribute = &attribute.solve();
         let mut vv_count = 0;
         for art in artifacts.iter() {
             if art.set_name == ArtifactSetName::ViridescentVenerer {

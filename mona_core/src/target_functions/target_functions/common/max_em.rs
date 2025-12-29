@@ -81,8 +81,9 @@ impl TargetFunction for MaxEMTargetFunction {
         Default::default()
     }
 
-    fn target(&self, attribute: &TargetFunctionAttributeResultType, _character: &Character<TargetFunctionAttributeType>, _weapon: &Weapon<TargetFunctionAttributeType>, _artifacts: &[&Artifact], _enemy: &Enemy) -> f64 {
+    fn target(&self, attribute: &TargetFunctionAttributeType, _character: &Character<TargetFunctionAttributeType>, _weapon: &Weapon<TargetFunctionAttributeType>, _artifacts: &[&Artifact], _enemy: &Enemy) -> f64 {
         // attribute.get_value(AttributeName::ElementalMastery)
+        let attribute = &attribute.solve();
         attribute.get_em_all()
     }
 }

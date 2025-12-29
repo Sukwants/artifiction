@@ -10,7 +10,7 @@ use crate::common::{ChangeAttribute, change_attribute};
 pub struct AttributeUtils {}
 
 impl AttributeUtils {
-    pub fn create_attribute_from_c_w_bs<T: Attribute>(
+    pub fn create_attribute_from_c_w_bs_result<T: Attribute>(
         character: &Character<T>,
         weapon: &Weapon<T>,
         buffs: &Vec<Box<dyn Buff<T>>>
@@ -26,7 +26,23 @@ impl AttributeUtils {
         attribute.solve()
     }
 
-    pub fn create_attribute_from_big_config<T: Attribute>(
+    pub fn create_attribute_from_c_w_bs<T: Attribute>(
+        character: &Character<T>,
+        weapon: &Weapon<T>,
+        buffs: &Vec<Box<dyn Buff<T>>>
+    ) -> T {
+        let mut attribute = T::new(T::new_with_base_edge(vec![CharacterStatus::new_single(0)]), 0);
+
+        character.change_attribute(&mut attribute);
+        weapon.change_attribute(&mut attribute);
+        for buff in buffs.iter() {
+            buff.change_attribute(&mut attribute);
+        }
+
+        attribute
+    }
+
+    pub fn create_attribute_from_big_config_result<T: Attribute>(
         artifacts: &ArtifactList,
         artifact_config: &ArtifactEffectConfig,
         character: &Character<T>,
@@ -46,7 +62,7 @@ impl AttributeUtils {
         attribute.solve()
     }
 
-    pub fn create_attribute_from_big_config_mut<T: Attribute>(
+    pub fn create_attribute_from_big_config<T: Attribute>(
         artifacts: &ArtifactList,
         artifact_config: &ArtifactEffectConfig,
         character: &Character<T>,
@@ -66,7 +82,7 @@ impl AttributeUtils {
         attribute
     }
 
-    pub fn create_attribute_from_big_config_with_skill_config<T: Attribute>(
+    pub fn create_attribute_from_big_config_with_skill_config_result<T: Attribute>(
         artifacts: &ArtifactList,
         artifact_config: &ArtifactEffectConfig,
         character: &Character<T>,
@@ -87,5 +103,28 @@ impl AttributeUtils {
         character.common_data.name.change_attribute(&mut attribute, &character.common_data, character_skill_config);
 
         attribute.solve()
+    }
+
+    pub fn create_attribute_from_big_config_with_skill_config<T: Attribute>(
+        artifacts: &ArtifactList,
+        artifact_config: &ArtifactEffectConfig,
+        character: &Character<T>,
+        character_skill_config: &CharacterSkillConfig,
+        weapon: &Weapon<T>,
+        buffs: &[Box<dyn Buff<T>>],
+    ) -> T {
+        let mut attribute = T::new(T::new_with_base_edge(vec![CharacterStatus::new_single(0)]), 0);
+
+        character.change_attribute(&mut attribute);
+        weapon.change_attribute(&mut attribute);
+        artifacts.apply(&mut attribute, character, artifact_config);
+
+        for buff in buffs.iter() {
+            buff.change_attribute(&mut attribute);
+        }
+
+        character.common_data.name.change_attribute(&mut attribute, &character.common_data, character_skill_config);
+
+        attribute
     }
 }

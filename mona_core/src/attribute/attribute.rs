@@ -148,11 +148,15 @@ pub trait Attribute {
 
     fn get_character_id(&self) -> &usize;
 
+    fn get_character(&self) -> &CharacterStatus;
+
     fn get_characters(&self) -> &Vec<CharacterStatus>;
 
     fn solve(&self) -> Self::ResultType;
 }
 
+
+#[derive(Clone)]
 pub struct AttributeWithCharacter<GraphTy: AttributeGraph> {
     pub attribute: GraphTy,
     pub character_id: usize,
@@ -199,6 +203,14 @@ impl<GraphTy: AttributeGraph> Attribute for AttributeWithCharacter<GraphTy> {
 
     fn get_character_id(&self) -> &usize {
         &self.character_id
+    }
+
+    fn get_character(&self) -> &CharacterStatus {
+        let characters = self.attribute.get_characters();
+        characters
+            .iter()
+            .find(|c| c.character_id == self.character_id)
+            .unwrap()
     }
 
     fn get_characters(&self) -> &Vec<CharacterStatus> {

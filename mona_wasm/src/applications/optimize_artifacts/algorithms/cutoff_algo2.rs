@@ -158,7 +158,7 @@ impl<'a> CutoffAlgo2Helper<'a> {
     pub fn is_better_than_current_least(&self, arts: &[&Artifact], value_fn: &ValueFunction, rc: &ResultRecorder) -> bool {
         let attribute = value_fn.get_attribute(arts);
 
-        if !value_fn.check_attribute_attribute(&attribute) {
+        if !value_fn.check_attribute_attribute(&attribute.solve()) {
             return false;
         }
 
@@ -169,7 +169,7 @@ impl<'a> CutoffAlgo2Helper<'a> {
 
     pub fn update_artifacts(&self, arts: &[&Artifact], value_fn: &ValueFunction, rc: &mut ResultRecorder) {
         let attribute = value_fn.get_attribute(arts);
-        if !value_fn.check_attribute_attribute(&attribute) {
+        if !value_fn.check_attribute_attribute(&attribute.solve()) {
             return;
         }
         let score = value_fn.score_attribute(&attribute, arts);

@@ -36,7 +36,7 @@ pub fn get_attribute(val: JsValue) -> JsValue {
 
     let buffs: Vec<Box<dyn Buff<ComplicatedAttribute>>> = input.buffs.iter().map(|x| x.to_buff()).collect();
 
-    let attribute = AttributeUtils::create_attribute_from_big_config_with_skill_config(
+    let attribute = AttributeUtils::create_attribute_from_big_config_with_skill_config_result(
         &artifact_list,
         &artifact_config,
         &character,

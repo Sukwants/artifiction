@@ -25,7 +25,8 @@ impl TargetFunction for TargetFunctionDSL {
         Default::default()
     }
 
-    fn target(&self, attribute: &SimpleAttributeResult, character: &Character<SimpleAttribute>, _weapon: &Weapon<SimpleAttribute>, _artifacts: &[&Artifact], enemy: &Enemy) -> f64 {
+    fn target(&self, attribute: &SimpleAttribute, character: &Character<SimpleAttribute>, _weapon: &Weapon<SimpleAttribute>, _artifacts: &[&Artifact], enemy: &Enemy) -> f64 {
+        let attribute = &attribute.solve();
         let context_unsafe = UnsafeDamageContext {
             character_common_data: &character.common_data,
             enemy: &*enemy,

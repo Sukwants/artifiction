@@ -282,7 +282,7 @@ impl AttributeName {
             MoonglareReaction::None => None,
             MoonglareReaction::LunarChargedReaction | MoonglareReaction::LunarCharged => Some(AttributeName::EnhanceLunarCharged),
             MoonglareReaction::LunarBloom => Some(AttributeName::EnhanceLunarBloom),
-            _ => None,
+            _ => Some(AttributeName::NULL),
         }
     }
 
@@ -291,7 +291,7 @@ impl AttributeName {
             MoonglareReaction::None => None,
             MoonglareReaction::LunarChargedReaction | MoonglareReaction::LunarCharged => Some(AttributeName::IncreaseLunarCharged),
             MoonglareReaction::LunarBloom => Some(AttributeName::IncreaseLunarBloom),
-            _ => None,
+            _ => Some(AttributeName::NULL),
         }
     }
 
@@ -300,7 +300,7 @@ impl AttributeName {
             MoonglareReaction::None => None,
             MoonglareReaction::LunarChargedReaction | MoonglareReaction::LunarCharged => Some(AttributeName::ElevateLunarCharged),
             MoonglareReaction::LunarBloom => Some(AttributeName::ElevateLunarBloom),
-            _ => None,
+            _ => Some(AttributeName::NULL),
         }
     }
 
@@ -344,7 +344,7 @@ impl AttributeName {
             MoonglareReaction::None => None,
             MoonglareReaction::LunarChargedReaction | MoonglareReaction::LunarCharged => Some(AttributeName::CriticalLunarCharged),
             MoonglareReaction::LunarBloom => Some(AttributeName::CriticalLunarBloom),
-            _ => None,
+            _ => Some(AttributeName::NULL),
         }
     }
 
@@ -377,7 +377,7 @@ impl AttributeName {
             MoonglareReaction::None => None,
             MoonglareReaction::LunarChargedReaction | MoonglareReaction::LunarCharged => Some(AttributeName::CriticalDamageLunarCharged),
             MoonglareReaction::LunarBloom => Some(AttributeName::CriticalDamageLunarBloom),
-            _ => None,
+            _ => Some(AttributeName::NULL),
         }
     }
 

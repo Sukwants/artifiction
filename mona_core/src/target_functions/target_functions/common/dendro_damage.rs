@@ -65,7 +65,8 @@ impl TargetFunction for DendroDamageTargetFunction {
         Default::default()
     }
 
-    fn target(&self, attribute: &TargetFunctionAttributeResultType, character: &Character<TargetFunctionAttributeType>, weapon: &Weapon<TargetFunctionAttributeType>, artifacts: &[&Artifact], enemy: &Enemy) -> f64 {
+    fn target(&self, attribute: &TargetFunctionAttributeType, character: &Character<TargetFunctionAttributeType>, weapon: &Weapon<TargetFunctionAttributeType>, artifacts: &[&Artifact], enemy: &Enemy) -> f64 {
+        let attribute = &attribute.solve();
         let atk = attribute.get_atk();
         let crit = attribute.get_value(AttributeName::CriticalBase) + attribute.get_value(AttributeName::CriticalDendro)
             + attribute.get_value(AttributeName::CriticalAttacking);
