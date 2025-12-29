@@ -67,7 +67,7 @@ export default {
                 push(this.analysisFromWasm.TransformativeDamage.result, this.t(`dmg.${toSnake(this.analysisFromWasm.TransformativeDamage.transformative_type)}`))
             } else if (this.analysisFromWasm.MoonglareDamage != undefined) {
                 push(this.analysisFromWasm.MoonglareDamage.result, this.t(`dmg.${toSnake(this.analysisFromWasm.MoonglareDamage.lunar_type)}`))
-            } else {
+            } else if (this.analysisFromWasm.Damage != undefined) {
 
                 push(this.analysisFromWasm.Damage.normal.result, this.t(`dmg.${this.analysisFromWasm.Damage.normal.element}`))
 
