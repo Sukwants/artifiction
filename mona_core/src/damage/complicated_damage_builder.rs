@@ -451,15 +451,15 @@ impl DamageBuilder for ComplicatedDamageBuilder {
         let elevate = elevate_comp.sum();
 
         let reaction_base = match lunar_type {
-            MoonglareReaction::LunarChargedReaction => LEVEL_MULTIPLIER[character_level - 1],
+            MoonglareReaction::LunarChargedReaction | MoonglareReaction::LunarCrystallizeReaction => LEVEL_MULTIPLIER[character_level - 1],
             _ => 0.0,
         };
         let reaction_coefficient = lunar_type.get_reaction_coefficient();
 
         let damage = {
             let dmg = match lunar_type {
-                MoonglareReaction::LunarChargedReaction => reaction_base,
-                MoonglareReaction::LunarCharged | MoonglareReaction::LunarBloom => base_damage,
+                MoonglareReaction::LunarChargedReaction | MoonglareReaction::LunarCrystallizeReaction => reaction_base,
+                MoonglareReaction::LunarCharged | MoonglareReaction::LunarBloom | MoonglareReaction::LunarCrystallize => base_damage,
                 _ => panic!()
             } * reaction_coefficient * (1.0 + enhance) * (1.0 + increase) + extra_increase;
             DamageResult {

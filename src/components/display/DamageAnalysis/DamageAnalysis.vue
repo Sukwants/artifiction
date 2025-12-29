@@ -467,6 +467,8 @@ export default {
                 "LunarChargedReaction": "月感电",
                 "LunarCharged": "月感电伤害",
                 "LunarBloom": "月绽放伤害",
+                "LunarCrystallizeReaction": "月结晶",
+                "LunarCrystallize": "月结晶伤害",
             }
             return map[lunar_type]
         },

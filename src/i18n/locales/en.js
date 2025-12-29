@@ -293,6 +293,8 @@ export default {
         lunar_charged_reaction: "Lunar-Charged",
         lunar_charged: "Lunar-Charged DMG",
         lunar_bloom: "Lunar-Bloom DMG",
+        lunar_crystallize_reaction: "Lunar-Crystallize",
+        lunar_crystallize: "Lunar-Crystallize DMG",
     },
     res: {
         Pyro: "Pyro Res",

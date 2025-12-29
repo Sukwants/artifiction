@@ -327,6 +327,7 @@ impl CalculatorInterface {
 
         let result = MoonglareDamageAnalysisForAll {
             lunar_charged_reaction: get_damage(MoonglareReaction::LunarChargedReaction),
+            lunar_crystallize_reaction: get_damage(MoonglareReaction::LunarCrystallizeReaction),
         };
 
         result

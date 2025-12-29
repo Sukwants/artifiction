@@ -166,4 +166,5 @@ pub struct TransformativeDamageAnalysisForAll {
 #[derive(Debug, Serialize, Deserialize)]
 pub struct MoonglareDamageAnalysisForAll {
     pub lunar_charged_reaction: EventAnalysis,
+    pub lunar_crystallize_reaction: EventAnalysis,
 }
