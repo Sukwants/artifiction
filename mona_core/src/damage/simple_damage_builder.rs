@@ -25,6 +25,8 @@ pub struct SimpleDamageBuilder {
     pub ratio_em: f64,
     pub base: f64,
 
+    pub extra_reaction_enhance: f64,
+    pub extra_reaction_extra: f64,
     pub extra_enhance_melt: f64,
     pub extra_enhance_vaporize: f64,
     pub enhance_melt: f64,
@@ -90,6 +92,14 @@ impl DamageBuilder for SimpleDamageBuilder {
 
     fn add_extra_bonus(&mut self, _key: &str, value: f64) {
         self.extra_bonus += value
+    }
+
+    fn add_extra_reaction_enhance(&mut self, key: &str, value: f64) {
+        self.extra_reaction_enhance += value;
+    }
+
+    fn add_extra_reaction_extra(&mut self, key: &str, value: f64) {
+        self.extra_reaction_extra += value;
     }
 
     fn add_extra_enhance_melt(&mut self, _key: &str, value: f64) {
@@ -176,7 +186,7 @@ impl DamageBuilder for SimpleDamageBuilder {
                 enemy.get_resistance_ratio(element, res_minus)
             };
 
-            let reaction_enhance = match reaction {
+            let reaction_enhance = self.extra_reaction_enhance + match reaction {
                 Some(ReactionType::Melt) => Reaction::amp(em) + attribute.get_result(AttributeName::EnhanceMelt) + self.extra_enhance_melt,
                 Some(ReactionType::Vaporize) => Reaction::amp(em) + attribute.get_result(AttributeName::EnhanceVaporize) + self.extra_enhance_vaporize,
                 Some(ReactionType::Spread) => Reaction::catalyze(em) + attribute.get_result(AttributeName::EnhanceSpread),
@@ -273,7 +283,7 @@ impl DamageBuilder for SimpleDamageBuilder {
             enemy.get_resistance_ratio(element.unwrap(), res_minus)
         } else { 1.0 };
 
-        let enhance = Reaction::transformative(em) + match transformative_type {
+        let enhance = Reaction::transformative(em) + self.extra_reaction_enhance + match transformative_type {
             TransformativeType::SwirlCryo => attribute.get_value(AttributeName::EnhanceSwirlCryo) + attribute.get_value(AttributeName::EnhanceSwirlBase),
             TransformativeType::SwirlPyro => attribute.get_value(AttributeName::EnhanceSwirlPyro) + attribute.get_value(AttributeName::EnhanceSwirlBase),
             TransformativeType::SwirlHydro => attribute.get_value(AttributeName::EnhanceSwirlHydro) + attribute.get_value(AttributeName::EnhanceSwirlBase),
@@ -289,7 +299,7 @@ impl DamageBuilder for SimpleDamageBuilder {
             TransformativeType::Crystallize => 0.0,
         } + attribute.get_result_t(get_attribute_type(AttributeVariableType::ReactionEnhance));
         
-        let extra_increase = attribute.get_result(AttributeName::extra_increase_name_by_reaction(reaction).unwrap_or(AttributeName::NULL))
+        let extra_increase = self.extra_reaction_extra + attribute.get_result(AttributeName::extra_increase_name_by_reaction(reaction).unwrap_or(AttributeName::NULL))
             + attribute.get_result_t(get_attribute_type(AttributeVariableType::ReactionExtra));
 
         let damage = {
@@ -349,13 +359,14 @@ impl DamageBuilder for SimpleDamageBuilder {
             enemy.get_resistance_ratio(element, res_minus)
         };
 
-        let enhance = Reaction::moonglare(em) + attribute.get_value(AttributeName::EnhanceMoonglare) + match lunar_type {
+        let enhance = Reaction::moonglare(em) + self.extra_reaction_enhance + attribute.get_value(AttributeName::EnhanceMoonglare)
+            + match lunar_type {
             MoonglareReaction::LunarChargedReaction | MoonglareReaction::LunarCharged => attribute.get_value(AttributeName::EnhanceLunarCharged),
             MoonglareReaction::LunarBloom => attribute.get_value(AttributeName::EnhanceLunarBloom),
             _ => 0.0
         } + attribute.get_result_t(get_attribute_type(AttributeVariableType::ReactionEnhance));
         
-        let extra_increase = match lunar_type {
+        let extra_increase = self.extra_reaction_extra + match lunar_type {
             MoonglareReaction::LunarChargedReaction | MoonglareReaction::LunarCharged => attribute.get_value(AttributeName::ExtraIncreaseLunarCharged),
             MoonglareReaction::LunarBloom => attribute.get_value(AttributeName::ExtraIncreaseLunarBloom),
             _ => 0.0
@@ -486,6 +497,8 @@ impl SimpleDamageBuilder {
             ratio_em: 0.0,
             base: 0.0,
 
+            extra_reaction_enhance: 0.0,
+            extra_reaction_extra: 0.0,
             extra_enhance_melt: 0.0,
             extra_enhance_vaporize: 0.0,
             enhance_melt: 0.0,

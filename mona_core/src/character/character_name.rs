@@ -146,4 +146,5 @@ pub enum CharacterName {
     Jahoda,
     Durin,
     Columbina,
+    Zibai,
 }

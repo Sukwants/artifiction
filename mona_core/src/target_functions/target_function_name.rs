@@ -125,4 +125,5 @@ pub enum TargetFunctionName {
     DurinDefault,
     ColumbinaOffField,
     ColumbinaOnField,
+    ZibaiDefault,
 }

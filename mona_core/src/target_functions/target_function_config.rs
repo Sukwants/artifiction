@@ -69,5 +69,6 @@ pub enum TargetFunctionConfig {
     DurinDefault { vaporize_rate: f64, melt_rate: f64, atk_demand: f64 },
     ColumbinaOffField { lunar_charged_coefficient: f64, lunar_crystallize_coefficient: f64, hp_demand: f64 },
     ColumbinaOnField {},
+    ZibaiDefault { lunar_crystallize_coefficient: f64 },
     NoConfig,
 }

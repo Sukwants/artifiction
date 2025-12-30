@@ -69,6 +69,7 @@ pub enum WeaponName {
     PeakPatrolSong,
     Azurelight,
     AthameArtis,
+    LightbearingMoonshard,
 
     // claymore
     // 1 star

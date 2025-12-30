@@ -25,6 +25,8 @@ pub struct ComplicatedDamageBuilder {
     pub extra_hp: EntryType,
     pub extra_healing_bonus: EntryType,
     
+    pub extra_reaction_enhance: EntryType,
+    pub extra_reaction_extra: EntryType,
     pub extra_enhance_melt: EntryType,
     pub extra_enhance_vaporize: EntryType,
     pub extra_em: EntryType,
@@ -106,6 +108,14 @@ impl DamageBuilder for ComplicatedDamageBuilder {
 
     fn add_extra_bonus(&mut self, key: &str, value: f64) {
         *self.extra_bonus.0.entry(String::from(key)).or_insert(0.0) += value;
+    }
+
+    fn add_extra_reaction_enhance(&mut self, key: &str, value: f64) {
+        *self.extra_reaction_enhance.0.entry(String::from(key)).or_insert(0.0) += value;
+    }
+
+    fn add_extra_reaction_extra(&mut self, key: &str, value: f64) {
+        *self.extra_reaction_extra.0.entry(String::from(key)).or_insert(0.0) += value;
     }
 
     fn add_extra_enhance_melt(&mut self, key: &str, value: f64) {
@@ -671,6 +681,7 @@ impl ComplicatedDamageBuilder {
 
     fn get_enhance_melt_composition(&self, attribute: &AttributeTy) -> EntryType {
         let mut comp = attribute.get_result(AttributeName::EnhanceMelt);
+        comp.merge(&self.extra_reaction_enhance);
         comp.merge(&self.extra_enhance_melt);
         let em = self.extra_em.sum() + attribute.get_em_all();
         if em > 0.0 {
@@ -681,6 +692,7 @@ impl ComplicatedDamageBuilder {
 
     fn get_enhance_vaporize_composition(&self, attribute: &AttributeTy) -> EntryType {
         let mut comp = attribute.get_result(AttributeName::EnhanceVaporize);
+        comp.merge(&self.extra_reaction_enhance);
         comp.merge(&self.extra_enhance_vaporize);
         let em = self.extra_em.sum() + attribute.get_em_all();
         if em > 0.0 {
@@ -691,6 +703,7 @@ impl ComplicatedDamageBuilder {
 
     fn get_enhance_spread_composition(&self, attribute: &AttributeTy) -> EntryType {
         let mut comp = attribute.get_result(AttributeName::EnhanceSpread);
+        comp.merge(&self.extra_reaction_enhance);
         let em = &self.extra_em.sum() + attribute.get_em_all();
         if em > 0.0 {
             comp.add_value("精通", Reaction::catalyze(em));
@@ -700,6 +713,7 @@ impl ComplicatedDamageBuilder {
 
     fn get_enhance_aggravate_composition(&self, attribute: &AttributeTy) -> EntryType {
         let mut comp = attribute.get_result(AttributeName::EnhanceAggravate);
+        comp.merge(&self.extra_reaction_enhance);
         let em = &self.extra_em.sum() + attribute.get_em_all();
         if em > 0.0 {
             comp.add_value("精通", Reaction::catalyze(em));
@@ -723,6 +737,7 @@ impl ComplicatedDamageBuilder {
             TransformativeType::Hyperbloom => attribute.get_result(AttributeName::EnhanceHyperbloom),
             TransformativeType::Crystallize => EntryType::new(),
         };
+        comp.merge(&self.extra_reaction_enhance);
         let em = &self.extra_em.sum() + attribute.get_em_all();
         if em > 0.0 {
             comp.add_value("精通", Reaction::transformative(em));
@@ -732,6 +747,7 @@ impl ComplicatedDamageBuilder {
 
     fn get_enhance_moonglare_composition(&self, attribute: &AttributeTy, lunar_type: MoonglareReaction) -> EntryType {
         let mut comp = attribute.get_result(AttributeName::enhance_name_by_moonglare_reaction(lunar_type).unwrap_or(AttributeName::NULL));
+        comp.merge(&self.extra_reaction_enhance);
         comp.merge(&attribute.get_result(AttributeName::EnhanceMoonglare));
         let em = &self.extra_em.sum() + attribute.get_em_all();
         if em > 0.0 {
@@ -742,6 +758,7 @@ impl ComplicatedDamageBuilder {
 
     fn get_extra_increase_reaction_composition(&self, attribute: &AttributeTy, reaction_type: ReactionType) -> EntryType {
         let mut comp = attribute.get_result(AttributeName::extra_increase_name_by_reaction(reaction_type).unwrap_or(AttributeName::NULL));
+        comp.merge(&self.extra_reaction_extra);
         comp
     }
 

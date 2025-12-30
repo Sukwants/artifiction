@@ -144,7 +144,7 @@ impl TargetFunctionMetaTrait for ColumbinaOnFieldTargetFunction {
             zh_cn: "前台一轮输出总伤害乘以生命值上限满足需求比例",
             en: "On Field Total Damage"
         ),
-        tags: "主C",
+        tags: "输出",
         four: TargetFunctionFor::SomeWho(CharacterName::Columbina),
         image: TargetFunctionMetaImage::Avatar
     };

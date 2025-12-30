@@ -20,8 +20,10 @@ pub trait DamageBuilder {
 
     fn add_base(&mut self, key: &str, value: f64); // 用于添加治疗量或护盾量的常数值
 
-    // 以下方法由于误差问题已弃用，请调用 Attribute 中的方法以获得更加准确的结果
-    // the following methods are deprecated due to accuracy issues, please use the methods in Attribute for more accurate results
+    // 使用以下方法添加的属性不会计入图的计算，使用时请确保该属性不存在出边，否则请调用 Attribute 中的方法以获得更加准确的结果
+    // The attributes added using the following methods will not be calculated in the graph.
+    // When using them, please ensure that there are no outgoing edges for these attributes,
+    // otherwise please use the methods in Attribute for more accurate results.
     fn add_extra_em(&mut self, key: &str, value: f64);
 
     fn add_extra_atk(&mut self, key: &str, value: f64);
@@ -37,6 +39,10 @@ pub trait DamageBuilder {
     fn add_extra_critical_damage(&mut self, key: &str, value: f64);
 
     fn add_extra_bonus(&mut self, key: &str, value: f64);
+
+    fn add_extra_reaction_enhance(&mut self, key: &str, value: f64);
+
+    fn add_extra_reaction_extra(&mut self, key: &str, value: f64);
 
     fn add_extra_enhance_melt(&mut self, key: &str, value: f64);
 

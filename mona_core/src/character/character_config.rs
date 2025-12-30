@@ -69,5 +69,6 @@ pub enum CharacterConfig {
     Jahoda { max_elements: ConfigElements8Multi, moonsign: Moonsign },
     Durin { hexerei_secret_rite: bool, essential_transmutation: usize },
     Columbina { moonsign: Moonsign, main_element: Option<Element>, reacted_element: ConfigElements8Multi },
+    Zibai { moonsign: Moonsign, geo_count: usize, hydro_count: usize },
     NoConfig,
 }
