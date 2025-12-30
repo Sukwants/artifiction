@@ -185,6 +185,7 @@ damage_enum!(
     E3
     E4
     E5
+    EZ
     ENS
     Q1
     Q2
@@ -199,7 +200,7 @@ impl FlinsDamageEnum {
     pub fn get_element(&self) -> Element {
         use FlinsDamageEnum::*;
         match *self {
-            E1 | E2 | E3 | E4 | E5| ENS | Q1 | Q2 | Q3 | QTS | QTSA | C2 | LunarCharged => Element::Electro,
+            E1 | E2 | E3 | E4 | E5 | EZ | ENS | Q1 | Q2 | Q3 | QTS | QTSA | C2 | LunarCharged => Element::Electro,
             _ => Element::Physical,
         }
     }
@@ -216,11 +217,11 @@ impl FlinsDamageEnum {
     pub fn get_skill_type(&self) -> SkillType {
         use FlinsDamageEnum::*;
         match *self {
-            A1 | A2 | A3 | A4 | A5 => SkillType::NormalAttack,
-            Z => SkillType::ChargedAttack,
+            A1 | A2 | A3 | A4 | A5 | E1 | E2 | E3 | E4 | E5 => SkillType::NormalAttack,
+            Z | EZ => SkillType::ChargedAttack,
             X1 => SkillType::PlungingAttackInAction,
             X2 | X3 => SkillType::PlungingAttackOnGround,
-            E1 | E2 | E3 | E4 | E5 | ENS => SkillType::ElementalSkill,
+            ENS => SkillType::ElementalSkill,
             Q1 => SkillType::ElementalBurst,
             Q2 | Q3 | QTS | QTSA | C2 | LunarCharged => SkillType::Moonglare,
         }
@@ -257,6 +258,7 @@ impl CharacterTrait for Flins {
             E3 hit_n_dmg!(3)
             E4 hit_n_dmg!(4)
             E5 hit_n_dmg!(5)
+            EZ charged_dmg!()
             ENS locale!(zh_cn: "北国枪阵伤害", en: "Northland Spearstorm DMG")
             C2 locale!(zh_cn: "二命额外伤害", en: "C2 extra DMG")
             LunarCharged locale!(zh_cn: "月感电伤害", en: "Lunar-Charged DMG")
@@ -321,6 +323,7 @@ impl CharacterTrait for Flins {
                 E3 => FLINS_SKILL.e_dmg3[s2],
                 E4 => FLINS_SKILL.e_dmg4[s2],
                 E5 => FLINS_SKILL.e_dmg5[s2],
+                EZ => FLINS_SKILL.e_dmgz[s2],
                 ENS => FLINS_SKILL.e_ns_dmg[s2],
                 Q1 => FLINS_SKILL.q_dmg1[s3],
                 _ => 0.0

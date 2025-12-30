@@ -158,7 +158,7 @@ impl<A: Attribute> ChangeAttribute<A> for ColumbinaEffect {
                 )),
             Arc::new(|hp: f64, _| (hp / 1000.0 * 0.002).min(0.07) ),
             "哥伦比娅天赋3",
-            EdgePriority::Common,
+            EdgePriority::Invisible,
         );
 
         if self.common_data.constellation >= 1 {
@@ -228,11 +228,12 @@ impl ColumbinaDamageEnum {
         use ColumbinaDamageEnum::*;
         match *self {
             A1 | A2 | A3 => SkillType::NormalAttack,
-            Z | ZM => SkillType::ChargedAttack,
+            Z => SkillType::ChargedAttack,
             X1 => SkillType::PlungingAttackInAction,
             X2 | X3 => SkillType::PlungingAttackOnGround,
-            E | EGC | EGI => SkillType::ElementalSkill,
+            E | EGC => SkillType::ElementalSkill,
             Q => SkillType::ElementalBurst,
+            ZM | EGI => SkillType::Moonglare,
         }
     }
 }
@@ -364,7 +365,7 @@ impl CharacterTrait for Columbina {
                             _ => panic!(),
                         },
                         "哥伦比娅命座4",
-                        EdgePriority::Common,
+                        EdgePriority::Invisible,
                     );
                 }
             }
