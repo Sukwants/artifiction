@@ -91,7 +91,7 @@ pub enum EdgePriority {
     Static,
     Base,
     Common,
-    Special,
+    Invisible,
     Last,
 }
 
@@ -524,7 +524,11 @@ impl<T: Attribute> AttributeCommon<T> for T {
         bwd: EdgeFunctionBwd,
         key: &str,
     ) {
-        T::add_edge_n1(self, from, to, Arc::from(fwd), key, EdgePriority::Common);
+        if to.is_panel() {
+            T::add_edge_n1(self, from, to, Arc::from(fwd), key, EdgePriority::Common);
+        } else {
+            T::add_edge_n1(self, from, to, Arc::from(fwd), key, EdgePriority::Invisible);
+        }
     }
 
     fn add_edge2(
@@ -536,15 +540,11 @@ impl<T: Attribute> AttributeCommon<T> for T {
         bwd: EdgeFunctionBwd,
         key: &str,
     ) {
-        T::add_edge_n2(
-            self,
-            from1,
-            from2,
-            to,
-            Arc::from(fwd),
-            key,
-            EdgePriority::Common,
-        );
+        if to.is_panel() {
+            T::add_edge_n2(self, from1, from2, to, Arc::from(fwd), key, EdgePriority::Common);
+        } else {
+            T::add_edge_n2(self, from1, from2, to, Arc::from(fwd), key, EdgePriority::Invisible);
+        }
     }
 
     fn add_edge_n1(
