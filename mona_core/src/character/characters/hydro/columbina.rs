@@ -407,11 +407,16 @@ impl CharacterTrait for Columbina {
             X3 => COLUMBINA_SKILL.x_dmg3[s1],
             E => COLUMBINA_SKILL.e_dmg[s2],
             EGC => COLUMBINA_SKILL.e_dmggc[s2],
-            EGI => COLUMBINA_SKILL.e_dmggc[s2],
+            EGI => match main_element {
+                Some(Element::Electro) => COLUMBINA_SKILL.e_dmg_electro[s2],
+                Some(Element::Dendro) => COLUMBINA_SKILL.e_dmg_dendro[s2],
+                Some(Element::Geo) => COLUMBINA_SKILL.e_dmg_geo[s2],
+                _ => 0.0,
+            },
             Q => COLUMBINA_SKILL.q_dmg[s3],
         };
 
-        if s == ZM || s.get_skill_type() == SkillType::ElementalSkill || s.get_skill_type() == SkillType::ElementalBurst {
+        if s.get_skill_type() == SkillType::Moonglare || s.get_skill_type() == SkillType::ElementalSkill || s.get_skill_type() == SkillType::ElementalBurst {
             builder.add_hp_ratio("技能倍率", ratio);
         } else {
             builder.add_atk_ratio("技能倍率", ratio);
