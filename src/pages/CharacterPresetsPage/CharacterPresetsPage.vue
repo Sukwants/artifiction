@@ -176,7 +176,7 @@ function handleDeletePreset(name: string) {
 function handleClickPreset(name: string) {
     router.push({
         name: "calculate",
-        params: {
+        state: {
             presetName: name
         }
     })

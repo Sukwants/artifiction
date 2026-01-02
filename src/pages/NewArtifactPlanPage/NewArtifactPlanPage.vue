@@ -735,7 +735,7 @@ const { t, ta } = useI18n()
 //////////////////////////////////////////////////////////
 // set preset from other place
 function setPresetFromRoute() {
-    const presetName = route.params.presetName
+    const presetName = history.state?.presetName
     if (presetName && typeof presetName === "string") {
         usePreset(presetName)
     }
