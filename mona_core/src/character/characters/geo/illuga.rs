@@ -54,7 +54,7 @@ pub const ILLUGA_STATIC_DATA: CharacterStaticData = CharacterStaticData {
     def: [74, 193, 257, 385, 430, 495, 555, 621, 666, 732, 777, 844, 890, 957, 1025],
     sub_stat: CharacterSubStatFamily::ElementalMastery96,
     weapon_type: WeaponType::Polearm,
-    star: 5,
+    star: 4,
     skill_name1: locale!(
         zh_cn: "守誓枪术",
         en: "Oathkeeper's Spear",
