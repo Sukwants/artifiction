@@ -313,6 +313,14 @@ impl CharacterTrait for Columbina {
             config: ItemConfigType::Bool { default: true }
         },
         ItemConfig {
+            name: "stack_p1",
+            title: locale!(
+                zh_cn: "天赋一层数",
+                en: "Talent 1 Stack Count"
+            ),
+            config: ItemConfigType::Int { min: 0, max: 3, default: 3 }
+        },
+        ItemConfig {
             name: "activated_c4",
             title: locale!(
                 zh_cn: "四命加成",
@@ -328,9 +336,9 @@ impl CharacterTrait for Columbina {
             _ => (Moonsign::None, None, ConfigElements8Multi::default()),
         };
 
-        let (activated_q, activated_c4) = match *skill_config {
-            CharacterSkillConfig::Columbina { activated_q, activated_c4 } => (activated_q, activated_c4),
-            _ => (false, false)
+        let (activated_q, stack_p1, activated_c4) = match *skill_config {
+            CharacterSkillConfig::Columbina { activated_q, stack_p1, activated_c4 } => (activated_q, stack_p1, activated_c4),
+            _ => (false, 0, false)
         };
 
         if activated_q {
@@ -346,6 +354,10 @@ impl CharacterTrait for Columbina {
                     AttributeVariableType::ReactionEnhance,
                     None, None, Some(ReactionType::LunarCrystallize),
                 )), "哥伦比娅Q技能", COLUMBINA_SKILL.q_enhance[common_data.skill3 as usize]);
+        }
+
+        if common_data.has_talent1 && stack_p1 > 0 {
+            attribute.set_value_by(AttributeName::CriticalBase, "哥伦比娅天赋1", stack_p1 as f64 * 0.05);
         }
 
         if common_data.constellation >= 4 && activated_c4 {

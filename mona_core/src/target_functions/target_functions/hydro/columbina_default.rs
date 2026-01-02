@@ -87,8 +87,8 @@ impl TargetFunction for ColumbinaOffFieldTargetFunction {
     }
 
     fn target(&self, attribute: &TargetFunctionAttributeType, character: &Character<TargetFunctionAttributeType>, weapon: &Weapon<TargetFunctionAttributeType>, artifacts: &[&Artifact], enemy: &Enemy) -> f64 {
-        let config1 = CharacterSkillConfig::Columbina { activated_q: true, activated_c4: false };
-        let config2 = CharacterSkillConfig::Columbina { activated_q: true, activated_c4: true };
+        let config1 = CharacterSkillConfig::Columbina { activated_q: true, stack_p1: 3, activated_c4: false };
+        let config2 = CharacterSkillConfig::Columbina { activated_q: true, stack_p1: 3, activated_c4: true };
         
         let context1 = {
             let mut attribute_temp = (*attribute).clone();
@@ -181,8 +181,8 @@ impl TargetFunction for ColumbinaOnFieldTargetFunction {
     }
 
     fn target(&self, attribute: &TargetFunctionAttributeType, character: &Character<TargetFunctionAttributeType>, weapon: &Weapon<TargetFunctionAttributeType>, artifacts: &[&Artifact], enemy: &Enemy) -> f64 {
-        let config1 = CharacterSkillConfig::Columbina { activated_q: true, activated_c4: false };
-        let config2 = CharacterSkillConfig::Columbina { activated_q: true, activated_c4: true };
+        let config1 = CharacterSkillConfig::Columbina { activated_q: true, stack_p1: 3, activated_c4: false };
+        let config2 = CharacterSkillConfig::Columbina { activated_q: true, stack_p1: 3, activated_c4: true };
         
         let context1 = {
             let mut attribute_temp = (*attribute).clone();
