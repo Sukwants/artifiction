@@ -20,7 +20,7 @@
                 prop="nonCritical"
                 :label="t('dmg.nonCrit')"
             ></el-table-column>
-            <!-- <el-table-column width="50">
+            <el-table-column width="50">
                 <template #default="scope">
                     <el-button
                         :icon="Histogram"
@@ -30,7 +30,7 @@
                     >
                     </el-button>
                 </template>
-            </el-table-column> -->
+            </el-table-column>
         </el-table>
     </div>
 </template>
