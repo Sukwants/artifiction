@@ -1,6 +1,5 @@
 use crate::target_functions::target_functions::prelude::*;
 use crate::character::characters::Columbina;
-use crate::utils;
 
 pub struct ColumbinaOffFieldTargetFunction {
     pub lunar_charged_coefficient: f64,
