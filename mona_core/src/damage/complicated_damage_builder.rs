@@ -5,7 +5,7 @@ use num_traits::Inv;
 use crate::attribute::*;
 use crate::buffs::buffs::base_dmg;
 use crate::common::{DamageResult, Element, TransformativeType, MoonglareReaction, ReactionType, SkillType};
-use crate::damage::damage_analysis::{DamageAnalysis, DamageAnalysisWithPossibleReaction, EventAnalysis, HealAnalysis, MoonglareDamageAnalysis, ShieldAnalysis, TransformativeDamageAnalysis};
+use crate::damage::damage_analysis::{DamageAnalysis, DamageAnalysisWithPossibleReaction, EventAnalysis, HealAnalysis, MoonglareDamageAnalysis, NumberAnalysis, ShieldAnalysis, TransformativeDamageAnalysis};
 use crate::enemies::Enemy;
 use crate::common::EntryType;
 use crate::damage::damage_builder::{DamageBuilder};
@@ -25,6 +25,8 @@ pub struct ComplicatedDamageBuilder {
     pub extra_hp: EntryType,
     pub extra_healing_bonus: EntryType,
     
+    pub extra_reaction_enhance: EntryType,
+    pub extra_reaction_extra: EntryType,
     pub extra_enhance_melt: EntryType,
     pub extra_enhance_vaporize: EntryType,
     pub extra_em: EntryType,
@@ -106,6 +108,14 @@ impl DamageBuilder for ComplicatedDamageBuilder {
 
     fn add_extra_bonus(&mut self, key: &str, value: f64) {
         *self.extra_bonus.0.entry(String::from(key)).or_insert(0.0) += value;
+    }
+
+    fn add_extra_reaction_enhance(&mut self, key: &str, value: f64) {
+        *self.extra_reaction_enhance.0.entry(String::from(key)).or_insert(0.0) += value;
+    }
+
+    fn add_extra_reaction_extra(&mut self, key: &str, value: f64) {
+        *self.extra_reaction_extra.0.entry(String::from(key)).or_insert(0.0) += value;
     }
 
     fn add_extra_enhance_melt(&mut self, key: &str, value: f64) {
@@ -451,15 +461,15 @@ impl DamageBuilder for ComplicatedDamageBuilder {
         let elevate = elevate_comp.sum();
 
         let reaction_base = match lunar_type {
-            MoonglareReaction::LunarChargedReaction => LEVEL_MULTIPLIER[character_level - 1],
+            MoonglareReaction::LunarChargedReaction | MoonglareReaction::LunarCrystallizeReaction => LEVEL_MULTIPLIER[character_level - 1],
             _ => 0.0,
         };
         let reaction_coefficient = lunar_type.get_reaction_coefficient();
 
         let damage = {
             let dmg = match lunar_type {
-                MoonglareReaction::LunarChargedReaction => reaction_base,
-                MoonglareReaction::LunarCharged | MoonglareReaction::LunarBloom => base_damage,
+                MoonglareReaction::LunarChargedReaction | MoonglareReaction::LunarCrystallizeReaction => reaction_base,
+                MoonglareReaction::LunarCharged | MoonglareReaction::LunarBloom | MoonglareReaction::LunarCrystallize => base_damage,
                 _ => panic!()
             } * reaction_coefficient * (1.0 + enhance) * (1.0 + increase) + extra_increase;
             DamageResult {
@@ -608,6 +618,40 @@ impl DamageBuilder for ComplicatedDamageBuilder {
         })
     }
 
+    fn number(&self, attribute: &Self::AttributeType) -> Self::Result {
+
+        let atk_comp = self.get_atk_composition(attribute);
+        let atk = atk_comp.sum();
+        let def_comp = self.get_def_composition(attribute);
+        let def = def_comp.sum();
+        let hp_comp = self.get_hp_composition(attribute);
+        let hp = hp_comp.sum();
+        let em_comp = self.get_em_composition(attribute);
+        let em = em_comp.sum();
+
+        let base = atk * self.ratio_atk.sum() + hp * self.ratio_hp.sum() + def * self.ratio_def.sum() + em * self.ratio_em.sum() + self.base.sum() + self.extra_damage.sum();
+
+        let value = DamageResult {
+            expectation: base,
+            critical: base,
+            non_critical: base,
+        };
+
+        EventAnalysis::Number(NumberAnalysis {
+            atk: atk_comp.0,
+            atk_ratio: self.ratio_atk.0.clone(),
+            hp: hp_comp.0,
+            hp_ratio: self.ratio_hp.0.clone(),
+            def: def_comp.0,
+            def_ratio: self.ratio_def.0.clone(),
+            em: em_comp.0,
+            em_ratio: self.ratio_em.0.clone(),
+            base: self.base.0.clone(),
+
+            result: value,
+        })
+    }
+
     fn none(&self) -> Self::Result {
         EventAnalysis::None
     }
@@ -671,6 +715,7 @@ impl ComplicatedDamageBuilder {
 
     fn get_enhance_melt_composition(&self, attribute: &AttributeTy) -> EntryType {
         let mut comp = attribute.get_result(AttributeName::EnhanceMelt);
+        comp.merge(&self.extra_reaction_enhance);
         comp.merge(&self.extra_enhance_melt);
         let em = self.extra_em.sum() + attribute.get_em_all();
         if em > 0.0 {
@@ -681,6 +726,7 @@ impl ComplicatedDamageBuilder {
 
     fn get_enhance_vaporize_composition(&self, attribute: &AttributeTy) -> EntryType {
         let mut comp = attribute.get_result(AttributeName::EnhanceVaporize);
+        comp.merge(&self.extra_reaction_enhance);
         comp.merge(&self.extra_enhance_vaporize);
         let em = self.extra_em.sum() + attribute.get_em_all();
         if em > 0.0 {
@@ -691,6 +737,7 @@ impl ComplicatedDamageBuilder {
 
     fn get_enhance_spread_composition(&self, attribute: &AttributeTy) -> EntryType {
         let mut comp = attribute.get_result(AttributeName::EnhanceSpread);
+        comp.merge(&self.extra_reaction_enhance);
         let em = &self.extra_em.sum() + attribute.get_em_all();
         if em > 0.0 {
             comp.add_value("精通", Reaction::catalyze(em));
@@ -700,6 +747,7 @@ impl ComplicatedDamageBuilder {
 
     fn get_enhance_aggravate_composition(&self, attribute: &AttributeTy) -> EntryType {
         let mut comp = attribute.get_result(AttributeName::EnhanceAggravate);
+        comp.merge(&self.extra_reaction_enhance);
         let em = &self.extra_em.sum() + attribute.get_em_all();
         if em > 0.0 {
             comp.add_value("精通", Reaction::catalyze(em));
@@ -723,6 +771,7 @@ impl ComplicatedDamageBuilder {
             TransformativeType::Hyperbloom => attribute.get_result(AttributeName::EnhanceHyperbloom),
             TransformativeType::Crystallize => EntryType::new(),
         };
+        comp.merge(&self.extra_reaction_enhance);
         let em = &self.extra_em.sum() + attribute.get_em_all();
         if em > 0.0 {
             comp.add_value("精通", Reaction::transformative(em));
@@ -732,6 +781,7 @@ impl ComplicatedDamageBuilder {
 
     fn get_enhance_moonglare_composition(&self, attribute: &AttributeTy, lunar_type: MoonglareReaction) -> EntryType {
         let mut comp = attribute.get_result(AttributeName::enhance_name_by_moonglare_reaction(lunar_type).unwrap_or(AttributeName::NULL));
+        comp.merge(&self.extra_reaction_enhance);
         comp.merge(&attribute.get_result(AttributeName::EnhanceMoonglare));
         let em = &self.extra_em.sum() + attribute.get_em_all();
         if em > 0.0 {
@@ -742,6 +792,7 @@ impl ComplicatedDamageBuilder {
 
     fn get_extra_increase_reaction_composition(&self, attribute: &AttributeTy, reaction_type: ReactionType) -> EntryType {
         let mut comp = attribute.get_result(AttributeName::extra_increase_name_by_reaction(reaction_type).unwrap_or(AttributeName::NULL));
+        comp.merge(&self.extra_reaction_extra);
         comp
     }
 

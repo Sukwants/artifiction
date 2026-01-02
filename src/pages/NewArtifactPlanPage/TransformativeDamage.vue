@@ -20,16 +20,17 @@
                 prop="nonCritical"
                 :label="t('dmg.nonCrit')"
             ></el-table-column>
-            <el-table-column width="60">
+            <!-- <el-table-column width="50">
                 <template #default="scope">
                     <el-button
                         :icon="Histogram"
                         :size="'small'"
+                        style="width: 25px;"
                         @click="handleDisplayAnalysis(scope.row.key)"
                     >
                     </el-button>
                 </template>
-            </el-table-column>
+            </el-table-column> -->
         </el-table>
     </div>
 </template>

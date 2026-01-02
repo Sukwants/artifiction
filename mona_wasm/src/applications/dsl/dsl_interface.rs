@@ -86,7 +86,7 @@ impl DSLInterface {
         env.set_ostream(Box::new(os));
 
         // set damage context
-        let attribute = AttributeUtils::create_attribute_from_big_config(
+        let attribute = AttributeUtils::create_attribute_from_big_config_result(
             &ArtifactList { artifacts: &artifacts_ref },
             &artifact_config,
             &character,

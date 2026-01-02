@@ -80,6 +80,8 @@ pub enum ArtifactSetName {
     FinaleOfTheDeepGalleries,
     NightOfTheSkysUnveiling,
     SilkenMoonsSerenade,
+    AubadeOfMorningstarAndMoon,
+    ADayCarvedFromRisingWinds,
 }
 
 impl ArtifactSetName {

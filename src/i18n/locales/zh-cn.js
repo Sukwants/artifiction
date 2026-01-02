@@ -285,6 +285,7 @@ export default {
         vaporize: "蒸发",
         heal: "治疗",
         shield: "护盾",
+        number: "数值",
         none: "无",
         spread: "蔓激化",
         aggravate: "超激化",
@@ -295,6 +296,8 @@ export default {
         lunar_charged_reaction: "月感电",
         lunar_charged: "月感电伤害",
         lunar_bloom: "月绽放伤害",
+        lunar_crystallize_reaction: "月结晶",
+        lunar_crystallize: "月结晶伤害",
     },
     res: {
         Pyro: "火抗",

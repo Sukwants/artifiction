@@ -108,7 +108,8 @@ impl TargetFunction for BennettDefaultTargetFunction {
         Default::default()
     }
 
-    fn target(&self, attribute: &TargetFunctionAttributeResultType, character: &Character<TargetFunctionAttributeType>, _weapon: &Weapon<TargetFunctionAttributeType>, artifacts: &[&Artifact], enemy: &Enemy) -> f64 {
+    fn target(&self, attribute: &TargetFunctionAttributeType, character: &Character<TargetFunctionAttributeType>, _weapon: &Weapon<TargetFunctionAttributeType>, artifacts: &[&Artifact], enemy: &Enemy) -> f64 {
+        let attribute = &attribute.solve();
         let mut noblesse_count = 0;
         for artifact in artifacts.iter() {
             if artifact.set_name == ArtifactSetName::NoblesseOblige {

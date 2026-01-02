@@ -42,6 +42,7 @@ pub enum WeaponConfig {
     SerenitysCall { reaction: bool, moonsign: Moonsign },
     MoonweaversDawn { energy: usize },
     AthameArtis { hexerei_secret_rite: bool, effect: bool },
+    LightbearingMoonshard { rate: f64 },
 
     // claymore
     WolfsGravestone { rate: f64 },
@@ -136,6 +137,7 @@ pub enum WeaponConfig {
     BlackmarrowLantern { moonsign: Moonsign },
     ReliquaryOfTruth { effect1: bool, effect2: bool },
     DawningFrost { rate1: f64, rate2: f64 },
+    NocturnesCurtainCall { effect: bool },
 
     // Bow
     PolarStar { stack: usize },

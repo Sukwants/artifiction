@@ -9,6 +9,8 @@ pub mod navia;
 pub mod chiori;
 pub mod kachina;
 pub mod xilonen;
+pub mod illuga;
+pub mod zibai;
 
 pub use albedo::Albedo;
 pub use arataki_itto::AratakiItto;
@@ -21,3 +23,5 @@ pub use navia::Navia;
 pub use chiori::Chiori;
 pub use kachina::Kachina;
 pub use xilonen::Xilonen;
+pub use illuga::Illuga;
+pub use zibai::Zibai;

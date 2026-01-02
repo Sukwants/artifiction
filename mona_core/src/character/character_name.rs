@@ -145,4 +145,7 @@ pub enum CharacterName {
     Nefer,
     Jahoda,
     Durin,
+    Illuga,
+    Columbina,
+    Zibai,
 }

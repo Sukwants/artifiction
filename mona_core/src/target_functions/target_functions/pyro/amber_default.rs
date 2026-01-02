@@ -92,12 +92,13 @@ impl TargetFunction for AmberDefaultTargetFunction {
 
     fn target(
         &self,
-        attribute: &TargetFunctionAttributeResultType,
+        attribute: &TargetFunctionAttributeType,
         character: &Character<TargetFunctionAttributeType>,
         _weapon: &Weapon<TargetFunctionAttributeType>,
         _artifacts: &[&Artifact],
         enemy: &Enemy
     ) -> f64 {
+        let attribute = &attribute.solve();
         let context: DamageContext<'_, TargetFunctionAttributeResultType> = DamageContext {
             character_common_data: &character.common_data,
             attribute,

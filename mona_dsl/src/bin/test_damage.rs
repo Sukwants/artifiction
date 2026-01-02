@@ -71,7 +71,7 @@ fn main() {
         &WeaponConfig::MistsplitterReforged { emblem_level: 2 },
         &character
     );
-    let attribute = AttributeUtils::create_attribute_from_c_w_bs(&character, &weapon, &Vec::new());
+    let attribute = AttributeUtils::create_attribute_from_c_w_bs_result(&character, &weapon, &Vec::new());
     let enemy = Enemy::default();
     let context = UnsafeDamageContext {
         character_common_data: &character.common_data,

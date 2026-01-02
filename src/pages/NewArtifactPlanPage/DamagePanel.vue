@@ -59,7 +59,9 @@ export default {
                 })
             }
 
-            if (this.analysisFromWasm.Heal != undefined) {
+            if (this.analysisFromWasm.Number) {
+                push(this.analysisFromWasm.Number.result, this.t("dmg.number"))
+            } else if (this.analysisFromWasm.Heal != undefined) {
                 push(this.analysisFromWasm.Heal.result, this.t("dmg.heal"))
             } else if (this.analysisFromWasm.Shield != undefined) {
                 push(this.analysisFromWasm.Shield.result, this.t("dmg.shield"))
@@ -67,7 +69,7 @@ export default {
                 push(this.analysisFromWasm.TransformativeDamage.result, this.t(`dmg.${toSnake(this.analysisFromWasm.TransformativeDamage.transformative_type)}`))
             } else if (this.analysisFromWasm.MoonglareDamage != undefined) {
                 push(this.analysisFromWasm.MoonglareDamage.result, this.t(`dmg.${toSnake(this.analysisFromWasm.MoonglareDamage.lunar_type)}`))
-            } else {
+            } else if (this.analysisFromWasm.Damage != undefined) {
 
                 push(this.analysisFromWasm.Damage.normal.result, this.t(`dmg.${this.analysisFromWasm.Damage.normal.element}`))
 

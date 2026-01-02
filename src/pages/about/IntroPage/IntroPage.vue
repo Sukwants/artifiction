@@ -78,7 +78,11 @@ import {useRouter} from "vue-router"
 import {useI18n} from "@/i18n/i18n"
 
 
-const version = process.env.MONA_VERSION
+const version = function formatVersion(version: string): string {
+  return version.replace(/-(\w+)/g, (_, word) =>
+    ' ' + word[0].toUpperCase() + word.slice(1).toLowerCase()
+  );
+}(process.env.MONA_VERSION)
 const webTitle = process.env.MONA_TITLE
 const needMigrate = process.env.MONA_NEED_MIGRATE
 const buildDate = process.env.MONA_BUILD_DATA

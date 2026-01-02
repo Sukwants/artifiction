@@ -49,6 +49,7 @@ pub use azurelight::Azurelight;
 pub use serenitys_call::SerenitysCall;
 pub use moonweavers_dawn::MoonweaversDawn;
 pub use athame_artis::AthameArtis;
+pub use lightbearing_moonshard::LightbearingMoonshard;
 
 pub mod mistsplitter_reforged;
 pub mod aquila_favonia;
@@ -101,3 +102,4 @@ pub mod azurelight;
 pub mod serenitys_call;
 pub mod moonweavers_dawn;
 pub mod athame_artis;
+pub mod lightbearing_moonshard;

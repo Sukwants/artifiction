@@ -69,6 +69,7 @@ pub enum WeaponName {
     PeakPatrolSong,
     Azurelight,
     AthameArtis,
+    LightbearingMoonshard,
 
     // claymore
     // 1 star
@@ -220,6 +221,7 @@ pub enum WeaponName {
     VividNotions,
     NightweaversLookingGlass,
     ReliquaryOfTruth,
+    NocturnesCurtainCall,
 
     // bows
     // 1 star

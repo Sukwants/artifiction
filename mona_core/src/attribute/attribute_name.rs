@@ -250,9 +250,97 @@ impl InvisibleAttributeType {
             reaction,
         }
     }
+
+    pub fn new_any(attribute_variable_type: AttributeVariableType) -> Self {
+        InvisibleAttributeType {
+            attribute_variable_type,
+            element: None,
+            skill: None,
+            reaction: None,
+        }
+    }
+
+    pub fn new_element(attribute_variable_type: AttributeVariableType, element: Element) -> Self {
+        InvisibleAttributeType {
+            attribute_variable_type,
+            element: Some(element),
+            skill: None,
+            reaction: None,
+        }
+    }
+
+    pub fn new_skill(attribute_variable_type: AttributeVariableType, skill: SkillType) -> Self {
+        InvisibleAttributeType {
+            attribute_variable_type,
+            element: None,
+            skill: Some(skill),
+            reaction: None,
+        }
+    }
+
+    pub fn new_reaction(attribute_variable_type: AttributeVariableType, reaction: ReactionType) -> Self {
+        InvisibleAttributeType {
+            attribute_variable_type,
+            element: None,
+            skill: None,
+            reaction: Some(reaction),
+        }
+    }
 }
 
 impl AttributeName {
+    pub fn is_panel(&self) -> bool {
+        match *self {
+            // 基础属性
+            
+            AttributeName::ATKBase |
+            AttributeName::ATKFixed |
+            AttributeName::ATKPercentage |
+            AttributeName::ATK |
+            
+            AttributeName::HPBase |
+            AttributeName::HPFixed |
+            AttributeName::HPPercentage |
+            AttributeName::HP |
+
+            AttributeName::DEFBase |
+            AttributeName::DEFFixed |
+            AttributeName::DEFPercentage |
+            AttributeName::DEF |
+
+            AttributeName::ElementalMastery |
+            AttributeName::ElementalMasteryExtra |
+
+            // 进阶属性
+
+            AttributeName::CriticalBase |
+
+            AttributeName::CriticalDamageBase |
+
+            AttributeName::HealingBonus |
+
+            AttributeName::IncomingHealingBonus |
+
+            AttributeName::Recharge |
+            AttributeName::RechargeExtra |
+
+            AttributeName::ShieldStrength |
+
+            // 元素属性
+
+            AttributeName::BonusPyro |
+            AttributeName::BonusHydro |
+            AttributeName::BonusAnemo |
+            AttributeName::BonusElectro |
+            AttributeName::BonusDendro |
+            AttributeName::BonusCryo |
+            AttributeName::BonusGeo |
+            AttributeName::BonusPhysical
+            => true,
+            _ => false,
+        }
+    }
+    
     pub fn bonus_name_by_element(element: Element) -> AttributeName {
         match element {
             Element::Electro => AttributeName::BonusElectro,
@@ -282,7 +370,7 @@ impl AttributeName {
             MoonglareReaction::None => None,
             MoonglareReaction::LunarChargedReaction | MoonglareReaction::LunarCharged => Some(AttributeName::EnhanceLunarCharged),
             MoonglareReaction::LunarBloom => Some(AttributeName::EnhanceLunarBloom),
-            _ => None,
+            _ => Some(AttributeName::NULL),
         }
     }
 
@@ -291,7 +379,7 @@ impl AttributeName {
             MoonglareReaction::None => None,
             MoonglareReaction::LunarChargedReaction | MoonglareReaction::LunarCharged => Some(AttributeName::IncreaseLunarCharged),
             MoonglareReaction::LunarBloom => Some(AttributeName::IncreaseLunarBloom),
-            _ => None,
+            _ => Some(AttributeName::NULL),
         }
     }
 
@@ -300,7 +388,7 @@ impl AttributeName {
             MoonglareReaction::None => None,
             MoonglareReaction::LunarChargedReaction | MoonglareReaction::LunarCharged => Some(AttributeName::ElevateLunarCharged),
             MoonglareReaction::LunarBloom => Some(AttributeName::ElevateLunarBloom),
-            _ => None,
+            _ => Some(AttributeName::NULL),
         }
     }
 
@@ -344,7 +432,7 @@ impl AttributeName {
             MoonglareReaction::None => None,
             MoonglareReaction::LunarChargedReaction | MoonglareReaction::LunarCharged => Some(AttributeName::CriticalLunarCharged),
             MoonglareReaction::LunarBloom => Some(AttributeName::CriticalLunarBloom),
-            _ => None,
+            _ => Some(AttributeName::NULL),
         }
     }
 
@@ -377,7 +465,7 @@ impl AttributeName {
             MoonglareReaction::None => None,
             MoonglareReaction::LunarChargedReaction | MoonglareReaction::LunarCharged => Some(AttributeName::CriticalDamageLunarCharged),
             MoonglareReaction::LunarBloom => Some(AttributeName::CriticalDamageLunarBloom),
-            _ => None,
+            _ => Some(AttributeName::NULL),
         }
     }
 

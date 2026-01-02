@@ -33,7 +33,7 @@ pub trait TargetFunction {
 
     fn target(
         &self,
-        attribute: &SimpleAttributeResult,
+        attribute: &SimpleAttribute,
         character: &Character<SimpleAttribute>,
         weapon: &Weapon<SimpleAttribute>,
         artifacts: &[&Artifact],

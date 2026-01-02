@@ -42,7 +42,7 @@ pub struct BonusPerStatOutput {
 
 fn get_atk(attribute: &mut SimpleAttribute, baseline: f64, artifacts: &Vec<&Artifact>, input: &BonusPerStatInput) -> Vec<f64> {
     attribute.set_value_by(AttributeName::ATKFixed, "temp", 10000.0);
-    let test_value = input.tf.target(&attribute.solve(), &input.character, &input.weapon, artifacts, &input.enemy);
+    let test_value = input.tf.target(&attribute, &input.character, &input.weapon, artifacts, &input.enemy);
     attribute.set_value_by(AttributeName::ATKFixed, "temp", -10000.0);
     if (test_value - baseline).abs() < 1e-6 {
         return Vec::new();
@@ -54,7 +54,7 @@ fn get_atk(attribute: &mut SimpleAttribute, baseline: f64, artifacts: &Vec<&Arti
         let x = i as f64 / INTERVAL;
         let add_value = ARTIFACT_EFF5.atk[3] * x;
         attribute.set_value_by(AttributeName::ATKFixed, "temp", add_value);
-        let value = input.tf.target(&attribute.solve(), &input.character, &input.weapon, artifacts, &input.enemy);
+        let value = input.tf.target(&attribute, &input.character, &input.weapon, artifacts, &input.enemy);
         attribute.set_value_by(AttributeName::ATKFixed, "temp", -add_value);
 
         data.push((value - baseline) / baseline)
@@ -65,7 +65,7 @@ fn get_atk(attribute: &mut SimpleAttribute, baseline: f64, artifacts: &Vec<&Arti
 
 fn get_atk_p(attribute: &mut SimpleAttribute, baseline: f64, artifacts: &Vec<&Artifact>, input: &BonusPerStatInput) -> Vec<f64> {
     attribute.set_value_by(AttributeName::ATKFixed, "temp", 10000.0);
-    let test_value = input.tf.target(&attribute.solve(), &input.character, &input.weapon, artifacts, &input.enemy);
+    let test_value = input.tf.target(&attribute, &input.character, &input.weapon, artifacts, &input.enemy);
     attribute.set_value_by(AttributeName::ATKFixed, "temp", -10000.0);
     if (test_value - baseline).abs() < 1e-6 {
         return Vec::new();
@@ -78,7 +78,7 @@ fn get_atk_p(attribute: &mut SimpleAttribute, baseline: f64, artifacts: &Vec<&Ar
         let p = ARTIFACT_EFF5.atk_percentage[3] * x;
 
         attribute.add_atk_percentage("temp", p);
-        let value = input.tf.target(&attribute.solve(), &input.character, &input.weapon, artifacts, &input.enemy);
+        let value = input.tf.target(&attribute, &input.character, &input.weapon, artifacts, &input.enemy);
         attribute.add_atk_percentage("temp", -p);
 
         data.push((value - baseline) / baseline)
@@ -89,7 +89,7 @@ fn get_atk_p(attribute: &mut SimpleAttribute, baseline: f64, artifacts: &Vec<&Ar
 
 fn get_def(attribute: &mut SimpleAttribute, baseline: f64, artifacts: &Vec<&Artifact>, input: &BonusPerStatInput) -> Vec<f64> {
     attribute.set_value_by(AttributeName::DEFFixed, "temp", 10000.0);
-    let test_value = input.tf.target(&attribute.solve(), &input.character, &input.weapon, artifacts, &input.enemy);
+    let test_value = input.tf.target(&attribute, &input.character, &input.weapon, artifacts, &input.enemy);
     attribute.set_value_by(AttributeName::DEFFixed, "temp", -10000.0);
     if (test_value - baseline).abs() < 1e-6 {
         return Vec::new();
@@ -101,7 +101,7 @@ fn get_def(attribute: &mut SimpleAttribute, baseline: f64, artifacts: &Vec<&Arti
         let x = i as f64 / INTERVAL;
         let add_value = ARTIFACT_EFF5.def[3] * x;
         attribute.set_value_by(AttributeName::DEFFixed, "temp", add_value);
-        let value = input.tf.target(&attribute.solve(), &input.character, &input.weapon, artifacts, &input.enemy);
+        let value = input.tf.target(&attribute, &input.character, &input.weapon, artifacts, &input.enemy);
         attribute.set_value_by(AttributeName::DEFFixed, "temp", -add_value);
 
         data.push((value - baseline) / baseline)
@@ -112,7 +112,7 @@ fn get_def(attribute: &mut SimpleAttribute, baseline: f64, artifacts: &Vec<&Arti
 
 fn get_def_p(attribute: &mut SimpleAttribute, baseline: f64, artifacts: &Vec<&Artifact>, input: &BonusPerStatInput) -> Vec<f64> {
     attribute.set_value_by(AttributeName::DEFFixed, "temp", 10000.0);
-    let test_value = input.tf.target(&attribute.solve(), &input.character, &input.weapon, artifacts, &input.enemy);
+    let test_value = input.tf.target(&attribute, &input.character, &input.weapon, artifacts, &input.enemy);
     attribute.set_value_by(AttributeName::DEFFixed, "temp", -10000.0);
     if (test_value - baseline).abs() < 1e-6 {
         return Vec::new();
@@ -125,7 +125,7 @@ fn get_def_p(attribute: &mut SimpleAttribute, baseline: f64, artifacts: &Vec<&Ar
         let p = ARTIFACT_EFF5.def_percentage[3] * x;
 
         attribute.add_def_percentage("temp", p);
-        let value = input.tf.target(&attribute.solve(), &input.character, &input.weapon, artifacts, &input.enemy);
+        let value = input.tf.target(&attribute, &input.character, &input.weapon, artifacts, &input.enemy);
         attribute.add_def_percentage("temp", -p);
 
         data.push((value - baseline) / baseline)
@@ -136,7 +136,7 @@ fn get_def_p(attribute: &mut SimpleAttribute, baseline: f64, artifacts: &Vec<&Ar
 
 fn get_hp(attribute: &mut SimpleAttribute, baseline: f64, artifacts: &Vec<&Artifact>, input: &BonusPerStatInput) -> Vec<f64> {
     attribute.set_value_by(AttributeName::HPFixed, "temp", 10000.0);
-    let test_value = input.tf.target(&attribute.solve(), &input.character, &input.weapon, artifacts, &input.enemy);
+    let test_value = input.tf.target(&attribute, &input.character, &input.weapon, artifacts, &input.enemy);
     attribute.set_value_by(AttributeName::HPFixed, "temp", -10000.0);
     if (test_value - baseline).abs() < 1e-6 {
         return Vec::new();
@@ -148,7 +148,7 @@ fn get_hp(attribute: &mut SimpleAttribute, baseline: f64, artifacts: &Vec<&Artif
         let x = i as f64 / INTERVAL;
         let add_value = ARTIFACT_EFF5.hp[3] * x;
         attribute.set_value_by(AttributeName::HPFixed, "temp", add_value);
-        let value = input.tf.target(&attribute.solve(), &input.character, &input.weapon, artifacts, &input.enemy);
+        let value = input.tf.target(&attribute, &input.character, &input.weapon, artifacts, &input.enemy);
         attribute.set_value_by(AttributeName::HPFixed, "temp", -add_value);
 
         data.push((value - baseline) / baseline)
@@ -159,7 +159,7 @@ fn get_hp(attribute: &mut SimpleAttribute, baseline: f64, artifacts: &Vec<&Artif
 
 fn get_hp_p(attribute: &mut SimpleAttribute, baseline: f64, artifacts: &Vec<&Artifact>, input: &BonusPerStatInput) -> Vec<f64> {
     attribute.set_value_by(AttributeName::HPFixed, "temp", 10000.0);
-    let test_value = input.tf.target(&attribute.solve(), &input.character, &input.weapon, artifacts, &input.enemy);
+    let test_value = input.tf.target(&attribute, &input.character, &input.weapon, artifacts, &input.enemy);
     attribute.set_value_by(AttributeName::HPFixed, "temp", -10000.0);
     if (test_value - baseline).abs() < 1e-6 {
         return Vec::new();
@@ -172,7 +172,7 @@ fn get_hp_p(attribute: &mut SimpleAttribute, baseline: f64, artifacts: &Vec<&Art
         let p = ARTIFACT_EFF5.hp_percentage[3] * x;
 
         attribute.add_hp_percentage("temp", p);
-        let value = input.tf.target(&attribute.solve(), &input.character, &input.weapon, artifacts, &input.enemy);
+        let value = input.tf.target(&attribute, &input.character, &input.weapon, artifacts, &input.enemy);
         attribute.add_hp_percentage("temp", -p);
 
         data.push((value - baseline) / baseline)
@@ -183,7 +183,7 @@ fn get_hp_p(attribute: &mut SimpleAttribute, baseline: f64, artifacts: &Vec<&Art
 
 fn get_critical_rate(attribute: &mut SimpleAttribute, baseline: f64, artifacts: &Vec<&Artifact>, input: &BonusPerStatInput) -> Vec<f64> {
     attribute.set_value_by(AttributeName::CriticalBase, "temp", 1.0);
-    let test_value = input.tf.target(&attribute.solve(), &input.character, &input.weapon, artifacts, &input.enemy);
+    let test_value = input.tf.target(&attribute, &input.character, &input.weapon, artifacts, &input.enemy);
     attribute.set_value_by(AttributeName::CriticalBase, "temp", -1.0);
     if (test_value - baseline).abs() < 1e-6 {
         return Vec::new();
@@ -194,7 +194,7 @@ fn get_critical_rate(attribute: &mut SimpleAttribute, baseline: f64, artifacts: 
         let x = i as f64 / INTERVAL;
         let p = ARTIFACT_EFF5.critical_rate[3] * x;
         attribute.set_value_by(AttributeName::CriticalBase, "temp", p);
-        let value = input.tf.target(&attribute.solve(), &input.character, &input.weapon, artifacts, &input.enemy);
+        let value = input.tf.target(&attribute, &input.character, &input.weapon, artifacts, &input.enemy);
         attribute.set_value_by(AttributeName::CriticalBase, "temp", -p);
         data.push((value - baseline) / baseline)
     }
@@ -204,7 +204,7 @@ fn get_critical_rate(attribute: &mut SimpleAttribute, baseline: f64, artifacts: 
 
 fn get_critical_damage(attribute: &mut SimpleAttribute, baseline: f64, artifacts: &Vec<&Artifact>, input: &BonusPerStatInput) -> Vec<f64> {
     attribute.set_value_by(AttributeName::CriticalDamageBase, "temp", 1.0);
-    let test_value = input.tf.target(&attribute.solve(), &input.character, &input.weapon, artifacts, &input.enemy);
+    let test_value = input.tf.target(&attribute, &input.character, &input.weapon, artifacts, &input.enemy);
     attribute.set_value_by(AttributeName::CriticalDamageBase, "temp", -1.0);
     if (test_value - baseline).abs() < 1e-6 {
         return Vec::new();
@@ -215,7 +215,7 @@ fn get_critical_damage(attribute: &mut SimpleAttribute, baseline: f64, artifacts
         let x = i as f64 / INTERVAL;
         let p = ARTIFACT_EFF5.critical_damage[3] * x;
         attribute.set_value_by(AttributeName::CriticalDamageBase, "temp", p);
-        let value = input.tf.target(&attribute.solve(), &input.character, &input.weapon, artifacts, &input.enemy);
+        let value = input.tf.target(&attribute, &input.character, &input.weapon, artifacts, &input.enemy);
         attribute.set_value_by(AttributeName::CriticalDamageBase, "temp", -p);
         data.push((value - baseline) / baseline)
     }
@@ -225,7 +225,7 @@ fn get_critical_damage(attribute: &mut SimpleAttribute, baseline: f64, artifacts
 
 fn get_recharge(attribute: &mut SimpleAttribute, baseline: f64, artifacts: &Vec<&Artifact>, input: &BonusPerStatInput) -> Vec<f64> {
     attribute.set_value_by(AttributeName::Recharge, "temp", 1.0);
-    let test_value = input.tf.target(&attribute.solve(), &input.character, &input.weapon, artifacts, &input.enemy);
+    let test_value = input.tf.target(&attribute, &input.character, &input.weapon, artifacts, &input.enemy);
     attribute.set_value_by(AttributeName::Recharge, "temp", -1.0);
     if (test_value - baseline).abs() < 1e-6 {
         return Vec::new();
@@ -236,7 +236,7 @@ fn get_recharge(attribute: &mut SimpleAttribute, baseline: f64, artifacts: &Vec<
         let x = i as f64 / INTERVAL;
         let p = ARTIFACT_EFF5.recharge[3] * x;
         attribute.set_value_by(AttributeName::Recharge, "temp", p);
-        let value = input.tf.target(&attribute.solve(), &input.character, &input.weapon, artifacts, &input.enemy);
+        let value = input.tf.target(&attribute, &input.character, &input.weapon, artifacts, &input.enemy);
         attribute.set_value_by(AttributeName::Recharge, "temp", -p);
         data.push((value - baseline) / baseline)
     }
@@ -246,7 +246,7 @@ fn get_recharge(attribute: &mut SimpleAttribute, baseline: f64, artifacts: &Vec<
 
 fn get_em(attribute: &mut SimpleAttribute, baseline: f64, artifacts: &Vec<&Artifact>, input: &BonusPerStatInput) -> Vec<f64> {
     attribute.set_value_by(AttributeName::ElementalMastery, "temp", 1000.0);
-    let test_value = input.tf.target(&attribute.solve(), &input.character, &input.weapon, artifacts, &input.enemy);
+    let test_value = input.tf.target(&attribute, &input.character, &input.weapon, artifacts, &input.enemy);
     attribute.set_value_by(AttributeName::ElementalMastery, "temp", -1000.0);
     if (test_value - baseline).abs() < 1e-6 {
         return Vec::new();
@@ -257,7 +257,7 @@ fn get_em(attribute: &mut SimpleAttribute, baseline: f64, artifacts: &Vec<&Artif
         let x = i as f64 / INTERVAL;
         let p = ARTIFACT_EFF5.elemental_mastery[3] * x;
         attribute.set_value_by(AttributeName::ElementalMastery, "temp", p);
-        let value = input.tf.target(&attribute.solve(), &input.character, &input.weapon, artifacts, &input.enemy);
+        let value = input.tf.target(&attribute, &input.character, &input.weapon, artifacts, &input.enemy);
         attribute.set_value_by(AttributeName::ElementalMastery, "temp", -p);
         data.push((value - baseline) / baseline)
     }
@@ -282,7 +282,7 @@ pub fn bonus_per_stat(input: BonusPerStatInput) -> BonusPerStatOutput {
         default_artifact_config.as_ref().unwrap()
     };
 
-    let mut attribute = AttributeUtils::create_attribute_from_big_config_mut(
+    let mut attribute = AttributeUtils::create_attribute_from_big_config(
         &artifact_list,
         &artifact_config,
         &input.character,
@@ -290,7 +290,7 @@ pub fn bonus_per_stat(input: BonusPerStatInput) -> BonusPerStatOutput {
         &input.buffs
     );
 
-    let value_baseline = input.tf.target(&attribute.solve(), &input.character, &input.weapon, &artifact_vec, &input.enemy);
+    let value_baseline = input.tf.target(&attribute, &input.character, &input.weapon, &artifact_vec, &input.enemy);
 
     BonusPerStatOutput {
         atk: get_atk(&mut attribute, value_baseline, &artifact_vec, &input),

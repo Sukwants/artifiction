@@ -128,7 +128,8 @@ impl TargetFunction for BennettDamageTargetFunction {
             .build()
     }
 
-    fn target(&self, attribute: &TargetFunctionAttributeResultType, character: &Character<TargetFunctionAttributeType>, _weapon: &Weapon<TargetFunctionAttributeType>, _artifacts: &[&Artifact], enemy: &Enemy) -> f64 {
+    fn target(&self, attribute: &TargetFunctionAttributeType, character: &Character<TargetFunctionAttributeType>, _weapon: &Weapon<TargetFunctionAttributeType>, _artifacts: &[&Artifact], enemy: &Enemy) -> f64 {
+        let attribute = &attribute.solve();
         let bonus_for_other = attribute.get_value(AttributeName::ATKBonusForOther);
         // if bonus_for_other > 1e-6 {
         //     crate::utils::log!("666 {}", bonus_for_other);

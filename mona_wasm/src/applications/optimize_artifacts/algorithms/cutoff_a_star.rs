@@ -137,7 +137,7 @@ impl<'a> ResultRecorder<'a> {
             &self.buffs
         );
 
-        if !check_attribute(&attribute, &self.constraint) {
+        if !check_attribute(&attribute.solve(), &self.constraint) {
             return None;
         }
 

@@ -68,5 +68,8 @@ pub enum CharacterSkillConfig {
     Nefer { veil_of_falsehood: usize, shadow_dance: bool },
     Jahoda { elemental_absorption: Element, activated_p2: bool },
     Durin { activated_res: bool, primordial_fusion: bool, cycle_of_enlightenment: bool, activated_reaction: bool },
+    Illuga { nightingales_song: bool },
+    Columbina { activated_q: bool, stack_p1: usize, activated_c4: bool },
+    Zibai { lunar_phase_shift: bool, activated_c1: bool, activated_c4: bool, stack_c6: usize },
     NoConfig,
 }

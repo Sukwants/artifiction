@@ -94,7 +94,7 @@ impl TargetFunction for ChongyunDefaultTargetFunction {
             .build()
     }
 
-    fn target(&self, attribute: &TargetFunctionAttributeResultType, character: &Character<TargetFunctionAttributeType>, _weapon: &Weapon<TargetFunctionAttributeType>, artifacts: &[&Artifact], enemy: &Enemy) -> f64 {
+    fn target(&self, attribute: &TargetFunctionAttributeType, character: &Character<TargetFunctionAttributeType>, _weapon: &Weapon<TargetFunctionAttributeType>, artifacts: &[&Artifact], enemy: &Enemy) -> f64 {
         let mut noblesse_count = 0;
         for artifact in artifacts.iter() {
             if artifact.set_name == ArtifactSetName::NoblesseOblige {
@@ -102,6 +102,7 @@ impl TargetFunction for ChongyunDefaultTargetFunction {
             }
         }
 
+        let attribute = &attribute.solve();
         let context: DamageContext<'_, TargetFunctionAttributeResultType> = DamageContext {
             character_common_data: &character.common_data,
             attribute, enemy

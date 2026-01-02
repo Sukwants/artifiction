@@ -61,9 +61,11 @@ impl TransformativeType {
 
 #[derive(Debug, Serialize, Deserialize, Hash, Eq, PartialEq, Copy, Clone)]
 pub enum MoonglareReaction {
-    LunarChargedReaction,   // 月感电
-    LunarCharged,           // 广义月感电
+    LunarChargedReaction,       // 月感电
+    LunarCharged,               // 广义月感电
     LunarBloom,
+    LunarCrystallizeReaction,   // 月结晶
+    LunarCrystallize,           // 广义月结晶
     None,
 }
 
@@ -72,6 +74,7 @@ impl MoonglareReaction {
         match *self {
             MoonglareReaction::LunarChargedReaction | MoonglareReaction::LunarCharged => Some(Element::Electro),
             MoonglareReaction::LunarBloom => Some(Element::Dendro),
+            MoonglareReaction::LunarCrystallizeReaction | MoonglareReaction::LunarCrystallize => Some(Element::Geo),
             _ => None
         }
     }
@@ -81,6 +84,8 @@ impl MoonglareReaction {
             MoonglareReaction::LunarChargedReaction => 1.8,
             MoonglareReaction::LunarCharged => 3.0,
             MoonglareReaction::LunarBloom => 1.0,
+            MoonglareReaction::LunarCrystallizeReaction => 0.96,
+            MoonglareReaction::LunarCrystallize => 1.6,
             _ => panic!()
         }
     }
@@ -104,6 +109,7 @@ pub enum ReactionType {
     Crystallize,
     LunarCharged,
     LunarBloom,
+    LunarCrystallize,
 }
 
 impl ReactionType {
@@ -125,6 +131,7 @@ impl ReactionType {
         match lunar_type {
             MoonglareReaction::LunarChargedReaction | MoonglareReaction::LunarCharged => Some(ReactionType::LunarCharged),
             MoonglareReaction::LunarBloom => Some(ReactionType::LunarBloom),
+            MoonglareReaction::LunarCrystallizeReaction | MoonglareReaction::LunarCrystallize => Some(ReactionType::LunarCrystallize),
             MoonglareReaction::None => None,
         }
     }

@@ -204,7 +204,7 @@ impl CalculatorInterface {
             artifacts: &artifacts,
         };
 
-        let attribute = AttributeUtils::create_attribute_from_big_config_with_skill_config(
+        let attribute = AttributeUtils::create_attribute_from_big_config_with_skill_config_result(
             &artifact_list,
             artifact_config,
             character,
@@ -237,7 +237,7 @@ impl CalculatorInterface {
             artifacts: &artifacts,
         };
 
-        let attribute = AttributeUtils::create_attribute_from_big_config_with_skill_config(
+        let attribute = AttributeUtils::create_attribute_from_big_config_with_skill_config_result(
             &artifact_list,
             artifact_config,
             character,
@@ -296,7 +296,7 @@ impl CalculatorInterface {
             artifacts: &artifacts,
         };
 
-        let attribute = AttributeUtils::create_attribute_from_big_config_with_skill_config(
+        let attribute = AttributeUtils::create_attribute_from_big_config_with_skill_config_result(
             &artifact_list,
             artifact_config,
             character,
@@ -327,6 +327,7 @@ impl CalculatorInterface {
 
         let result = MoonglareDamageAnalysisForAll {
             lunar_charged_reaction: get_damage(MoonglareReaction::LunarChargedReaction),
+            lunar_crystallize_reaction: get_damage(MoonglareReaction::LunarCrystallizeReaction),
         };
 
         result

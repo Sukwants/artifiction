@@ -60,7 +60,7 @@ impl ValueFunction {
         let artifact_list = ArtifactList {
             artifacts,
         };
-        let attribute = AttributeUtils::create_attribute_from_big_config(
+        let attribute = AttributeUtils::create_attribute_from_big_config_result(
             &artifact_list,
             &self.artifact_config,
             &self.character,

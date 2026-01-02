@@ -3,6 +3,8 @@ use crate::attribute::*;
 use crate::character::Character;
 use crate::weapon::Weapon;
 
+pub mod prelude;
+
 pub mod pyro;
 pub mod electro;
 pub mod geo;

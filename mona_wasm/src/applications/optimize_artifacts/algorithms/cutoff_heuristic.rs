@@ -259,7 +259,7 @@ impl SingleOptimizeAlgorithm for CutoffAlgorithmHeuristic {
                                 &buffs
                             );
 
-                            if !check_attribute(&attribute, constraint) {
+                            if !check_attribute(&attribute.solve(), constraint) {
                                 continue;
                             }
 

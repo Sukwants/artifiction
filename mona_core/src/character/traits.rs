@@ -2,7 +2,7 @@ use crate::attribute::Attribute;
 use crate::character::character_common_data::CharacterCommonData;
 use crate::character::{CharacterConfig, CharacterStaticData};
 use crate::character::skill_config::CharacterSkillConfig;
-use crate::common::ChangeAttribute;
+use crate::common::{ChangeAttribute, MoonglareReaction, TransformativeType, SkillType};
 use crate::common::item_config_type::ItemConfig;
 use crate::damage::damage_builder::DamageBuilder;
 use crate::damage::DamageContext;
@@ -49,6 +49,24 @@ pub trait CharacterTrait {
 
     fn change_attribute<A: Attribute>(attribute: &mut A, common_data: &CharacterCommonData, skill_config: &CharacterSkillConfig) {
 
+    }
+
+    fn transformative_damage<D: DamageBuilder>(context: &DamageContext<'_, D::AttributeType>, transformative_type: TransformativeType) -> D::Result {
+        let builder = D::new();
+        builder.transformative(context.attribute, context.enemy, transformative_type, context.character_common_data.level)
+    }
+
+    fn moonglare_damage<D: DamageBuilder>(context: &DamageContext<'_, D::AttributeType>, lunar_type: MoonglareReaction) -> D::Result {
+        let builder = D::new();
+        builder.moonglare(
+            context.attribute,
+            context.enemy,
+            lunar_type.get_element().unwrap(),
+            lunar_type,
+            SkillType::Moonglare,
+            context.character_common_data.level,
+            None,
+        )
     }
 
     fn damage_internal<D: DamageBuilder>(context: &DamageContext<'_, D::AttributeType>, s: usize, config: &CharacterSkillConfig, fumo: Option<Element>) -> D::Result;
