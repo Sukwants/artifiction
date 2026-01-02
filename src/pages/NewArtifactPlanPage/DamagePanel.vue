@@ -59,7 +59,9 @@ export default {
                 })
             }
 
-            if (this.analysisFromWasm.Heal != undefined) {
+            if (this.analysisFromWasm.Number) {
+                push(this.analysisFromWasm.Number.result, this.t("dmg.number"))
+            } else if (this.analysisFromWasm.Heal != undefined) {
                 push(this.analysisFromWasm.Heal.result, this.t("dmg.heal"))
             } else if (this.analysisFromWasm.Shield != undefined) {
                 push(this.analysisFromWasm.Shield.result, this.t("dmg.shield"))

@@ -77,9 +77,27 @@ impl CharacterSelector {
         }
     }
 
+    pub fn select_team_except_self(character_id: usize, team_id: usize) -> Self {
+        CharacterSelector {
+            selector: Arc::new(move |status: &CharacterStatus| status.character_id != character_id && status.team_id == team_id ),
+        }
+    }
+
     pub fn select_all() -> Self {
         CharacterSelector {
             selector: Arc::new(move |status: &CharacterStatus| true ),
+        }
+    }
+
+    pub fn select_all_onfield() -> Self {
+        CharacterSelector {
+            selector: Arc::new(move |status: &CharacterStatus| status.on_field ),
+        }
+    }
+
+    pub fn select_all_except_self(character_id: usize) -> Self {
+        CharacterSelector {
+            selector: Arc::new(move |status: &CharacterStatus| status.character_id != character_id ),
         }
     }
 }

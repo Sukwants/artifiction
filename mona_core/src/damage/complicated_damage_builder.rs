@@ -5,7 +5,7 @@ use num_traits::Inv;
 use crate::attribute::*;
 use crate::buffs::buffs::base_dmg;
 use crate::common::{DamageResult, Element, TransformativeType, MoonglareReaction, ReactionType, SkillType};
-use crate::damage::damage_analysis::{DamageAnalysis, DamageAnalysisWithPossibleReaction, EventAnalysis, HealAnalysis, MoonglareDamageAnalysis, ShieldAnalysis, TransformativeDamageAnalysis};
+use crate::damage::damage_analysis::{DamageAnalysis, DamageAnalysisWithPossibleReaction, EventAnalysis, HealAnalysis, MoonglareDamageAnalysis, NumberAnalysis, ShieldAnalysis, TransformativeDamageAnalysis};
 use crate::enemies::Enemy;
 use crate::common::EntryType;
 use crate::damage::damage_builder::{DamageBuilder};
@@ -615,6 +615,40 @@ impl DamageBuilder for ComplicatedDamageBuilder {
             shield_strength: shield_strength_comp.0,
 
             result: shield,
+        })
+    }
+
+    fn number(&self, attribute: &Self::AttributeType) -> Self::Result {
+
+        let atk_comp = self.get_atk_composition(attribute);
+        let atk = atk_comp.sum();
+        let def_comp = self.get_def_composition(attribute);
+        let def = def_comp.sum();
+        let hp_comp = self.get_hp_composition(attribute);
+        let hp = hp_comp.sum();
+        let em_comp = self.get_em_composition(attribute);
+        let em = em_comp.sum();
+
+        let base = atk * self.ratio_atk.sum() + hp * self.ratio_hp.sum() + def * self.ratio_def.sum() + em * self.ratio_em.sum() + self.base.sum() + self.extra_damage.sum();
+
+        let value = DamageResult {
+            expectation: base,
+            critical: base,
+            non_critical: base,
+        };
+
+        EventAnalysis::Number(NumberAnalysis {
+            atk: atk_comp.0,
+            atk_ratio: self.ratio_atk.0.clone(),
+            hp: hp_comp.0,
+            hp_ratio: self.ratio_hp.0.clone(),
+            def: def_comp.0,
+            def_ratio: self.ratio_def.0.clone(),
+            em: em_comp.0,
+            em_ratio: self.ratio_em.0.clone(),
+            base: self.base.0.clone(),
+
+            result: value,
         })
     }
 

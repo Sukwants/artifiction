@@ -87,5 +87,7 @@ pub trait DamageBuilder {
 
     fn shield(&self, attribute: &Self::AttributeType, element: Element) -> Self::Result;
 
+    fn number(&self, attribute: &Self::AttributeType) -> Self::Result;
+
     fn none(&self) -> Self::Result;
 }

@@ -115,6 +115,21 @@ pub struct ShieldAnalysis {
 }
 
 #[derive(Debug, Serialize, Deserialize)]
+pub struct NumberAnalysis {
+    pub atk: HashMap<String, f64>,
+    pub atk_ratio: HashMap<String, f64>,
+    pub hp: HashMap<String, f64>,
+    pub hp_ratio: HashMap<String, f64>,
+    pub def: HashMap<String, f64>,
+    pub def_ratio: HashMap<String, f64>,
+    pub em: HashMap<String, f64>,
+    pub em_ratio: HashMap<String, f64>,
+    pub base: HashMap<String, f64>,
+
+    pub result: DamageResult,
+}
+
+#[derive(Debug, Serialize, Deserialize)]
 pub struct DamageAnalysisWithPossibleReaction {
     pub normal: DamageAnalysis,
     pub melt: Option<DamageAnalysis>,
@@ -130,6 +145,7 @@ pub enum EventAnalysis {
     MoonglareDamage(MoonglareDamageAnalysis),
     Heal(HealAnalysis),
     Shield(ShieldAnalysis),
+    Number(NumberAnalysis),
     None,
 }
 
@@ -141,6 +157,7 @@ impl DamageBuilderResult for EventAnalysis {
             EventAnalysis::MoonglareDamage(d) => d.result,
             EventAnalysis::Heal(d) => d.result,
             EventAnalysis::Shield(d) => d.result,
+            EventAnalysis::Number(d) => d.result,
             EventAnalysis::None => DamageResult::default(),
         }
     }

@@ -471,6 +471,25 @@ impl DamageBuilder for SimpleDamageBuilder {
         SimpleDamageResult::new_normal(damage)
     }
 
+    fn number(&self, attribute: &Self::AttributeType) -> Self::Result {
+        let atk = attribute.get_atk() + self.extra_atk;
+        let def = attribute.get_def() + self.extra_def;
+        let hp = attribute.get_hp() + self.extra_hp;
+        let em = attribute.get_em_all() + self.extra_em;
+
+        let base = self.ratio_def * def + self.ratio_hp * hp + self.ratio_atk * atk + self.ratio_em * em + self.base;
+
+        let value = {
+            DamageResult {
+                critical: base,
+                non_critical: base,
+                expectation: base,
+            }
+        };
+
+        SimpleDamageResult::new_normal(value)
+    }
+
     fn none(&self) -> Self::Result {
         SimpleDamageResult::new_normal(DamageResult::default())
     }

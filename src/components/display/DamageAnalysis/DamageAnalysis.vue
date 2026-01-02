@@ -9,7 +9,8 @@
             <el-radio-button v-if="hasTransformativeDamage" label="TransformativeDamage">{{ get_name_from_transformative_type(this.TransformativeDamage.transformative_type) }}</el-radio-button>
             <el-radio-button v-if="hasMoonglareDamage" label="MoonglareDamage">{{ get_name_from_lunar_type(this.MoonglareDamage.lunar_type) }}</el-radio-button>
             <el-radio-button v-if="hasHeal" label="Heal">治疗</el-radio-button>
-            <el-radio-button v-if="hasShield" label="Heal">护盾</el-radio-button>
+            <el-radio-button v-if="hasShield" label="Shield">护盾</el-radio-button>
+            <el-radio-button v-if="hasNumber" label="Number">数值</el-radio-button>
         </el-radio-group>
 
         <span class="damage-display">{{ calc_result() }}</span>
@@ -79,7 +80,7 @@
             </div>
         </div>
 
-        <div v-if="this.damageType != 'TransformativeDamage'">
+        <div v-if="this.damageType != 'TransformativeDamage' && this.damageType != 'Number'">
             <div class="big-title bonus-region">加成</div>
             <div class="header-row">
                 <damage-analysis-util
@@ -133,7 +134,7 @@
     </div>
 
     <div v-if="this.damageType != 'None'" class="header-row" style="overflow: auto; margin-bottom: 16px; min-height: 200px;">
-        <div v-if="this.damageType != 'Shield'">
+        <div v-if="this.damageType != 'Shield' && this.damageType != 'Number'">
             <div class="big-title critical-region">暴击区</div>
             <div class="header-row">
                 <damage-analysis-util
@@ -146,7 +147,7 @@
                 ></damage-analysis-util>
             </div>
         </div>
-        <div v-if="this.damageType != 'Heal' && this.damageType != 'Shield'">
+        <div v-if="this.damageType != 'Heal' && this.damageType != 'Shield' && this.damageType != 'Number'">
             <div class="big-title res-minus">抗性区</div>
             <div class="header-row">
                 <damage-analysis-util
@@ -251,6 +252,7 @@ export default {
             MoonglareDamage: null,
             Heal: null,
             Shield: null,
+            Number: null,
         }
     },
     methods: {
@@ -259,6 +261,10 @@ export default {
             
             this.damageType = "None"
 
+            if (analysis.Number) {
+                this.Number = init_value(analysis.Number)
+                this.damageType = "Number"
+            } else this.Number = null
             if (analysis.Shield) {
                 this.Shield = init_value(analysis.Shield)
                 this.damageType = "Shield"
@@ -405,6 +411,16 @@ export default {
             return shield
         },
 
+        calc_Number(result) {
+            let number = sum(result.atk) * sum(result.atk_ratio)
+                + sum(result.hp) * sum(result.hp_ratio)
+                + sum(result.def) * sum(result.def_ratio)
+                + sum(result.em) * sum(result.em_ratio)
+                + sum(result.base)
+
+            return number
+        },
+
         calc_result() {
             return Math.round((() => {
                 if (this.damageType == "DamageNormal") {
@@ -425,6 +441,8 @@ export default {
                     return this.calc_Heal(this.Heal)
                 } else if (this.damageType == "Shield") {
                     return this.calc_Shield(this.Shield)
+                } else if (this.damageType == "Number") {
+                    return this.calc_Number(this.Number)
                 }
             })())
         },
@@ -501,6 +519,9 @@ export default {
         hasShield() {
             return this.Shield != null
         },
+        hasNumber() {
+            return this.Number != null
+        },
 
         result() {
             const map = {
@@ -513,6 +534,7 @@ export default {
                 MoonglareDamage: this.$data.MoonglareDamage,
                 Heal: this.$data.Heal,
                 Shield: this.$data.Shield,
+                Number: this.$data.Number,
                 None: {},
             }
 

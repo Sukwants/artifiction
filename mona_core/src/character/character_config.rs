@@ -68,6 +68,7 @@ pub enum CharacterConfig {
     Nefer { moonsign: Moonsign },
     Jahoda { max_elements: ConfigElements8Multi, moonsign: Moonsign },
     Durin { hexerei_secret_rite: bool, essential_transmutation: usize },
+    Illuga { moonsign: Moonsign, hydro_geo_count: usize },
     Columbina { moonsign: Moonsign, main_element: Option<Element>, reacted_element: ConfigElements8Multi },
     Zibai { moonsign: Moonsign, geo_count: usize, hydro_count: usize },
     NoConfig,
