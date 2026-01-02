@@ -59,7 +59,7 @@ impl AttributeGraphResult for SimpleAttributeGraphResult {
     }
 
     fn get_attribute(&self, node: AttributeNode) -> f64 {
-        self.get_attribute(node)
+        self.get_attribute_value(node)
     }
 
     fn get_attribute_merge(&self, nodes: &[AttributeNode]) -> f64 {
@@ -179,6 +179,9 @@ impl SimpleAttributeGraph2 {
         result = temp.clone();
 
         for list in edge_lists.values() {
+            for edge in list.iter() {
+                solve_edge(edge, &result, &mut temp, 1.0);
+            }
             for edge in edge_static.iter() {
                 solve_edge(edge, &result, &mut temp, -1.0);
             }
