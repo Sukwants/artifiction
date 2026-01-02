@@ -96,7 +96,7 @@ impl<A: Attribute> ChangeAttribute<A> for ZibaiEffect {
         }
         
         attribute.add_edge_s1to1(
-            CharacterSelector::select_all(),
+            CharacterSelector::select_all(attribute),
             AttributeType::Panel(AttributeName::HP),
             AttributeType::Invisible(InvisibleAttributeType::new_any(AttributeVariableType::MoonglareBase)),
             Arc::new(|def: f64, _| (def / 100.0 * 0.007).min(0.14) ),
@@ -277,7 +277,7 @@ impl CharacterTrait for Zibai {
 
         if common_data.constellation >= 2 && lunar_phase_shift {
             attribute.set_value_by_s(
-                CharacterSelector::select_all(),
+                CharacterSelector::select_all(attribute),
                 AttributeType::Invisible(InvisibleAttributeType::new_reaction(
                     AttributeVariableType::ReactionEnhance,
                     ReactionType::LunarCrystallize,

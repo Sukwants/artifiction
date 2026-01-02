@@ -88,7 +88,7 @@ impl<A: Attribute> ChangeAttribute<A> for ColumbinaEffect {
                     match element {
                         Element::Electro => {
                             attribute.add_edge_s1to1(
-                                CharacterSelector::select_onfield(attribute.get_character().team_id),
+                                CharacterSelector::select_onfield(attribute),
                                 AttributeType::Panel(AttributeName::HP),
                                 AttributeType::Panel(AttributeName::ATKFixed),
                                 Arc::new(move |hp: f64, _| hp * 0.01),
@@ -98,7 +98,7 @@ impl<A: Attribute> ChangeAttribute<A> for ColumbinaEffect {
                         },
                         Element::Dendro => {
                             attribute.add_edge_s1to1(
-                                CharacterSelector::select_onfield(attribute.get_character().team_id),
+                                CharacterSelector::select_onfield(attribute),
                                 AttributeType::Panel(AttributeName::HP),
                                 AttributeType::Panel(AttributeName::ElementalMastery),
                                 Arc::new(move |hp: f64, _| hp * 0.0035),
@@ -108,7 +108,7 @@ impl<A: Attribute> ChangeAttribute<A> for ColumbinaEffect {
                         },
                         Element::Geo => {
                             attribute.add_edge_s1to1(
-                                CharacterSelector::select_onfield(attribute.get_character().team_id),
+                                CharacterSelector::select_onfield(attribute),
                                 AttributeType::Panel(AttributeName::HP),
                                 AttributeType::Panel(AttributeName::DEFFixed),
                                 Arc::new(move |hp: f64, _| hp * 0.01),
@@ -124,25 +124,25 @@ impl<A: Attribute> ChangeAttribute<A> for ColumbinaEffect {
 
         if self.common_data.constellation >= 6 {
             if self.reacted_element.hydro {
-                attribute.set_value_by_s(CharacterSelector::select_all(), AttributeType::Invisible(InvisibleAttributeType::new(
+                attribute.set_value_by_s(CharacterSelector::select_all(attribute), AttributeType::Invisible(InvisibleAttributeType::new(
                         AttributeVariableType::CriticalDamage,
                         Some(Element::Hydro), None, None
                     )), "哥伦比娅命座6", 0.8);
             }
             if self.reacted_element.electro {
-                attribute.set_value_by_s(CharacterSelector::select_all(), AttributeType::Invisible(InvisibleAttributeType::new(
+                attribute.set_value_by_s(CharacterSelector::select_all(attribute), AttributeType::Invisible(InvisibleAttributeType::new(
                         AttributeVariableType::CriticalDamage,
                         Some(Element::Electro), None, None
                     )), "哥伦比娅命座6", 0.8);
             }
             if self.reacted_element.dendro {
-                attribute.set_value_by_s(CharacterSelector::select_all(), AttributeType::Invisible(InvisibleAttributeType::new(
+                attribute.set_value_by_s(CharacterSelector::select_all(attribute), AttributeType::Invisible(InvisibleAttributeType::new(
                         AttributeVariableType::CriticalDamage,
                         Some(Element::Dendro), None, None
                     )), "哥伦比娅命座6", 0.8);
             }
             if self.reacted_element.geo {
-                attribute.set_value_by_s(CharacterSelector::select_all(), AttributeType::Invisible(InvisibleAttributeType::new(
+                attribute.set_value_by_s(CharacterSelector::select_all(attribute), AttributeType::Invisible(InvisibleAttributeType::new(
                         AttributeVariableType::CriticalDamage,
                         Some(Element::Geo), None, None
                     )), "哥伦比娅命座6", 0.8);
@@ -150,7 +150,7 @@ impl<A: Attribute> ChangeAttribute<A> for ColumbinaEffect {
         }
 
         attribute.add_edge_s1to1(
-            CharacterSelector::select_all(),
+            CharacterSelector::select_all(attribute),
             AttributeType::Panel(AttributeName::HP),
             AttributeType::Invisible(InvisibleAttributeType::new(
                     AttributeVariableType::MoonglareBase,
@@ -172,7 +172,7 @@ impl<A: Attribute> ChangeAttribute<A> for ColumbinaEffect {
             if self.common_data.constellation >= 6 { val += 0.07; }
 
             attribute.set_value_by_s(
-                CharacterSelector::select_all(),
+                CharacterSelector::select_all(attribute),
                 AttributeType::Invisible(InvisibleAttributeType::new(
                     AttributeVariableType::MoonglareElevate,
                     None, None, None
@@ -342,15 +342,15 @@ impl CharacterTrait for Columbina {
         };
 
         if activated_q {
-            attribute.set_value_by_s(CharacterSelector::select_all(), AttributeType::Invisible(InvisibleAttributeType::new(
+            attribute.set_value_by_s(CharacterSelector::select_all(attribute), AttributeType::Invisible(InvisibleAttributeType::new(
                     AttributeVariableType::ReactionEnhance,
                     None, None, Some(ReactionType::LunarCharged),
                 )), "哥伦比娅Q技能", COLUMBINA_SKILL.q_enhance[common_data.skill3 as usize]);
-            attribute.set_value_by_s(CharacterSelector::select_all(), AttributeType::Invisible(InvisibleAttributeType::new(
+            attribute.set_value_by_s(CharacterSelector::select_all(attribute), AttributeType::Invisible(InvisibleAttributeType::new(
                     AttributeVariableType::ReactionEnhance,
                     None, None, Some(ReactionType::LunarBloom),
                 )), "哥伦比娅Q技能", COLUMBINA_SKILL.q_enhance[common_data.skill3 as usize]);
-            attribute.set_value_by_s(CharacterSelector::select_all(), AttributeType::Invisible(InvisibleAttributeType::new(
+            attribute.set_value_by_s(CharacterSelector::select_all(attribute), AttributeType::Invisible(InvisibleAttributeType::new(
                     AttributeVariableType::ReactionEnhance,
                     None, None, Some(ReactionType::LunarCrystallize),
                 )), "哥伦比娅Q技能", COLUMBINA_SKILL.q_enhance[common_data.skill3 as usize]);
@@ -364,7 +364,7 @@ impl CharacterTrait for Columbina {
             if let Some(element) = main_element {
                 for reaction in [ReactionType::LunarCharged, ReactionType::LunarBloom, ReactionType::LunarCrystallize] {
                     attribute.add_edge_s1to1(
-                        CharacterSelector::select_all(),
+                        CharacterSelector::select_all(attribute),
                         AttributeType::Panel(AttributeName::HP),
                         AttributeType::Invisible(InvisibleAttributeType::new(
                             AttributeVariableType::ReactionExtra,

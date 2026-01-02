@@ -1,6 +1,6 @@
 use std::sync::Arc;
 
-use crate::character::CharacterStaticData;
+use crate::{attribute::Attribute, character::CharacterStaticData};
 
 #[derive(Clone)]
 pub struct CharacterStatus {
@@ -59,43 +59,63 @@ impl CharacterSelector {
         list
     }
 
-    pub fn select_self(character_id: usize) -> Self {
+    pub fn select_self<A: Attribute>(attribute: &A) -> Self {
+        let character_id = attribute.get_character().character_id;
         CharacterSelector {
             selector: Arc::new(move |status: &CharacterStatus| status.character_id == character_id ),
         }
     }
 
-    pub fn select_onfield(team_id: usize) -> Self {
+    pub fn select_self_onfield<A: Attribute>(attribute: &A) -> Self {
+        let character_id = attribute.get_character().character_id;
+        CharacterSelector {
+            selector: Arc::new(move |status: &CharacterStatus| status.character_id == character_id && status.on_field ),
+        }
+    }
+
+    pub fn select_self_offfield<A: Attribute>(attribute: &A) -> Self {
+        let character_id = attribute.get_character().character_id;
+        CharacterSelector {
+            selector: Arc::new(move |status: &CharacterStatus| status.character_id == character_id && !status.on_field ),
+        }
+    }
+
+    pub fn select_onfield<A: Attribute>(attribute: &A) -> Self {
+        let team_id = attribute.get_character().team_id;
         CharacterSelector {
             selector: Arc::new(move |status: &CharacterStatus| status.on_field && status.team_id == team_id ),
         }
     }
 
-    pub fn select_team(team_id: usize) -> Self {
+    pub fn select_team<A: Attribute>(attribute: &A) -> Self {
+        let team_id = attribute.get_character().team_id;
         CharacterSelector {
             selector: Arc::new(move |status: &CharacterStatus| status.team_id == team_id ),
         }
     }
 
-    pub fn select_team_except_self(character_id: usize, team_id: usize) -> Self {
+    pub fn select_team_except_self<A: Attribute>(attribute: &A) -> Self {
+        let character_id = attribute.get_character().character_id;
+        let team_id = attribute.get_character().team_id;
         CharacterSelector {
             selector: Arc::new(move |status: &CharacterStatus| status.character_id != character_id && status.team_id == team_id ),
         }
     }
 
-    pub fn select_all() -> Self {
+    pub fn select_all<A: Attribute>(attribute: &A) -> Self {
         CharacterSelector {
             selector: Arc::new(move |status: &CharacterStatus| true ),
         }
     }
 
-    pub fn select_all_onfield() -> Self {
+    pub fn select_all_onfield<A: Attribute>(attribute: &A) -> Self {
         CharacterSelector {
             selector: Arc::new(move |status: &CharacterStatus| status.on_field ),
         }
     }
 
-    pub fn select_all_except_self(character_id: usize) -> Self {
+    pub fn select_all_except_self<A: Attribute>(attribute: &A) -> Self {
+        let character_id = attribute.get_character().character_id;
         CharacterSelector {
             selector: Arc::new(move |status: &CharacterStatus| status.character_id != character_id ),
         }

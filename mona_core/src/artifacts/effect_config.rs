@@ -215,6 +215,20 @@ pub struct ConfigSilkenMoonsSerenade {
     pub gleaming_moon_effect_count: usize,
 }
 
+#[derive(Serialize, Deserialize)]
+#[derive(Debug, Clone, Default)]
+pub struct ConfigAubadeOfMorningstarAndMoon {
+    pub moonsign: Moonsign,
+    pub set4_rate: f64,
+}
+
+#[derive(Serialize, Deserialize)]
+#[derive(Debug, Clone, Default)]
+pub struct ConfigADayCarvedFromRisingWinds {
+    pub is_hexerei: bool,
+    pub set4_rate: f64,
+}
+
 #[derive(Default, Debug, Clone)]
 #[derive(Serialize, Deserialize)]
 pub struct ArtifactEffectConfig {
@@ -255,6 +269,8 @@ pub struct ArtifactEffectConfig {
     pub config_finale_of_the_deep_galleries: ConfigFinaleOfTheDeepGalleries,
     pub config_night_of_the_skys_unveiling: ConfigNightOfTheSkysUnveiling,
     pub config_silken_moons_serenade: ConfigSilkenMoonsSerenade,
+    pub config_aubade_of_morningstar_and_moon: ConfigAubadeOfMorningstarAndMoon,
+    pub config_a_day_carved_from_rising_winds: ConfigADayCarvedFromRisingWinds,
 }
 
 #[derive(Serialize, Deserialize)]
@@ -297,6 +313,8 @@ pub struct ArtifactConfigInterface {
     pub config_finale_of_the_deep_galleries: Option<ConfigFinaleOfTheDeepGalleries>,
     pub config_night_of_the_skys_unveiling: Option<ConfigNightOfTheSkysUnveiling>,
     pub config_silken_moons_serenade: Option<ConfigSilkenMoonsSerenade>,
+    pub config_aubade_of_morningstar_and_moon: Option<ConfigAubadeOfMorningstarAndMoon>,
+    pub config_a_day_carved_from_rising_winds: Option<ConfigADayCarvedFromRisingWinds>,
 }
 
 impl ArtifactConfigInterface {
@@ -339,6 +357,8 @@ impl ArtifactConfigInterface {
             config_finale_of_the_deep_galleries: self.config_finale_of_the_deep_galleries.unwrap_or_default(),
             config_night_of_the_skys_unveiling: self.config_night_of_the_skys_unveiling.unwrap_or_default(),
             config_silken_moons_serenade: self.config_silken_moons_serenade.unwrap_or_default(),
+            config_aubade_of_morningstar_and_moon: self.config_aubade_of_morningstar_and_moon.unwrap_or_default(),
+            config_a_day_carved_from_rising_winds: self.config_a_day_carved_from_rising_winds.unwrap_or_default(),
         }
     }
 }
@@ -466,6 +486,17 @@ impl ArtifactEffectConfigBuilder {
     pub fn obsidian_codex(&mut self, set2_rate: f64, set4_rate: f64) -> &mut Self {
         self.config.config_obsidian_codex.set2_rate = set2_rate;
         self.config.config_obsidian_codex.set4_rate = set4_rate;
+        self
+    }
+
+    pub fn aubade_of_morningstar_and_moon(&mut self, set4_rate: f64) -> &mut Self {
+        self.config.config_aubade_of_morningstar_and_moon.set4_rate = set4_rate;
+        self
+    }
+
+    pub fn a_day_carved_from_rising_winds(&mut self, is_hexerei: bool, set4_rate: f64) -> &mut Self {
+        self.config.config_a_day_carved_from_rising_winds.is_hexerei = is_hexerei;
+        self.config.config_a_day_carved_from_rising_winds.set4_rate = set4_rate;
         self
     }
 }

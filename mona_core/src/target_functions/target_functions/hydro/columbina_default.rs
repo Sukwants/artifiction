@@ -1,5 +1,6 @@
 use crate::target_functions::target_functions::prelude::*;
 use crate::character::characters::Columbina;
+use crate::utils;
 
 pub struct ColumbinaOffFieldTargetFunction {
     pub lunar_charged_coefficient: f64,
@@ -82,7 +83,7 @@ impl TargetFunction for ColumbinaOffFieldTargetFunction {
 
     fn get_default_artifact_config(&self, _team_config: &TeamQuantization) -> ArtifactEffectConfig {
         ArtifactEffectConfigBuilder::new()
-            // .aubade_of_morningstar_and_moon(1.0)
+            .aubade_of_morningstar_and_moon(1.0)
             .build()
     }
 
@@ -176,7 +177,7 @@ impl TargetFunction for ColumbinaOnFieldTargetFunction {
 
     fn get_default_artifact_config(&self, _team_config: &TeamQuantization) -> ArtifactEffectConfig {
         ArtifactEffectConfigBuilder::new()
-            // .aubade_of_morningstar_and_moon(1.0)
+            .aubade_of_morningstar_and_moon(1.0)
             .build()
     }
 
@@ -211,7 +212,7 @@ impl TargetFunction for ColumbinaOnFieldTargetFunction {
             } else { 0.0 };
         let dmg_q = Columbina::damage::<SimpleDamageBuilder>(&context1, Ty::Q, &config1, None).normal.expectation;
 
-        let dmg_z = Columbina::damage::<SimpleDamageBuilder>(&context1, Ty::ZM, &config1, None).normal.expectation * 6.0;
+        let dmg_z = Columbina::damage::<SimpleDamageBuilder>(&context1, Ty::ZM, &config1, None).normal.expectation * 9.0;
 
         dmg_e1 + dmg_e2 * if main_element == Some(Element::Dendro) { 5.0 } else { 1.0 } + dmg_q + dmg_z
     }

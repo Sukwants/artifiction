@@ -83,13 +83,13 @@ impl<A: Attribute> ChangeAttribute<A> for IllugaEffect {
     fn change_attribute(&self, attribute: &mut A) {
         if self.common_data.has_talent1 {
             attribute.set_value_by_s(
-                CharacterSelector::select_all_except_self(*attribute.get_character_id()),
+                CharacterSelector::select_all_except_self(attribute),
                 AttributeType::Invisible(InvisibleAttributeType::new_element(AttributeVariableType::CriticalRate, Element::Geo)),
                 "叶洛亚天赋1",
                 if self.common_data.constellation >= 6 { 0.10 } else { 0.05 },
             );
             attribute.set_value_by_s(
-                CharacterSelector::select_all_except_self(*attribute.get_character_id()),
+                CharacterSelector::select_all_except_self(attribute),
                 AttributeType::Invisible(InvisibleAttributeType::new_element(AttributeVariableType::CriticalDamage, Element::Geo)),
                 "叶洛亚天赋1",
                 if self.common_data.constellation >= 6 { 0.30 } else { 0.10 },
@@ -97,7 +97,7 @@ impl<A: Attribute> ChangeAttribute<A> for IllugaEffect {
 
             if self.moonsign.is_ascendant() {
                 attribute.set_value_by_s(
-                    CharacterSelector::select_all_except_self(*attribute.get_character_id()),
+                    CharacterSelector::select_all_except_self(attribute),
                     AttributeType::Panel(AttributeName::ElementalMastery),
                     "叶洛亚天赋1",
                 if self.common_data.constellation >= 6 { 80.0 } else { 50.0 },
@@ -229,7 +229,7 @@ impl CharacterTrait for Illuga {
             let extra_lunar_ratio = if common_data.has_talent2 { [0.0, 0.48, 0.96, 1.60][hydro_geo_count.min(3)] } else { 0.0 };
             
             attribute.add_edge_s1to1(
-                CharacterSelector::select_all_onfield(),
+                CharacterSelector::select_all_onfield(attribute),
                 AttributeType::Panel(AttributeName::ElementalMastery),
                 AttributeType::Invisible(InvisibleAttributeType::new_element(
                     AttributeVariableType::BaseDamage,
@@ -240,7 +240,7 @@ impl CharacterTrait for Illuga {
                 EdgePriority::Invisible,
             );
             attribute.add_edge_s1to1(
-                CharacterSelector::select_all_onfield(),
+                CharacterSelector::select_all_onfield(attribute),
                 AttributeType::Panel(AttributeName::ElementalMastery),
                 AttributeType::Invisible(InvisibleAttributeType::new_reaction(
                     AttributeVariableType::MoonglareBase,
@@ -254,7 +254,7 @@ impl CharacterTrait for Illuga {
 
         if common_data.constellation >= 4 && nightingales_song {
             attribute.set_value_by_s(
-                CharacterSelector::select_all_onfield(),
+                CharacterSelector::select_all_onfield(attribute),
                 AttributeType::Invisible(InvisibleAttributeType::new_reaction(
                 AttributeVariableType::ReactionEnhance,
                 ReactionType::LunarCrystallize, 
