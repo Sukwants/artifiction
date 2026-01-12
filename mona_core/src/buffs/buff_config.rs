@@ -107,6 +107,8 @@ pub enum BuffConfig {
     DurinP1 { hexerei_secret_rite: bool, elements: ConfigElements8Multi },
     DurinC1 { atk: f64 },
     DurinC2 { elements: ConfigElements8Multi },
+    IllugaQ { em: f64, level_q: usize, hydro_geo_count: usize },
+    IllugaP1 { moonsign: Moonsign, has_c6: bool },
     ColumbinaQ { level_q: usize },
     ColumbinaP3 { hp: f64 },
     ColumbinaC2 { moonsign: Moonsign, main_element: Option<Element>, hp: f64 },
