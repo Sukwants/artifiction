@@ -107,6 +107,10 @@ pub enum BuffConfig {
     DurinP1 { hexerei_secret_rite: bool, elements: ConfigElements8Multi },
     DurinC1 { atk: f64 },
     DurinC2 { elements: ConfigElements8Multi },
+    ColumbinaQ { level_q: usize },
+    ColumbinaP3 { hp: f64 },
+    ColumbinaC2 { moonsign: Moonsign, main_element: Option<Element>, hp: f64 },
+    ColumbinaC6 { reacted_element: ConfigElements8Multi },
 
     FreedomSworn { refine: usize },
     SongOfBrokenPines { refine: usize },

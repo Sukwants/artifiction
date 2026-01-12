@@ -15,6 +15,8 @@ pub mod weapon;
 pub mod resonance;
 pub mod artifact;
 
+pub mod prelude;
+
 pub fn get_buff<T: Attribute>(name: &BuffName, b: &BuffConfig) -> Box<dyn Buff<T>> {
     name.create(b)
 }
