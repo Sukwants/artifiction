@@ -174,6 +174,7 @@ pub enum BuffName {
     ColumbinaP3,
     ColumbinaC2,
     ColumbinaC6,
+    ColumbinaC,
 
     AloyTalent1,
 

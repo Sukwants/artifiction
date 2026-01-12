@@ -7,7 +7,7 @@ pub use nilou::{BuffNilouTalent1, BuffNilouTalent2};
 pub use xingqiu::BuffXingqiuC2;
 pub use yelan::{BuffYelanC4, BuffYelanTalent2};
 pub use barbara::BuffBarbaraC2;
-pub use columbina::{BuffColumbinaQ, BuffColumbinaP3, BuffColumbinaC2, BuffColumbinaC6};
+pub use columbina::{BuffColumbinaQ, BuffColumbinaP3, BuffColumbinaC2, BuffColumbinaC6, BuffColumbinaC};
 
 pub mod aino;
 pub mod candace;

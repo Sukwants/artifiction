@@ -113,6 +113,7 @@ pub enum BuffConfig {
     ColumbinaP3 { hp: f64 },
     ColumbinaC2 { moonsign: Moonsign, main_element: Option<Element>, hp: f64 },
     ColumbinaC6 { reacted_element: ConfigElements8Multi },
+    ColumbinaC { constellation: usize },
 
     FreedomSworn { refine: usize },
     SongOfBrokenPines { refine: usize },

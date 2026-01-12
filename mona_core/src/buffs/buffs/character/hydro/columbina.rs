@@ -307,3 +307,82 @@ impl BuffMeta for BuffColumbinaC6 {
         })
     }
 }
+
+
+pub struct BuffColumbinaC {
+    pub constellation: usize,
+}
+
+impl<A: Attribute> Buff<A> for BuffColumbinaC {
+    fn change_attribute(&self, attribute: &mut A) {
+        let mut val = 0.0;
+
+        if self.constellation >= 1 { val += 0.015; }
+        if self.constellation >= 2 { val += 0.07; }
+        if self.constellation >= 3 { val += 0.015; }
+        if self.constellation >= 4 { val += 0.015; }
+        if self.constellation >= 5 { val += 0.015; }
+        if self.constellation >= 6 { val += 0.07; }
+
+        attribute.set_value_by_s(
+            CharacterSelector::select_all(attribute),
+            AttributeType::Invisible(InvisibleAttributeType::new(
+                AttributeVariableType::MoonglareElevate,
+                None, None, None
+            )),
+            "哥伦比娅命座",
+            val
+        );
+    }
+}
+
+impl BuffMeta for BuffColumbinaC {
+    #[cfg(not(target_family = "wasm"))]
+    const META_DATA: BuffMetaData = BuffMetaData {
+        name: BuffName::ColumbinaC,
+        name_locale: locale!(
+            zh_cn: "哥伦比娅-「空月归乡」",
+            en: "Columbina-Welkin Moon's Homecoming"
+        ),
+        image: BuffImage::Avatar(CharacterName::Columbina),
+        genre: BuffGenre::Character,
+        description: Some(locale!(
+            zh_cn: "哥伦比娅命座1：队伍中附近的所有角色造成的月曜反应伤害擢升1.5%。\
+                <br>哥伦比娅命座2：队伍中附近的所有角色造成的月曜反应伤害擢升7%。\
+                <br>哥伦比娅命座3：队伍中附近的所有角色造成的月曜反应伤害擢升1.5%。\
+                <br>哥伦比娅命座4：队伍中附近的所有角色造成的月曜反应伤害擢升1.5%。\
+                <br>哥伦比娅命座5：队伍中附近的所有角色造成的月曜反应伤害擢升1.5%。\
+                <br>哥伦比娅命座6：队伍中附近的所有角色造成的月曜反应伤害擢升7%。",
+            en: "Columbina C1: All nearby party members' Lunar Reaction DMG is elevated by 1.5%.\
+                <br>Columbina C2: All nearby party members' Lunar Reaction DMG is elevated by 7%.\
+                <br>Columbina C3: All nearby party members' Lunar Reaction DMG is elevated by 1.5%.\
+                <br>Columbina C4: All nearby party members' Lunar Reaction DMG is elevated by 1.5%.\
+                <br>Columbina C5: All nearby party members' Lunar Reaction DMG is elevated by 1.5%.\
+                <br>Columbina C6: All nearby party members' Lunar Reaction DMG is elevated by 7%.",
+        )),
+        from: BuffFrom::Character(CharacterName::Columbina),
+    };
+
+    #[cfg(not(target_family = "wasm"))]
+    const CONFIG: Option<&'static [ItemConfig]> = Some(&[
+        ItemConfig {
+            name: "constellation",
+            title: locale!(
+                zh_cn: "命座",
+                en: "Constellation"
+            ),
+            config: ItemConfigType::Int { min: 0, max: 6, default: 0 }
+        },
+    ]);
+
+    fn create<A: Attribute>(b: &BuffConfig) -> Box<dyn Buff<A>> {
+        let constellation = match *b {
+            BuffConfig::ColumbinaC { constellation } => constellation,
+            _ => 0
+        };
+        Box::new(BuffColumbinaC {
+            constellation,
+        })
+    }
+}
+
