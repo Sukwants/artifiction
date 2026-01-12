@@ -21,7 +21,7 @@ impl BuffMeta for BuffZibaiP3 {
         name: BuffName::ZibaiP3,
         name_locale: locale!(
             zh_cn: "兹白-「月兆祝赐·浮明若流」",
-            en: "Zibai-Moonsign Benediction: Old World Secrets"
+            en: "Zibai-Moonsign Benediction: The Coursing Sun and Moon"
         ),
         image: BuffImage::Avatar(CharacterName::Zibai),
         genre: BuffGenre::Character,
