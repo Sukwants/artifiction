@@ -167,6 +167,15 @@ pub enum BuffName {
     DurinC1,
     DurinC2,
     DurinC6,
+    IllugaQ,
+    IllugaP1,
+    IllugaC4,
+    ColumbinaQ,
+    ColumbinaP3,
+    ColumbinaC2,
+    ColumbinaC6,
+    ColumbinaC,
+    ZibaiP3,
 
     AloyTalent1,
 

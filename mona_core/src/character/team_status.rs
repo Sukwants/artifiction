@@ -29,7 +29,7 @@ impl CharacterStatus {
         CharacterStatus {
             character_id,
             team_id: 0,
-            on_field: false,
+            on_field: true,
             character_static_data: None,
         }
     }

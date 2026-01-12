@@ -243,7 +243,7 @@ impl CharacterTrait for Illuga {
                 CharacterSelector::select_all_onfield(attribute),
                 AttributeType::Panel(AttributeName::ElementalMastery),
                 AttributeType::Invisible(InvisibleAttributeType::new_reaction(
-                    AttributeVariableType::MoonglareBase,
+                    AttributeVariableType::ReactionExtra,
                     ReactionType::LunarCrystallize,
                 )),
                 Arc::new(move |em: f64, _| em * (ILLUGA_SKILL.q_increase_lunar[s3] + extra_lunar_ratio) ),
@@ -255,10 +255,10 @@ impl CharacterTrait for Illuga {
         if common_data.constellation >= 4 && nightingales_song {
             attribute.set_value_by_s(
                 CharacterSelector::select_all_onfield(attribute),
-                AttributeType::Invisible(InvisibleAttributeType::new_reaction(
-                AttributeVariableType::ReactionEnhance,
-                ReactionType::LunarCrystallize, 
-            )), "叶洛亚命座4", 200.0);
+                AttributeType::Panel(AttributeName::DEFFixed),
+                "叶洛亚命座4",
+                200.0,
+            );
         }
     }
 
