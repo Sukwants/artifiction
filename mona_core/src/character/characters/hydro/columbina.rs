@@ -359,29 +359,6 @@ impl CharacterTrait for Columbina {
         if common_data.has_talent1 && stack_p1 > 0 {
             attribute.set_value_by(AttributeName::CriticalBase, "哥伦比娅天赋1", stack_p1 as f64 * 0.05);
         }
-
-        if common_data.constellation >= 4 && activated_c4 {
-            if let Some(element) = main_element {
-                for reaction in [ReactionType::LunarCharged, ReactionType::LunarBloom, ReactionType::LunarCrystallize] {
-                    attribute.add_edge_s1to1(
-                        CharacterSelector::select_all(attribute),
-                        AttributeType::Panel(AttributeName::HP),
-                        AttributeType::Invisible(InvisibleAttributeType::new(
-                            AttributeVariableType::ReactionExtra,
-                            None, None, Some(reaction)
-                        )),
-                        match element {
-                            Element::Electro => Arc::new(move |hp: f64, _| hp * 0.125),
-                            Element::Dendro => Arc::new(move |hp: f64, _| hp * 0.025),
-                            Element::Geo => Arc::new(move |hp: f64, _| hp * 0.125),
-                            _ => panic!(),
-                        },
-                        "哥伦比娅命座4",
-                        EdgePriority::Invisible,
-                    );
-                }
-            }
-        }
     }
 
     fn damage_internal<D: DamageBuilder>(context: &DamageContext<'_, D::AttributeType>, s: usize, config: &CharacterSkillConfig, fumo: Option<Element>) -> D::Result {
@@ -391,6 +368,11 @@ impl CharacterTrait for Columbina {
         let (moonsign, main_element, reacted_element) = match &context.character_common_data.config {
             CharacterConfig::Columbina { moonsign, main_element, reacted_element } => (*moonsign, *main_element, *reacted_element),
             _ => (Moonsign::None, None, ConfigElements8Multi::default()),
+        };
+
+        let (activated_q, stack_p1, activated_c4) = match *config {
+            CharacterSkillConfig::Columbina { activated_q, stack_p1, activated_c4 } => (activated_q, stack_p1, activated_c4),
+            _ => (false, 0, false)
         };
 
         use ColumbinaDamageEnum::*;
@@ -420,6 +402,21 @@ impl CharacterTrait for Columbina {
             builder.add_hp_ratio("技能倍率", ratio);
         } else {
             builder.add_atk_ratio("技能倍率", ratio);
+        }
+
+        if s == EGI {
+            if context.character_common_data.constellation >= 4 && activated_c4 {
+                if let Some(element) = main_element {
+                    builder.add_extra_reaction_extra("哥伦比娅命座4",
+                        match element {
+                            Element::Electro => 0.125,
+                            Element::Dendro => 0.025,
+                            Element::Geo => 0.125,
+                            _ => 0.0,
+                        } * context.attribute.get_hp()
+                    );
+                }
+            }
         }
 
         if s == ZM || s == EGI {
