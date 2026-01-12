@@ -114,6 +114,7 @@ pub enum BuffConfig {
     ColumbinaC2 { moonsign: Moonsign, main_element: Option<Element>, hp: f64 },
     ColumbinaC6 { reacted_element: ConfigElements8Multi },
     ColumbinaC { constellation: usize },
+    ZibaiP3 { def: f64 },
 
     FreedomSworn { refine: usize },
     SongOfBrokenPines { refine: usize },
