@@ -1,13 +1,12 @@
 use mona::artifacts::effect_config::ArtifactConfigInterface;
-use crate::applications::common::{BuffInterface, CharacterInterface, EnemyInterface, TargetFunctionInterface, WeaponInterface};
+use crate::applications::common::{BuffInterface, CharacterInterface, EnemyInterface, TargetFunctionInterface, WeaponInterface, CharactersInterface};
 use serde::{Serialize, Deserialize};
 
 #[derive(Serialize, Deserialize)]
 pub struct CalcArtifactBestSetInterface {
-    pub character: CharacterInterface,
-    pub weapon: WeaponInterface,
-    pub artifact_config: Option<ArtifactConfigInterface>,
-    pub target_function: TargetFunctionInterface,
-    pub buffs: Option<Vec<BuffInterface>>,
+    pub characters: CharactersInterface,
     pub enemy: Option<EnemyInterface>,
+
+    pub active_character_id: usize,
+    pub target_function: TargetFunctionInterface,
 }

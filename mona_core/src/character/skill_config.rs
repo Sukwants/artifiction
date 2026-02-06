@@ -9,7 +9,7 @@ fn default_false() -> bool {
     false
 }
 
-#[derive(Serialize, Deserialize, Debug)]
+#[derive(Serialize, Deserialize, Debug, Clone)]
 pub enum CharacterSkillConfig {
     AetherAnemo { elemental_absorption: Element },
     LumineAnemo { elemental_absorption: Element },

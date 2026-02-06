@@ -457,13 +457,13 @@ pub struct CutoffAlgo2 {
 }
 
 impl SingleOptimizeAlgorithm for CutoffAlgo2 {
-    fn optimize(&self, artifacts: &[&Artifact], artifact_config: Option<ArtifactEffectConfig>, character: &Character<SimpleAttribute>, weapon: &Weapon<SimpleAttribute>, target_function: &Box<dyn TargetFunction>, enemy: &Enemy, buffs: &[Box<dyn Buff<SimpleAttribute>>], constraint: &ConstraintConfig, count: usize) -> Vec<OptimizationResult> {
+    fn optimize(&self, artifacts: &[&Artifact], artifact_config: Option<ArtifactEffectConfig>, character: &Character<SimpleAttribute>, weapon: &Weapon<SimpleAttribute>, target_function: &Box<dyn TargetFunction>, enemy: &Enemy, buffs: &[Box<dyn Buff<SimpleAttribute>>], attribute: &SimpleAttribute, constraint: &ConstraintConfig, count: usize) -> Vec<OptimizationResult> {
         let (flowers, feathers, sands, goblets, heads) = get_per_slot_artifacts(&artifacts);
 
         let any_zero = vec![flowers, feathers, sands, goblets, heads].iter().any(|x| x.len() == 0);
         if any_zero {
             let naive_algo = CutoffAlgorithmHeuristic { use_heuristic: false };
-            return naive_algo.optimize(artifacts, artifact_config, character, weapon, target_function, enemy, buffs, constraint, count);
+            return naive_algo.optimize(artifacts, artifact_config, character, weapon, target_function, enemy, buffs, attribute, constraint, count);
         }
 
         let mut result_recorder = ResultRecorder::new(count);
@@ -483,12 +483,15 @@ impl SingleOptimizeAlgorithm for CutoffAlgo2 {
             target_function: &target_function,
             buffs: &buffs,
             enemy: &enemy,
+            attribute: attribute,
             constraint: &constraint
         };
 
         let weight_heuristic_algo = NaiveWeightHeuristic {
             character,
-            weapon
+            weapon,
+            buffs,
+            attribute,
         };
         let weight_heuristic = weight_heuristic_algo.generate_stat(&target_function);
         let set_heuristic = weight_heuristic_algo.generate_set(&target_function);

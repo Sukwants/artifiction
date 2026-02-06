@@ -731,6 +731,30 @@ const route = useRoute()
 // i18n
 const { t, ta } = useI18n()
 
+// props
+interface CharacterFullInterface {
+    character: any,
+    weapon: any,
+    buffs: any,
+    artifacts: any,
+    artifact_config: any,
+    skill: any,
+
+    character_id: number,
+    team_id: number,
+    on_field: boolean,
+}
+
+const props = defineProps<{
+    characters: CharacterFullInterface[],
+    currentCharacterId: number,
+    currentTeamId: number,
+    currentOnField: boolean,
+}>()
+
+const emit = defineEmits<{
+  (e: 'update:character', v: CharacterFullInterface): void
+}>()
 
 //////////////////////////////////////////////////////////
 // set preset from other place
@@ -1217,6 +1241,32 @@ watchEffect(() => {
     flush: "post"
 })
 
+////////////////////////////////////////////////////////////////////////
+// return
+
+const characterFullInterface = computed(() => {
+    return {
+        character: characterInterface.value,
+        weapon: weaponInterface.value,
+        buffs: buffsInterface.value,
+        artifacts: artifactWasmFormat.value,
+        artifact_config: artifactConfigForCalculator.value,
+        skill: characterSkillInterface.value,
+
+        character_id: props.currentCharacterId,
+        team_id: props.currentTeamId,
+        on_field: props.currentOnField,
+    }
+})
+
+watch(characterFullInterface, (v) => {
+    emit("update:character", v)
+}, {
+    deep: true,
+    flush: "post",
+    immediate: true,
+})
+
 
 ////////////////////////////////////////////////////////////////////////
 // damage
@@ -1225,13 +1275,10 @@ const damageAnalysisComponent = ref<null | InstanceType<typeof DamageAnalysis>>(
 
 const damageAnalysisWasmInterface = computed(() => {
     return {
-        character: characterInterface.value,
-        weapon: weaponInterface.value,
-        buffs: buffsInterface.value,
-        artifacts: artifactWasmFormat.value,
-        artifact_config: artifactConfigForCalculator.value,
-        skill: characterSkillInterface.value,
+        characters: props.characters,
         enemy: enemyInterface.value,
+
+        active_character_id: props.currentCharacterId,
     }
 })
 
@@ -1306,12 +1353,9 @@ function handleDisplayEventAnalysis(eventAnalysis: any) {
 // attribute
 const getAttributeWasmInterface = computed(() => {
     return {
-        character: characterInterface.value,
-        weapon: weaponInterface.value,
-        buffs: buffsInterface.value,
-        artifacts: artifactWasmFormat.value,
-        artifact_config: artifactConfigForCalculator.value,
-        skill: characterSkillInterface.value,
+        characters: props.characters,
+
+        active_character_id: props.currentCharacterId,
     }
 })
 
@@ -1329,12 +1373,11 @@ const showArtifactPerBonusDialog = ref(false)
 
 const bonusPerStatWasmInterface = computed(() => {
     return {
-        character: characterInterface.value,
-        weapon: weaponInterface.value,
-        artifacts: artifactWasmFormat.value,
+        characters: props.characters,
+        enemy: enemyInterface.value,
+
+        active_character_id: props.currentCharacterId,
         tf: targetFunctionInterface.value,
-        buffs: buffsInterface.value,
-        artifacts_config: artifactConfigForCalculator.value
     }
 })
 
@@ -1496,12 +1539,11 @@ function getOptimizeArtifactWasmInterface() {
     }
 
     const i = {
-        character: characterInterface.value,
-        weapon: weaponInterface.value,
+        characters: props.characters,
+
+        active_character_id: props.currentCharacterId,
         target_function: targetFunctionInterface.value,
         constraint: constraintInterface.value,
-        buffs: buffsInterface.value,
-        artifact_config,
         algorithm: algorithm.value,
     }
 

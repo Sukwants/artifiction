@@ -1,7 +1,14 @@
+use mona::artifacts::ArtifactList;
+use mona::attribute::*;
+use mona::character::team_status::CharacterStatus;
+use mona::common::CharacterFullInfo;
+use mona::target_functions::TargetFunction;
 use serde::Serialize;
 use wasm_bindgen::JsValue;
 use crate::applications::artifact_best_set::artifact_best_set::calc_artifact_best_set;
 use crate::applications::artifact_best_set::type_interface::CalcArtifactBestSetInterface;
+use crate::applications::common::CharacterFullInterface;
+use crate::target_function::dsl_tf::TargetFunctionDSL;
 use crate::utils::set_panic_hook;
 use wasm_bindgen::prelude::*;
 use crate::utils;
@@ -15,21 +22,31 @@ impl CalcArtifactBestSet {
 
         let calc_best_set_interface: CalcArtifactBestSetInterface = serde_wasm_bindgen::from_value(args).unwrap();
 
-        let character = calc_best_set_interface.character.to_character();
-        let weapon = calc_best_set_interface.weapon.to_weapon(&character);
-        let target_function = calc_best_set_interface.target_function.to_target_function(&character, &weapon);
-        let enemy = match calc_best_set_interface.enemy {
-            Some(ref x) => x.to_enemy(),
-            None => Default::default()
+        let characters = CharacterFullInterface::get_characters(&calc_best_set_interface.characters);
+
+        let attribute = AttributeUtils::create_attribute_from_list_except_active_character(&characters, calc_best_set_interface.active_character_id);
+        let active_character = CharacterFullInfo::get_character(&characters, calc_best_set_interface.active_character_id);
+
+        let target_function: Box<dyn TargetFunction> = if calc_best_set_interface.target_function.use_dsl {
+            Box::new(TargetFunctionDSL::new(&calc_best_set_interface.target_function.dsl_source.unwrap()))
+        } else {
+            calc_best_set_interface.target_function.to_target_function(&active_character.character, &active_character.weapon)
         };
-        let buffs = calc_best_set_interface.buffs.unwrap_or(vec![]).iter().map(|b| b.to_buff()).collect::<Vec<_>>();
-        let artifact_config = calc_best_set_interface.artifact_config.clone().map(|x| x.to_config());
+
+        let enemy = if let Some(x) = &calc_best_set_interface.enemy {
+            x.to_enemy()
+        } else {
+            Default::default()
+        };
 
         let mut result = calc_artifact_best_set(
-            &character, &weapon, &target_function,
-            artifact_config.as_ref(),
-            &buffs,
-            &enemy
+            &active_character.character,
+            &active_character.weapon,
+            &target_function,
+            Some(&active_character.artifact_config),
+            &active_character.buffs,
+            &enemy,
+            attribute,
         );
         // utils::log!("{:?}", result);
 

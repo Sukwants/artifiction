@@ -1,6 +1,7 @@
 use std::collections::{BinaryHeap, HashMap};
 use std::cmp::{PartialOrd, Eq, PartialEq, Ord, Ordering, Reverse};
 
+use mona::common::CharacterFullInfo;
 use wasm_bindgen::prelude::*;
 use serde::{Deserialize, Serialize};
 use smallvec::{SmallVec, smallvec};
@@ -14,7 +15,7 @@ use mona::artifacts::effect_config::ArtifactEffectConfig;
 use mona::attribute::*;
 use mona::enemies::Enemy;
 use mona::{utils};
-use crate::applications::common::{CharacterInterface, TargetFunctionInterface, WeaponInterface};
+use crate::applications::common::{CharacterFullInterface, CharacterInterface, TargetFunctionInterface, WeaponInterface};
 use crate::applications::optimize_artifacts::inter::OptimizeArtifactInterface;
 use crate::target_function::dsl_tf::TargetFunctionDSL;
 
@@ -32,17 +33,17 @@ impl OptimizeSingleWasm {
         let artifacts: Vec<Artifact> = serde_wasm_bindgen::from_value(artifacts).unwrap();
         let artifacts_ref: Vec<_> = artifacts.iter().collect();
 
-        let character = input.character.to_character();
-        let weapon = input.weapon.to_weapon(&character);
-        // let target_function = input.target_function.to_target_function(&character, &weapon);
+        let characters = CharacterFullInterface::get_characters(&input.characters);
+
+        let attribute = AttributeUtils::create_attribute_from_list_except_active_character(&characters, input.active_character_id);
+        let active_character = CharacterFullInfo::get_character(&characters, input.active_character_id);
+
         let target_function: Box<dyn TargetFunction> = if input.target_function.use_dsl {
             Box::new(TargetFunctionDSL::new(&input.target_function.dsl_source.unwrap()))
         } else {
-            input.target_function.to_target_function(&character, &weapon)
+            input.target_function.to_target_function(&active_character.character, &active_character.weapon)
         };
         let constraint = input.constraint.unwrap_or(Default::default());
-        let buffs: Vec<Box<dyn Buff<SimpleAttribute>>> = input.buffs.iter().map(|x| x.to_buff()).collect();
-        let artifact_config = input.artifact_config.as_ref().map(|x| x.clone().to_config());
 
         let filtered_artifacts = input.filter.as_ref().map(|x| x.filter_artifact(&artifacts_ref));
         let artifacts = match filtered_artifacts {
@@ -54,12 +55,13 @@ impl OptimizeSingleWasm {
 
         let result = algorithm.optimize(
             &artifacts,
-            artifact_config,
-            &character,
-            &weapon,
+            Some(active_character.artifact_config.clone()),
+            &active_character.character,
+            &active_character.weapon,
             &target_function,
             &Default::default(),
-            &buffs,
+            &active_character.buffs,
+            &attribute,
             &constraint,
             100
         );

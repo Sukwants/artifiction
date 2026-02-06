@@ -7,6 +7,7 @@ pub use crate::damage::damage_result::DamageResult;
 pub use entry_type::EntryType;
 pub use reaction_type::{ReactionType, TransformativeType, MoonglareReaction};
 pub use moonsign::Moonsign;
+pub use character_full_info::CharacterFullInfo;
 
 pub mod stat;
 pub mod element;
@@ -20,6 +21,7 @@ pub mod reaction_type;
 pub mod item_config_type;
 pub mod code_escape;
 pub mod i18n;
+pub mod character_full_info;
 
 pub struct Span {
     pub start_row: usize,

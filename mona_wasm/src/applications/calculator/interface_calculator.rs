@@ -6,12 +6,12 @@ use mona::artifacts::{Artifact, ArtifactList};
 use mona::artifacts::effect_config::ArtifactEffectConfig;
 use mona::attribute::*;
 use mona::buffs::{Buff, BuffConfig};
-use mona::character::{Character, CharacterName};
+use mona::character::{Character, CharacterName, characters};
 use mona::character::characters::damage;
 use mona::character::skill_config::CharacterSkillConfig;
 use mona::character::team_status::CharacterStatus;
 use mona::character::traits::CharacterTrait;
-use mona::common::{Element, MoonglareReaction, TransformativeType};
+use mona::common::{Element, MoonglareReaction, TransformativeType, CharacterFullInfo};
 use mona::damage::{ComplicatedDamageBuilder, DamageAnalysis, DamageContext, DamageResult, SimpleDamageBuilder};
 use mona::damage::damage_analysis::{EventAnalysis, TransformativeDamageAnalysisForAll, MoonglareDamageAnalysisForAll};
 use mona::damage::damage_builder::DamageBuilder;
@@ -25,19 +25,16 @@ use serde::{Deserialize, Serialize};
 use wasm_bindgen::JsValue;
 use wasm_bindgen::prelude::*;
 
-use crate::applications::common::{BuffInterface, CharacterInterface, EnemyInterface, SkillInterface, TargetFunctionInterface, WeaponInterface};
+use crate::applications::common::{BuffInterface, CharacterFullInterface, CharacterInterface, CharactersInterface, EnemyInterface, SkillInterface, TargetFunctionInterface, WeaponInterface};
 
 pub struct CalculatorInterface;
 
 #[derive(Serialize, Deserialize)]
 pub struct CalculatorConfigInterface {
-    pub character: CharacterInterface,
-    pub weapon: WeaponInterface,
-    pub buffs: Vec<BuffInterface>,
-    pub artifacts: Vec<Artifact>,
-    pub artifact_config: Option<ArtifactEffectConfig>,
-    pub skill: SkillInterface,
+    pub characters: CharactersInterface,
     pub enemy: Option<EnemyInterface>,
+
+    pub active_character_id: usize,
 }
 
 // #[derive(Serialize, Deserialize)]
@@ -79,34 +76,19 @@ impl CalculatorInterface {
         let input: CalculatorConfigInterface = serde_wasm_bindgen::from_value(value).unwrap();
         let fumo: Option<Element> = serde_wasm_bindgen::from_value(fumo).unwrap();
 
-        let character: Character<ComplicatedAttribute> = input.character.to_character();
-        let weapon: Weapon<ComplicatedAttribute> = input.weapon.to_weapon(&character);
+        let characters = CharacterFullInterface::get_characters(&input.characters);
 
-        let buffs: Vec<Box<dyn Buff<ComplicatedAttribute>>> = input.buffs.iter().map(|x| x.to_buff()).collect();
-        let artifacts: Vec<&Artifact> = input.artifacts.iter().collect();
-
-        // utils::log!("{:?}", default_artifact_config);
-        let artifact_config = match input.artifact_config {
-            Some(x) => x,
-            None => Default::default()
-        };
-
-        let enemy = if let Some(x) = input.enemy {
+        let enemy = if let Some(x) = &input.enemy {
             x.to_enemy()
         } else {
             Default::default()
         };
 
         let result = CalculatorInterface::get_damage_analysis_internal(
-            &character,
-            &weapon,
-            &buffs,
-            artifacts,
-            &artifact_config,
-            input.skill.index,
-            &input.skill.config,
+            &characters,
             &enemy,
             fumo,
+            input.active_character_id,
         );
 
         let s = serde_wasm_bindgen::Serializer::new().serialize_maps_as_objects(true);
@@ -118,31 +100,18 @@ impl CalculatorInterface {
 
         let input: CalculatorConfigInterface = serde_wasm_bindgen::from_value(value).unwrap();
 
-        let character: Character<ComplicatedAttribute> = input.character.to_character();
-        let weapon = input.weapon.to_weapon(&character);
+        let characters = CharacterFullInterface::get_characters(&input.characters);
 
-        let buffs: Vec<Box<dyn Buff<ComplicatedAttribute>>> = input.buffs.iter().map(|x| x.to_buff()).collect();
-        let artifacts: Vec<&Artifact> = input.artifacts.iter().collect();
-
-        let artifact_config = match input.artifact_config {
-            Some(x) => x,
-            None => Default::default()
-        };
-
-        let enemy = if let Some(x) = input.enemy {
+        let enemy = if let Some(x) = &input.enemy {
             x.to_enemy()
         } else {
             Default::default()
         };
 
         let result = CalculatorInterface::get_damage_transformative_internal(
-            &character,
-            &weapon,
-            &buffs,
-            artifacts.clone(),
-            &artifact_config,
-            &input.skill.config,
+            &characters,
             &enemy,
+            input.active_character_id,
         );
 
         let s = serde_wasm_bindgen::Serializer::new().serialize_maps_as_objects(true);
@@ -154,31 +123,18 @@ impl CalculatorInterface {
 
         let input: CalculatorConfigInterface = serde_wasm_bindgen::from_value(value).unwrap();
 
-        let character: Character<ComplicatedAttribute> = input.character.to_character();
-        let weapon = input.weapon.to_weapon(&character);
+        let characters = CharacterFullInterface::get_characters(&input.characters);
 
-        let buffs: Vec<Box<dyn Buff<ComplicatedAttribute>>> = input.buffs.iter().map(|x| x.to_buff()).collect();
-        let artifacts: Vec<&Artifact> = input.artifacts.iter().collect();
-
-        let artifact_config = match input.artifact_config {
-            Some(x) => x,
-            None => Default::default()
-        };
-
-        let enemy = if let Some(x) = input.enemy {
+        let enemy = if let Some(x) = &input.enemy {
             x.to_enemy()
         } else {
             Default::default()
         };
 
         let result = CalculatorInterface::get_damage_moonglare_internal(
-            &character,
-            &weapon,
-            &buffs,
-            artifacts,
-            &artifact_config,
-            &input.skill.config,
+            &characters,
             &enemy,
+            input.active_character_id,
         );
 
         let s = serde_wasm_bindgen::Serializer::new().serialize_maps_as_objects(true);
@@ -188,67 +144,37 @@ impl CalculatorInterface {
 
 impl CalculatorInterface {
     pub fn get_damage_analysis_internal(
-        character: &Character<ComplicatedAttribute>,
-        weapon: &Weapon<ComplicatedAttribute>,
-        buffs: &Vec<Box<dyn Buff<ComplicatedAttribute>>>,
-        artifacts: Vec<&Artifact>,
-        artifact_config: &ArtifactEffectConfig,
-        skill_index: usize,
-        skill_config: &CharacterSkillConfig,
+        characters: &Vec<CharacterFullInfo<ComplicatedAttribute>>,
         enemy: &Enemy,
         fumo: Option<Element>,
+        active_character_id: usize,
     ) -> EventAnalysis {
-        // let mut ans: HashMap<String, DamageAnalysis> = HashMap::new();
 
-        let artifact_list = ArtifactList {
-            artifacts: &artifacts,
-        };
-
-        let attribute = AttributeUtils::create_attribute_from_big_config_with_skill_config_result(
-            &artifact_list,
-            artifact_config,
-            character,
-            skill_config,
-            weapon,
-            buffs
-        );
+        let attribute = AttributeUtils::create_attribute_from_list(&characters, active_character_id);
+        let active_character = CharacterFullInfo::get_character(&characters, active_character_id);
 
         let context = DamageContext {
-            character_common_data: &character.common_data,
-            attribute: &attribute,
+            character_common_data: &active_character.character.common_data,
+            attribute: &attribute.solve(),
             enemy: &enemy
         };
 
-        let damage = damage::<ComplicatedDamageBuilder>(&context, skill_index, skill_config, fumo);
+        let damage = damage::<ComplicatedDamageBuilder>(&context, active_character.skill_index, &active_character.skill_config, fumo);
         damage
     }
 
     pub fn get_damage_transformative_internal(
-        character: &Character<ComplicatedAttribute>,
-        weapon: &Weapon<ComplicatedAttribute>,
-        buffs: &Vec<Box<dyn Buff<ComplicatedAttribute>>>,
-        artifacts: Vec<&Artifact>,
-        artifact_config: &ArtifactEffectConfig,
-        skill_config: &CharacterSkillConfig,
+        characters: &Vec<CharacterFullInfo<ComplicatedAttribute>>,
         enemy: &Enemy,
+        active_character_id: usize,
     ) -> TransformativeDamageAnalysisForAll {
 
-        let artifact_list = ArtifactList {
-            artifacts: &artifacts,
-        };
-
-        let attribute = AttributeUtils::create_attribute_from_big_config_with_skill_config_result(
-            &artifact_list,
-            artifact_config,
-            character,
-            skill_config,
-            weapon,
-            buffs
-        );
+        let attribute = AttributeUtils::create_attribute_from_list(&characters, active_character_id);
+        let active_character = CharacterFullInfo::get_character(&characters, active_character_id);
 
         let context = DamageContext {
-            character_common_data: &character.common_data,
-            attribute: &attribute,
+            character_common_data: &active_character.character.common_data,
+            attribute: &attribute.solve(),
             enemy: &enemy
         };
 
@@ -283,31 +209,17 @@ impl CalculatorInterface {
     }
 
     pub fn get_damage_moonglare_internal(
-        character: &Character<ComplicatedAttribute>,
-        weapon: &Weapon<ComplicatedAttribute>,
-        buffs: &Vec<Box<dyn Buff<ComplicatedAttribute>>>,
-        artifacts: Vec<&Artifact>,
-        artifact_config: &ArtifactEffectConfig,
-        skill_config: &CharacterSkillConfig,
+        characters: &Vec<CharacterFullInfo<ComplicatedAttribute>>,
         enemy: &Enemy,
+        active_character_id: usize,
     ) -> MoonglareDamageAnalysisForAll {
 
-        let artifact_list = ArtifactList {
-            artifacts: &artifacts,
-        };
-
-        let attribute = AttributeUtils::create_attribute_from_big_config_with_skill_config_result(
-            &artifact_list,
-            artifact_config,
-            character,
-            skill_config,
-            weapon,
-            buffs
-        );
+        let attribute = AttributeUtils::create_attribute_from_list(&characters, active_character_id);
+        let active_character = CharacterFullInfo::get_character(&characters, active_character_id);
 
         let context = DamageContext {
-            character_common_data: &character.common_data,
-            attribute: &attribute,
+            character_common_data: &active_character.character.common_data,
+            attribute: &attribute.solve(),
             enemy: &enemy
         };
 

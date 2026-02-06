@@ -125,7 +125,7 @@ pub struct CutoffAlgorithmHeuristic {
 }
 
 impl SingleOptimizeAlgorithm for CutoffAlgorithmHeuristic {
-    fn optimize(&self, artifacts: &[&Artifact], artifact_config: Option<ArtifactEffectConfig>, character: &Character<SimpleAttribute>, weapon: &Weapon<SimpleAttribute>, target_function: &Box<dyn TargetFunction>, enemy: &Enemy, buffs: &[Box<dyn Buff<SimpleAttribute>>], constraint: &ConstraintConfig, count: usize) -> Vec<OptimizationResult> {
+    fn optimize(&self, artifacts: &[&Artifact], artifact_config: Option<ArtifactEffectConfig>, character: &Character<SimpleAttribute>, weapon: &Weapon<SimpleAttribute>, target_function: &Box<dyn TargetFunction>, enemy: &Enemy, buffs: &[Box<dyn Buff<SimpleAttribute>>], attribute: &SimpleAttribute, constraint: &ConstraintConfig, count: usize) -> Vec<OptimizationResult> {
         let need_constraint = !constraint.is_any();
 
         let mut enemy = enemy.clone();
@@ -251,7 +251,8 @@ impl SingleOptimizeAlgorithm for CutoffAlgorithmHeuristic {
                                 artifacts: &buffer_artifacts
                             };
 
-                            let mut attribute = AttributeUtils::create_attribute_from_big_config(
+                            let mut attribute = AttributeUtils::change_attribute_without_skill(
+                                attribute.clone(),
                                 &artifact_list,
                                 &artifact_config,
                                 character,

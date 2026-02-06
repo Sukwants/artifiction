@@ -19,6 +19,7 @@ pub struct BonusPerStatInput<'a> {
     pub tf: &'a Box<dyn TargetFunction>,
     pub buffs: &'a [Box<dyn Buff<SimpleAttribute>>],
     pub artifacts_config: Option<&'a ArtifactEffectConfig>,
+    pub attribute: &'a SimpleAttribute,
 }
 
 const SIZE: usize = 10;
@@ -282,7 +283,8 @@ pub fn bonus_per_stat(input: BonusPerStatInput) -> BonusPerStatOutput {
         default_artifact_config.as_ref().unwrap()
     };
 
-    let mut attribute = AttributeUtils::create_attribute_from_big_config(
+    let mut attribute = AttributeUtils::change_attribute_without_skill(
+        input.attribute.clone(),
         &artifact_list,
         &artifact_config,
         &input.character,

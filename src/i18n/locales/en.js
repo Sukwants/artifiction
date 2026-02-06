@@ -249,6 +249,7 @@ export default {
         skill: "Skill",
         fumo: "Element Infusion",
         skillConfig: "Skill Config",
+        onField: "On Field",
     },
     dmg: {
         electroCharged: "Electro-Charged",

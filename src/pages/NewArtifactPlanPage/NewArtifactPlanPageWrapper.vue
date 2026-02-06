@@ -19,7 +19,7 @@ const NewArtifactPlanPage = defineAsyncComponent({
     loader: () => import(
         /* webpackChunkName: "artifact-plan-page" */
         /* webpackPrefetch: true */
-        "./NewArtifactPlanPage.vue"
+        "./NewArtifactPlanPageCombined.vue"
     ),
     loadingComponent: SimpleLoading,
     errorComponent: SimpleError,

@@ -251,6 +251,7 @@ export default {
         skill: "技能",
         fumo: "附魔",
         skillConfig: "技能设置",
+        onField: "位于场上",
     },
     dmg: {
         electroCharged: "感电",
