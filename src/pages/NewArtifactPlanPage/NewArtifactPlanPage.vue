@@ -738,6 +738,7 @@ function setPresetFromRoute() {
     const presetName = history.state?.presetName
     if (presetName && typeof presetName === "string") {
         usePreset(presetName)
+        history.replaceState(null, "")
     }
 }
 
