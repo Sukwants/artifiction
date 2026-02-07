@@ -677,7 +677,7 @@ import EnemyConfigComponent from "./EnemyConfig"
 import SelectArtifactMainStat from "@c/select/SelectArtifactMainStat"
 import ArtifactConfig from "./ArtifactConfig.vue"
 import DamageAnalysis from "@/components/display/DamageAnalysis"
-import {getObjectConfigUnlinked, useGlobalConfig} from "@/composables/globalConfig"
+import {getObjectConfigUnlinked, useGlobalConfig, processSharedGlobalConfig} from "@/composables/globalConfig"
 import {getDefaultCharacterConfig, useCharacter, useCharacterSkill} from "@/composables/character"
 import {useEnemy} from "@/composables/enemy"
 import {getDefaultWeaponConfig, useWeapon} from "@/composables/weapon"
@@ -750,10 +750,12 @@ const props = defineProps<{
     currentCharacterId: number,
     currentTeamId: number,
     currentOnField: boolean,
+    teamSharedGlobalConfig: any,
 }>()
 
 const emit = defineEmits<{
-  (e: 'update:character', v: CharacterFullInterface): void
+  (e: 'update:interface', v: CharacterFullInterface): void
+  (e: 'update:configList', v: any): void
 }>()
 
 //////////////////////////////////////////////////////////
@@ -1198,8 +1200,8 @@ const {
     updateGlobalConfig
 } = useGlobalConfig()
 
-watchEffect(() => {
-    setGlobalConfig([
+function getConfigList() {
+    return [
         {
             configConfig: characterConfigConfig.value,
             config: characterConfig.value[characterName.value]
@@ -1236,7 +1238,11 @@ watchEffect(() => {
             configConfig: artifactsData[key].config4,
             config: artifactSingleConfig.value["config_" + toSnakeCase(artifactsData[key].name2)]
         })),
-    ])
+    ]
+}
+
+watchEffect(() => {
+    setGlobalConfig(getConfigList(), props.teamSharedGlobalConfig)
 }, {
     flush: "post"
 })
@@ -1260,7 +1266,19 @@ const characterFullInterface = computed(() => {
 })
 
 watch(characterFullInterface, (v) => {
-    emit("update:character", v)
+    emit("update:interface", v)
+}, {
+    deep: true,
+    flush: "post",
+    immediate: true,
+})
+
+const characterFullConfigList = computed(() => {
+    return processSharedGlobalConfig(getConfigList())
+})
+
+watch(characterFullConfigList, (v) => {
+    emit("update:configList", v)
 }, {
     deep: true,
     flush: "post",

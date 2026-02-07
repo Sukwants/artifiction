@@ -40,15 +40,15 @@
             </template>
             <new-artifact-plan-page
                 :characters="characters"
-                @update:character="val => characters[id] = val"
                 :currentCharacterId="id"
                 :currentTeamId="characterTeamIds[id]"
                 :currentOnField="characterOnField[id]"
+                :teamSharedGlobalConfig="teamSharedGlobalConfig"
+                @update:interface="val => characters[id] = val"
+                @update:configList="val => configList[id] = val"
             ></new-artifact-plan-page>
         </el-tab-pane>
     </el-tabs>
-    
-    
 </template>
 
 <script setup lang="ts">
@@ -56,6 +56,7 @@ import NewArtifactPlanPage from "./NewArtifactPlanPage.vue"
 import type { TabPaneName } from 'element-plus'
 import {useI18n} from "@/i18n/i18n"
 import { characterData } from "@/assets/character";
+import { processSharedGlobalConfig } from "@/composables/globalConfig";
 
 const { t, ta } = useI18n()
 
@@ -78,6 +79,7 @@ const editCharacter = (
         const index = characterIds.value.findIndex((id) => id === targetName)
         if (index !== -1) {
             characters.value[characterIds.value[index]] = null
+            configList.value[characterIds.value[index]] = null
             if (currentCharacterId.value === targetName) {
                 currentCharacterId.value = characterIds.value[index + 1] || characterIds.value[index - 1] || 0
             }
@@ -93,11 +95,23 @@ let maxTeamId = computed(() => {
 let characterOnField = ref<boolean[]>([false, true])
 
 
-let characters = ref<any[]>([])
+const characters = ref<any[]>([])
+const configList = ref<any[]>([])
 
 const get_character_name = (id: number) => {
     return (characterData as any)[characters.value[id]?.character?.name]?.nameLocale
 }
+
+let teamSharedGlobalConfig = computed(() => {
+    let values: any = {};
+    for (let i of configList.value) {
+        for (let key in i) {
+            if (!values[key]) values[key] = [];
+            values[key].push(...i[key])
+        }
+    }
+    return values
+})
 
 
 </script>

@@ -1,5 +1,7 @@
 // @ts-ignore
 
+import { deepCopy } from "@/utils/common";
+
 export function getObjectConfig(config: any) {
     if (config === "NoConfig") {
         return "NoConfig";
@@ -69,11 +71,33 @@ export function restoreObjectConfig(config: any, configValue: any, unlinked: any
     return res;
 }
 
+export function processSharedGlobalConfig(list: any) {
+    let values: any = {};
+
+    for (const p of list) {
+        if (!p.configConfig) continue;
+        for (const i of p.configConfig) {
+            if (i.type == "globalLink" && i.team_shared && p.config[i.name].unlinked !== true) {
+                if (!values[i.key]) values[i.key] = [];
+                values[i.key].push({
+                    "priority": i.priority,
+                    "value": p.config[i.name].config,
+                    "update_value": (val: any) => {
+                        p.config[i.name].config = val;
+                    }
+                })
+            }
+        }
+    }
+
+    return values;
+}
+
 export function useGlobalConfig() {
     let values: any = {};
 
-    function setGlobalConfig(list: any) {
-        values = {};
+    function setGlobalConfig(list: any, sharedConfig: any = {}) {
+        values = deepCopy(sharedConfig);
 
         for (const p of list) {
             if (!p.configConfig) continue;
