@@ -74,7 +74,6 @@ impl AttributeGraphResult for SimpleAttributeGraphResult {
 #[derive(Clone)]
 pub struct SimpleAttributeGraph2 {
     pub nodes: SimpleAttributeGraphResult,
-    pub fixed: HashMap<AttributeNode, f64>,
     pub edges: Vec<Edge>,
     pub characters: Vec<CharacterStatus>,
 }
@@ -84,7 +83,7 @@ impl AttributeGraph for SimpleAttributeGraph2 {
     type ResultType = SimpleAttributeGraphResult;
 
     fn set_value_to_internal(&mut self, node: AttributeNode, key: &str, value: f64) {
-        self.fixed.insert(node, value);
+        *self.nodes.get_attribute_mut(node) = value;
     }
 
     fn set_value_by_internal(&mut self, node: AttributeNode, key: &str, value: f64) {
@@ -131,7 +130,6 @@ impl AttributeGraph for SimpleAttributeGraph2 {
     fn new_with_characters(characters: Vec<CharacterStatus>) -> Self {
         SimpleAttributeGraph2 {
             nodes: SimpleAttributeGraphResult::new(),
-            fixed: HashMap::new(),
             edges: Vec::new(),
             characters,
         }
@@ -190,10 +188,6 @@ impl SimpleAttributeGraph2 {
                 solve_edge(edge, &result, &mut temp, 1.0);
             }
             result = temp.clone();
-        }
-
-        for (node, value) in self.fixed.iter() {
-            *result.get_attribute_mut(*node) = *value;
         }
 
         result
