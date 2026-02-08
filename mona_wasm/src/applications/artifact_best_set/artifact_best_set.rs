@@ -63,7 +63,6 @@ pub fn calc_artifact_best_set(
     artifact_config: Option<&ArtifactEffectConfig>,
     buffs: &[Box<dyn Buff<SimpleAttribute>>],
     enemy: &Enemy,
-    attribute: SimpleAttribute,
 ) -> BinaryHeap<UpdateItem> {
     let mut default_effect_config: ArtifactEffectConfig;
     let effect_config_ref = if let Some(x) = artifact_config {
@@ -79,8 +78,7 @@ pub fn calc_artifact_best_set(
         tf: &target_function,
         artifact_config: &effect_config_ref,
         buffs,
-        enemy,
-        attribute: &attribute,
+        enemy
     };
 
     use StatName::*;

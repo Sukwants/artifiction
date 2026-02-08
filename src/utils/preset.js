@@ -94,3 +94,77 @@ export function convertPresetToWasmInterface(item) {
 
     return wasm
 }
+
+export function convertPresetListToWasmInterface(list) {
+    let characters = []
+    let i = 0
+
+    for (let c of list) {
+
+        let wasm = {}
+
+        wasm.character = c.item.character
+        wasm.weapon = c.item.weapon
+        if (c.item.artifactEffectMode === "custom") {
+            wasm.artifact_config = c.item.artifactConfig
+        }
+        wasm.buffs = c.item.buffs ?? []
+        wasm.artifacts = []
+        wasm.skill = null
+
+        wasm.character_id = ++i
+        wasm.team_id = 0
+        if (i == 1) wasm.on_field = true
+        else wasm.on_field = false
+        
+        characters.push(wasm)
+    }
+
+    let wasm_list = []
+    i = 0
+
+    for (let c of list) {
+
+        let wasm = {}
+
+        wasm.characters = characters
+        wasm.active_character_id = ++i
+
+        wasm.target_function = c.item.targetFunction
+
+        if (c.item.constraint) {
+            wasm.constraint = {
+                set_mode: artifactSetNamesToConstraintSetMode(c.item.constraint.setNames),
+                recharge_min: c.item.constraint.minRecharge ?? 1,
+                em_min: c.item.constraint.minElementalMastery ?? 0,
+                crit_min: c.item.constraint.minCritical ?? 0,
+                crit_damage_min: c.item.constraint.minCriticalDamage ?? 0
+            }
+        } else {
+            wasm.constraint = null
+        }
+
+        if (c.item.algorithm) {
+            wasm.algorithm = c.item.algorithm
+        } else {
+            wasm.algorithm = "AStar"
+        }
+
+        if (c.item.filter) {
+            wasm.filter = {}
+            if (c.item.filter.sandMainStats) {
+                wasm.filter.sand_main_stat = c.item.filter.sandMainStats.map(x => convertArtifactStatName(x))
+            }
+            if (c.item.filter.gobletMainStats) {
+                wasm.filter.goblet_main_stat = c.item.filter.gobletMainStats.map(x => convertArtifactStatName(x))
+            }
+            if (c.item.filter.headMainStats) {
+                wasm.filter.head_main_stat = c.item.filter.headMainStats.map(x => convertArtifactStatName(x))
+            }
+        }
+
+        wasm_list.push(wasm)
+    }
+
+    return wasm_list
+}

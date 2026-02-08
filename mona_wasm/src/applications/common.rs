@@ -208,7 +208,7 @@ pub struct CharacterFullInterface {
     pub buffs: Vec<BuffInterface>,
     pub artifacts: Vec<Artifact>,
     pub artifact_config: Option<ArtifactEffectConfig>,
-    pub skill: SkillInterface,
+    pub skill: Option<SkillInterface>,
 
     pub character_id: usize,
     pub team_id: usize,
@@ -233,8 +233,8 @@ impl CharacterFullInterface {
                         Some(x) => x.clone(),
                         None => Default::default()
                     },
-                    skill_config: c.skill.config.clone(),
-                    skill_index: c.skill.index,
+                    skill_config: if let Some(skill) = &c.skill { skill.config.clone() } else { CharacterSkillConfig::NoConfig },
+                    skill_index: if let Some(skill) = &c.skill { skill.index } else { usize::MAX },
                     character_status: CharacterStatus::new(c.character_id, c.team_id, c.on_field, Some(c.character.name.get_static_data())),
                 });
             }

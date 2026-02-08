@@ -5,7 +5,8 @@ use mona::artifacts::effect_config::ArtifactEffectConfig;
 use mona::attribute::*;
 use mona::buffs::Buff;
 use mona::character::Character;
-use mona::common::{StatName, CharacterFullInfo};
+use mona::character::team_status::CharacterStatus;
+use mona::common::StatName;
 use mona::enemies::Enemy;
 use mona::target_functions::TargetFunction;
 use mona::weapon::Weapon;
@@ -18,7 +19,6 @@ pub struct ValueFunction<'a> {
     pub artifact_config: &'a ArtifactEffectConfig,
     pub buffs: &'a [Box<dyn Buff<SimpleAttribute>>],
     pub enemy: &'a Enemy,
-    pub attribute: &'a SimpleAttribute,
 }
 
 impl<'a> ValueFunction<'a> {
@@ -27,7 +27,10 @@ impl<'a> ValueFunction<'a> {
             artifacts,
         };
         let attribute = AttributeUtils::change_attribute_without_skill(
-            self.attribute.clone(),
+            SimpleAttribute::new(
+                SimpleAttribute::new_with_base_edge(vec![CharacterStatus::new_single(0, self.character.common_data.name)]),
+                0
+            ),
             &artifact_list,
             &self.artifact_config,
             &self.character,

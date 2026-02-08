@@ -1,6 +1,6 @@
 use std::sync::Arc;
 
-use crate::{attribute::Attribute, character::CharacterStaticData};
+use crate::{attribute::Attribute, character::{CharacterName, CharacterStaticData}};
 
 #[derive(Clone)]
 pub struct CharacterStatus {
@@ -25,12 +25,12 @@ impl CharacterStatus {
         }
     }
 
-    pub fn new_single(character_id: usize) -> Self {
+    pub fn new_single(character_id: usize, character_name: CharacterName) -> Self {
         CharacterStatus {
             character_id,
             team_id: 0,
             on_field: true,
-            character_static_data: None,
+            character_static_data: Some(character_name.get_static_data()),
         }
     }
 }
