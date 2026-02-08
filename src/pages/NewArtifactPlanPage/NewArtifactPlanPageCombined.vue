@@ -56,7 +56,7 @@ import NewArtifactPlanPage from "./NewArtifactPlanPage.vue"
 import type { TabPaneName } from 'element-plus'
 import {useI18n} from "@/i18n/i18n"
 import { characterData } from "@/assets/character";
-import { processSharedGlobalConfig } from "@/composables/globalConfig";
+import { ref, computed } from 'vue';
 
 const { t, ta } = useI18n()
 
@@ -105,6 +105,7 @@ const get_character_name = (id: number) => {
 let teamSharedGlobalConfig = computed(() => {
     let values: any = {};
     for (let i of configList.value) {
+        if (!i) continue;
         for (let key in i) {
             if (!values[key]) values[key] = [];
             values[key].push(...i[key])
