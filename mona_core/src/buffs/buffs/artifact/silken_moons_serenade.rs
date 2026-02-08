@@ -26,8 +26,8 @@ impl<A: Attribute> Buff<A> for BuffSilkenMoonsSerenade4 {
             }
             _ => {}
         }
-        
-        attribute.set_value_by(AttributeName::EnhanceMoonglare, "BUFF: 纺月的夜歌4", 0.1 * self.gleaming_moon_effect_count as f64);
+
+        attribute.set_value_to(AttributeName::EnhanceMoonglare, "圣遗物套装效果：「月辉明光」效果", 0.1 * self.gleaming_moon_effect_count as f64);
     }
 }
 

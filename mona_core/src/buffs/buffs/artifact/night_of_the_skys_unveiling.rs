@@ -4,6 +4,7 @@ use crate::buffs::{Buff, BuffConfig};
 use crate::buffs::buff::BuffMeta;
 use crate::buffs::buff_meta::{BuffFrom, BuffGenre, BuffImage, BuffMetaData};
 use crate::buffs::buff_name::BuffName;
+use crate::character::team_status::CharacterSelector;
 #[cfg(not(target_family = "wasm"))]
 use crate::common::i18n::locale;
 use crate::common::item_config_type::{ItemConfig, ItemConfigType};
@@ -16,7 +17,7 @@ pub struct BuffNightOfTheSkysUnveiling4 {
 
 impl<A: Attribute> Buff<A> for BuffNightOfTheSkysUnveiling4 {
     fn change_attribute(&self, attribute: &mut A) {
-        attribute.set_value_by(AttributeName::EnhanceMoonglare, "BUFF: 穹境示现之夜4", 0.1 * self.gleaming_moon_effect_count as f64);
+        attribute.set_value_to(AttributeName::EnhanceMoonglare, "圣遗物套装效果：「月辉明光」效果", 0.1 * self.gleaming_moon_effect_count as f64);
     }
 }
 

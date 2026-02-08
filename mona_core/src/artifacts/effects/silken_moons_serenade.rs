@@ -4,6 +4,7 @@ use crate::artifacts::effect::ArtifactEffect;
 use crate::artifacts::effect_config::ArtifactEffectConfig;
 use crate::attribute::*;
 use crate::character::character_common_data::CharacterCommonData;
+use crate::character::team_status::CharacterSelector;
 use crate::common::i18n::locale;
 use crate::common::item_config_type::{ItemConfig, ItemConfigType};
 use crate::common::Moonsign;
@@ -21,15 +22,15 @@ impl<A: Attribute> ArtifactEffect<A> for SilkenMoonsSerenadeEffect {
     fn effect4(&self, attribute: &mut A) {
         match self.moonsign {
             Moonsign::Nascent => {
-                attribute.set_value_by(AttributeName::ElementalMastery, "纺月的夜歌4", 60.0);
+                attribute.set_value_to_s(CharacterSelector::select_all(attribute), AttributeType::Panel(AttributeName::ElementalMastery), "纺月的夜歌4", 60.0);
             }
             Moonsign::Ascendant => {
-                attribute.set_value_by(AttributeName::ElementalMastery, "纺月的夜歌4", 120.0);
+                attribute.set_value_to_s(CharacterSelector::select_all(attribute), AttributeType::Panel(AttributeName::ElementalMastery), "纺月的夜歌4", 120.0);
             }
             _ => {}
         }
-        
-        attribute.set_value_by(AttributeName::EnhanceMoonglare, "BUFF: 纺月的夜歌4", 0.1 * self.gleaming_moon_effect_count as f64);
+
+        attribute.set_value_to_s(CharacterSelector::select_all(attribute), AttributeType::Panel(AttributeName::EnhanceMoonglare), "圣遗物套装效果：「月辉明光」效果", 0.1 * self.gleaming_moon_effect_count as f64);
     }
 }
 
