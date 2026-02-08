@@ -235,7 +235,7 @@ impl CharacterFullInterface {
                     },
                     skill_config: if let Some(skill) = &c.skill { skill.config.clone() } else { CharacterSkillConfig::NoConfig },
                     skill_index: if let Some(skill) = &c.skill { skill.index } else { usize::MAX },
-                    character_status: CharacterStatus::new(c.character_id, c.team_id, c.on_field, Some(c.character.name.get_static_data())),
+                    character_status: CharacterStatus::new(c.character_id, c.team_id, c.on_field, c.character.name.get_static_data()),
                 });
             }
         }

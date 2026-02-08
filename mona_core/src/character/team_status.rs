@@ -7,7 +7,7 @@ pub struct CharacterStatus {
     pub character_id: usize,
     pub team_id: usize,
     pub on_field: bool,
-    pub character_static_data: Option<CharacterStaticData>,
+    pub character_static_data: CharacterStaticData,
 }
 
 impl CharacterStatus {
@@ -15,7 +15,7 @@ impl CharacterStatus {
         character_id: usize,
         team_id: usize,
         on_field: bool,
-        character_static_data: Option<CharacterStaticData>,
+        character_static_data: CharacterStaticData,
     ) -> Self {
         CharacterStatus {
             character_id,
@@ -30,7 +30,7 @@ impl CharacterStatus {
             character_id,
             team_id: 0,
             on_field: true,
-            character_static_data: Some(character_name.get_static_data()),
+            character_static_data: character_name.get_static_data(),
         }
     }
 }
