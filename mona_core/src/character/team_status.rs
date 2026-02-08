@@ -114,6 +114,13 @@ impl CharacterSelector {
         }
     }
 
+    pub fn select_all_onfield_except_self<A: Attribute>(attribute: &A) -> Self {
+        let character_id = attribute.get_character().character_id;
+        CharacterSelector {
+            selector: Arc::new(move |status: &CharacterStatus| status.on_field && status.character_id != character_id ),
+        }
+    }
+
     pub fn select_all_except_self<A: Attribute>(attribute: &A) -> Self {
         let character_id = attribute.get_character().character_id;
         CharacterSelector {

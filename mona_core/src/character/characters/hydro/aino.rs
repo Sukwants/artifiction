@@ -1,7 +1,10 @@
+use std::sync::Arc;
+
 use num_traits::FromPrimitive;
 use crate::attribute::*;
 use crate::character::character_common_data::CharacterCommonData;
 use crate::character::character_sub_stat::CharacterSubStatFamily;
+use crate::character::team_status::{CharacterSelector, CharacterStatus};
 use crate::character::{CharacterConfig, CharacterName, CharacterStaticData};
 use crate::character::skill_config::CharacterSkillConfig;
 use crate::character::traits::{CharacterSkillMap, CharacterSkillMapItem, CharacterTrait};
@@ -103,12 +106,16 @@ impl<A: Attribute> ChangeAttribute<A> for AinoEffect {
                     em * 0.5
                 }),
                 Box::new(move |em, _, grad| (0.0, 0.0)),
-                "天赋：结构化功率提升"
+                "爱诺天赋2：结构化功率提升"
             );
         }
 
         if self.has_c1 {
-            attribute.set_value_by(AttributeName::ElementalMastery, "C1：灰与力场的平衡理论", 80.0);
+            attribute.set_value_to(AttributeName::ElementalMastery, "爱诺命座1：灰与力场的平衡理论", 80.0);
+
+            let team_id = attribute.get_character().team_id;
+
+            attribute.set_value_to_s(CharacterSelector::select_all_onfield_except_self(attribute), AttributeType::Panel(AttributeName::ElementalMastery), "爱诺命座1：灰与力场的平衡理论", 80.0);
         }
 
         if self.has_c6 {
@@ -118,14 +125,10 @@ impl<A: Attribute> ChangeAttribute<A> for AinoEffect {
                 Moonsign::None => 0.0
             };
 
-            attribute.set_value_by(AttributeName::EnhanceElectroCharged, "C6：天才之为构造之责任", val);
-            attribute.set_value_by(AttributeName::EnhanceBloom, "C6：天才之为构造之责任", val);
-            attribute.set_value_by(AttributeName::EnhanceLunarCharged, "C6：天才之为构造之责任", val);
-            attribute.set_value_by(AttributeName::EnhanceLunarBloom, "C6：天才之为构造之责任", val);
-        }
-
-        if self.has_p1 {
-            attribute.set_value_by(AttributeName::USER1, "Talent1: 模块式高效运作", if self.moonsign.is_ascendant() { 0.7 } else { 1.5 });   // 元素爆发伤害间隔(s)
+            attribute.set_value_by_s(CharacterSelector::select_all_onfield(attribute), AttributeType::Panel(AttributeName::EnhanceElectroCharged), "爱诺命座6：天才之为构造之责任", val);
+            attribute.set_value_by_s(CharacterSelector::select_all_onfield(attribute), AttributeType::Panel(AttributeName::EnhanceBloom), "爱诺命座6：天才之为构造之责任", val);
+            attribute.set_value_by_s(CharacterSelector::select_all_onfield(attribute), AttributeType::Panel(AttributeName::EnhanceLunarCharged), "爱诺命座6：天才之为构造之责任", val);
+            attribute.set_value_by_s(CharacterSelector::select_all_onfield(attribute), AttributeType::Panel(AttributeName::EnhanceLunarBloom), "爱诺命座6：天才之为构造之责任", val);
         }
     }
 }

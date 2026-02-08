@@ -1,7 +1,7 @@
 use crate::artifacts::Artifact;
 use crate::artifacts::effect_config::ArtifactEffectConfig;
 use crate::attribute::*;
-use crate::character::{Character, CharacterName};
+use crate::character::{Character, CharacterConfig, CharacterName};
 use crate::character::character_common_data::CharacterCommonData;
 use crate::character::characters::Aino;
 use crate::character::skill_config::CharacterSkillConfig;
@@ -67,7 +67,12 @@ impl TargetFunction for AinoDefaultTargetFunction {
         let dmg_q = Aino::damage::<SimpleDamageBuilder>(&context, <Aino as CharacterTrait>::DamageEnumType::Q, &config, None).normal.expectation;
         let dmg_c2 = Aino::damage::<SimpleDamageBuilder>(&context, <Aino as CharacterTrait>::DamageEnumType::C2, &config, None).normal.expectation;
 
-        let interval = context.attribute.get_value(AttributeName::USER1);
+        let moonsign = match &context.character_common_data.config {
+            CharacterConfig::Aino { moonsign, .. } => *moonsign,
+            _ => Moonsign::None,
+        };
+
+        let interval = if context.character_common_data.has_talent1 && moonsign.is_ascendant() { 0.7 } else { 1.5 };
 
         dmg_q / interval + dmg_c2 / 5.0
     }
