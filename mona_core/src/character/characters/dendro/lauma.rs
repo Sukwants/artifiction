@@ -1,21 +1,4 @@
-use num_traits::FromPrimitive;
-use crate::attribute::*;
-use crate::character::character_common_data::CharacterCommonData;
-use crate::character::character_sub_stat::CharacterSubStatFamily;
-use crate::character::{CharacterConfig, CharacterName, CharacterStaticData};
-use crate::character::skill_config::CharacterSkillConfig;
-use crate::character::traits::{CharacterSkillMap, CharacterSkillMapItem, CharacterTrait};
-use crate::character::macros::{damage_enum, skill_map};
-use crate::common::{ChangeAttribute, Element, MoonglareReaction, ReactionType, Moonsign, SkillType, WeaponType};
-use crate::common::i18n::{locale, hit_n_dmg, plunging_dmg, charged_dmg};
-use crate::common::item_config_type::{ItemConfig, ItemConfigType};
-use crate::damage::damage_builder::DamageBuilder;
-use crate::damage::DamageContext;
-use crate::damage::reaction::Reaction;
-// use crate::target_functions::target_functions::LaumaDefaultTargetFunction;
-use crate::target_functions::TargetFunction;
-use crate::team::TeamQuantization;
-use crate::weapon::weapon_common_data::WeaponCommonData;
+use crate::character::characters::prelude::*;
 
 pub struct LaumaSkillType {
     pub a_dmg1: [f64; 15],
@@ -112,33 +95,76 @@ pub struct LaumaEffect {
 
 impl<A: Attribute> ChangeAttribute<A> for LaumaEffect {
     fn change_attribute(&self, attribute: &mut A) {
-        attribute.set_value_by(AttributeName::ElementalMastery, "初始精通", 200.0);
+        attribute.set_value_by(AttributeName::ElementalMastery, "菈乌玛初始精通", 200.0);
 
         if self.has_p1 {
             if self.moonsign == Moonsign::Nascent {
-                attribute.set_value_to_t(AttributeType::Invisible(InvisibleAttributeType::new(
-                    AttributeVariableType::CriticalDamage, None, None, Some(ReactionType::Bloom),
-                )), "天赋：奉向霜夜的明光", 1.0);
-                attribute.set_value_to_t(AttributeType::Invisible(InvisibleAttributeType::new(
-                    AttributeVariableType::CriticalDamage, None, None, Some(ReactionType::Hyperbloom),
-                )), "天赋：奉向霜夜的明光", 1.0);
-                attribute.set_value_to_t(AttributeType::Invisible(InvisibleAttributeType::new(
-                    AttributeVariableType::CriticalDamage, None, None, Some(ReactionType::Burgeon),
-                )), "天赋：奉向霜夜的明光", 1.0);
+                attribute.set_value_to_s(
+                    CharacterSelector::select_all(attribute),
+                    AttributeType::Invisible(InvisibleAttributeType::new_reaction(
+                        AttributeVariableType::CriticalDamage,
+                        ReactionType::Bloom
+                    )),
+                    "菈乌玛天赋1",
+                    1.0
+                );
+                attribute.set_value_to_s(
+                    CharacterSelector::select_all(attribute),
+                    AttributeType::Invisible(InvisibleAttributeType::new_reaction(
+                        AttributeVariableType::CriticalDamage,
+                        ReactionType::Hyperbloom
+                    )),
+                    "菈乌玛天赋1",
+                    1.0
+                );
+                attribute.set_value_to_s(
+                    CharacterSelector::select_all(attribute),
+                    AttributeType::Invisible(InvisibleAttributeType::new_reaction(
+                        AttributeVariableType::CriticalDamage,
+                        ReactionType::Burgeon
+                    )),
+                    "菈乌玛天赋1",
+                    1.0
+                );
 
-                attribute.set_value_by_t(AttributeType::Invisible(InvisibleAttributeType::new(
-                    AttributeVariableType::CriticalRate, None, None, Some(ReactionType::Bloom),
-                )), "天赋：奉向霜夜的明光", 0.15);
-                attribute.set_value_by_t(AttributeType::Invisible(InvisibleAttributeType::new(
-                    AttributeVariableType::CriticalRate, None, None, Some(ReactionType::Hyperbloom),
-                )), "天赋：奉向霜夜的明光", 0.15);
-                attribute.set_value_by_t(AttributeType::Invisible(InvisibleAttributeType::new(
-                    AttributeVariableType::CriticalRate, None, None, Some(ReactionType::Burgeon),
-                )), "天赋：奉向霜夜的明光", 0.15);
+                attribute.set_value_by_s(CharacterSelector::select_all(attribute), 
+                    AttributeType::Invisible(InvisibleAttributeType::new_reaction(
+                        AttributeVariableType::CriticalRate, 
+                        ReactionType::Bloom
+                    )),
+                    "菈乌玛天赋1",
+                    0.15
+                );
+                attribute.set_value_by_s(CharacterSelector::select_all(attribute), 
+                    AttributeType::Invisible(InvisibleAttributeType::new_reaction(
+                        AttributeVariableType::CriticalRate, 
+                        ReactionType::Hyperbloom
+                    )),
+                    "菈乌玛天赋1",
+                    0.15
+                );
+                attribute.set_value_by_s(CharacterSelector::select_all(attribute), 
+                    AttributeType::Invisible(InvisibleAttributeType::new_reaction(
+                        AttributeVariableType::CriticalRate, 
+                        ReactionType::Burgeon
+                    )),
+                    "菈乌玛天赋1",
+                    0.15
+                );
             } else if self.moonsign == Moonsign::Ascendant {
-                attribute.set_value_by(AttributeName::CriticalDamageLunarBloom, "天赋：奉向霜夜的明光", 0.2);
+                attribute.set_value_by_s(
+                    CharacterSelector::select_all(attribute),
+                    AttributeType::Invisible(InvisibleAttributeType::new_reaction(AttributeVariableType::CriticalDamage, ReactionType::LunarBloom)),
+                    "菈乌玛天赋1",
+                    0.2
+                );
 
-                attribute.set_value_by(AttributeName::CriticalLunarBloom, "天赋：奉向霜夜的明光", 0.1);
+                attribute.set_value_by_s(
+                    CharacterSelector::select_all(attribute),
+                    AttributeType::Invisible(InvisibleAttributeType::new_reaction(AttributeVariableType::CriticalRate, ReactionType::LunarBloom)),
+                    "菈乌玛天赋1",
+                    0.1
+                );
             }
         }
 
@@ -150,75 +176,88 @@ impl<A: Attribute> ChangeAttribute<A> for LaumaEffect {
                     (em * 0.0004).min(0.32)
                 }),
                 Box::new(move |em, _, grad| (0.0, 0.0)),
-                "天赋：奉向甘泉的沐濯"
+                "菈乌玛天赋2"
             );
         }
 
-        attribute.add_edge1(
-            AttributeName::ElementalMastery,
-            AttributeName::IncreaseLunarBloom,
-            Box::new(move |em: f64, _| {
-                (em * 0.000175).min(0.14)
-            }),
-            Box::new(move |atk, _, grad| (0.0, 0.0)),
-            "天赋：月兆祝赐·千籁恩宠"
+        attribute.add_edge_s1to1(
+            CharacterSelector::select_all(attribute),
+            AttributeType::Panel(AttributeName::ElementalMastery),
+            AttributeType::Invisible(InvisibleAttributeType::new_reaction(AttributeVariableType::MoonglareBase, ReactionType::LunarBloom)),
+            Arc::new(move |em: f64, _| (em * 0.000175).min(0.14) ),
+            "菈乌玛天赋3",
+            EdgePriority::Invisible,
         );
 
         if self.activated_q {
             let q_bloom_increase = LAUMA_SKILL.q_bloom_increase[self.level_q] + if self.has_c2 { LAUMA_SKILL.c2_bloom_increase } else { 0.0 };
             let q_lunar_bloom_increase = LAUMA_SKILL.q_lunar_bloom_increase[self.level_q] + if self.has_c2 { LAUMA_SKILL.c2_lunar_bloom_increase } else { 0.0 };
 
-            attribute.add_edge1(
-                AttributeName::ElementalMastery,
-                AttributeName::ExtraIncreaseBloom,
-                Box::new(move |em, _| {
+            attribute.add_edge_s1to1(
+                CharacterSelector::select_all(attribute),
+                AttributeType::Panel(AttributeName::ElementalMastery),
+                AttributeType::Invisible(InvisibleAttributeType::new_reaction(AttributeVariableType::ReactionExtra, ReactionType::Bloom)),
+                Arc::new(move |em, _| {
                     em * q_bloom_increase
                 }),
-                Box::new(move |em, _, grad| (0.0, 0.0)),
-                "元素爆发：圣言述咏·众心为月"
+                "菈乌玛Q技能",
+                EdgePriority::Invisible,
             );
-            attribute.add_edge1(
-                AttributeName::ElementalMastery,
-                AttributeName::ExtraIncreaseHyperBloom,
-                Box::new(move |em, _| {
+            attribute.add_edge_s1to1(
+                CharacterSelector::select_all(attribute),
+                AttributeType::Panel(AttributeName::ElementalMastery),
+                AttributeType::Invisible(InvisibleAttributeType::new_reaction(AttributeVariableType::ReactionExtra, ReactionType::Hyperbloom)),
+                Arc::new(move |em, _| {
                     em * q_bloom_increase
                 }),
-                Box::new(move |em, _, grad| (0.0, 0.0)),
-                "元素爆发：圣言述咏·众心为月"
+                "菈乌玛Q技能",
+                EdgePriority::Invisible,
             );
-            attribute.add_edge1(
-                AttributeName::ElementalMastery,
-                AttributeName::ExtraIncreaseBurgeon,
-                Box::new(move |em, _| {
+            attribute.add_edge_s1to1(
+                CharacterSelector::select_all(attribute),
+                AttributeType::Panel(AttributeName::ElementalMastery),
+                AttributeType::Invisible(InvisibleAttributeType::new_reaction(AttributeVariableType::ReactionExtra, ReactionType::Burgeon)),
+                Arc::new(move |em, _| {
                     em * q_bloom_increase
                 }),
-                Box::new(move |em, _, grad| (0.0, 0.0)),
-                "元素爆发：圣言述咏·众心为月"
+                "菈乌玛Q技能",
+                EdgePriority::Invisible,
             );
-            attribute.add_edge1(
-                AttributeName::ElementalMastery,
-                AttributeName::ExtraIncreaseLunarBloom,
-                Box::new(move |em, _| {
+            attribute.add_edge_s1to1(
+                CharacterSelector::select_all(attribute),
+                AttributeType::Panel(AttributeName::ElementalMastery),
+                AttributeType::Invisible(InvisibleAttributeType::new_reaction(AttributeVariableType::ReactionExtra, ReactionType::LunarBloom)),
+                Arc::new(move |em, _| {
                     em * q_lunar_bloom_increase
                 }),
-                Box::new(move |em, _, grad| (0.0, 0.0)),
-                "元素爆发：圣言述咏·众心为月"
+                "菈乌玛Q技能",
+                EdgePriority::Invisible,
             );
         }
 
         if self.activated_res {
             let e_res = LAUMA_SKILL.e_res[self.level_e];
-            attribute.set_value_by(AttributeName::ResMinusDendro, "元素战技：圣言述咏·终宵永眠", e_res);
-            attribute.set_value_by(AttributeName::ResMinusHydro, "元素战技：圣言述咏·终宵永眠", e_res);
+            attribute.set_value_by_s(
+                CharacterSelector::select_all(attribute),
+                AttributeType::Invisible(InvisibleAttributeType::new_element(AttributeVariableType::ResMinus, Element::Dendro)),
+                "菈乌玛E技能",
+                e_res
+            );
+            attribute.set_value_by_s(
+                CharacterSelector::select_all(attribute),
+                AttributeType::Invisible(InvisibleAttributeType::new_element(AttributeVariableType::ResMinus, Element::Hydro)),
+                "菈乌玛E技能",
+                e_res
+            );
         }
 
         if self.has_c6 && self.moonsign.is_ascendant() {
-            attribute.set_value_by_t(AttributeType::Invisible(InvisibleAttributeType::new(
-                AttributeVariableType::MoonglareElevate,
-                None,
-                None,
-                Some(ReactionType::LunarBloom),
-            )), "六命擢升", 0.25);
+            attribute.set_value_by_s(
+                CharacterSelector::select_all(attribute),
+                AttributeType::Invisible(InvisibleAttributeType::new_reaction(AttributeVariableType::MoonglareElevate, ReactionType::LunarBloom)),
+                "菈乌玛命座6",
+                0.25
+            );
         }
     }
 }
