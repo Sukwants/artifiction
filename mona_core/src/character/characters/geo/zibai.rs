@@ -98,7 +98,7 @@ impl<A: Attribute> ChangeAttribute<A> for ZibaiEffect {
         attribute.add_edge_s1to1(
             CharacterSelector::select_all(attribute),
             AttributeType::Panel(AttributeName::DEF),
-            AttributeType::Invisible(InvisibleAttributeType::new_any(AttributeVariableType::MoonglareBase)),
+            AttributeType::Invisible(InvisibleAttributeType::new_reaction(AttributeVariableType::MoonglareBase, ReactionType::LunarCrystallize)),
             Arc::new(|def: f64, _| (def / 100.0 * 0.007).min(0.14) ),
             "兹白天赋3",
             EdgePriority::Invisible,
