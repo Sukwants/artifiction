@@ -72,10 +72,6 @@ impl ArtifactTrait for SilkenMoonsSerenade {
     #[cfg(not(target_family = "wasm"))]
     const CONFIG4: Option<&'static [ItemConfig]> = Some(&[
         ItemConfig::MOONSIGN_GLOBAL(Moonsign::None, ItemConfig::PRIORITY_ARTIFACT),
-        ItemConfig {
-            name: "gleaming_moon_effect_count",
-            title: locale!(zh_cn: "「月辉明光」数量", en: "Gleaming Moon Effect Count"),
-            config: ItemConfigType::Int { min: 0, max: 2, default: 1 },
-        }
+        ItemConfig::GLEAMING_MOON_EFFECT(1, ItemConfig::PRIORITY_ARTIFACT),
     ]);
 }
