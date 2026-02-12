@@ -1,21 +1,6 @@
-use num_traits::FromPrimitive;
-use crate::attribute::*;
-use crate::character::character_common_data::CharacterCommonData;
-use crate::character::character_sub_stat::CharacterSubStatFamily;
-use crate::character::{CharacterConfig, CharacterName, CharacterStaticData};
-use crate::character::skill_config::CharacterSkillConfig;
-use crate::character::traits::{CharacterSkillMap, CharacterSkillMapItem, CharacterTrait};
-use crate::character::macros::{damage_enum, skill_map};
-use crate::common::{ChangeAttribute, Element, MoonglareReaction, Moonsign, ReactionType, SkillType, WeaponType};
-use crate::common::i18n::{locale, hit_n_dmg, plunging_dmg, charged_dmg};
-use crate::common::item_config_type::{ItemConfig, ItemConfigType};
-use crate::damage::damage_builder::DamageBuilder;
-use crate::damage::DamageContext;
-use crate::target_functions::TargetFunction;
-use crate::team::TeamQuantization;
-use crate::weapon::weapon_common_data::WeaponCommonData;
+use crate::character::characters::prelude::*;
 
-pub struct ReferSkillType {
+pub struct NeferSkillType {
     pub a_dmg1: [f64; 15],
     pub a_dmg2: [f64; 15],
     pub a_dmg3: [f64; 15],
@@ -44,7 +29,7 @@ pub struct ReferSkillType {
     pub c6_dmg2: f64,
 }
 
-pub const REFER_SKILL: ReferSkillType = ReferSkillType {
+pub const NEFER_SKILL: NeferSkillType = NeferSkillType {
     // Normal Attack: Striking Serpent (values from provided page, converted to decimal)
     a_dmg1: [0.380712, 0.409265, 0.437819, 0.47589, 0.504443, 0.532997, 0.571068, 0.609139, 0.64721, 0.685282, 0.723353, 0.761424, 0.809013, 0.856602, 0.904191],
     a_dmg2: [0.37564, 0.403813, 0.431986, 0.46955, 0.497723, 0.525896, 0.56346, 0.601024, 0.638588, 0.676152, 0.713716, 0.75128, 0.798235, 0.84519, 0.892145],
@@ -76,7 +61,7 @@ pub const REFER_SKILL: ReferSkillType = ReferSkillType {
     c6_dmg2: 1.2,
 };
 
-pub const REFER_STATIC_DATA: CharacterStaticData = CharacterStaticData {
+pub const NEFER_STATIC_DATA: CharacterStaticData = CharacterStaticData {
     name: CharacterName::Nefer,
     internal_name: "Nefer",
     element: Element::Dendro,
@@ -104,23 +89,22 @@ pub const REFER_STATIC_DATA: CharacterStaticData = CharacterStaticData {
     )
 };
 
-pub struct ReferEffect {
+pub struct NeferEffect {
     pub has_c6: bool,
     pub moonsign: Moonsign,
 }
 
-impl<A: Attribute> ChangeAttribute<A> for ReferEffect {
+impl<A: Attribute> ChangeAttribute<A> for NeferEffect {
     fn change_attribute(&self, attribute: &mut A) {
-        attribute.set_value_by(AttributeName::ElementalMastery, "初始精通", 100.0);
+        attribute.set_value_by(AttributeName::ElementalMastery, "奈芙尔初始精通", 100.0);
 
-        attribute.add_edge1(
-            AttributeName::ElementalMastery,
-            AttributeName::IncreaseLunarBloom,
-            Box::new(move |em: f64, _| {
-                (em * 0.000175).min(0.14)
-            }),
-            Box::new(move |atk, _, grad| (0.0, 0.0)),
-            "天赋：月兆祝赐·廊下暮影"
+        attribute.add_edge_s1to1(
+            CharacterSelector::select_all(attribute),
+            AttributeType::Panel(AttributeName::ElementalMastery),
+            AttributeType::Invisible(InvisibleAttributeType::new_reaction(AttributeVariableType::MoonglareBase, ReactionType::LunarBloom)),
+            Arc::new(move |em: f64, _| (em * 0.000175).min(0.14) ),
+            "奈芙尔天赋3",
+            EdgePriority::Invisible,
         );
 
         if self.has_c6 && self.moonsign.is_ascendant() {
@@ -129,13 +113,13 @@ impl<A: Attribute> ChangeAttribute<A> for ReferEffect {
                 None,
                 None,
                 Some(ReactionType::LunarBloom),
-            )), "六命：决胜于逆转之时", 0.15);
+            )), "奈芙尔命座6", 0.15);
         }
     }
 }
 
 damage_enum!(
-    ReferDamageEnum
+    NeferDamageEnum
     A1
     A2
     A3
@@ -156,14 +140,14 @@ damage_enum!(
     C62
 );
 
-impl ReferDamageEnum {
+impl NeferDamageEnum {
     pub fn get_element(&self) -> Element {
-        use ReferDamageEnum::*;
+        use NeferDamageEnum::*;
         Element::Dendro
     }
 
     pub fn get_lunar_type(&self) -> MoonglareReaction {
-        use ReferDamageEnum::*;
+        use NeferDamageEnum::*;
         match *self {
             ES1 | ES2 | ES3 | C61 | C62 => MoonglareReaction::LunarBloom,
             _ => MoonglareReaction::None,
@@ -171,7 +155,7 @@ impl ReferDamageEnum {
     }
 
     pub fn get_skill_type(&self) -> SkillType {
-        use ReferDamageEnum::*;
+        use NeferDamageEnum::*;
         match *self {
             A1 | A2 | A3 | A4 => SkillType::NormalAttack,
             Z => SkillType::ChargedAttack,
@@ -187,16 +171,16 @@ impl ReferDamageEnum {
 pub struct Nefer;
 
 impl CharacterTrait for Nefer {
-    const STATIC_DATA: CharacterStaticData = REFER_STATIC_DATA;
-    type SkillType = ReferSkillType;
-    const SKILL: Self::SkillType = REFER_SKILL;
-    type DamageEnumType = ReferDamageEnum;
+    const STATIC_DATA: CharacterStaticData = NEFER_STATIC_DATA;
+    type SkillType = NeferSkillType;
+    const SKILL: Self::SkillType = NEFER_SKILL;
+    type DamageEnumType = NeferDamageEnum;
     type RoleEnum = ();
 
     #[cfg(not(target_family = "wasm"))]
     const SKILL_MAP: CharacterSkillMap = CharacterSkillMap {
         skill1: skill_map!(
-            ReferDamageEnum
+            NeferDamageEnum
             A1 hit_n_dmg!(1)
             A2 hit_n_dmg!(2)
             A3 hit_n_dmg!(3)
@@ -207,7 +191,7 @@ impl CharacterTrait for Nefer {
             X3 plunging_dmg!(3)
         ),
         skill2: skill_map!(
-            ReferDamageEnum
+            NeferDamageEnum
             E locale!(zh_cn: "点按伤害", en: "Press DMG")
             E1 locale!(zh_cn: "幻戏自身一段伤害", en: "Phantasm Performance 1-Hit DMG (Nefer)")
             E2 locale!(zh_cn: "幻戏自身二段伤害", en: "Phantasm Performance 2-Hit DMG (Nefer)")
@@ -218,7 +202,7 @@ impl CharacterTrait for Nefer {
             C62 locale!(zh_cn: "六命额外伤害", en: "C6 Extra DMG")
         ),
         skill3: skill_map!(
-            ReferDamageEnum
+            NeferDamageEnum
             Q1 hit_n_dmg!(1)
             Q2 hit_n_dmg!(2)
         )
@@ -249,8 +233,24 @@ impl CharacterTrait for Nefer {
         },
     ]);
 
+    fn change_attribute<A: Attribute>(attribute: &mut A, common_data: &CharacterCommonData, skill_config: &CharacterSkillConfig) {
+        let (veil_of_falsehood, shadow_dance) = match *skill_config {
+            CharacterSkillConfig::Nefer { veil_of_falsehood, shadow_dance } => (veil_of_falsehood, shadow_dance),
+            _ => (0, false)
+        };
+        
+        if common_data.constellation >= 4 && shadow_dance {
+            attribute.set_value_by_s(
+                CharacterSelector::select_all(attribute),
+                AttributeType::Invisible(InvisibleAttributeType::new_element(AttributeVariableType::ResMinus, Element::Dendro)),
+                "奈芙尔命座4",
+                0.2
+            );
+        }
+    }
+
     fn damage_internal<D: DamageBuilder>(context: &DamageContext<'_, D::AttributeType>, s: usize, config: &CharacterSkillConfig, fumo: Option<Element>) -> D::Result {
-        let s: ReferDamageEnum = num::FromPrimitive::from_usize(s).unwrap();
+        let s: NeferDamageEnum = num::FromPrimitive::from_usize(s).unwrap();
         let (s1, s2, s3) = context.character_common_data.get_3_skill();
 
         let (veil_of_falsehood, shadow_dance) = match *config {
@@ -258,28 +258,24 @@ impl CharacterTrait for Nefer {
             _ => (0, false)
         };
 
-        use ReferDamageEnum::*;
+        use NeferDamageEnum::*;
         let mut builder = D::new();
-
-        if context.character_common_data.constellation >= 4 && shadow_dance {
-            builder.add_extra_res_minus("四命：眩惑入谜局之网", 0.2);
-        }
 
         if context.character_common_data.has_talent1 {
             if veil_of_falsehood >= 5 && context.character_common_data.constellation >= 2 {
-                builder.add_extra_em("二命：明察为筹算之先", 200.0);
+                builder.add_extra_em("奈芙尔天赋1", 200.0);
             } else if veil_of_falsehood >= 3{
-                builder.add_extra_em("天赋：月下的豪赌", 100.0);
+                builder.add_extra_em("奈芙尔天赋1", 100.0);
             }
         }
 
         if s.get_skill_type() == SkillType::Moonglare {
             let ratio = (match s {
-                ES1 => REFER_SKILL.e_dmgs1[s2],
-                ES2 => REFER_SKILL.e_dmgs2[s2],
-                ES3 => REFER_SKILL.e_dmgs3[s2],
-                C61 => REFER_SKILL.c6_dmg1,
-                C62 => REFER_SKILL.c6_dmg2,
+                ES1 => NEFER_SKILL.e_dmgs1[s2],
+                ES2 => NEFER_SKILL.e_dmgs2[s2],
+                ES3 => NEFER_SKILL.e_dmgs3[s2],
+                C61 => NEFER_SKILL.c6_dmg1,
+                C62 => NEFER_SKILL.c6_dmg2,
                 _ => 0.0
             }
                 + if context.character_common_data.constellation >= 1 { 0.6 } else { 0.0 })
@@ -298,27 +294,27 @@ impl CharacterTrait for Nefer {
             )
         } else {
             let atk_ratio = match s {
-                A1 => REFER_SKILL.a_dmg1[s1],
-                A2 => REFER_SKILL.a_dmg2[s1],
-                A3 => REFER_SKILL.a_dmg3[s1],
-                Z => REFER_SKILL.z_dmg[s1],
-                X1 => REFER_SKILL.x_dmg1[s1],
-                X2 => REFER_SKILL.x_dmg2[s1],
-                X3 => REFER_SKILL.x_dmg3[s1],
-                E => REFER_SKILL.e_dmg_atk[s2],
-                E1 => REFER_SKILL.e_dmg1_atk[s2],
-                E2 => REFER_SKILL.e_dmg2_atk[s2],
-                Q1 => REFER_SKILL.q_dmg1_atk[s3],
-                Q2 => REFER_SKILL.q_dmg2_atk[s3],
+                A1 => NEFER_SKILL.a_dmg1[s1],
+                A2 => NEFER_SKILL.a_dmg2[s1],
+                A3 => NEFER_SKILL.a_dmg3[s1],
+                Z => NEFER_SKILL.z_dmg[s1],
+                X1 => NEFER_SKILL.x_dmg1[s1],
+                X2 => NEFER_SKILL.x_dmg2[s1],
+                X3 => NEFER_SKILL.x_dmg3[s1],
+                E => NEFER_SKILL.e_dmg_atk[s2],
+                E1 => NEFER_SKILL.e_dmg1_atk[s2],
+                E2 => NEFER_SKILL.e_dmg2_atk[s2],
+                Q1 => NEFER_SKILL.q_dmg1_atk[s3],
+                Q2 => NEFER_SKILL.q_dmg2_atk[s3],
                 _ => 0.0
             };
 
             let em_ratio = match s {
-                E => REFER_SKILL.e_dmg_em[s2],
-                E1 => REFER_SKILL.e_dmg1_em[s2],
-                E2 => REFER_SKILL.e_dmg2_em[s2],
-                Q1 => REFER_SKILL.q_dmg1_em[s3],
-                Q2 => REFER_SKILL.q_dmg2_em[s3],
+                E => NEFER_SKILL.e_dmg_em[s2],
+                E1 => NEFER_SKILL.e_dmg1_em[s2],
+                E2 => NEFER_SKILL.e_dmg2_em[s2],
+                Q1 => NEFER_SKILL.q_dmg1_em[s3],
+                Q2 => NEFER_SKILL.q_dmg2_em[s3],
                 _ => 0.0
             };
 
@@ -343,7 +339,7 @@ impl CharacterTrait for Nefer {
             CharacterConfig::Nefer { moonsign } => *moonsign,
             _ => Moonsign::None,
         };
-        Some(Box::new(ReferEffect {
+        Some(Box::new(NeferEffect {
             has_c6: common_data.constellation >= 6,
             moonsign: moonsign,
         }))
