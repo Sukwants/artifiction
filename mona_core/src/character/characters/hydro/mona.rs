@@ -66,10 +66,6 @@ pub struct MonaEffect {
 
 impl MonaEffect {
     pub fn new(common_data: &CharacterCommonData) -> MonaEffect {
-        let is_hexerei = match &common_data.config {
-            CharacterConfig::Mona { is_hexerei } => *is_hexerei,
-            _ => false,
-        };
         MonaEffect {
             has_talent2: common_data.has_talent2,
         }
