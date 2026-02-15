@@ -1,4 +1,5 @@
 use std::collections::{HashMap, HashSet};
+use mona::character::team_status::CharacterTag;
 use mona::character::{CharacterName, CharacterStaticData};
 use mona::common::i18n::I18nLocale;
 use strum::*;
@@ -204,6 +205,14 @@ pub fn collect_config_locale() -> Vec<I18nLocale> {
     set.into_iter().collect()
 }
 
+fn collect_tag_locale() -> Vec<I18nLocale> {
+    let mut set = HashSet::new();
+    for tag in CharacterTag::iter() {
+        set.insert(tag.get_locale());
+    }
+    set.into_iter().collect()
+}
+
 pub fn collect_locale() -> Vec<I18nLocale> {
     let mut set = HashSet::new();
 
@@ -222,6 +231,7 @@ pub fn collect_locale() -> Vec<I18nLocale> {
     set.extend(collect_artifact_locale());
 
     set.extend(collect_config_locale());
+    set.extend(collect_tag_locale());
 
     set.into_iter().collect()
 }

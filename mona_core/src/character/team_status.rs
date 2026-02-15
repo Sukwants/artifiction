@@ -1,6 +1,11 @@
-use std::sync::Arc;
-
-use crate::{attribute::Attribute, character::{CharacterName, CharacterStaticData}};
+use crate::attribute::Attribute;
+use crate::character::{CharacterName, CharacterStaticData};
+use crate::common::i18n::{locale, I18nLocale};
+use mona_derive::EnumLen;
+use num_derive::FromPrimitive;
+use serde::{Deserialize, Serialize};
+use std::{collections::HashSet, sync::Arc};
+use strum_macros::{Display, EnumIter};
 
 #[derive(Clone)]
 pub struct CharacterStatus {
@@ -8,6 +13,24 @@ pub struct CharacterStatus {
     pub team_id: usize,
     pub on_field: bool,
     pub character_static_data: CharacterStaticData,
+    pub tags: CharacterTags,
+}
+
+#[derive(Clone, Display, Hash, Eq, PartialEq, Serialize, Deserialize, EnumLen, EnumIter, FromPrimitive)]
+pub enum CharacterTag {
+    Moonsign,
+    Hexerei,
+}
+
+pub type CharacterTags = HashSet<CharacterTag>;
+
+impl CharacterTag {
+    pub fn get_locale(&self) -> I18nLocale {
+        match self {
+            CharacterTag::Moonsign => locale!(zh_cn: "月兆", en: "Moonsign"),
+            CharacterTag::Hexerei => locale!(zh_cn: "魔导", en: "Hexerei"),
+        }
+    }
 }
 
 impl CharacterStatus {
@@ -16,12 +39,14 @@ impl CharacterStatus {
         team_id: usize,
         on_field: bool,
         character_static_data: CharacterStaticData,
+        tags: CharacterTags,
     ) -> Self {
         CharacterStatus {
             character_id,
             team_id,
             on_field,
             character_static_data,
+            tags,
         }
     }
 
@@ -31,6 +56,7 @@ impl CharacterStatus {
             team_id: 0,
             on_field: true,
             character_static_data: character_name.get_static_data(),
+            tags: HashSet::new(),
         }
     }
 }

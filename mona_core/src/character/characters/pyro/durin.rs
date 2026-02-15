@@ -1,20 +1,4 @@
-use num_traits::FromPrimitive;
-use crate::attribute::*;
-use crate::character::character_common_data::CharacterCommonData;
-use crate::character::character_sub_stat::CharacterSubStatFamily;
-use crate::character::{CharacterConfig, CharacterName, CharacterStaticData};
-use crate::character::skill_config::CharacterSkillConfig;
-use crate::character::traits::{CharacterSkillMap, CharacterSkillMapItem, CharacterTrait};
-use crate::character::macros::{damage_enum, skill_map};
-use crate::common::{ChangeAttribute, Element, MoonglareReaction, Moonsign, SkillType, WeaponType};
-use crate::common::i18n::{locale, hit_n_dmg, plunging_dmg, charged_dmg};
-// use crate::common::i18n::*;
-use crate::common::item_config_type::{ItemConfig, ItemConfigType};
-use crate::damage::damage_builder::DamageBuilder;
-use crate::damage::DamageContext;
-use crate::target_functions::TargetFunction;
-use crate::team::TeamQuantization;
-use crate::weapon::weapon_common_data::WeaponCommonData;
+use crate::character::characters::prelude::*;
 
 pub struct DurinSkillType {
     pub a_dmg1: [f64; 15],
@@ -174,6 +158,10 @@ impl CharacterTrait for Durin {
     const SKILL: Self::SkillType = DURIN_SKILL;
     type DamageEnumType = DurinDamageEnum;
     type RoleEnum = ();
+
+    const DEFAULT_TAGS: Option<&'static [CharacterTag]> = Some(
+        &[CharacterTag::Hexerei]
+    );
 
     #[cfg(not(target_family = "wasm"))]
     const SKILL_MAP: CharacterSkillMap = CharacterSkillMap {

@@ -144,7 +144,7 @@ module.exports = {
                 "@targetFunction": path.resolve(__dirname, "src/assets/target_function"),
                 "@potentialFunction": path.resolve(__dirname, "src/assets/potential_function"),
                 "@buff": path.resolve(__dirname, "src/assets/buff"),
-                "@globalConfig": path.resolve(__dirname, "src/assets/global_config"),
+                "@tag": path.resolve(__dirname, "src/assets/tag"),
                 "@image": path.resolve(__dirname, "src/images"),
                 "@artifact": path.resolve(__dirname, "src/assets/artifacts"),
                 // "genshin_panel": path.resolve(__dirname, "../../ts/genshin/dist"),

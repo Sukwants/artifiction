@@ -1,19 +1,4 @@
-use num_traits::FromPrimitive;
-use crate::attribute::*;
-use crate::character::character_common_data::CharacterCommonData;
-use crate::character::character_sub_stat::CharacterSubStatFamily;
-use crate::character::{CharacterConfig, CharacterName, CharacterStaticData};
-use crate::character::skill_config::CharacterSkillConfig;
-use crate::character::traits::{CharacterSkillMap, CharacterSkillMapItem, CharacterTrait};
-use crate::character::macros::{damage_enum, skill_map};
-use crate::common::{ChangeAttribute, Element, MoonglareReaction, Moonsign, SkillType, WeaponType};
-use crate::common::i18n::{locale, hit_n_dmg, plunging_dmg, charged_dmg};
-use crate::common::item_config_type::{ItemConfig, ItemConfigType};
-use crate::damage::damage_builder::DamageBuilder;
-use crate::damage::DamageContext;
-use crate::target_functions::TargetFunction;
-use crate::team::TeamQuantization;
-use crate::weapon::weapon_common_data::WeaponCommonData;
+use crate::character::characters::prelude::*;
 
 pub struct MonaSkillType {
     pub normal_dmg1: [f64; 15],
@@ -76,7 +61,6 @@ pub const MONA_STATIC_DATA: CharacterStaticData = CharacterStaticData {
 };
 
 pub struct MonaEffect {
-    pub is_hexerei: bool,
     has_talent2: bool
 }
 
@@ -87,7 +71,6 @@ impl MonaEffect {
             _ => false,
         };
         MonaEffect {
-            is_hexerei,
             has_talent2: common_data.has_talent2,
         }
     }
@@ -151,6 +134,10 @@ impl CharacterTrait for Mona {
     type DamageEnumType = MonaDamageEnum;
     type RoleEnum = MonaRoleEnum;
 
+    const DEFAULT_TAGS: Option<&'static [CharacterTag]> = Some(
+        &[CharacterTag::Hexerei]
+    );
+
     #[cfg(not(target_family = "wasm"))]
     const SKILL_MAP: CharacterSkillMap = CharacterSkillMap {
         skill1: Some(&[
@@ -210,11 +197,6 @@ impl CharacterTrait for Mona {
         let s: MonaDamageEnum = num::FromPrimitive::from_usize(s).unwrap();
         let (s1, s2, s3) = context.character_common_data.get_3_skill();
 
-        let is_hexerei = match &context.character_common_data.config {
-            CharacterConfig::Mona { is_hexerei } => *is_hexerei,
-            _ => false,
-        };
-
         let (omen, after_z, bonus_z) = match *config {
             CharacterSkillConfig::Mona { omen, after_z, bonus_z } => (omen, after_z, bonus_z),
             _ => (false, false, 0)
@@ -238,7 +220,7 @@ impl CharacterTrait for Mona {
         if context.character_common_data.constellation >= 4 {
             builder.add_extra_critical("命座4：灭绝的预言", 0.15);
 
-            if is_hexerei {
+            if context.character_common_data.tags.contains(&CharacterTag::Hexerei) {
                 builder.add_extra_critical_damage("命座4：灭绝的预言", 0.15);
             }
         }

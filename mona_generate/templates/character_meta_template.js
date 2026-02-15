@@ -91,6 +91,11 @@ export default {
             {{ config|e("none") }},
             {% endfor %}
         ],
+        defaultTags: [
+            {% for tag in c.default_tags %}
+            {{ tag|e("none") }},
+            {% endfor %}
+        ]
     },
     {% endfor %}
 }

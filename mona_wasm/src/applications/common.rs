@@ -1,4 +1,3 @@
-use mona::character::team_status::CharacterStatus;
 use serde::{Serialize, Deserialize};
 use mona::artifacts::{Artifact, ArtifactList, ArtifactSlotName};
 use mona::artifacts::effect_config::ArtifactEffectConfig;
@@ -7,6 +6,7 @@ use mona::buffs::buff_name::BuffName;
 use mona::buffs::{Buff, BuffConfig};
 use mona::character::{Character, CharacterConfig, CharacterName};
 use mona::character::skill_config::CharacterSkillConfig;
+use mona::character::team_status::{CharacterStatus, CharacterTag, CharacterTags};
 use mona::common::{StatName, CharacterFullInfo};
 use mona::enemies::Enemy;
 use mona::potential_function::potential_function::PotentialFunction;
@@ -31,6 +31,7 @@ pub struct CharacterInterface {
     pub skill2: usize,
     pub skill3: usize,
     pub params: CharacterConfig,
+    pub tags: Vec<CharacterTag>,
 }
 
 fn default_false() -> bool {
@@ -47,7 +48,8 @@ impl CharacterInterface {
             self.skill1,
             self.skill2,
             self.skill3,
-            &self.params
+            &self.params,
+            &self.tags.iter().cloned().collect(),
         )
     }
 }
@@ -235,7 +237,13 @@ impl CharacterFullInterface {
                     },
                     skill_config: if let Some(skill) = &c.skill { skill.config.clone() } else { CharacterSkillConfig::NoConfig },
                     skill_index: if let Some(skill) = &c.skill { skill.index } else { usize::MAX },
-                    character_status: CharacterStatus::new(c.character_id, c.team_id, c.on_field, c.character.name.get_static_data()),
+                    character_status: CharacterStatus::new(
+                        c.character_id,
+                        c.team_id,
+                        c.on_field,
+                        c.character.name.get_static_data(),
+                        c.character.tags.iter().cloned().collect(),
+                    ),
                 });
             }
         }

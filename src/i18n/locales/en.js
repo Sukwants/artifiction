@@ -100,6 +100,7 @@ export default {
         panel: "Stats",
         lang: "Language",
         noData: "No Data",
+        tag: "Tag",
     },
     stat: {
         cureEffect: "Healing Bonus",
@@ -250,6 +251,7 @@ export default {
         fumo: "Element Infusion",
         skillConfig: "Skill Config",
         onField: "On Field",
+        noTag: "No Tag",
     },
     dmg: {
         electroCharged: "Electro-Charged",

@@ -13,6 +13,7 @@ use crate::character::character_static_data::CharacterStaticData;
 use crate::character::CharacterConfig;
 use crate::character::skill_config::CharacterSkillConfig;
 use crate::character::traits::{CharacterSkillMap, CharacterTrait};
+use crate::character::team_status::CharacterTag;
 use crate::common::ChangeAttribute;
 use crate::common::element::Element;
 use crate::common::item_config_type::ItemConfig;

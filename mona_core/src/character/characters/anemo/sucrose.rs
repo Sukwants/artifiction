@@ -1,21 +1,5 @@
-use num_derive::FromPrimitive;
-use crate::attribute::*;
-use crate::character::character_common_data::CharacterCommonData;
-use crate::character::character_sub_stat::CharacterSubStatFamily;
-use crate::character::{CharacterConfig, CharacterName, CharacterStaticData};
-use crate::character::skill_config::CharacterSkillConfig;
-use crate::character::traits::{CharacterSkillMap, CharacterSkillMapItem, CharacterTrait};
-use crate::common::{ChangeAttribute, Element, SkillType, StatName, WeaponType};
-use crate::common::item_config_type::ItemConfig;
-use crate::damage::damage_builder::DamageBuilder;
-use crate::damage::DamageContext;
-use crate::target_functions::target_functions::anemo::sucrose_default::SucroseDefaultTargetFunction;
-use crate::target_functions::TargetFunction;
-use crate::team::TeamQuantization;
-use crate::weapon::weapon_common_data::WeaponCommonData;
-use strum::EnumCount;
-use strum_macros::{EnumCount as EnumCountMacro, EnumString};
-use crate::common::i18n::{charged_dmg, hit_n_dmg, locale, plunging_dmg};
+use crate::character::characters::prelude::*;
+use crate::target_functions::target_functions::SucroseDefaultTargetFunction;
 
 pub struct SucroseSkillType {
     pub normal_dmg1: [f64; 15],
@@ -137,6 +121,10 @@ impl CharacterTrait for Sucrose {
     const SKILL: Self::SkillType = SUCROSE_SKILL;
     type DamageEnumType = SucroseDamageEnum;
     type RoleEnum = SucroseRoleEnum;
+
+    const DEFAULT_TAGS: Option<&'static [CharacterTag]> = Some(
+        &[CharacterTag::Hexerei]
+    );
 
     #[cfg(not(target_family = "wasm"))]
     const SKILL_MAP: CharacterSkillMap = CharacterSkillMap {

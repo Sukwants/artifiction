@@ -303,6 +303,7 @@ pub fn derive_character_data(input: TokenStream) -> TokenStream {
     let mut rows_change_attribute = String::new();
     let mut rows_damage = String::new();
     let mut rows_tf = String::new();
+    let mut rows_default_tags = String::new();
     let mut rows_skill_map = String::new();
     let mut rows_config_data = String::new();
     let mut rows_config_skill = String::new();
@@ -315,6 +316,7 @@ pub fn derive_character_data(input: TokenStream) -> TokenStream {
         rows_change_attribute.push_str(&format!("CharacterName::{n} => crate::character::characters::{n}::change_attribute(attribute, common_data, skill_config),\n", n=v));
         rows_damage.push_str(&format!("CharacterName::{n} => crate::character::characters::{n}::damage_internal::<D>(context, skill_index, skill_config, fumo),\n", n=v));
         rows_tf.push_str(&format!("CharacterName::{n} => crate::character::characters::{n}::get_target_function_by_role(role_index, team, character, weapon),\n", n=v));
+        rows_default_tags.push_str(&format!("CharacterName::{n} => crate::character::characters::{n}::DEFAULT_TAGS,\n", n=v));
         rows_skill_map.push_str(&format!("CharacterName::{n} => crate::character::characters::{n}::SKILL_MAP,\n", n=v));
         rows_config_data.push_str(&format!("CharacterName::{n} => crate::character::characters::{n}::CONFIG_DATA,\n", n=v));
         rows_config_skill.push_str(&format!("CharacterName::{n} => crate::character::characters::{n}::CONFIG_SKILL,\n", n=v));
@@ -347,6 +349,10 @@ pub fn derive_character_data(input: TokenStream) -> TokenStream {
                 match character.name {{ {rows_tf} }}
             }}
 
+            pub fn get_default_tags(&self) -> Option<&'static [CharacterTag]> {{
+                match *self {{ {rows_default_tags} }}
+            }}
+
             #[cfg(not(target_family = "wasm"))]
             pub fn get_skill_map(&self) -> CharacterSkillMap {{
                 match *self {{ {rows_skill_map} }}
@@ -377,6 +383,7 @@ pub fn derive_character_data(input: TokenStream) -> TokenStream {
         rows_effect=rows_effect,
         rows_damage=rows_damage,
         rows_tf=rows_tf,
+        rows_default_tags=rows_default_tags,
         rows_skill_map=rows_skill_map,
         rows_config_data=rows_config_data,
         rows_config_skill=rows_config_skill,

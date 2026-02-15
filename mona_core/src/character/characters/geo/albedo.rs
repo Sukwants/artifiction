@@ -1,20 +1,4 @@
-use num_traits::FromPrimitive;
-use crate::attribute::*;
-use crate::buffs::buffs::common;
-use crate::character::character_common_data::CharacterCommonData;
-use crate::character::character_sub_stat::CharacterSubStatFamily;
-use crate::character::{CharacterConfig, CharacterName, CharacterStaticData};
-use crate::character::skill_config::CharacterSkillConfig;
-use crate::character::traits::{CharacterSkillMap, CharacterSkillMapItem, CharacterTrait};
-use crate::character::macros::{damage_enum, skill_map};
-use crate::common::{ChangeAttribute, DamageResult, Element, MoonglareReaction, Moonsign, SkillType, StatName, WeaponType};
-use crate::common::i18n::{locale, hit_n_dmg, plunging_dmg, charged_dmg};
-use crate::common::item_config_type::{ItemConfig, ItemConfigType};
-use crate::damage::damage_builder::DamageBuilder;
-use crate::damage::DamageContext;
-use crate::target_functions::TargetFunction;
-use crate::team::TeamQuantization;
-use crate::weapon::weapon_common_data::WeaponCommonData;
+use crate::character::characters::prelude::*;
 
 pub struct AlbedoSkillType {
     pub normal_dmg1: [f64; 15],
@@ -86,7 +70,6 @@ const ALBEDO_STATIC_DATA: CharacterStaticData = CharacterStaticData {
 
 pub struct AlbedoEffect {
     pub hexerei_secret_rite: bool,
-    pub is_hexerei: bool,
     pub common_data: CharacterCommonData,
 }
 
@@ -97,11 +80,7 @@ impl<A: Attribute> ChangeAttribute<A> for AlbedoEffect {
                 attribute.add_edge1(
                     AttributeName::DEF,
                     AttributeName::BonusNormalAttack,
-                    if self.is_hexerei {
-                        Box::new(move |def, _| { (def / 1000.0 * 0.14).min(0.42) })
-                    } else {
-                        Box::new(move |def, _| { (def / 1000.0 * 0.04).min(0.12) })
-                    },
+                    Box::new(move |def, _| { (def / 1000.0 * 0.14).min(0.42) }),
                     Box::new(move |def, _, grad| (0.0, 0.0)),
                     "天赋3：魔女的前夜礼·白芒之书"
                 );
@@ -187,6 +166,10 @@ impl CharacterTrait for Albedo {
     type DamageEnumType = AlbedoDamageEnum;
     type RoleEnum = AlbedoRoleEnum;
 
+    const DEFAULT_TAGS: Option<&'static [CharacterTag]> = Some(
+        &[CharacterTag::Hexerei]
+    );
+
     #[cfg(not(target_family = "wasm"))]
     const SKILL_MAP: CharacterSkillMap = CharacterSkillMap {
         skill1: Some(&[
@@ -261,9 +244,9 @@ impl CharacterTrait for Albedo {
         let s2 = context.character_common_data.skill2;
         let s3 = context.character_common_data.skill3;
 
-        let (hexerei_secret_rite, is_hexerei) = match &context.character_common_data.config {
-            CharacterConfig::Albedo { hexerei_secret_rite, is_hexerei } => (*hexerei_secret_rite, *is_hexerei),
-            _ => (false, false),
+        let hexerei_secret_rite = match &context.character_common_data.config {
+            CharacterConfig::Albedo { hexerei_secret_rite } => *hexerei_secret_rite,
+            _ => false,
         };
 
         let (lower50, activated_q, fatal_count, crystallize_shield) = match *config {
@@ -342,13 +325,12 @@ impl CharacterTrait for Albedo {
     }
 
     fn new_effect<A: Attribute>(common_data: &CharacterCommonData, config: &CharacterConfig) -> Option<Box<dyn ChangeAttribute<A>>> {
-        let (hexerei_secret_rite, is_hexerei) = match *config {
-            CharacterConfig::Albedo { hexerei_secret_rite, is_hexerei } => (hexerei_secret_rite, is_hexerei),
-            _ => (false, false),
+        let hexerei_secret_rite = match *config {
+            CharacterConfig::Albedo { hexerei_secret_rite } => hexerei_secret_rite,
+            _ => false,
         };
         Some(Box::new(AlbedoEffect {
             hexerei_secret_rite: hexerei_secret_rite,
-            is_hexerei: is_hexerei,
             common_data: common_data.clone(),
         }))
     }

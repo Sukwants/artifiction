@@ -310,6 +310,15 @@
                             ></el-input-number>
                         </div>
 
+                        <div class="character-tag">
+                            <h3 class="common-title2">{{ t("misc.tag") }}</h3>
+                            <select-tag
+                                v-model="characterTags"
+                                :tags="tags"
+                                style="flex: 1"
+                            ></select-tag>
+                        </div>
+
                         <div class="character-extra-config" v-if="characterNeedConfig">
                             <item-config
                                 v-model="characterConfig"
@@ -656,6 +665,7 @@ import SelectArtifact from "@/components/select/SelectArtifact.vue"
 import SelectArtifactSet from "@c/select/SelectArtifactSet"
 import SelectCharacter from "@/components/select/SelectCharacter.vue"
 import SelectCharacterLevel from "@/components/select/SelectCharacterLevel.vue"
+import SelectTag from "@/components/select/SelectTag.vue"
 import SelectWeapon from "@/components/select/SelectWeapon.vue"
 import SelectWeaponLevel from "@/components/select/SelectWeaponLevel.vue"
 import SelectTargetFunction from "@/components/select/SelectTargetFunction.vue"
@@ -678,7 +688,7 @@ import SelectArtifactMainStat from "@c/select/SelectArtifactMainStat"
 import ArtifactConfig from "./ArtifactConfig.vue"
 import DamageAnalysis from "@/components/display/DamageAnalysis"
 import {getObjectConfigUnlinked, useGlobalConfig, processSharedGlobalConfig} from "@/composables/globalConfig"
-import {getDefaultCharacterConfig, useCharacter, useCharacterSkill} from "@/composables/character"
+import {getDefaultCharacterConfig, getDefaultCharacterTag, useCharacter, useCharacterSkill} from "@/composables/character"
 import {useEnemy} from "@/composables/enemy"
 import {getDefaultWeaponConfig, useWeapon} from "@/composables/weapon"
 import {getDefaultTargetFunctionConfig, useTargetFunction} from "@/composables/targetFunction"
@@ -715,6 +725,7 @@ import {ElMessage} from "element-plus"
 import "element-plus/es/components/message/style/css"
 import SelectElementType from "@/components/select/SelectElementType.vue";
 import { add, get } from "lodash"
+import { useTag } from "@/composables/tag"
 
 // stores
 const presetStore = usePresetStore()
@@ -785,6 +796,13 @@ function handleClickEnemyConfig() {
     showEnemyConfigDialog.value = true
 }
 
+////////////////////////////////////////////////////////
+// tag
+
+const {
+    tags,
+} = useTag()
+
 
 ////////////////////////////////////////////////////////
 // character
@@ -804,6 +822,7 @@ const {
     characterConfigConfig,
     characterInterface,
     characterLocale,
+    characterTags,
 } = useCharacter()
 
 const {
@@ -1095,6 +1114,7 @@ function usePreset(name: string) {
         characterSkill2.value = c.skill2 + 1
         characterSkill3.value = c.skill3 + 1
         characterConfig.value = deepMerge(restoreObjectConfig(c.params, c.params, c.configUnlinked ?? {}), getDefaultCharacterConfig(c.name))
+        characterTags.value = c.tags ?? getDefaultCharacterTag(c.name)
     }
 
     // use weapon

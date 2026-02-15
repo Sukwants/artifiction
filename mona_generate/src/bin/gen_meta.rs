@@ -23,6 +23,7 @@ use mona_generate::gen_meta::gen_buff_meta::gen_buff_meta_as_js_file;
 use mona_generate::gen_meta::gen_character_meta::gen_character_meta_as_js_file;
 use mona_generate::gen_meta::gen_locale::generate_locale_vec;
 use mona_generate::gen_meta::gen_pf_meta::gen_pf_meta_as_js_file;
+use mona_generate::gen_meta::gen_tag_meta::gen_tag_meta_as_js_file;
 use mona_generate::gen_meta::gen_tf_meta::gen_tf_meta_as_js_file;
 use mona_generate::gen_meta::gen_weapon_meta::gen_weapon_meta_as_js_file;
 
@@ -43,8 +44,8 @@ fn main() {
     let buff_file = Path::new(&args.dir).join("_gen_buff.js");
     let character_file = Path::new(&args.dir).join("_gen_character.js");
     let pf_file = Path::new(&args.dir).join("_gen_pf.js");
+    let tag_file = Path::new(&args.dir).join("_gen_tag.js");
     let tf_file = Path::new(&args.dir).join("_gen_tf.js");
-    let gc_file = Path::new(&args.dir).join("_gen_gc.js");
 
     let get_file = |path: &PathBuf| {
         OpenOptions::new()
@@ -69,6 +70,9 @@ fn main() {
 
     let mut file_pf = OpenOptions::new().write(true).create(true).truncate(true).open(&pf_file).expect("cannot open/create pf file");
     file_pf.write_all(gen_pf_meta_as_js_file().as_bytes());
+
+    let mut file_tag = OpenOptions::new().write(true).create(true).truncate(true).open(&tag_file).expect("cannot open/create tag file");
+    file_tag.write_all(gen_tag_meta_as_js_file().as_bytes());
 
     let mut file_tf = OpenOptions::new().write(true).create(true).truncate(true).open(&tf_file).expect("cannot open/create tf file");
     file_tf.write_all(gen_tf_meta_as_js_file().as_bytes());
