@@ -25,6 +25,7 @@ pub struct CharacterCommonData {
     pub static_data: CharacterStaticData,
     pub config: CharacterConfig,
     pub tags: CharacterTags,
+    pub on_field: bool,
 }
 
 impl CharacterCommonData {
@@ -38,6 +39,7 @@ impl CharacterCommonData {
         skill3: usize,
         config: &CharacterConfig,
         tags: &CharacterTags,
+        on_field: bool,
     ) -> CharacterCommonData {
         let data = get_static_data(name);
 
@@ -57,6 +59,7 @@ impl CharacterCommonData {
             skill3,
             config: config.clone(),
             tags: tags.clone(),
+            on_field,
         }
     }
 

@@ -35,6 +35,7 @@ impl<T: Attribute> Character<T> {
         skill3: usize,
         config: &CharacterConfig,
         tags: &CharacterTags,
+        on_field: bool,
     ) -> Character<T> {
         let common_data = CharacterCommonData::new(
             name,
@@ -46,6 +47,7 @@ impl<T: Attribute> Character<T> {
             skill3,
             config,
             tags,
+            on_field,
         );
         let effect = get_effect(name, &common_data, config);
 

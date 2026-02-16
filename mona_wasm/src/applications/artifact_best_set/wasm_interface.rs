@@ -15,7 +15,7 @@ impl CalcArtifactBestSet {
 
         let calc_best_set_interface: CalcArtifactBestSetInterface = serde_wasm_bindgen::from_value(args).unwrap();
 
-        let character = calc_best_set_interface.character.to_character();
+        let character = calc_best_set_interface.character.to_character(true);
         let weapon = calc_best_set_interface.weapon.to_weapon(&character);
         let target_function = calc_best_set_interface.target_function.to_target_function(&character, &weapon);
         let enemy = match calc_best_set_interface.enemy {

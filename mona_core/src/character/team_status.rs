@@ -113,6 +113,13 @@ impl CharacterSelector {
         }
     }
 
+    pub fn select_offfield<A: Attribute>(attribute: &A) -> Self {
+        let team_id = attribute.get_character().team_id;
+        CharacterSelector {
+            selector: Arc::new(move |status: &CharacterStatus| !status.on_field && status.team_id == team_id ),
+        }
+    }
+
     pub fn select_onfield_except_self<A: Attribute>(attribute: &A) -> Self {
         let character_id = attribute.get_character().character_id;
         let team_id = attribute.get_character().team_id;
@@ -159,6 +166,12 @@ impl CharacterSelector {
         let character_id = attribute.get_character().character_id;
         CharacterSelector {
             selector: Arc::new(move |status: &CharacterStatus| status.character_id != character_id ),
+        }
+    }
+
+    pub fn select_by_tag<A: Attribute>(attribute: &A, tag: &CharacterTag) -> Self {
+        CharacterSelector {
+            selector: Arc::new(move |status: &CharacterStatus| status.tags.contains(tag) ),
         }
     }
 }

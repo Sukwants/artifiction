@@ -86,19 +86,74 @@ pub const DURIN_STATIC_DATA: CharacterStaticData = CharacterStaticData {
 pub struct DurinEffect {
     pub hexerei_secret_rite: bool,
     pub essential_transmutation: usize,
-    pub has_p1: bool,
-    pub has_c4: bool,
+    pub elements: ConfigElements8Multi,
+    pub common_data: CharacterCommonData,
 }
 
 impl<A: Attribute> ChangeAttribute<A> for DurinEffect {
     fn change_attribute(&self, attribute: &mut A) {
-        if self.has_p1 {
+
+        if self.common_data.has_talent1 {
             if self.essential_transmutation == 0 {
-                attribute.set_value_by(AttributeName::ResMinusPyro, "天赋1：光灵遵神数显现", if self.hexerei_secret_rite { 0.35 } else { 0.20 });
+                
+                let ratio = if self.hexerei_secret_rite { 0.35 } else { 0.20 };
+
+                if self.elements.pyro {
+                    attribute.set_value_by_s(CharacterSelector::select_all(attribute),
+                        AttributeType::Invisible(InvisibleAttributeType::new_element(AttributeVariableType::ResMinus, Element::Pyro)),
+                        "杜林天赋1", ratio,
+                    );
+                }
+                if self.elements.anemo {
+                    attribute.set_value_by_s(CharacterSelector::select_all(attribute),
+                        AttributeType::Invisible(InvisibleAttributeType::new_element(AttributeVariableType::ResMinus, Element::Anemo)),
+                        "杜林天赋1", ratio,
+                    );
+                }
+                if self.elements.electro {
+                    attribute.set_value_by_s(CharacterSelector::select_all(attribute),
+                        AttributeType::Invisible(InvisibleAttributeType::new_element(AttributeVariableType::ResMinus, Element::Electro)),
+                        "杜林天赋1", ratio,
+                    );
+                }
+                if self.elements.dendro {
+                    attribute.set_value_by_s(CharacterSelector::select_all(attribute),
+                        AttributeType::Invisible(InvisibleAttributeType::new_element(AttributeVariableType::ResMinus, Element::Dendro)),
+                        "杜林天赋1", ratio,
+                    );
+                }
+                if self.elements.geo {
+                    attribute.set_value_by_s(CharacterSelector::select_all(attribute),
+                        AttributeType::Invisible(InvisibleAttributeType::new_element(AttributeVariableType::ResMinus, Element::Geo)),
+                        "杜林天赋1", ratio,
+                    );
+                }
             } else {
-                attribute.set_value_by(AttributeName::EnhanceMelt, "天赋1：光灵遵神数显现", if self.hexerei_secret_rite { 0.7 } else { 0.4 });
-                attribute.set_value_by(AttributeName::EnhanceVaporize, "天赋1：光灵遵神数显现", if self.hexerei_secret_rite { 0.7 } else { 0.4 });
+                attribute.set_value_by_t(
+                    AttributeType::Invisible(InvisibleAttributeType::new_reaction(AttributeVariableType::ReactionEnhance, ReactionType::Vaporize)),
+                    "杜林天赋1", if self.hexerei_secret_rite { 0.7 } else { 0.4 }
+                );
+                attribute.set_value_by_t(
+                    AttributeType::Invisible(InvisibleAttributeType::new_reaction(AttributeVariableType::ReactionEnhance, ReactionType::Melt)),
+                    "杜林天赋1", if self.hexerei_secret_rite { 0.7 } else { 0.4 }
+                );
             }
+        }
+
+        if self.common_data.constellation >= 4 {
+            attribute.set_value_by_t(
+                AttributeType::Invisible(InvisibleAttributeType::new_skill(AttributeVariableType::Bonus, SkillType::ElementalBurst)),
+                "杜林命座4",
+                0.4
+            );
+        }
+
+        if self.common_data.constellation >= 6 {
+            attribute.set_value_by_t(
+                AttributeType::Invisible(InvisibleAttributeType::new_skill(AttributeVariableType::DefPenetration, SkillType::ElementalBurst)),
+                "杜林命座6",
+                0.3
+            );
         }
     }
 }
@@ -200,7 +255,6 @@ impl CharacterTrait for Durin {
     #[cfg(not(target_family = "wasm"))]
     const CONFIG_DATA: Option<&'static [ItemConfig]> = Some(&[
         ItemConfig::HEXEREI_SECRET_RITE_GLOBAL(false, ItemConfig::PRIORITY_CHARACTER),
-        ItemConfig::IS_HEXEREI(true, ItemConfig::PRIORITY_CHARACTER),
         ItemConfig {
             name: "essential_transmutation",
             title: locale!(
@@ -208,6 +262,26 @@ impl CharacterTrait for Durin {
                 en: "Essential Transmutation"
             ),
             config: ItemConfigType::Option2 { options_zh: "白化之是,黑度之否", options_en: "Confirmation of Purity,Denial of Darkness", default: 0 }
+        },
+        ItemConfig {
+            name: "elements",
+            title: locale!(
+                zh_cn: "反应元素",
+                en: "Reaction Elements"
+            ),
+            config: ItemConfigType::ElementMulti {
+                elements: &[Element::Pyro, Element::Hydro, Element::Anemo, Element::Electro, Element::Dendro, Element::Cryo, Element::Geo],
+                default: ConfigElements8Multi {
+                    pyro: true,
+                    hydro: false,
+                    anemo: false,
+                    electro: false,
+                    dendro: false,
+                    cryo: false,
+                    geo: false,
+                    physical: false,
+                }
+            }
         },
     ]);
 
@@ -247,13 +321,77 @@ impl CharacterTrait for Durin {
         },
     ]);
 
+    fn change_attribute<A: Attribute>(attribute: &mut A, common_data: &CharacterCommonData, skill_config: &CharacterSkillConfig) {
+
+        let (hexerei_secret_rite, essential_transmutation, elements) = match &common_data.config {
+            CharacterConfig::Durin { hexerei_secret_rite, essential_transmutation, elements } => (*hexerei_secret_rite, *essential_transmutation, *elements),
+            _ => (false, 0, ConfigElements8Multi::default()),
+        };
+
+        let (activated_res, primordial_fusion, cycle_of_enlightenment, activated_reaction) = match *skill_config {
+            CharacterSkillConfig::Durin { activated_res, primordial_fusion, cycle_of_enlightenment, activated_reaction } => (activated_res, primordial_fusion, cycle_of_enlightenment, activated_reaction),
+            _ => (false, false, false, false)
+        };
+
+        if common_data.constellation >= 1 && cycle_of_enlightenment {
+            if essential_transmutation == 0 {
+                for skill in [SkillType::NormalAttack, SkillType::ChargedAttack, SkillType::PlungingAttackInAction, SkillType::PlungingAttackOnGround, SkillType::ElementalSkill, SkillType::ElementalBurst].into_iter() {
+                    attribute.add_edge_s1to1(
+                        CharacterSelector::select_all_except_self(attribute),
+                        AttributeType::Panel(AttributeName::ATK),
+                        AttributeType::Invisible(InvisibleAttributeType::new_skill(AttributeVariableType::BaseDamage, skill)),
+                        Arc::new(move |atk: f64, _ | atk * 0.6 ),
+                        "杜林命座1",
+                        EdgePriority::Invisible,
+                    );
+                }
+            } else {
+                attribute.add_edge_t1(
+                    AttributeType::Panel(AttributeName::ATK),
+                    AttributeType::Invisible(InvisibleAttributeType::new_skill(AttributeVariableType::BaseDamage, SkillType::ElementalBurst)),
+                    Arc::new(move |atk: f64, _ | atk * 1.5 ),
+                    "杜林命座1",
+                    EdgePriority::Invisible,
+                );
+            }
+        }
+
+        if common_data.constellation >= 2 {
+            if elements.pyro { attribute.set_value_by_s(CharacterSelector::select_all(attribute), AttributeType::Panel(AttributeName::BonusPyro), "杜林天赋2", 0.5); }
+            if elements.hydro { attribute.set_value_by_s(CharacterSelector::select_all(attribute), AttributeType::Panel(AttributeName::BonusHydro), "杜林天赋2", 0.5); }
+            if elements.anemo { attribute.set_value_by_s(CharacterSelector::select_all(attribute), AttributeType::Panel(AttributeName::BonusAnemo), "杜林天赋2", 0.5); }
+            if elements.electro { attribute.set_value_by_s(CharacterSelector::select_all(attribute), AttributeType::Panel(AttributeName::BonusElectro), "杜林天赋2", 0.5); }
+            if elements.dendro { attribute.set_value_by_s(CharacterSelector::select_all(attribute), AttributeType::Panel(AttributeName::BonusDendro), "杜林天赋2", 0.5); }
+            if elements.cryo { attribute.set_value_by_s(CharacterSelector::select_all(attribute), AttributeType::Panel(AttributeName::BonusCryo), "杜林天赋2", 0.5); }
+            if elements.geo { attribute.set_value_by_s(CharacterSelector::select_all(attribute), AttributeType::Panel(AttributeName::BonusGeo), "杜林天赋2", 0.5); }
+        }
+
+        if common_data.constellation >= 6 {
+            if essential_transmutation == 0 {
+                attribute.set_value_by_s(
+                    CharacterSelector::select_all(attribute),
+                    AttributeType::Invisible(InvisibleAttributeType::new_any(AttributeVariableType::DefMinus)),
+                    "杜林命座6",
+                    0.3
+                );
+            } else {
+                attribute.set_value_by_t(
+                    AttributeType::Invisible(InvisibleAttributeType::new_skill(AttributeVariableType::DefPenetration, SkillType::ElementalBurst)),
+                    "杜林命座6",
+                    0.4
+                );
+            }
+        }
+        
+    }
+
     fn damage_internal<D: DamageBuilder>(context: &DamageContext<'_, D::AttributeType>, s: usize, config: &CharacterSkillConfig, fumo: Option<Element>) -> D::Result {
         let s: DurinDamageEnum = num::FromPrimitive::from_usize(s).unwrap();
         let (s1, s2, s3) = context.character_common_data.get_3_skill();
 
-        let (hexerei_secret_rite, essential_transmutation) = match &context.character_common_data.config {
-            CharacterConfig::Durin { hexerei_secret_rite, essential_transmutation } => (*hexerei_secret_rite, *essential_transmutation),
-            _ => (false, 0),
+        let (hexerei_secret_rite, essential_transmutation, elements) = match &context.character_common_data.config {
+            CharacterConfig::Durin { hexerei_secret_rite, essential_transmutation, elements } => (*hexerei_secret_rite, *essential_transmutation, *elements),
+            _ => (false, 0, ConfigElements8Multi::default()),
         };
 
         let (activated_res, primordial_fusion, cycle_of_enlightenment, activated_reaction) = match *config {
@@ -263,31 +401,6 @@ impl CharacterTrait for Durin {
 
         use DurinDamageEnum::*;
         let mut builder = D::new();
-
-        if context.character_common_data.constellation >= 1 && cycle_of_enlightenment {
-            if essential_transmutation == 1 && s.get_skill_type() == SkillType::ElementalBurst {
-                builder.add_extra_damage("命座1：红土之逆", context.attribute.get_atk() * 1.50);
-            }
-        }
-
-        if context.character_common_data.constellation >= 2 && activated_reaction {
-            if s.get_element() == Element::Pyro {
-                builder.add_extra_bonus("命座2：无底之想", 0.5);
-            }
-        }
-
-        if context.character_common_data.constellation >= 4 && s.get_skill_type() == SkillType::ElementalBurst {
-            builder.add_extra_bonus("命座4：流溢之原", 0.4);
-        }
-
-        if context.character_common_data.constellation >= 6 {
-            if essential_transmutation == 0 {
-                builder.add_extra_def_penetration("命座6：双重诞生", 0.3);
-                builder.add_extra_def_minus("命座6：双重诞生", 0.3);
-            } else {
-                builder.add_extra_def_penetration("命座6：双重诞生", 0.7);
-            }
-        }
 
         let ratio = match s {
             A1 => DURIN_SKILL.a_dmg1[s1],
@@ -333,15 +446,15 @@ impl CharacterTrait for Durin {
     }
 
     fn new_effect<A: Attribute>(common_data: &CharacterCommonData, config: &CharacterConfig) -> Option<Box<dyn ChangeAttribute<A>>> {
-        let (hexerei_secret_rite, essential_transmutation) = match *config {
-            CharacterConfig::Durin { hexerei_secret_rite, essential_transmutation } => (hexerei_secret_rite, essential_transmutation),
-            _ => (false, 0),
+        let (hexerei_secret_rite, essential_transmutation, elements) = match *config {
+            CharacterConfig::Durin { hexerei_secret_rite, essential_transmutation, elements } => (hexerei_secret_rite, essential_transmutation, elements),
+            _ => (false, 0, ConfigElements8Multi::default()),
         };
         Some(Box::new(DurinEffect {
             hexerei_secret_rite: hexerei_secret_rite,
             essential_transmutation: essential_transmutation,
-            has_p1: common_data.has_talent1,
-            has_c4: common_data.constellation >= 4,
+            elements,
+            common_data: common_data.clone(),
         }))
     }
 

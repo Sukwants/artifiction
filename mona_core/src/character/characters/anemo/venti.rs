@@ -90,20 +90,25 @@ pub struct VentiEffect {
 impl<A: Attribute> ChangeAttribute<A> for VentiEffect {
     fn change_attribute(&self, attribute: &mut A) {
         if self.common_data.constellation >= 2 {
-            attribute.set_value_by(AttributeName::ResMinusAnemo, "命座2：眷恋的泠风", 0.24);
-            attribute.set_value_by(AttributeName::ResMinusPhysical, "命座2：眷恋的泠风", 0.24);
+            attribute.set_value_by_s(CharacterSelector::select_all(attribute), AttributeType::Invisible(
+                InvisibleAttributeType::new_element(AttributeVariableType::ResMinus, Element::Anemo)), "温迪命座2", 0.24);
+            attribute.set_value_by_s(CharacterSelector::select_all(attribute), AttributeType::Invisible(
+                InvisibleAttributeType::new_element(AttributeVariableType::ResMinus, Element::Physical)), "温迪命座2", 0.24);
         }
 
         if self.common_data.constellation >= 4 {
-            attribute.set_value_by(AttributeName::BonusAnemo, "命座4：自由的凛风", 0.25);
+            attribute.set_value_by(AttributeName::BonusAnemo, "温迪命座4", 0.25);
+            attribute.set_value_by_s(CharacterSelector::select_onfield_except_self(attribute), AttributeType::Panel(AttributeName::BonusAnemo), "温迪命座4", 0.25);
         }
 
         if self.common_data.constellation >= 6 {
-            attribute.set_value_by(AttributeName::ResMinusAnemo, "命座6：抗争的暴风", 0.2);
+            attribute.set_value_by_s(CharacterSelector::select_all(attribute), AttributeType::Invisible(
+                InvisibleAttributeType::new_element(AttributeVariableType::ResMinus, Element::Anemo)), "温迪命座6", 0.2);
             if self.elemental_absorption != None {
-                attribute.set_value_by(AttributeName::res_minus_name_by_element(self.elemental_absorption.unwrap()), "命座6：抗争的暴风", 0.2);
+                attribute.set_value_by_s(CharacterSelector::select_all(attribute), AttributeType::Invisible(
+                    InvisibleAttributeType::new_element(AttributeVariableType::ResMinus, self.elemental_absorption.unwrap())), "温迪命座6", 0.2);
             }
-            attribute.set_value_by(AttributeName::CriticalDamageBase, "命座6：抗争的暴风", 1.0);
+            attribute.set_value_by(AttributeName::CriticalDamageBase, "温迪命座6", 1.0);
         }
     }
 }
@@ -200,7 +205,6 @@ impl CharacterTrait for Venti {
     #[cfg(not(target_family = "wasm"))]
     const CONFIG_DATA: Option<&'static [ItemConfig]> = Some(&[
         ItemConfig::HEXEREI_SECRET_RITE_GLOBAL(false, ItemConfig::PRIORITY_CHARACTER),
-        ItemConfig::IS_HEXEREI(true, ItemConfig::PRIORITY_CHARACTER),
         ItemConfig {
             name: "elemental_absorption",
             title: locale!(
@@ -225,14 +229,6 @@ impl CharacterTrait for Venti {
             config: ItemConfigType::Bool { default: true }
         },
         ItemConfig {
-            name: "active",
-            title: locale!(
-                zh_cn: "位于场上",
-                en: "Is active"
-            ),
-            config: ItemConfigType::Bool { default: false }
-        },
-        ItemConfig {
             name: "breeze_blow",
             title: locale!(
                 zh_cn: "风起之时",
@@ -241,6 +237,26 @@ impl CharacterTrait for Venti {
             config: ItemConfigType::Bool { default: false }
         },
     ]);
+
+    fn change_attribute<A: Attribute>(attribute: &mut A, common_data: &CharacterCommonData, skill_config: &CharacterSkillConfig) {
+        let (hexerei_secret_rite, elemental_absorption) = match &context.character_common_data.config {
+            CharacterConfig::Venti { hexerei_secret_rite, elemental_absorption } => (*hexerei_secret_rite, *elemental_absorption),
+            _ => (false, None),
+        };
+
+        let (activated_q, breeze_blow) = match *config {
+            CharacterSkillConfig::Venti { activated_q, breeze_blow } => (activated_q, breeze_blow),
+            _ => (false, false)
+        };
+
+        if hexerei_secret_rite && activated_q && elemental_absorption != None && common_data.on_field {
+            attribute.set_value_by_t(
+                AttributeType::Invisible(InvisibleAttributeType::new_any(AttributeVariableType::Bonus)),
+                "温迪天赋3",
+                0.5
+            );
+        }
+    }
 
     fn damage_internal<D: DamageBuilder>(context: &DamageContext<'_, D::AttributeType>, s: usize, config: &CharacterSkillConfig, fumo: Option<Element>) -> D::Result {
         let s: VentiDamageEnum = num::FromPrimitive::from_usize(s).unwrap();
@@ -251,17 +267,13 @@ impl CharacterTrait for Venti {
             _ => (false, None),
         };
 
-        let (activated_q, active, breeze_blow) = match *config {
-            CharacterSkillConfig::Venti { activated_q, active, breeze_blow } => (activated_q, active, breeze_blow),
-            _ => (false, false, false)
+        let (activated_q, breeze_blow) = match *config {
+            CharacterSkillConfig::Venti { activated_q, breeze_blow } => (activated_q, breeze_blow),
+            _ => (false, false)
         };
 
         use VentiDamageEnum::*;
         let mut builder = D::new();
-
-        if activated_q && active && elemental_absorption != None {
-            builder.add_extra_bonus("天赋3：魔女的前夜礼·颂时风若", 0.5);
-        }
 
         if s == QA && elemental_absorption == None {
             return builder.none();

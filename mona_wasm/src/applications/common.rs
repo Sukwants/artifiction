@@ -39,7 +39,7 @@ fn default_false() -> bool {
 }
 
 impl CharacterInterface {
-    pub fn to_character<T: Attribute>(&self) -> Character<T> {
+    pub fn to_character<T: Attribute>(&self, on_field: bool) -> Character<T> {
         Character::new(
             self.name,
             self.level,
@@ -50,6 +50,7 @@ impl CharacterInterface {
             self.skill3,
             &self.params,
             &self.tags.iter().cloned().collect(),
+            on_field,
         )
     }
 }
@@ -227,8 +228,8 @@ impl CharacterFullInterface {
         for c in input.iter() {
             if let Some(c) = c {
                 characters.push(CharacterFullInfo {
-                    character: c.character.to_character(),
-                    weapon: c.weapon.to_weapon(&c.character.to_character()),
+                    character: c.character.to_character(c.on_field),
+                    weapon: c.weapon.to_weapon(&c.character.to_character(c.on_field)),
                     buffs: c.buffs.iter().map(|x| x.to_buff()).collect(),
                     artifacts: c.artifacts.iter().collect(),
                     artifact_config: match &c.artifact_config {
