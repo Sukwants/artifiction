@@ -86,8 +86,12 @@ pub struct JahodaEffect {
 impl<A: Attribute> ChangeAttribute<A> for JahodaEffect {
     fn change_attribute(&self, attribute: &mut A) {
         if self.has_c6 && self.moonsign.is_ascendant() {
-            attribute.set_value_by(AttributeName::CriticalBase, "命座6：最渺小的幸运", 0.05);
-            attribute.set_value_by(AttributeName::CriticalDamageBase, "命座6：最渺小的幸运", 0.40);
+            attribute.set_value_by_s(
+                CharacterSelector::select_by_tag(attribute, CharacterTag::Moonsign),
+                AttributeType::Panel(AttributeName::CriticalBase), "雅珂达命座6", 0.05);
+            attribute.set_value_by_s(
+                CharacterSelector::select_by_tag(attribute, CharacterTag::Moonsign),
+                AttributeType::Panel(AttributeName::CriticalDamageBase), "雅珂达命座6", 0.05);
         }
     }
 }
@@ -250,7 +254,7 @@ impl CharacterTrait for Jahoda {
         } else { (1.0, 1.0) };
 
         if context.character_common_data.has_talent2 && activated_p2 {
-            builder.add_extra_em("天赋2：蜜莓的嘉赏", 100.0);
+            builder.add_extra_em("雅珂达天赋2", 100.0);
         }
 
         if s == QHeal || s == QHealAd {
