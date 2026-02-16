@@ -225,7 +225,6 @@ pub struct ConfigAubadeOfMorningstarAndMoon {
 #[derive(Serialize, Deserialize)]
 #[derive(Debug, Clone, Default)]
 pub struct ConfigADayCarvedFromRisingWinds {
-    pub is_hexerei: bool,
     pub set4_rate: f64,
 }
 
@@ -495,7 +494,6 @@ impl ArtifactEffectConfigBuilder {
     }
 
     pub fn a_day_carved_from_rising_winds(&mut self, is_hexerei: bool, set4_rate: f64) -> &mut Self {
-        self.config.config_a_day_carved_from_rising_winds.is_hexerei = is_hexerei;
         self.config.config_a_day_carved_from_rising_winds.set4_rate = set4_rate;
         self
     }

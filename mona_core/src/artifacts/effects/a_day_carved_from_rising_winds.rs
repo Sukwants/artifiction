@@ -1,7 +1,6 @@
 use crate::artifacts::effects::prelude::*;
 
 pub struct ADayCarvedFromRisingWindsEffect {
-    pub is_hexerei: bool,
     pub set4_rate: f64,
 }
 
@@ -13,9 +12,12 @@ impl<A: Attribute> ArtifactEffect<A> for ADayCarvedFromRisingWindsEffect {
     fn effect4(&self, attribute: &mut A) {
         attribute.add_atk_percentage("风起之日4", 0.25 * self.set4_rate);
 
-        if self.is_hexerei {
-            attribute.set_value_by(AttributeName::CriticalBase, "风起之日4", 0.2 * self.set4_rate);
-        }
+        attribute.set_value_by_s(
+            CharacterSelector::select_self_by_tag(attribute, CharacterTag::Hexerei),
+            AttributeType::Panel(AttributeName::CriticalBase),
+            "风起之日4",
+            0.2 * self.set4_rate
+        );
     }
 }
 
@@ -24,7 +26,6 @@ pub struct ADayCarvedFromRisingWinds;
 impl ArtifactTrait for ADayCarvedFromRisingWinds {
     fn create_effect<A: Attribute>(config: &ArtifactEffectConfig, character_common_data: &CharacterCommonData) -> Box<dyn ArtifactEffect<A>> {
         Box::new(ADayCarvedFromRisingWindsEffect {
-            is_hexerei: config.config_a_day_carved_from_rising_winds.is_hexerei,
             set4_rate: config.config_a_day_carved_from_rising_winds.set4_rate,
         })
     }
@@ -56,7 +57,6 @@ impl ArtifactTrait for ADayCarvedFromRisingWinds {
 
     #[cfg(not(target_family = "wasm"))]
     const CONFIG4: Option<&'static [ItemConfig]> = Some(&[
-        ItemConfig::IS_HEXEREI(false, ItemConfig::PRIORITY_ARTIFACT),
         ItemConfig {
             name: "set4_rate",
             title: locale!(

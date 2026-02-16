@@ -181,4 +181,11 @@ impl CharacterSelector {
             selector: Arc::new(move |status: &CharacterStatus| status.tags.contains(&tag) ),
         }
     }
+
+    pub fn select_self_by_tag<A: Attribute>(attribute: &A, tag: CharacterTag) -> Self {
+        let character_id = attribute.get_character().character_id;
+        CharacterSelector {
+            selector: Arc::new(move |status: &CharacterStatus| status.tags.contains(&tag) && status.character_id == character_id ),
+        }
+    }
 }
