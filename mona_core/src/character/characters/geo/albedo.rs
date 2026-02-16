@@ -94,7 +94,7 @@ impl<A: Attribute> ChangeAttribute<A> for AlbedoEffect {
                 );
 
                 attribute.add_edge_s1to1(
-                    CharacterSelector::select_by_tag(attribute, &CharacterTag::Hexerei),
+                    CharacterSelector::select_by_tag(attribute, CharacterTag::Hexerei),
                     AttributeType::Panel(AttributeName::DEF),
                     AttributeType::Invisible(InvisibleAttributeType::new_skill(AttributeVariableType::Bonus, skill)),
                     Arc::new(move |def, _| { (def / 1000.0 * 0.10).min(0.30) }),

@@ -1,5 +1,6 @@
 use crate::attribute::Attribute;
 use crate::character::{CharacterName, CharacterStaticData};
+use crate::common::Element;
 use crate::common::i18n::{locale, I18nLocale};
 use mona_derive::EnumLen;
 use num_derive::FromPrimitive;
@@ -169,9 +170,15 @@ impl CharacterSelector {
         }
     }
 
-    pub fn select_by_tag<A: Attribute>(attribute: &A, tag: &CharacterTag) -> Self {
+    pub fn select_element<A: Attribute>(attribute: &A, element: Element) -> Self {
         CharacterSelector {
-            selector: Arc::new(move |status: &CharacterStatus| status.tags.contains(tag) ),
+            selector: Arc::new(move |status: &CharacterStatus| status.character_static_data.element == element ),
+        }
+    }
+
+    pub fn select_by_tag<A: Attribute>(attribute: &A, tag: CharacterTag) -> Self {
+        CharacterSelector {
+            selector: Arc::new(move |status: &CharacterStatus| status.tags.contains(&tag) ),
         }
     }
 }

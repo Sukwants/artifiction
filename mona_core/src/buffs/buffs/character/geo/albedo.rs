@@ -1,11 +1,4 @@
-use crate::attribute::*;
-use crate::buffs::{Buff, BuffConfig};
-use crate::buffs::buff::BuffMeta;
-use crate::buffs::buff_meta::{BuffFrom, BuffGenre, BuffImage, BuffMetaData};
-use crate::buffs::buff_name::BuffName;
-use crate::character::CharacterName;
-use crate::common::i18n::locale;
-use crate::common::item_config_type::{ItemConfig, ItemConfigType};
+use crate::buffs::buffs::prelude::*;
 
 pub struct BuffAlbedoTalent2;
 
@@ -44,16 +37,28 @@ pub struct BuffAlbedoTalent3 {
 
 impl<A: Attribute> Buff<A> for BuffAlbedoTalent3 {
     fn change_attribute(&self, attribute: &mut A) {
-        let val = if self.is_hexerei {
-            (self.def / 1000.0 * 0.14).min(0.42)
-        } else {
-            (self.def / 1000.0 * 0.04).min(0.12)
-        };
-        attribute.set_value_by(AttributeName::BonusNormalAttack, "阿贝多「魔女的前夜礼·白芒之书」", val);
-        attribute.set_value_by(AttributeName::BonusChargedAttack, "阿贝多「魔女的前夜礼·白芒之书」", val);
-        attribute.set_value_by(AttributeName::BonusPlungingAttack, "阿贝多「魔女的前夜礼·白芒之书」", val);
-        attribute.set_value_by(AttributeName::BonusElementalSkill, "阿贝多「魔女的前夜礼·白芒之书」", val);
-        attribute.set_value_by(AttributeName::BonusElementalBurst, "阿贝多「魔女的前夜礼·白芒之书」", val);
+        for skill in vec![
+            SkillType::NormalAttack,
+            SkillType::ChargedAttack,
+            SkillType::PlungingAttackInAction,
+            SkillType::PlungingAttackOnGround,
+            SkillType::ElementalSkill,
+            SkillType::ElementalBurst,
+        ] {
+            attribute.set_value_by_s(
+                CharacterSelector::select_all(attribute),
+                AttributeType::Invisible(InvisibleAttributeType::new_skill(AttributeVariableType::Bonus, skill)),
+                "阿贝多天赋3",
+                (self.def / 1000.0 * 0.04).min(0.12)
+            );
+
+            attribute.set_value_by_s(
+                CharacterSelector::select_by_tag(attribute, CharacterTag::Hexerei),
+                AttributeType::Invisible(InvisibleAttributeType::new_skill(AttributeVariableType::Bonus, skill)),
+                "阿贝多天赋3",
+                (self.def / 1000.0 * 0.10).min(0.30)
+            );
+        }
     }
 }
 
@@ -88,7 +93,6 @@ impl BuffMeta for BuffAlbedoTalent3 {
             ),
             config: ItemConfigType::FloatInput { default: 0.0 }
         },
-        ItemConfig::IS_HEXEREI(false, ItemConfig::PRIORITY_BUFF),
     ]);
 
     fn create<A: Attribute>(_b: &BuffConfig) -> Box<dyn Buff<A>> {

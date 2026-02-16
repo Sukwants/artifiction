@@ -3,7 +3,7 @@ pub use crate::buffs::buff::BuffMeta;
 pub use crate::buffs::buff_meta::{BuffFrom, BuffGenre, BuffImage, BuffMetaData};
 pub use crate::buffs::buff_name::BuffName;
 pub use crate::buffs::{Buff, BuffConfig};
-pub use crate::character::team_status::CharacterSelector;
+pub use crate::character::team_status::{CharacterSelector, CharacterTag, CharacterTags};
 pub use crate::character::CharacterName;
 pub(crate) use crate::common::i18n::locale;
 pub use crate::common::item_config_type::{ItemConfig, ItemConfigType, ConfigElements8Multi};

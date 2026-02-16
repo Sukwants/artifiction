@@ -239,12 +239,12 @@ impl CharacterTrait for Venti {
     ]);
 
     fn change_attribute<A: Attribute>(attribute: &mut A, common_data: &CharacterCommonData, skill_config: &CharacterSkillConfig) {
-        let (hexerei_secret_rite, elemental_absorption) = match &context.character_common_data.config {
+        let (hexerei_secret_rite, elemental_absorption) = match &common_data.config {
             CharacterConfig::Venti { hexerei_secret_rite, elemental_absorption } => (*hexerei_secret_rite, *elemental_absorption),
             _ => (false, None),
         };
 
-        let (activated_q, breeze_blow) = match *config {
+        let (activated_q, breeze_blow) = match *skill_config {
             CharacterSkillConfig::Venti { activated_q, breeze_blow } => (activated_q, breeze_blow),
             _ => (false, false)
         };

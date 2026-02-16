@@ -214,7 +214,7 @@ impl CharacterTrait for Mona {
                 CharacterSelector::select_all(attribute),
                 AttributeType::Invisible(InvisibleAttributeType::new_any(AttributeVariableType::Bonus)),
                 "莫娜Q技能",
-                MONA_SKILL.elemental_burst_bonus[s3],
+                MONA_SKILL.elemental_burst_bonus[common_data.skill3 as usize],
             );
 
             if common_data.constellation >= 1 {
@@ -246,7 +246,7 @@ impl CharacterTrait for Mona {
                 );
 
                 attribute.set_value_by_s(
-                    CharacterSelector::select_by_tag(attribute, &CharacterTag::Hexerei),
+                    CharacterSelector::select_by_tag(attribute, CharacterTag::Hexerei),
                     AttributeType::Invisible(InvisibleAttributeType::new_any(AttributeVariableType::CriticalDamage)),
                     "莫娜命座4",
                     0.15
@@ -269,7 +269,7 @@ impl CharacterTrait for Mona {
         let s: MonaDamageEnum = num::FromPrimitive::from_usize(s).unwrap();
         let (s1, s2, s3) = context.character_common_data.get_3_skill();
 
-        let (omen, astral_glow_of_mercury, after_z, bonus_z) = match *skill_config {
+        let (omen, astral_glow_of_mercury, after_z, bonus_z) = match *config {
             CharacterSkillConfig::Mona { omen, astral_glow_of_mercury, after_z, bonus_z } => (omen, astral_glow_of_mercury, after_z, bonus_z),
             _ => (false, 0.0, false, 0)
         };
