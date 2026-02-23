@@ -13,6 +13,7 @@ pub mod chasca_default;
 pub mod lanyan_default;
 pub mod yumemizuki_mizuki_default;
 pub mod ifa_default;
+pub mod varka_default;
 
 pub use jean_default::JeanDefaultTargetFunction;
 pub use kaedehara_kazuha_damage::KaedeharaKazuhaDamageTargetFunction;
@@ -29,3 +30,4 @@ pub use chasca_default::ChascaDefaultTargetFunction;
 pub use lanyan_default::LanyanDefaultTargetFunction;
 pub use yumemizuki_mizuki_default::YumemizukiMizukiDefaultTargetFunction;
 pub use ifa_default::IfaDefaultTargetFunction;
+pub use varka_default::VarkaDefaultTargetFunction;

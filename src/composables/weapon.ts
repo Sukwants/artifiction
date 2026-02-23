@@ -1,4 +1,4 @@
-const DEFAULT_WEAPON = "NocturnesCurtainCall";
+const DEFAULT_WEAPON = "GestOfTheMightyWolf";
 
 import type {WeaponName, WeaponType} from "@/types/weapon"
 // @ts-ignore

@@ -70,5 +70,6 @@ pub enum CharacterConfig {
     Illuga { moonsign: Moonsign, hydro_geo_count: usize },
     Columbina { moonsign: Moonsign, main_element: Option<Element>, reacted_element: ConfigElements8Multi },
     Zibai { moonsign: Moonsign, geo_count: usize, hydro_count: usize },
+    Varka { hexerei_secret_rite: bool, team_elements: ConfigElements8Multi, repeated_element: bool },
     NoConfig,
 }
