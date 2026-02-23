@@ -310,6 +310,15 @@
                             ></el-input-number>
                         </div>
 
+                        <div class="character-tag">
+                            <h3 class="common-title2">{{ t("misc.tag") }}</h3>
+                            <select-tag
+                                v-model="characterTags"
+                                :tags="tags"
+                                style="flex: 1"
+                            ></select-tag>
+                        </div>
+
                         <div class="character-extra-config" v-if="characterNeedConfig">
                             <item-config
                                 v-model="characterConfig"
@@ -656,6 +665,7 @@ import SelectArtifact from "@/components/select/SelectArtifact.vue"
 import SelectArtifactSet from "@c/select/SelectArtifactSet"
 import SelectCharacter from "@/components/select/SelectCharacter.vue"
 import SelectCharacterLevel from "@/components/select/SelectCharacterLevel.vue"
+import SelectTag from "@/components/select/SelectTag.vue"
 import SelectWeapon from "@/components/select/SelectWeapon.vue"
 import SelectWeaponLevel from "@/components/select/SelectWeaponLevel.vue"
 import SelectTargetFunction from "@/components/select/SelectTargetFunction.vue"
@@ -677,8 +687,8 @@ import EnemyConfigComponent from "./EnemyConfig"
 import SelectArtifactMainStat from "@c/select/SelectArtifactMainStat"
 import ArtifactConfig from "./ArtifactConfig.vue"
 import DamageAnalysis from "@/components/display/DamageAnalysis"
-import {getObjectConfigUnlinked, useGlobalConfig} from "@/composables/globalConfig"
-import {getDefaultCharacterConfig, useCharacter, useCharacterSkill} from "@/composables/character"
+import {getObjectConfigUnlinked, useGlobalConfig, processSharedGlobalConfig} from "@/composables/globalConfig"
+import {getDefaultCharacterConfig, getDefaultCharacterTag, useCharacter, useCharacterSkill} from "@/composables/character"
 import {useEnemy} from "@/composables/enemy"
 import {getDefaultWeaponConfig, useWeapon} from "@/composables/weapon"
 import {getDefaultTargetFunctionConfig, useTargetFunction} from "@/composables/targetFunction"
@@ -715,6 +725,7 @@ import {ElMessage} from "element-plus"
 import "element-plus/es/components/message/style/css"
 import SelectElementType from "@/components/select/SelectElementType.vue";
 import { add, get } from "lodash"
+import { useTag } from "@/composables/tag"
 
 // stores
 const presetStore = usePresetStore()
@@ -731,6 +742,32 @@ const route = useRoute()
 // i18n
 const { t, ta } = useI18n()
 
+// props
+interface CharacterFullInterface {
+    character: any,
+    weapon: any,
+    buffs: any,
+    artifacts: any,
+    artifact_config: any,
+    skill: any,
+
+    character_id: number,
+    team_id: number,
+    on_field: boolean,
+}
+
+const props = defineProps<{
+    characters: CharacterFullInterface[],
+    currentCharacterId: number,
+    currentTeamId: number,
+    currentOnField: boolean,
+    teamSharedGlobalConfig: any,
+}>()
+
+const emit = defineEmits<{
+  (e: 'update:interface', v: CharacterFullInterface): void
+  (e: 'update:configList', v: any): void
+}>()
 
 //////////////////////////////////////////////////////////
 // set preset from other place
@@ -738,6 +775,7 @@ function setPresetFromRoute() {
     const presetName = history.state?.presetName
     if (presetName && typeof presetName === "string") {
         usePreset(presetName)
+        history.replaceState(null, "")
     }
 }
 
@@ -758,6 +796,13 @@ function handleClickEnemyConfig() {
     showEnemyConfigDialog.value = true
 }
 
+////////////////////////////////////////////////////////
+// tag
+
+const {
+    tags,
+} = useTag()
+
 
 ////////////////////////////////////////////////////////
 // character
@@ -777,6 +822,7 @@ const {
     characterConfigConfig,
     characterInterface,
     characterLocale,
+    characterTags,
 } = useCharacter()
 
 const {
@@ -1068,6 +1114,7 @@ function usePreset(name: string) {
         characterSkill2.value = c.skill2 + 1
         characterSkill3.value = c.skill3 + 1
         characterConfig.value = deepMerge(restoreObjectConfig(c.params, c.params, c.configUnlinked ?? {}), getDefaultCharacterConfig(c.name))
+        characterTags.value = c.tags ?? getDefaultCharacterTag(c.name)
     }
 
     // use weapon
@@ -1173,8 +1220,8 @@ const {
     updateGlobalConfig
 } = useGlobalConfig()
 
-watchEffect(() => {
-    setGlobalConfig([
+function getConfigList() {
+    return [
         {
             configConfig: characterConfigConfig.value,
             config: characterConfig.value[characterName.value]
@@ -1211,9 +1258,51 @@ watchEffect(() => {
             configConfig: artifactsData[key].config4,
             config: artifactSingleConfig.value["config_" + toSnakeCase(artifactsData[key].name2)]
         })),
-    ])
+    ]
+}
+
+watchEffect(() => {
+    setGlobalConfig(getConfigList(), props.teamSharedGlobalConfig)
 }, {
     flush: "post"
+})
+
+////////////////////////////////////////////////////////////////////////
+// return
+
+const characterFullInterface = computed(() => {
+    return {
+        character: characterInterface.value,
+        weapon: weaponInterface.value,
+        buffs: buffsInterface.value,
+        artifacts: artifactWasmFormat.value,
+        artifact_config: artifactConfigForCalculator.value,
+        skill: characterSkillInterface.value,
+
+        character_id: props.currentCharacterId,
+        team_id: props.currentTeamId,
+        on_field: props.currentOnField,
+    }
+})
+
+watch(characterFullInterface, (v) => {
+    emit("update:interface", v)
+}, {
+    deep: true,
+    flush: "post",
+    immediate: true,
+})
+
+const characterFullConfigList = computed(() => {
+    return processSharedGlobalConfig(getConfigList())
+})
+
+watch(characterFullConfigList, (v) => {
+    emit("update:configList", v)
+}, {
+    deep: true,
+    flush: "post",
+    immediate: true,
 })
 
 
@@ -1224,13 +1313,10 @@ const damageAnalysisComponent = ref<null | InstanceType<typeof DamageAnalysis>>(
 
 const damageAnalysisWasmInterface = computed(() => {
     return {
-        character: characterInterface.value,
-        weapon: weaponInterface.value,
-        buffs: buffsInterface.value,
-        artifacts: artifactWasmFormat.value,
-        artifact_config: artifactConfigForCalculator.value,
-        skill: characterSkillInterface.value,
+        characters: props.characters,
         enemy: enemyInterface.value,
+
+        active_character_id: props.currentCharacterId,
     }
 })
 
@@ -1305,12 +1391,9 @@ function handleDisplayEventAnalysis(eventAnalysis: any) {
 // attribute
 const getAttributeWasmInterface = computed(() => {
     return {
-        character: characterInterface.value,
-        weapon: weaponInterface.value,
-        buffs: buffsInterface.value,
-        artifacts: artifactWasmFormat.value,
-        artifact_config: artifactConfigForCalculator.value,
-        skill: characterSkillInterface.value,
+        characters: props.characters,
+
+        active_character_id: props.currentCharacterId,
     }
 })
 
@@ -1328,12 +1411,11 @@ const showArtifactPerBonusDialog = ref(false)
 
 const bonusPerStatWasmInterface = computed(() => {
     return {
-        character: characterInterface.value,
-        weapon: weaponInterface.value,
-        artifacts: artifactWasmFormat.value,
+        characters: props.characters,
+        enemy: enemyInterface.value,
+
+        active_character_id: props.currentCharacterId,
         tf: targetFunctionInterface.value,
-        buffs: buffsInterface.value,
-        artifacts_config: artifactConfigForCalculator.value
     }
 })
 
@@ -1495,12 +1577,11 @@ function getOptimizeArtifactWasmInterface() {
     }
 
     const i = {
-        character: characterInterface.value,
-        weapon: weaponInterface.value,
+        characters: props.characters,
+
+        active_character_id: props.currentCharacterId,
         target_function: targetFunctionInterface.value,
         constraint: constraintInterface.value,
-        buffs: buffsInterface.value,
-        artifact_config,
         algorithm: algorithm.value,
     }
 

@@ -83,6 +83,7 @@ struct ResultRecorder<'a> {
     constraint: &'a ConstraintConfig,
     buffs: &'a [Box<dyn Buff<SimpleAttribute>>],
     enemy: Enemy,
+    attribute: &'a SimpleAttribute,
 }
 
 impl<'a> ResultRecorder<'a> {
@@ -94,7 +95,8 @@ impl<'a> ResultRecorder<'a> {
         enemy: &'a Enemy,
         constraint: &'a ConstraintConfig,
         buffs: &'a [Box<dyn Buff<SimpleAttribute>>],
-        result_count: usize
+        attribute: &'a SimpleAttribute,
+        result_count: usize,
     ) -> Self {
         let mut enemy = enemy.clone();
 
@@ -121,6 +123,7 @@ impl<'a> ResultRecorder<'a> {
             constraint,
             buffs,
             enemy,
+            attribute: attribute,
         }
     }
 
@@ -129,7 +132,8 @@ impl<'a> ResultRecorder<'a> {
             artifacts: arts
         };
 
-        let attribute = AttributeUtils::create_attribute_from_big_config(
+        let attribute = AttributeUtils::change_attribute_without_skill(
+            self.attribute.clone(),
             &artifact_list,
             &self.artifact_config,
             self.character,
@@ -615,13 +619,13 @@ impl<'a> SingleOptimizer<'a> {
 pub struct AStarCutoff;
 
 impl SingleOptimizeAlgorithm for AStarCutoff {
-    fn optimize(&self, artifacts: &[&Artifact], artifact_config: Option<ArtifactEffectConfig>, character: &Character<SimpleAttribute>, weapon: &Weapon<SimpleAttribute>, target_function: &Box<dyn TargetFunction>, enemy: &Enemy, buffs: &[Box<dyn Buff<SimpleAttribute>>], constraint: &ConstraintConfig, count: usize) -> Vec<OptimizationResult> {
+    fn optimize(&self, artifacts: &[&Artifact], artifact_config: Option<ArtifactEffectConfig>, character: &Character<SimpleAttribute>, weapon: &Weapon<SimpleAttribute>, target_function: &Box<dyn TargetFunction>, enemy: &Enemy, buffs: &[Box<dyn Buff<SimpleAttribute>>], attribute: &SimpleAttribute, constraint: &ConstraintConfig, count: usize) -> Vec<OptimizationResult> {
         let (flowers, feathers, sands, goblets, heads) = get_per_slot_artifacts(&artifacts);
 
         let any_zero = vec![flowers, feathers, sands, goblets, heads].iter().any(|x| x.len() == 0);
         if any_zero {
             let naive_algo = CutoffAlgorithmHeuristic { use_heuristic: false };
-            return naive_algo.optimize(artifacts, artifact_config, character, weapon, target_function, enemy, buffs, constraint, count);
+            return naive_algo.optimize(artifacts, artifact_config, character, weapon, target_function, enemy, buffs, attribute, constraint, count);
         }
 
         let single_optimizer = SingleOptimizer::new(artifacts, constraint);
@@ -633,6 +637,7 @@ impl SingleOptimizeAlgorithm for AStarCutoff {
             &enemy,
             constraint,
             buffs,
+            attribute,
             count,
         );
         single_optimizer.optimize(&mut res_rec)

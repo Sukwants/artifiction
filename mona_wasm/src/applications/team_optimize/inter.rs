@@ -74,7 +74,7 @@ impl TeamInterface {
         let mut members: Vec<TeamEntry<A>> = Vec::new();
 
         for i in 0..self.characters.len() {
-            let character = self.characters[i].to_character();
+            let character = self.characters[i].to_character(true);
             let weapon = self.weapons[i].to_weapon(&character);
             let member = TeamEntry {
                 character, weapon,

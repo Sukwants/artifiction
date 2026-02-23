@@ -1,11 +1,13 @@
 use serde::{Serialize, Deserialize};
-use mona::artifacts::{Artifact, ArtifactSlotName};
+use mona::artifacts::{Artifact, ArtifactList, ArtifactSlotName};
+use mona::artifacts::effect_config::ArtifactEffectConfig;
 use mona::attribute::{Attribute, SimpleAttribute};
 use mona::buffs::buff_name::BuffName;
 use mona::buffs::{Buff, BuffConfig};
 use mona::character::{Character, CharacterConfig, CharacterName};
 use mona::character::skill_config::CharacterSkillConfig;
-use mona::common::StatName;
+use mona::character::team_status::{CharacterStatus, CharacterTag, CharacterTags};
+use mona::common::{StatName, CharacterFullInfo};
 use mona::enemies::Enemy;
 use mona::potential_function::potential_function::PotentialFunction;
 use mona::potential_function::potential_function_config::PotentialFunctionConfig;
@@ -29,6 +31,7 @@ pub struct CharacterInterface {
     pub skill2: usize,
     pub skill3: usize,
     pub params: CharacterConfig,
+    pub tags: Vec<CharacterTag>,
 }
 
 fn default_false() -> bool {
@@ -36,7 +39,7 @@ fn default_false() -> bool {
 }
 
 impl CharacterInterface {
-    pub fn to_character<T: Attribute>(&self) -> Character<T> {
+    pub fn to_character<T: Attribute>(&self, on_field: bool) -> Character<T> {
         Character::new(
             self.name,
             self.level,
@@ -45,7 +48,9 @@ impl CharacterInterface {
             self.skill1,
             self.skill2,
             self.skill3,
-            &self.params
+            &self.params,
+            &self.tags.iter().cloned().collect(),
+            on_field,
         )
     }
 }
@@ -196,5 +201,54 @@ impl PotentialFunctionInterface {
         let no_config = PotentialFunctionConfig::NoConfig;
         let config = self.config.as_ref().unwrap_or(&no_config);
         self.name.create(config)
+    }
+}
+
+#[derive(Serialize, Deserialize)]
+pub struct CharacterFullInterface {
+    pub character: CharacterInterface,
+    pub weapon: WeaponInterface,
+    pub buffs: Vec<BuffInterface>,
+    pub artifacts: Vec<Artifact>,
+    pub artifact_config: Option<ArtifactEffectConfig>,
+    pub skill: Option<SkillInterface>,
+
+    pub character_id: usize,
+    pub team_id: usize,
+    pub on_field: bool,
+}
+
+pub type CharactersInterface = Vec<Option<CharacterFullInterface>>;
+
+impl CharacterFullInterface {
+    pub fn get_characters<'a, A: Attribute>(input: &'a Vec<Option<CharacterFullInterface>>) -> Vec<CharacterFullInfo<'a, A>> {
+
+        let mut characters: Vec<CharacterFullInfo<A>> = Vec::new();
+
+        for c in input.iter() {
+            if let Some(c) = c {
+                characters.push(CharacterFullInfo {
+                    character: c.character.to_character(c.on_field),
+                    weapon: c.weapon.to_weapon(&c.character.to_character(c.on_field)),
+                    buffs: c.buffs.iter().map(|x| x.to_buff()).collect(),
+                    artifacts: c.artifacts.iter().collect(),
+                    artifact_config: match &c.artifact_config {
+                        Some(x) => x.clone(),
+                        None => Default::default()
+                    },
+                    skill_config: if let Some(skill) = &c.skill { skill.config.clone() } else { CharacterSkillConfig::NoConfig },
+                    skill_index: if let Some(skill) = &c.skill { skill.index } else { usize::MAX },
+                    character_status: CharacterStatus::new(
+                        c.character_id,
+                        c.team_id,
+                        c.on_field,
+                        c.character.name.get_static_data(),
+                        c.character.tags.iter().cloned().collect(),
+                    ),
+                });
+            }
+        }
+
+        characters
     }
 }

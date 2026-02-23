@@ -20,7 +20,7 @@ impl CommonInterface {
 
         let artifacts: Vec<Artifact> = serde_wasm_bindgen::from_value(artifacts).unwrap();
 
-        let character = character_interface.to_character();
+        let character = character_interface.to_character(true);
         let weapon = weapon_interface.to_weapon(&character);
         let target_function = tf_interface.to_target_function(&character, &weapon);
 

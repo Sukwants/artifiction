@@ -123,7 +123,6 @@ impl AttributeGraphResult for ComplicatedAttributeGraphResult {
 #[derive(Clone)]
 pub struct ComplicatedAttributeGraph {
     pub nodes: ComplicatedAttributeGraphResult,
-    pub fixed: HashMap<AttributeNode, (String, f64)>,
     pub edges: Vec<Edge>,
     pub characters: Vec<CharacterStatus>,
 }
@@ -133,7 +132,7 @@ impl AttributeGraph for ComplicatedAttributeGraph {
     type ResultType = ComplicatedAttributeGraphResult;
 
     fn set_value_to_internal(&mut self, node: AttributeNode, key: &str, value: f64) {
-        self.fixed.insert(node, (String::from(key), value));
+        (*self.nodes.get_attribute_mut(node)).set_value_to(key, value);
     }
 
     fn set_value_by_internal(&mut self, node: AttributeNode, key: &str, value: f64) {
@@ -180,7 +179,6 @@ impl AttributeGraph for ComplicatedAttributeGraph {
     fn new_with_characters(characters: Vec<CharacterStatus>) -> Self {
         ComplicatedAttributeGraph {
             nodes: ComplicatedAttributeGraphResult::new(),
-            fixed: HashMap::new(),
             edges: Vec::new(),
             characters,
         }
@@ -239,10 +237,6 @@ impl ComplicatedAttributeGraph {
                 solve_edge(edge, &result, &mut temp, 1.0);
             }
             result = temp.clone();
-        }
-
-        for (node, (key, value)) in self.fixed.iter() {
-            result.get_attribute_mut(*node).set_value_to(key, *value);
         }
 
         result

@@ -219,6 +219,12 @@ pub enum ItemConfigType {
         default: f64,
         global_link: GlobalLinkConfig,
     },
+    GlobalLinkInt {
+        min: i32,
+        max: i32,
+        default: i32,
+        global_link: GlobalLinkConfig,
+    },
     GlobalLinkMoonsign3 {
         default: Moonsign,
         global_link: GlobalLinkConfig,
@@ -264,6 +270,9 @@ impl ItemConfig {
 
     pub const fn MOONSIGN_GLOBAL(default: Moonsign, priority: usize) -> ItemConfig {
         return ItemConfig { name: "moonsign", title: locale!(zh_cn: "月兆", en: "Moonsign"), config: ItemConfigType::GlobalLinkMoonsign3 { default, global_link: GlobalLinkConfig { key: "moonsign", priority, team_shared: true } } };
+    }
+    pub const fn GLEAMING_MOON_EFFECT(default: usize, priority: usize) -> ItemConfig {
+        return ItemConfig { name: "gleaming_moon_effect_count", title: locale!(zh_cn: "「月辉明光」数量", en: "Gleaming Moon Effect Count"), config: ItemConfigType::GlobalLinkInt { min: 0, max: 2, default: default as i32, global_link: GlobalLinkConfig { key: "gleaming_moon_effect_count", priority, team_shared: true } } };
     }
     pub const fn HEXEREI_SECRET_RITE_GLOBAL(default: bool, priority: usize) -> ItemConfig {
         return ItemConfig { name: "hexerei_secret_rite", title: locale!(zh_cn: "魔导·秘仪", en: "Hexerei Secret Rite"), config: ItemConfigType::GlobalLinkBool { default, global_link: GlobalLinkConfig { key: "hexerei_secret_rite", priority, team_shared: true } } };

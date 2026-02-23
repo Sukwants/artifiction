@@ -61,6 +61,7 @@ pub struct ValueFunction<'a> {
     pub target_function: &'a Box<dyn TargetFunction>,
     pub buffs: &'a [Box<dyn Buff<SimpleAttribute>>],
     pub enemy: &'a Enemy,
+    pub attribute: &'a SimpleAttribute,
     pub constraint: &'a ConstraintConfig,
 }
 
@@ -69,7 +70,8 @@ impl<'a> ValueFunction<'a> {
         let art_list = ArtifactList {
             artifacts: arts,
         };
-        let attribute = AttributeUtils::create_attribute_from_big_config(
+        let attribute = AttributeUtils::change_attribute_without_skill(
+            self.attribute.clone(),
             &art_list,
             &self.artifact_effect_config,
             &self.character,

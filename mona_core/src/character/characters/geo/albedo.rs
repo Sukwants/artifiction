@@ -1,20 +1,4 @@
-use num_traits::FromPrimitive;
-use crate::attribute::*;
-use crate::buffs::buffs::common;
-use crate::character::character_common_data::CharacterCommonData;
-use crate::character::character_sub_stat::CharacterSubStatFamily;
-use crate::character::{CharacterConfig, CharacterName, CharacterStaticData};
-use crate::character::skill_config::CharacterSkillConfig;
-use crate::character::traits::{CharacterSkillMap, CharacterSkillMapItem, CharacterTrait};
-use crate::character::macros::{damage_enum, skill_map};
-use crate::common::{ChangeAttribute, DamageResult, Element, MoonglareReaction, Moonsign, SkillType, StatName, WeaponType};
-use crate::common::i18n::{locale, hit_n_dmg, plunging_dmg, charged_dmg};
-use crate::common::item_config_type::{ItemConfig, ItemConfigType};
-use crate::damage::damage_builder::DamageBuilder;
-use crate::damage::DamageContext;
-use crate::target_functions::TargetFunction;
-use crate::team::TeamQuantization;
-use crate::weapon::weapon_common_data::WeaponCommonData;
+use crate::character::characters::prelude::*;
 
 pub struct AlbedoSkillType {
     pub normal_dmg1: [f64; 15],
@@ -86,42 +70,58 @@ const ALBEDO_STATIC_DATA: CharacterStaticData = CharacterStaticData {
 
 pub struct AlbedoEffect {
     pub hexerei_secret_rite: bool,
-    pub is_hexerei: bool,
     pub common_data: CharacterCommonData,
 }
 
 impl<A: Attribute> ChangeAttribute<A> for AlbedoEffect {
     fn change_attribute(&self, attribute: &mut A) {
         if self.hexerei_secret_rite {
-            let mut add_effect = |at: AttributeName| {
-                attribute.add_edge1(
-                    AttributeName::DEF,
-                    AttributeName::BonusNormalAttack,
-                    if self.is_hexerei {
-                        Box::new(move |def, _| { (def / 1000.0 * 0.14).min(0.42) })
-                    } else {
-                        Box::new(move |def, _| { (def / 1000.0 * 0.04).min(0.12) })
-                    },
-                    Box::new(move |def, _, grad| (0.0, 0.0)),
-                    "天赋3：魔女的前夜礼·白芒之书"
+            for skill in vec![
+                SkillType::NormalAttack,
+                SkillType::ChargedAttack,
+                SkillType::PlungingAttackInAction,
+                SkillType::PlungingAttackOnGround,
+                SkillType::ElementalSkill,
+                SkillType::ElementalBurst,
+            ] {
+                attribute.add_edge_s1to1(
+                    CharacterSelector::select_all(attribute),
+                    AttributeType::Panel(AttributeName::DEF),
+                    AttributeType::Invisible(InvisibleAttributeType::new_skill(AttributeVariableType::Bonus, skill)),
+                    Arc::new(move |def, _| { (def / 1000.0 * 0.04).min(0.12) }),
+                    "阿贝多天赋3",
+                    EdgePriority::Invisible,
                 );
-            };
-            add_effect(AttributeName::BonusNormalAttack);
-            add_effect(AttributeName::BonusChargedAttack);
-            add_effect(AttributeName::BonusPlungingAttack);
-            add_effect(AttributeName::BonusElementalSkill);
-            add_effect(AttributeName::BonusElementalBurst);
+
+                attribute.add_edge_s1to1(
+                    CharacterSelector::select_by_tag(attribute, CharacterTag::Hexerei),
+                    AttributeType::Panel(AttributeName::DEF),
+                    AttributeType::Invisible(InvisibleAttributeType::new_skill(AttributeVariableType::Bonus, skill)),
+                    Arc::new(move |def, _| { (def / 1000.0 * 0.10).min(0.30) }),
+                    "阿贝多天赋3",
+                    EdgePriority::Invisible,
+                );
+            }
         }
 
         if self.common_data.constellation >= 1 {
-            attribute.add_def_percentage("命座1：伊甸之花", 0.5);
+            attribute.add_def_percentage("阿贝多命座1", 0.5);
         }
 
         if self.common_data.constellation >= 4 {
+            attribute.set_value_by_s(
+                CharacterSelector::select_all_onfield(attribute),
+                AttributeType::Invisible(InvisibleAttributeType::new_skill(AttributeVariableType::Bonus, SkillType::PlungingAttackInAction)),
+                "阿贝多命座4",
+                0.3
+            );
             if self.hexerei_secret_rite {
-                attribute.set_value_by(AttributeName::BonusPlungingAttack, "命座4：神性之陨", 0.6);
-            } else {
-                attribute.set_value_by(AttributeName::BonusPlungingAttack, "命座4：神性之陨", 0.3);
+                attribute.set_value_by_s(
+                    CharacterSelector::select_all_onfield(attribute),
+                    AttributeType::Invisible(InvisibleAttributeType::new_skill(AttributeVariableType::Bonus, SkillType::PlungingAttackOnGround)),
+                    "阿贝多命座4",
+                    if self.hexerei_secret_rite { 0.6 } else { 0.3 }
+                );
             }
         }
     }
@@ -187,6 +187,10 @@ impl CharacterTrait for Albedo {
     type DamageEnumType = AlbedoDamageEnum;
     type RoleEnum = AlbedoRoleEnum;
 
+    const DEFAULT_TAGS: Option<&'static [CharacterTag]> = Some(
+        &[CharacterTag::Hexerei]
+    );
+
     #[cfg(not(target_family = "wasm"))]
     const SKILL_MAP: CharacterSkillMap = CharacterSkillMap {
         skill1: Some(&[
@@ -215,7 +219,6 @@ impl CharacterTrait for Albedo {
     #[cfg(not(target_family = "wasm"))]
     const CONFIG_DATA: Option<&'static [ItemConfig]> = Some(&[
         ItemConfig::HEXEREI_SECRET_RITE_GLOBAL(false, ItemConfig::PRIORITY_CHARACTER),
-        ItemConfig::IS_HEXEREI(true, ItemConfig::PRIORITY_CHARACTER),
     ]);
 
     #[cfg(not(target_family = "wasm"))]
@@ -247,12 +250,42 @@ impl CharacterTrait for Albedo {
         ItemConfig {
             name: "crystallize_shield",
             title: locale!(
-                zh_cn: "处于结晶反应产生的护盾庇护下",
-                en: "Protected by a shield created by Crystallize"
+                zh_cn: "处于结晶反应产生的护盾庇护下或附近存在月笼",
+                en: "Protected by a shield created by Crystallize or Moondrifts are present nearby"
             ),
             config: ItemConfigType::Bool { default: false }
         },
     ]);
+
+    fn change_attribute<A: Attribute>(attribute: &mut A, common_data: &CharacterCommonData, skill_config: &CharacterSkillConfig) {
+        let hexerei_secret_rite = match &common_data.config {
+            CharacterConfig::Albedo { hexerei_secret_rite } => *hexerei_secret_rite,
+            _ => false,
+        };
+
+        let (lower50, activated_q, fatal_count, crystallize_shield) = match *skill_config {
+
+            CharacterSkillConfig::Albedo { lower50, activated_q, fatal_count, crystallize_shield } => (lower50, activated_q, fatal_count, crystallize_shield),
+            _ => (false, false, 0, false)
+        };
+
+        if common_data.has_talent2 && activated_q {
+            attribute.set_value_by_s(CharacterSelector::select_all(attribute),
+                AttributeType::Panel(AttributeName::ElementalMastery),
+                "阿贝多天赋2",
+                125.0
+            );
+        }
+
+        if common_data.constellation >= 6 && crystallize_shield {
+            attribute.set_value_by_s(
+                CharacterSelector::select_all_onfield(attribute),
+                AttributeType::Invisible(InvisibleAttributeType::new_any(AttributeVariableType::Bonus)),
+                "阿贝多命座6",
+                0.17,
+            );
+        }
+    }
 
     fn damage_internal<D: DamageBuilder>(context: &DamageContext<'_, D::AttributeType>, s: usize, config: &CharacterSkillConfig, fumo: Option<Element>) -> D::Result {
         let s = num::FromPrimitive::from_usize(s).unwrap();
@@ -261,9 +294,9 @@ impl CharacterTrait for Albedo {
         let s2 = context.character_common_data.skill2;
         let s3 = context.character_common_data.skill3;
 
-        let (hexerei_secret_rite, is_hexerei) = match &context.character_common_data.config {
-            CharacterConfig::Albedo { hexerei_secret_rite, is_hexerei } => (*hexerei_secret_rite, *is_hexerei),
-            _ => (false, false),
+        let hexerei_secret_rite = match &context.character_common_data.config {
+            CharacterConfig::Albedo { hexerei_secret_rite } => *hexerei_secret_rite,
+            _ => false,
         };
 
         let (lower50, activated_q, fatal_count, crystallize_shield) = match *config {
@@ -302,32 +335,26 @@ impl CharacterTrait for Albedo {
             builder.add_atk_ratio("技能倍率", ratio)
         }
 
-        if s == ETransientBlossom && context.character_common_data.has_talent1 && lower50{
-            builder.add_extra_bonus("天赋1：白垩色的威压", 0.25);
-            if hexerei_secret_rite {
-                builder.add_def_ratio("天赋1：白垩色的威压", 2.40);
+        if s == ETransientBlossom && context.character_common_data.has_talent1 {
+            if lower50 {
+                builder.add_extra_bonus("阿贝多天赋1", 0.25);
             }
-        }
-
-        if context.character_common_data.has_talent2 && activated_q {
-            builder.add_extra_em("天赋2：瓶中人的天慧", 125.0);
+            if hexerei_secret_rite {
+                builder.add_def_ratio("阿贝多天赋1", 2.40);
+            }
         }
 
         if s.get_skill_type() == SkillType::ElementalBurst && context.character_common_data.constellation >= 2 {
             if (s == Q1 || s == QFatalBlossom) && context.character_common_data.constellation >= 6 {
-                builder.add_def_ratio("命座2：显生之宙", 0.3 * 4.0);
+                builder.add_def_ratio("阿贝多命座2", 0.3 * 4.0);
             } else if fatal_count > 0 {
-                builder.add_def_ratio("命座2：显生之宙", 0.3 * fatal_count as f64);
+                builder.add_def_ratio("阿贝多命座2", 0.3 * fatal_count as f64);
             }
         }
 
         if context.character_common_data.constellation >= 6 {
-            if crystallize_shield {
-                builder.add_extra_bonus("命座6：无垢之土", 0.17);
-            }
-
             if (s == QFatalBlossom || s == C2) && activated_q {
-                builder.add_def_ratio("命座6：无垢之土", 2.50);
+                builder.add_def_ratio("阿贝多命座6", 2.50);
             }
         }
 
@@ -342,13 +369,12 @@ impl CharacterTrait for Albedo {
     }
 
     fn new_effect<A: Attribute>(common_data: &CharacterCommonData, config: &CharacterConfig) -> Option<Box<dyn ChangeAttribute<A>>> {
-        let (hexerei_secret_rite, is_hexerei) = match *config {
-            CharacterConfig::Albedo { hexerei_secret_rite, is_hexerei } => (hexerei_secret_rite, is_hexerei),
-            _ => (false, false),
+        let hexerei_secret_rite = match *config {
+            CharacterConfig::Albedo { hexerei_secret_rite } => hexerei_secret_rite,
+            _ => false,
         };
         Some(Box::new(AlbedoEffect {
             hexerei_secret_rite: hexerei_secret_rite,
-            is_hexerei: is_hexerei,
             common_data: common_data.clone(),
         }))
     }

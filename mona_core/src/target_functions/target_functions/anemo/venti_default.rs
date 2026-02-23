@@ -63,9 +63,9 @@ impl TargetFunction for VentiDefaultTargetFunction {
             enemy
         };
 
-        let config1 = CharacterSkillConfig::Venti { activated_q: false, active: true, breeze_blow: false };
-        let config2 = CharacterSkillConfig::Venti { activated_q: true, active: true, breeze_blow: true };
-        let config3 = CharacterSkillConfig::Venti { activated_q: false, active: true, breeze_blow: true };
+        let config1 = CharacterSkillConfig::Venti { activated_q: false, breeze_blow: false };
+        let config2 = CharacterSkillConfig::Venti { activated_q: true, breeze_blow: true };
+        let config3 = CharacterSkillConfig::Venti { activated_q: false, breeze_blow: true };
 
         type Ty = <Venti as CharacterTrait>::DamageEnumType;
 

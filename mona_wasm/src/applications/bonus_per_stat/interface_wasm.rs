@@ -1,9 +1,12 @@
-use mona::attribute::SimpleAttribute;
+use mona::artifacts::ArtifactList;
+use mona::attribute::*;
+use mona::character::team_status::CharacterStatus;
+use mona::common::CharacterFullInfo;
 use serde::{Serialize, Deserialize};
 use wasm_bindgen::JsValue;
 use wasm_bindgen::prelude::*;
 use crate::applications::bonus_per_stat::bonus_per_stat::{BonusPerStatInput, BonusPerStatOutput};
-use crate::applications::common::{BuffInterface, CharacterInterface, TargetFunctionInterface, WeaponInterface};
+use crate::applications::common::{BuffInterface, CharacterInterface, TargetFunctionInterface, WeaponInterface, EnemyInterface, CharacterFullInterface, CharactersInterface};
 use mona::artifacts::Artifact;
 use mona::artifacts::effect_config::ArtifactEffectConfig;
 use mona::target_functions::TargetFunction;
@@ -13,12 +16,11 @@ use super::bonus_per_stat::bonus_per_stat;
 
 #[derive(Serialize, Deserialize)]
 pub struct WasmInput {
-    pub character: CharacterInterface,
-    pub weapon: WeaponInterface,
-    pub artifacts: Vec<Artifact>,
+    pub characters: CharactersInterface,
+    pub enemy: Option<EnemyInterface>,
+
+    pub active_character_id: usize,
     pub tf: TargetFunctionInterface,
-    pub buffs: Vec<BuffInterface>,
-    pub artifacts_config: Option<ArtifactEffectConfig>
 }
 
 // #[wasm_bindgen]
@@ -54,25 +56,32 @@ impl BonusPerStat {
 
         let input: WasmInput = serde_wasm_bindgen::from_value(val).unwrap();
 
-        let character = input.character.to_character::<SimpleAttribute>();
-        let weapon = input.weapon.to_weapon(&character);
-        let artifacts_ref: Vec<&Artifact> = input.artifacts.iter().collect();
+        let characters = CharacterFullInterface::get_characters(&input.characters);
+
+        let attribute = AttributeUtils::create_attribute_from_list_except_active_character(&characters, input.active_character_id);
+        let active_character = CharacterFullInfo::get_character(&characters, input.active_character_id);
+
         let tf: Box<dyn TargetFunction> = if input.tf.use_dsl {
             Box::new(TargetFunctionDSL::new(&input.tf.dsl_source.unwrap()))
         } else {
-            input.tf.to_target_function(&character, &weapon)
+            input.tf.to_target_function(&active_character.character, &active_character.weapon)
         };
-        let buffs: Vec<_> = input.buffs.iter().map(|b| b.to_buff()).collect();
-        let config_ref = input.artifacts_config.as_ref();
+
+        let enemy = if let Some(x) = &input.enemy {
+            x.to_enemy()
+        } else {
+            Default::default()
+        };
 
         let result = bonus_per_stat(BonusPerStatInput {
-            character: &character,
-            weapon: &weapon,
-            artifacts: &artifacts_ref,
-            enemy: &Default::default(),
+            character: &active_character.character,
+            weapon: &active_character.weapon,
+            artifacts: &active_character.artifacts,
+            enemy: &enemy,
             tf: &tf,
-            buffs: &buffs,
-            artifacts_config: config_ref
+            buffs: &active_character.buffs,
+            artifacts_config: Some(&active_character.artifact_config),
+            attribute: &attribute,
         });
 
         // utils::log!("{:?}", result.atk);

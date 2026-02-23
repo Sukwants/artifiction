@@ -1,21 +1,5 @@
-use num_derive::FromPrimitive;
-use crate::attribute::*;
-use crate::character::character_common_data::CharacterCommonData;
-use crate::character::character_sub_stat::CharacterSubStatFamily;
-use crate::character::{CharacterConfig, CharacterName, CharacterStaticData};
-use crate::character::skill_config::CharacterSkillConfig;
-use crate::character::traits::{CharacterSkillMap, CharacterSkillMapItem, CharacterTrait};
-use crate::common::{ChangeAttribute, Element, SkillType, StatName, WeaponType};
-use crate::common::item_config_type::{ItemConfig, ItemConfigType};
-use crate::damage::damage_builder::DamageBuilder;
-use crate::damage::DamageContext;
+use crate::character::characters::prelude::*;
 use crate::target_functions::target_functions::RazorDefaultTargetFunction;
-use crate::target_functions::TargetFunction;
-use crate::team::TeamQuantization;
-use crate::weapon::weapon_common_data::WeaponCommonData;
-use strum::EnumCount;
-use strum_macros::{EnumCount as EnumCountMacro, EnumString};
-use crate::common::i18n::{charged_dmg, hit_n_dmg, locale, plunging_dmg};
 
 pub struct RazorSkillType {
     pub normal_dmg1: [f64; 15],
@@ -82,7 +66,6 @@ pub const RAZOR_STATIC_DATA: CharacterStaticData = CharacterStaticData {
 };
 
 pub struct RazorEffect {
-    pub is_hexerei: bool,
     pub stack: f64,
     pub talent2_ratio: f64,
     pub has_talent2: bool,
@@ -91,12 +74,11 @@ pub struct RazorEffect {
 
 impl RazorEffect {
     pub fn new(common_data: &CharacterCommonData, config: &CharacterConfig) -> RazorEffect {
-        let (is_hexerei, stack, talent2_ratio) = match *config {
-            CharacterConfig::Razor { is_hexerei, e_stack, talent2_ratio } => (is_hexerei, e_stack, talent2_ratio),
-            _ => (false, 0.0, 0.0)
+        let (stack, talent2_ratio) = match *config {
+            CharacterConfig::Razor { e_stack, talent2_ratio } => (e_stack, talent2_ratio),
+            _ => (0.0, 0.0)
         };
         RazorEffect {
-            is_hexerei,
             stack,
             talent2_ratio,
             has_talent2: common_data.has_talent2,
@@ -182,6 +164,10 @@ impl CharacterTrait for Razor {
     type DamageEnumType = RazorDamageEnum;
     type RoleEnum = RazorRoleEnum;
 
+    const DEFAULT_TAGS: Option<&'static [CharacterTag]> = Some(
+        &[CharacterTag::Hexerei]
+    );
+
     #[cfg(not(target_family = "wasm"))]
     const SKILL_MAP: CharacterSkillMap = CharacterSkillMap {
         skill1: Some(&[
@@ -234,15 +220,10 @@ impl CharacterTrait for Razor {
         let s: RazorDamageEnum = num::FromPrimitive::from_usize(s).unwrap();
         let (s1, s2, s3) = context.character_common_data.get_3_skill();
 
-        let is_hexerei = match &context.character_common_data.config {
-            CharacterConfig::Razor { is_hexerei, .. } => *is_hexerei,
-            _ => false,
-        };
-
         use RazorDamageEnum::*;
         let mut builder = D::new();
 
-        if is_hexerei {
+        if context.character_common_data.tags.contains(&CharacterTag::Hexerei) {
             builder.add_extra_atk("天赋3：魔女的前夜礼·苍雷奔涌", context.attribute.get_atk() * 0.7);
         }
 

@@ -1,4 +1,5 @@
 use std::collections::HashMap;
+use mona::character::team_status::CharacterTag;
 use mona::common::i18n::I18nLocale;
 use mona::common::item_config_type::{ItemConfig, ItemConfigType};
 use serde_json::json;
@@ -195,6 +196,23 @@ pub fn config_to_json(config: &ItemConfig) -> String {
                 }
             })
         },
+        ItemConfigType::GlobalLinkInt { min, max, default, global_link } => {
+            json!({
+                "type": "globalLink",
+                "name": name,
+                "key": global_link.key,
+                "default": default,
+                "priority": global_link.priority,
+                "unlinked": false,
+                "team_shared": global_link.team_shared,
+                "config": {
+                    "type": "int",
+                    "title": title_index,
+                    "min": min,
+                    "max": max
+                }
+            })
+        },
         ItemConfigType::GlobalLinkMoonsign3 { default, global_link } => {
             json!({
                 "type": "globalLink",
@@ -211,6 +229,14 @@ pub fn config_to_json(config: &ItemConfig) -> String {
             })
         },
     };
+
+    j.to_string()
+}
+
+pub fn tag_to_json(tag: &CharacterTag) -> String {
+    let j = json!(
+        tag.to_string()
+    );
 
     j.to_string()
 }

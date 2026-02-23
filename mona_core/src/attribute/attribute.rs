@@ -130,7 +130,9 @@ pub trait Attribute {
 
     fn new(attribute: Self::GraphTy, character_id: usize) -> Self;
 
-    fn set_value_to_internal(&mut self, name: AttributeNode, key: &str, value: f64);
+    fn get_attribute(self) -> Self::GraphTy;
+
+    fn set_value_to_internal(&mut self, name: AttributeNode, key: &str, value: f64); // 请勿在同一 key 上混用 set_value_to 与 set_value_by，否则结果不作保证
 
     fn set_value_by_internal(&mut self, name: AttributeNode, key: &str, value: f64);
 
@@ -174,6 +176,10 @@ impl<GraphTy: AttributeGraph> Attribute for AttributeWithCharacter<GraphTy> {
             attribute,
             character_id,
         }
+    }
+
+    fn get_attribute(self) -> Self::GraphTy {
+        self.attribute
     }
 
     fn set_value_by_internal(&mut self, name: AttributeNode, key: &str, value: f64) {

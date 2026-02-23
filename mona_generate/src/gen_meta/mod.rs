@@ -4,4 +4,5 @@ pub mod gen_buff_meta;
 pub mod gen_character_meta;
 pub mod gen_pf_meta;
 pub mod gen_tf_meta;
+pub mod gen_tag_meta;
 pub mod gen_locale;

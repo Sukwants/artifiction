@@ -5,7 +5,7 @@ use mona::character::traits::{CharacterSkillMap, CharacterSkillMapItem};
 use mona::common::item_config_type::ItemConfig;
 use lazy_static::lazy_static;
 use crate::gen_meta::gen_locale::get_index_mapping;
-use crate::utils::config_to_json;
+use crate::utils::{config_to_json, tag_to_json};
 use crate::utils::icon_hashmap::ICON_HASHMAP;
 
 struct CharacterMeta {
@@ -26,6 +26,7 @@ struct CharacterMeta {
     skill_map3: Vec<SkillMapItem>,
     config: Vec<String>,
     config_skill: Vec<String>,
+    default_tags: Vec<String>,
 }
 
 struct SkillMapItem {
@@ -99,6 +100,12 @@ pub fn gen_character_meta_as_js_file() -> String {
         let icon_hash: String = icon_hashmap.get(meta.name.to_string().as_str())
             .map_or(String::new(), |&hash| hash.to_string());
 
+        let default_tags: Vec<String> = if let Some(tags) = name_enum.get_default_tags() {
+            tags.iter().map(|t| tag_to_json(&t)).collect()
+        } else {
+            Vec::new()
+        };
+
         data.push(CharacterMeta {
             name: meta.name.to_string(),
             internal_name: String::from(meta.internal_name),
@@ -114,7 +121,8 @@ pub fn gen_character_meta_as_js_file() -> String {
             skill_map2: s2,
             skill_map3: s3,
             config: config_data,
-            config_skill
+            config_skill,
+            default_tags,
         })
     }
 

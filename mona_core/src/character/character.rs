@@ -1,4 +1,5 @@
 use super::character_common_data::CharacterCommonData;
+use crate::character::team_status::CharacterTags;
 use crate::common::ChangeAttribute;
 use crate::attribute::*;
 use crate::character::CharacterName;
@@ -32,7 +33,9 @@ impl<T: Attribute> Character<T> {
         skill1: usize,
         skill2: usize,
         skill3: usize,
-        config: &CharacterConfig
+        config: &CharacterConfig,
+        tags: &CharacterTags,
+        on_field: bool,
     ) -> Character<T> {
         let common_data = CharacterCommonData::new(
             name,
@@ -42,7 +45,9 @@ impl<T: Attribute> Character<T> {
             skill1,
             skill2,
             skill3,
-            config
+            config,
+            tags,
+            on_field,
         );
         let effect = get_effect(name, &common_data, config);
 

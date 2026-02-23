@@ -100,6 +100,7 @@ export default {
         panel: "面板",
         lang: "语言",
         noData: "无数据",
+        tag: "标签",
     },
     ele: {
         Pyro: "火",
@@ -251,6 +252,8 @@ export default {
         skill: "技能",
         fumo: "附魔",
         skillConfig: "技能设置",
+        onField: "位于场上",
+        noTag: "无标签",
     },
     dmg: {
         electroCharged: "感电",

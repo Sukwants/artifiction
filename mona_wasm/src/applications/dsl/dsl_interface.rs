@@ -2,6 +2,7 @@ use mona::artifacts::{Artifact, ArtifactList};
 use mona::artifacts::effect_config::ArtifactEffectConfig;
 use mona::attribute::*;
 use mona::buffs::Buff;
+use mona::common::CharacterFullInfo;
 use mona_dsl::common::UnsafeDamageContext;
 use mona_dsl::compile_source_to_code_object;
 use mona_dsl::error::CompileError;
@@ -10,7 +11,7 @@ use mona_dsl::vm::env::MonaEnv;
 use mona_dsl::vm::stream::StringOutputStream;
 use wasm_bindgen::prelude::*;
 use serde::{Serialize, Deserialize};
-use crate::applications::common::{BuffInterface, CharacterInterface, EnemyInterface, WeaponInterface};
+use crate::applications::common::{BuffInterface, CharactersInterface, CharacterFullInterface, CharacterInterface, EnemyInterface, WeaponInterface};
 use crate::utils;
 
 pub struct DSLInterface;
@@ -24,11 +25,10 @@ pub struct RunResult {
 
 #[derive(Deserialize)]
 pub struct RunInput {
-    pub character: CharacterInterface,
-    pub weapon: WeaponInterface,
-    pub buffs: Vec<BuffInterface>,
-    pub artifact_config: Option<ArtifactEffectConfig>,
+    pub characters: CharactersInterface,
     pub enemy: Option<EnemyInterface>,
+
+    pub active_character_id: usize,
 }
 
 impl RunResult {
@@ -57,14 +57,11 @@ impl DSLInterface {
         let artifacts: Vec<Artifact> = serde_wasm_bindgen::from_value(artifacts).unwrap();
 
         // get all items
-        let character = damage_env.character.to_character::<SimpleAttribute>();
-        let weapon = damage_env.weapon.to_weapon(&character);
-        let buffs: Vec<Box<dyn Buff<SimpleAttribute>>> = damage_env.buffs.iter().map(|x| x.to_buff()).collect();
-        let artifacts_ref: Vec<&Artifact> = artifacts.iter().collect();
-        let artifact_config = match damage_env.artifact_config {
-            Some(x) => x,
-            None => Default::default()
-        };
+        let characters = CharacterFullInterface::get_characters(&damage_env.characters);
+
+        let attribute: SimpleAttribute = AttributeUtils::create_attribute_from_list_except_active_character(&characters, damage_env.active_character_id);
+        let active_character = CharacterFullInfo::get_character(&characters, damage_env.active_character_id);
+
         let enemy = if let Some(x) = damage_env.enemy {
             x.to_enemy()
         } else {
@@ -86,17 +83,10 @@ impl DSLInterface {
         env.set_ostream(Box::new(os));
 
         // set damage context
-        let attribute = AttributeUtils::create_attribute_from_big_config_result(
-            &ArtifactList { artifacts: &artifacts_ref },
-            &artifact_config,
-            &character,
-            &weapon,
-            &buffs
-        );
         let unsafe_context = UnsafeDamageContext {
-            character_common_data: &character.common_data,
+            character_common_data: &active_character.character.common_data,
             enemy: &enemy,
-            attribute: &attribute
+            attribute: &attribute.solve()
         };
         env.add_damage_context(unsafe_context);
         utils::log!("{:?}", env.damage_ctx.keys());

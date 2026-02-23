@@ -97,7 +97,10 @@ pub enum ReactionType {
     Vaporize,
     Spread,
     Aggravate,
-    Swirl,
+    CryoSwirl,
+    PyroSwirl,
+    HydroSwirl,
+    ElectroSwirl,
     Superconduct,
     Overload,
     Burning,
@@ -115,7 +118,10 @@ pub enum ReactionType {
 impl ReactionType {
     pub fn get_reaction_from_transformative_type(transformative_type: TransformativeType) -> ReactionType {
         match transformative_type {
-            TransformativeType::SwirlCryo | TransformativeType::SwirlPyro | TransformativeType::SwirlHydro | TransformativeType::SwirlElectro => ReactionType::Swirl,
+            TransformativeType::SwirlCryo => ReactionType::CryoSwirl,
+            TransformativeType::SwirlPyro => ReactionType::PyroSwirl,
+            TransformativeType::SwirlHydro => ReactionType::HydroSwirl,
+            TransformativeType::SwirlElectro => ReactionType::ElectroSwirl,
             TransformativeType::Superconduct => ReactionType::Superconduct,
             TransformativeType::Overload => ReactionType::Overload,
             TransformativeType::Burning => ReactionType::Burning,

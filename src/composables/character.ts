@@ -35,6 +35,10 @@ export function getDefaultCharacterConfig(name: string) {
     return res;
 }
 
+export function getDefaultCharacterTag(name: string) {
+    return characterData[name].defaultTags || []
+}
+
 export function useCharacter() {
     const characterName = ref(DEFAULT_CHARACTER)
     const characterLevel = ref("90")
@@ -78,6 +82,8 @@ export function useCharacter() {
         return ta(characterData[characterName.value].nameLocale)
     })
 
+    const characterTags = ref(getDefaultCharacterTag(characterName.value))
+
     const characterInterface = computed(() => {
         let i = {
             name: characterName.value,
@@ -87,7 +93,8 @@ export function useCharacter() {
             skill1: characterSkill1.value - 1,
             skill2: characterSkill2.value - 1,
             skill3: characterSkill3.value - 1,
-            params: getObjectConfigValue(characterConfig.value)
+            params: getObjectConfigValue(characterConfig.value),
+            tags: characterTags.value,
         }
         return i
     })
@@ -95,6 +102,7 @@ export function useCharacter() {
     watch(() => characterName.value, name => {
         characterName.value = name
         characterConfig.value = getDefaultCharacterConfig(name)
+        characterTags.value = getDefaultCharacterTag(name)
     }, {
         flush: "sync"
     })
@@ -115,6 +123,7 @@ export function useCharacter() {
         characterConfigConfig,
         characterInterface,
         characterLocale,
+        characterTags,
     }
 }
 

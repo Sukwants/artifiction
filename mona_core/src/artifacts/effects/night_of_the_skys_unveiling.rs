@@ -4,6 +4,7 @@ use crate::artifacts::effect::ArtifactEffect;
 use crate::artifacts::effect_config::ArtifactEffectConfig;
 use crate::attribute::*;
 use crate::character::character_common_data::CharacterCommonData;
+use crate::character::team_status::CharacterSelector;
 use crate::common::i18n::locale;
 use crate::common::item_config_type::{ItemConfig, ItemConfigType};
 use crate::common::Moonsign;
@@ -21,15 +22,15 @@ impl<A: Attribute> ArtifactEffect<A> for NightOfTheSkysUnveilingEffect {
     fn effect4(&self, attribute: &mut A) {
         match self.moonsign {
             Moonsign::Nascent => {
-                attribute.set_value_by(AttributeName::CriticalBase, "穹境示现之夜4", 0.15);
+                attribute.set_value_by_s(CharacterSelector::select_self_onfield(attribute), AttributeType::Panel(AttributeName::CriticalBase), "穹境示现之夜4", 0.15);
             }
             Moonsign::Ascendant => {
-                attribute.set_value_by(AttributeName::CriticalBase, "穹境示现之夜4", 0.30);
+                attribute.set_value_by_s(CharacterSelector::select_self_onfield(attribute), AttributeType::Panel(AttributeName::CriticalBase), "穹境示现之夜4", 0.30);
             }
             _ => {}
         }
 
-        attribute.set_value_by(AttributeName::EnhanceMoonglare, "穹境示现之夜4", 0.1 * self.gleaming_moon_effect_count as f64);
+        attribute.set_value_to_s(CharacterSelector::select_all(attribute), AttributeType::Panel(AttributeName::EnhanceMoonglare), "圣遗物套装效果：「月辉明光」效果", 0.1 * self.gleaming_moon_effect_count as f64);
     }
 }
 
@@ -71,10 +72,6 @@ impl ArtifactTrait for NightOfTheSkysUnveiling {
     #[cfg(not(target_family = "wasm"))]
     const CONFIG4: Option<&'static [ItemConfig]> = Some(&[
         ItemConfig::MOONSIGN_GLOBAL(Moonsign::None, ItemConfig::PRIORITY_ARTIFACT),
-        ItemConfig {
-            name: "gleaming_moon_effect_count",
-            title: locale!(zh_cn: "「月辉明光」数量", en: "Gleaming Moon Effect Count"),
-            config: ItemConfigType::Int { min: 0, max: 2, default: 1 },
-        }
+        ItemConfig::GLEAMING_MOON_EFFECT(1, ItemConfig::PRIORITY_ARTIFACT),
     ]);
 }

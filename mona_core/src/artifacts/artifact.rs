@@ -246,12 +246,19 @@ impl Artifact {
     }
 }
 
+#[derive(Default)]
 pub struct ArtifactList<'a> {
     pub artifacts: &'a [&'a Artifact]
     // pub artifacts: &'a SmallVec<[&'b Artifact; 5]>
 }
 
 impl<'a> ArtifactList<'a> {
+    pub fn new(artifacts: &'a [&'a Artifact]) -> ArtifactList<'a> {
+        ArtifactList {
+            artifacts
+        }
+    }
+    
     pub fn apply<T: Attribute>(&self, attribute: &mut T, character: &Character<T>, config: &ArtifactEffectConfig) {
         let mut attributes_hash: HashMap<StatName, f64> = HashMap::new();
         let mut set_name_count: HashMap<ArtifactSetName, i32> = HashMap::new();

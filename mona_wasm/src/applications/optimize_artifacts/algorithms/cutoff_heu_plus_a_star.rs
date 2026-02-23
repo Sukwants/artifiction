@@ -15,7 +15,7 @@ pub struct CutoffHeuristicPlusAStar;
 
 
 impl SingleOptimizeAlgorithm for CutoffHeuristicPlusAStar {
-    fn optimize(&self, artifacts: &[&Artifact], artifact_config: Option<ArtifactEffectConfig>, character: &Character<SimpleAttribute>, weapon: &Weapon<SimpleAttribute>, target_function: &Box<dyn TargetFunction>, enemy: &Enemy, buffs: &[Box<dyn Buff<SimpleAttribute>>], constraint: &ConstraintConfig, count: usize) -> Vec<OptimizationResult> {
+    fn optimize(&self, artifacts: &[&Artifact], artifact_config: Option<ArtifactEffectConfig>, character: &Character<SimpleAttribute>, weapon: &Weapon<SimpleAttribute>, target_function: &Box<dyn TargetFunction>, enemy: &Enemy, buffs: &[Box<dyn Buff<SimpleAttribute>>], attribute: &SimpleAttribute, constraint: &ConstraintConfig, count: usize) -> Vec<OptimizationResult> {
         let target_function_opt_config = target_function.get_target_function_opt_config();
 
         let artifacts_vec: Vec<&Artifact> = artifacts.iter().cloned().collect();
@@ -31,6 +31,7 @@ impl SingleOptimizeAlgorithm for CutoffHeuristicPlusAStar {
             target_function,
             enemy,
             buffs,
+            attribute,
             constraint,
             count
         )

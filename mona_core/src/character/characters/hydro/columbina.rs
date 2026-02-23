@@ -247,6 +247,10 @@ impl CharacterTrait for Columbina {
     type DamageEnumType = ColumbinaDamageEnum;
     type RoleEnum = ();
 
+    const DEFAULT_TAGS: Option<&'static [CharacterTag]> = Some(
+        &[CharacterTag::Moonsign]
+    );
+
     #[cfg(not(target_family = "wasm"))]
     const SKILL_MAP: CharacterSkillMap = CharacterSkillMap {
         skill1: skill_map!(

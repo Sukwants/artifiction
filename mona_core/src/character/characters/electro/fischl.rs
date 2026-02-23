@@ -1,21 +1,5 @@
-use num_derive::FromPrimitive;
-use crate::attribute::*;
-use crate::character::character_common_data::CharacterCommonData;
-use crate::character::character_sub_stat::CharacterSubStatFamily;
-use crate::character::{CharacterConfig, CharacterName, CharacterStaticData};
-use crate::character::skill_config::CharacterSkillConfig;
-use crate::character::traits::{CharacterSkillMap, CharacterSkillMapItem, CharacterTrait};
-use crate::common::{ChangeAttribute, Element, SkillType, WeaponType};
-use crate::common::item_config_type::ItemConfig;
-use crate::damage::damage_builder::DamageBuilder;
-use crate::damage::DamageContext;
+use crate::character::characters::prelude::*;
 use crate::target_functions::target_functions::FischlDefaultTargetFunction;
-use crate::target_functions::TargetFunction;
-use crate::team::TeamQuantization;
-use crate::weapon::weapon_common_data::WeaponCommonData;
-use strum::EnumCount;
-use strum_macros::{EnumCount as EnumCountMacro, EnumString};
-use crate::common::i18n::{charged_dmg, hit_n_dmg, locale, plunging_dmg};
 
 pub struct FischlSkillType {
     pub normal_dmg1: [f64; 15],
@@ -79,7 +63,40 @@ pub const FISCHL_STATIC_DATA: CharacterStaticData = CharacterStaticData {
     )
 };
 
-pub struct Fischl;
+pub struct FischlEffect {
+    pub hexerei_secret_rite: bool,
+    pub elements: ConfigElements8Multi,
+    pub common_data: CharacterCommonData,
+}
+
+impl<A: Attribute> ChangeAttribute<A> for FischlEffect {
+    fn change_attribute(&self, attribute: &mut A) {
+        if self.hexerei_secret_rite {
+            let ratio = if self.common_data.constellation >= 6 { 2.0 } else { 1.0 };
+            if self.elements.pyro {
+                attribute.add_atk_percentage("菲谢尔天赋3", 0.225 * ratio);
+                attribute.add_edge_s1ton(
+                    CharacterSelector::select_all_onfield_except_self(attribute),
+                    AttributeType::Panel(AttributeName::ATKBase),
+                    AttributeType::Panel(AttributeName::ATKPercentage),
+                    Arc::new(move |atk, _| atk * 0.225 * ratio),
+                    "菲谢尔天赋3",
+                    EdgePriority::Common,
+                );
+            }
+            if self.elements.hydro {
+                attribute.set_value_by(AttributeName::ElementalMastery, "菲谢尔天赋3", 90.0 * ratio);
+                attribute.set_value_by_s(
+                    CharacterSelector::select_all_onfield_except_self(attribute),
+                    AttributeType::Panel(AttributeName::ElementalMastery),
+                    "菲谢尔天赋3",
+                    90.0 * ratio
+                );
+            }
+        }
+    }
+}
+
 
 #[derive(Copy, Clone, FromPrimitive)]
 #[derive(EnumString, EnumCountMacro)]
@@ -127,6 +144,8 @@ impl Into<usize> for FischlDamageEnum {
     }
 }
 
+pub struct Fischl;
+
 #[derive(Copy, Clone, FromPrimitive)]
 pub enum FischlRoleEnum {
     Damage
@@ -138,6 +157,10 @@ impl CharacterTrait for Fischl {
     const SKILL: Self::SkillType = FISCHL_SKILL;
     type DamageEnumType = FischlDamageEnum;
     type RoleEnum = FischlRoleEnum;
+
+    const DEFAULT_TAGS: Option<&'static [CharacterTag]> = Some(
+        &[CharacterTag::Hexerei]
+    );
 
     #[cfg(not(target_family = "wasm"))]
     const SKILL_MAP: CharacterSkillMap = CharacterSkillMap {
@@ -165,7 +188,17 @@ impl CharacterTrait for Fischl {
     #[cfg(not(target_family = "wasm"))]
     const CONFIG_DATA: Option<&'static [ItemConfig]> = Some(&[
         ItemConfig::HEXEREI_SECRET_RITE_GLOBAL(false, ItemConfig::PRIORITY_CHARACTER),
-        ItemConfig::IS_HEXEREI(true, ItemConfig::PRIORITY_CHARACTER),
+        ItemConfig {
+            name: "elements",
+            title: locale!(
+                zh_cn: "反应元素",
+                en: "Reactions Element",
+            ),
+            config: ItemConfigType::ElementMulti { 
+                elements: &[Element::Pyro, Element::Hydro],
+                default: ConfigElements8Multi { pyro: false, hydro: false, anemo: false, electro: false, dendro: false, cryo: false, geo: false, physical: false }, 
+            }
+        },
     ]);
 
     fn damage_internal<D: DamageBuilder>(context: &DamageContext<'_, D::AttributeType>, s: usize, config: &CharacterSkillConfig, fumo: Option<Element>) -> D::Result {
@@ -202,7 +235,15 @@ impl CharacterTrait for Fischl {
     }
 
     fn new_effect<A: Attribute>(_common_data: &CharacterCommonData, _config: &CharacterConfig) -> Option<Box<dyn ChangeAttribute<A>>> {
-        None
+        let (hexerei_secret_rite, elements) = match *_config {
+            CharacterConfig::Fischl { hexerei_secret_rite, elements } => (hexerei_secret_rite, elements),
+            _ => (false, ConfigElements8Multi::default()),
+        };
+        Some(Box::new(FischlEffect {
+            hexerei_secret_rite,
+            elements,
+            common_data: _common_data.clone(),
+        }))
     }
 
     fn get_target_function_by_role(role_index: usize, _team: &TeamQuantization, _c: &CharacterCommonData, _w: &WeaponCommonData) -> Box<dyn TargetFunction> {

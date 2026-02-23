@@ -49,9 +49,9 @@ pub const ILLUGA_STATIC_DATA: CharacterStaticData = CharacterStaticData {
     name: CharacterName::Illuga,
     internal_name: "Illuga",
     element: Element::Geo,
-    hp: [1006, 2609, 3471, 5194, 5807, 6681, 7498, 8381, 8994, 9885, 10497, 11399, 12011, 12919, 13838],
-    atk: [18, 45, 60, 90, 101, 116, 130, 146, 157, 172, 183, 198, 209, 225, 275],
-    def: [74, 193, 257, 385, 430, 495, 555, 621, 666, 732, 777, 844, 890, 957, 1025],
+    hp: [1003, 2577, 3326, 4982, 5514, 6343, 7052, 7881, 8413, 9241, 9773, 10602, 11134, 11962, 12790],
+    atk: [16, 41, 53, 80, 88, 101, 113, 126, 134, 148, 156, 169, 178, 191, 240],
+    def: [68, 175, 226, 339, 375, 431, 480, 536, 572, 628, 665, 721, 757, 814, 870],
     sub_stat: CharacterSubStatFamily::ElementalMastery96,
     weapon_type: WeaponType::Polearm,
     star: 4,
@@ -158,6 +158,10 @@ impl CharacterTrait for Illuga {
     const SKILL: Self::SkillType = ILLUGA_SKILL;
     type DamageEnumType = IllugaDamageEnum;
     type RoleEnum = ();
+
+    const DEFAULT_TAGS: Option<&'static [CharacterTag]> = Some(
+        &[CharacterTag::Moonsign]
+    );
 
     #[cfg(not(target_family = "wasm"))]
     const SKILL_MAP: CharacterSkillMap = CharacterSkillMap {

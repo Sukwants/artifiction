@@ -23,6 +23,7 @@ pub trait SingleOptimizeAlgorithm {
         target_function: &Box<dyn TargetFunction>,
         enemy: &Enemy,
         buffs: &[Box<dyn Buff<SimpleAttribute>>],
+        attribute: &SimpleAttribute,
         constraint: &ConstraintConfig,
         count: usize
     ) -> Vec<OptimizationResult>;

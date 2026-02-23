@@ -1,19 +1,4 @@
-use crate::attribute::*;
-use crate::character::character_common_data::CharacterCommonData;
-use crate::character::character_sub_stat::CharacterSubStatFamily;
-use crate::character::{CharacterConfig, CharacterName, CharacterStaticData};
-use crate::character::skill_config::CharacterSkillConfig;
-use crate::character::traits::{CharacterSkillMap, CharacterSkillMapItem, CharacterTrait};
-use crate::character::macros::{damage_enum, skill_map};
-use crate::common::{ChangeAttribute, Element, MoonglareReaction, Moonsign, ReactionType, SkillType, WeaponType};
-use crate::common::i18n::{locale, hit_n_dmg, plunging_dmg, charged_dmg};
-use crate::common::item_config_type::{ItemConfig, ItemConfigType};
-use crate::damage::damage_builder::DamageBuilder;
-use crate::damage::DamageContext;
-// use crate::target_functions::target_functions::FlinsDefaultTargetFunction;
-use crate::target_functions::TargetFunction;
-use crate::team::TeamQuantization;
-use crate::weapon::weapon_common_data::WeaponCommonData;
+use crate::character::characters::prelude::*;
 
 pub struct FlinsSkillType {
     pub a_dmg1: [f64; 15],
@@ -114,38 +99,11 @@ pub struct FlinsEffect {
 impl<A: Attribute> ChangeAttribute<A> for FlinsEffect {
     fn change_attribute(&self, attribute: &mut A) {
         if self.has_p1 && self.moonsign.is_ascendant() {
-            attribute.set_value_by(AttributeName::EnhanceLunarCharged, "菲林斯天赋：寒冬的交响", 0.2);
+            attribute.set_value_by(AttributeName::EnhanceLunarCharged, "菲林斯天赋1", 0.2);
         }
 
         if self.has_p2 {
-            attribute.add_edge1(
-                AttributeName::ATK,
-                AttributeName::ElementalMastery,
-                Box::new(move |atk, _| {
-                    (atk * 0.08).min(160.0)
-                }),
-                Box::new(move |atk, _, grad| (0.0, 0.0)),
-                "菲林斯天赋：幽焰的呢喃"
-            );
-        }
-
-        attribute.add_edge1(
-            AttributeName::ATK,
-            AttributeName::IncreaseLunarCharged,
-            Box::new(move |atk, _| {
-                (atk * 0.00007).min(0.14)
-            }),
-            Box::new(move |atk, _, grad| (0.0, 0.0)),
-            "菲林斯天赋：月兆祝赐·旧世潜藏"
-        );
-
-        if self.has_c2 && self.moonsign.is_ascendant() {
-            attribute.set_value_by(AttributeName::ResMinusElectro, "菲林斯命座：渡越魍魉之墙", 0.25);
-        }
-
-        if self.has_c4 {
-            attribute.add_atk_percentage("菲林斯命座：荒山嘶啭之夜", 0.2);
-            if self.has_p2 {
+            if self.has_c4 {
                 attribute.add_edge1(
                     AttributeName::ATK,
                     AttributeName::ElementalMastery,
@@ -153,9 +111,36 @@ impl<A: Attribute> ChangeAttribute<A> for FlinsEffect {
                         (atk * 0.1).min(220.0)
                     }),
                     Box::new(move |atk, _, grad| (0.0, 0.0)),
-                    "菲林斯命座：荒山嘶啭之夜"
+                    "菲林斯天赋2"
+                );
+            } else {
+                attribute.add_edge1(
+                    AttributeName::ATK,
+                    AttributeName::ElementalMastery,
+                    Box::new(move |atk, _| {
+                        (atk * 0.08).min(160.0)
+                    }),
+                    Box::new(move |atk, _, grad| (0.0, 0.0)),
+                    "菲林斯天赋2"
                 );
             }
+        }
+
+        attribute.add_edge_s1to1(
+            CharacterSelector::select_all(attribute),
+            AttributeType::Panel(AttributeName::ATK),
+            AttributeType::Invisible(InvisibleAttributeType::new_reaction(AttributeVariableType::MoonglareBase, ReactionType::LunarCharged)),
+            Arc::new(move |atk, _| (atk * 0.00007).min(0.14) ),
+            "菲林斯天赋3",
+            EdgePriority::Invisible
+        );
+
+        if self.has_c2 && self.moonsign.is_ascendant() {
+            attribute.set_value_by(AttributeName::ResMinusElectro, "菲林斯命座2", 0.25);
+        }
+
+        if self.has_c4 {
+            attribute.add_atk_percentage("菲林斯命座4", 0.2);
         }
 
         if self.has_c6 {
@@ -164,7 +149,7 @@ impl<A: Attribute> ChangeAttribute<A> for FlinsEffect {
                 None,
                 None,
                 Some(ReactionType::LunarCharged),
-            )), "菲林斯命座：歌与亡者之舞", if self.moonsign.is_ascendant() { 0.45 } else { 0.35 });
+            )), "菲林斯命座6", if self.moonsign.is_ascendant() { 0.45 } else { 0.35 });
         }
     }
 }
@@ -236,6 +221,10 @@ impl CharacterTrait for Flins {
     const SKILL: Self::SkillType = FLINS_SKILL;
     type DamageEnumType = FlinsDamageEnum;
     type RoleEnum = ();
+
+    const DEFAULT_TAGS: Option<&'static [CharacterTag]> = Some(
+        &[CharacterTag::Moonsign]
+    );
 
     #[cfg(not(target_family = "wasm"))]
     const SKILL_MAP: CharacterSkillMap = CharacterSkillMap {

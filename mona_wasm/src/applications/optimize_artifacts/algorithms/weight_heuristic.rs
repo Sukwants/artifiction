@@ -2,6 +2,7 @@ use std::collections::HashMap;
 use mona::artifacts::{Artifact, ArtifactList, ArtifactSetName, ArtifactSlotName};
 use mona::artifacts::eff::{ARTIFACT_EFF5, ArtifactEff};
 use mona::attribute::*;
+use mona::buffs::Buff;
 use mona::character::Character;
 use mona::common::StatName;
 use mona::enemies::Enemy;
@@ -38,6 +39,8 @@ pub trait WeightHeuristicAlgorithm {
 pub struct NaiveWeightHeuristic<'a> {
     pub character: &'a Character<SimpleAttribute>,
     pub weapon: &'a Weapon<SimpleAttribute>,
+    pub buffs: &'a [Box<dyn Buff<SimpleAttribute>>],
+    pub attribute: &'a SimpleAttribute,
 }
 
 impl<'a> WeightHeuristicAlgorithm for NaiveWeightHeuristic<'a> {
@@ -63,7 +66,12 @@ impl<'a> WeightHeuristicAlgorithm for NaiveWeightHeuristic<'a> {
         ];
 
         let base_value = {
-            let base_attribute = AttributeUtils::create_attribute_from_c_w_bs(&self.character, &self.weapon, &Vec::new());
+            let base_attribute = AttributeUtils::change_attribute_from_c_w_bs(
+                self.attribute.clone(),
+                &self.character,
+                &self.weapon,
+                &self.buffs,
+            );
             let target_value = target_function.target(&base_attribute, &self.character, &self.weapon, &[], &Default::default());
             target_value
         };
@@ -85,12 +93,13 @@ impl<'a> WeightHeuristicAlgorithm for NaiveWeightHeuristic<'a> {
                 artifacts: &arts
             };
 
-            let attribute = AttributeUtils::create_attribute_from_big_config(
+            let attribute = AttributeUtils::change_attribute_without_skill(
+                self.attribute.clone(),
                 &art_list,
                 &Default::default(),
                 &self.character,
                 &self.weapon,
-                &[]
+                &self.buffs,
             );
 
             let value = target_function.target(&attribute, &self.character, &self.weapon, &[], &Default::default());

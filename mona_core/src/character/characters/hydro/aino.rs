@@ -1,20 +1,4 @@
-use num_traits::FromPrimitive;
-use crate::attribute::*;
-use crate::character::character_common_data::CharacterCommonData;
-use crate::character::character_sub_stat::CharacterSubStatFamily;
-use crate::character::{CharacterConfig, CharacterName, CharacterStaticData};
-use crate::character::skill_config::CharacterSkillConfig;
-use crate::character::traits::{CharacterSkillMap, CharacterSkillMapItem, CharacterTrait};
-use crate::character::macros::{damage_enum, skill_map};
-use crate::common::{ChangeAttribute, Element, MoonglareReaction, Moonsign, SkillType, WeaponType};
-use crate::common::i18n::{locale, hit_n_dmg, plunging_dmg, charged_dmg};
-use crate::common::item_config_type::{ItemConfig, ItemConfigType};
-use crate::damage::damage_builder::DamageBuilder;
-use crate::damage::DamageContext;
-// use crate::target_functions::target_functions::AinoDefaultTargetFunction;
-use crate::target_functions::TargetFunction;
-use crate::team::TeamQuantization;
-use crate::weapon::weapon_common_data::WeaponCommonData;
+use crate::character::characters::prelude::*;
 
 pub struct AinoSkillType {
     pub a_dmg1: [f64; 15],
@@ -103,12 +87,16 @@ impl<A: Attribute> ChangeAttribute<A> for AinoEffect {
                     em * 0.5
                 }),
                 Box::new(move |em, _, grad| (0.0, 0.0)),
-                "天赋：结构化功率提升"
+                "爱诺天赋2"
             );
         }
 
         if self.has_c1 {
-            attribute.set_value_by(AttributeName::ElementalMastery, "C1：灰与力场的平衡理论", 80.0);
+            attribute.set_value_to(AttributeName::ElementalMastery, "爱诺命座1", 80.0);
+
+            let team_id = attribute.get_character().team_id;
+
+            attribute.set_value_to_s(CharacterSelector::select_all_onfield_except_self(attribute), AttributeType::Panel(AttributeName::ElementalMastery), "爱诺命座1：灰与力场的平衡理论", 80.0);
         }
 
         if self.has_c6 {
@@ -118,14 +106,36 @@ impl<A: Attribute> ChangeAttribute<A> for AinoEffect {
                 Moonsign::None => 0.0
             };
 
-            attribute.set_value_by(AttributeName::EnhanceElectroCharged, "C6：天才之为构造之责任", val);
-            attribute.set_value_by(AttributeName::EnhanceBloom, "C6：天才之为构造之责任", val);
-            attribute.set_value_by(AttributeName::EnhanceLunarCharged, "C6：天才之为构造之责任", val);
-            attribute.set_value_by(AttributeName::EnhanceLunarBloom, "C6：天才之为构造之责任", val);
-        }
-
-        if self.has_p1 {
-            attribute.set_value_by(AttributeName::USER1, "Talent1: 模块式高效运作", if self.moonsign.is_ascendant() { 0.7 } else { 1.5 });   // 元素爆发伤害间隔(s)
+            attribute.set_value_by_s(
+                CharacterSelector::select_all_onfield(attribute),
+                AttributeType::Invisible(InvisibleAttributeType::new_reaction(AttributeVariableType::ReactionEnhance, ReactionType::ElectroCharged)),
+                "爱诺命座6",
+                val
+            );
+            attribute.set_value_by_s(
+                CharacterSelector::select_all_onfield(attribute),
+                AttributeType::Invisible(InvisibleAttributeType::new_reaction(AttributeVariableType::ReactionEnhance, ReactionType::Bloom)),
+                "爱诺命座6",
+                val
+            );
+            attribute.set_value_by_s(
+                CharacterSelector::select_all_onfield(attribute),
+                AttributeType::Invisible(InvisibleAttributeType::new_reaction(AttributeVariableType::ReactionEnhance, ReactionType::LunarCharged)),
+                "爱诺命座6",
+                val
+            );
+            attribute.set_value_by_s(
+                CharacterSelector::select_all_onfield(attribute),
+                AttributeType::Invisible(InvisibleAttributeType::new_reaction(AttributeVariableType::ReactionEnhance, ReactionType::LunarBloom)),
+                "爱诺命座6",
+                val
+            );
+            attribute.set_value_by_s(
+                CharacterSelector::select_all_onfield(attribute),
+                AttributeType::Invisible(InvisibleAttributeType::new_reaction(AttributeVariableType::ReactionEnhance, ReactionType::LunarCrystallize)),
+                "爱诺命座6",
+                val
+            );
         }
     }
 }
@@ -176,6 +186,10 @@ impl CharacterTrait for Aino {
     const SKILL: Self::SkillType = AINO_SKILL;
     type DamageEnumType = AinoDamageEnum;
     type RoleEnum = ();
+
+    const DEFAULT_TAGS: Option<&'static [CharacterTag]> = Some(
+        &[CharacterTag::Moonsign]
+    );
 
     #[cfg(not(target_family = "wasm"))]
     const SKILL_MAP: CharacterSkillMap = CharacterSkillMap {

@@ -1,19 +1,4 @@
-use num_traits::FromPrimitive;
-use crate::attribute::*;
-use crate::character::character_common_data::CharacterCommonData;
-use crate::character::character_sub_stat::CharacterSubStatFamily;
-use crate::character::{CharacterConfig, CharacterName, CharacterStaticData};
-use crate::character::skill_config::CharacterSkillConfig;
-use crate::character::traits::{CharacterSkillMap, CharacterSkillMapItem, CharacterTrait};
-use crate::character::macros::{damage_enum, skill_map};
-use crate::common::{ChangeAttribute, Element, MoonglareReaction, Moonsign, SkillType, WeaponType};
-use crate::common::i18n::{locale, hit_n_dmg, plunging_dmg, charged_dmg};
-use crate::common::item_config_type::{ItemConfig, ItemConfigType};
-use crate::damage::damage_builder::DamageBuilder;
-use crate::damage::DamageContext;
-use crate::target_functions::TargetFunction;
-use crate::team::TeamQuantization;
-use crate::weapon::weapon_common_data::WeaponCommonData;
+use crate::character::characters::prelude::*;
 
 pub struct MonaSkillType {
     pub normal_dmg1: [f64; 15],
@@ -76,18 +61,12 @@ pub const MONA_STATIC_DATA: CharacterStaticData = CharacterStaticData {
 };
 
 pub struct MonaEffect {
-    pub is_hexerei: bool,
     has_talent2: bool
 }
 
 impl MonaEffect {
     pub fn new(common_data: &CharacterCommonData) -> MonaEffect {
-        let is_hexerei = match &common_data.config {
-            CharacterConfig::Mona { is_hexerei } => *is_hexerei,
-            _ => false,
-        };
         MonaEffect {
-            is_hexerei,
             has_talent2: common_data.has_talent2,
         }
     }
@@ -101,7 +80,7 @@ impl<T: Attribute> ChangeAttribute<T> for MonaEffect {
                 AttributeName::BonusHydro,
                 Box::new(|recharge, _| recharge * 0.2),
                 Box::new(|grad, _x1, _x2| (grad * 0.2, 0.0)),
-                "莫娜天赋：「托付于命运吧!」"
+                "莫娜天赋2"
             );
         }
     }
@@ -151,6 +130,10 @@ impl CharacterTrait for Mona {
     type DamageEnumType = MonaDamageEnum;
     type RoleEnum = MonaRoleEnum;
 
+    const DEFAULT_TAGS: Option<&'static [CharacterTag]> = Some(
+        &[CharacterTag::Hexerei]
+    );
+
     #[cfg(not(target_family = "wasm"))]
     const SKILL_MAP: CharacterSkillMap = CharacterSkillMap {
         skill1: Some(&[
@@ -175,7 +158,6 @@ impl CharacterTrait for Mona {
     #[cfg(not(target_family = "wasm"))]
     const CONFIG_DATA: Option<&'static [ItemConfig]> = Some(&[
         ItemConfig::HEXEREI_SECRET_RITE_GLOBAL(false, ItemConfig::PRIORITY_CHARACTER),
-        ItemConfig::IS_HEXEREI(true, ItemConfig::PRIORITY_CHARACTER),
     ]);
 
     #[cfg(not(target_family = "wasm"))]
@@ -189,12 +171,20 @@ impl CharacterTrait for Mona {
             config: ItemConfigType::Bool { default: false },
         },
         ItemConfig {
+            name: "astral_glow_of_mercury",
+            title: locale!(
+                zh_cn: "「水星天的辉光」平均层数",
+                en: "Average Stacks of Astral Glow of Mercury",
+            ),
+            config: ItemConfigType::Float { min: 0.0, max: 3.0, default: 0.0 },
+        },
+        ItemConfig {
             name: "after_z",
             title: locale!(
                 zh_cn: "重击命中后",
                 en: "After Charged Attack Hits",
             ),
-            config: ItemConfigType::Bool { default: false },
+            config: ItemConfigType::Bool { default: true },
         },
         ItemConfig {
             name: "bonus_z",
@@ -206,45 +196,89 @@ impl CharacterTrait for Mona {
         },
     ]);
 
+    fn change_attribute<A: Attribute>(attribute: &mut A, common_data: &CharacterCommonData, skill_config: &CharacterSkillConfig) {
+        let (omen, astral_glow_of_mercury, after_z, bonus_z) = match *skill_config {
+            CharacterSkillConfig::Mona { omen, astral_glow_of_mercury, after_z, bonus_z } => (omen, astral_glow_of_mercury, after_z, bonus_z),
+            _ => (false, 0.0, false, 0)
+        };
+
+        attribute.set_value_by_s(
+            CharacterSelector::select_team_except_self(attribute),
+            AttributeType::Invisible(InvisibleAttributeType::new_reaction(AttributeVariableType::ReactionEnhance, ReactionType::Vaporize)),
+            "莫娜天赋3",
+            0.05 * astral_glow_of_mercury
+        );
+
+        if omen {
+            attribute.set_value_by_s(
+                CharacterSelector::select_all(attribute),
+                AttributeType::Invisible(InvisibleAttributeType::new_any(AttributeVariableType::Bonus)),
+                "莫娜Q技能",
+                MONA_SKILL.elemental_burst_bonus[common_data.skill3 as usize],
+            );
+
+            if common_data.constellation >= 1 {
+                for reaction in vec![
+                    ReactionType::ElectroCharged, ReactionType::LunarCharged, ReactionType::Vaporize, ReactionType::HydroSwirl, ReactionType::LunarCrystallize
+                ] {
+                    attribute.set_value_by_s(
+                        CharacterSelector::select_onfield(attribute),
+                        AttributeType::Invisible(InvisibleAttributeType::new_reaction(AttributeVariableType::ReactionEnhance, reaction)),
+                        "莫娜命座1",
+                        0.15
+                    );
+
+                    attribute.set_value_by_s(
+                        CharacterSelector::select_offfield(attribute),
+                        AttributeType::Invisible(InvisibleAttributeType::new_reaction(AttributeVariableType::ReactionEnhance, reaction)),
+                        "莫娜命座1",
+                        0.15 * 1.60
+                    );
+                }
+            }
+
+            if common_data.constellation >= 4 {
+                attribute.set_value_by_s(
+                    CharacterSelector::select_all(attribute),
+                    AttributeType::Invisible(InvisibleAttributeType::new_any(AttributeVariableType::CriticalRate)),
+                    "莫娜命座4",
+                    0.15
+                );
+
+                attribute.set_value_by_s(
+                    CharacterSelector::select_by_tag(attribute, CharacterTag::Hexerei),
+                    AttributeType::Invisible(InvisibleAttributeType::new_any(AttributeVariableType::CriticalDamage)),
+                    "莫娜命座4",
+                    0.15
+                );
+            }
+        }
+
+        if common_data.constellation >= 2 && after_z {
+            attribute.set_value_by_s(
+                CharacterSelector::select_all(attribute),
+                AttributeType::Panel(AttributeName::ElementalMastery),
+                "莫娜命座2",
+                80.0
+            );
+        }
+        
+    }
+
     fn damage_internal<D: DamageBuilder>(context: &DamageContext<'_, D::AttributeType>, s: usize, config: &CharacterSkillConfig, fumo: Option<Element>) -> D::Result {
         let s: MonaDamageEnum = num::FromPrimitive::from_usize(s).unwrap();
         let (s1, s2, s3) = context.character_common_data.get_3_skill();
 
-        let is_hexerei = match &context.character_common_data.config {
-            CharacterConfig::Mona { is_hexerei } => *is_hexerei,
-            _ => false,
-        };
-
-        let (omen, after_z, bonus_z) = match *config {
-            CharacterSkillConfig::Mona { omen, after_z, bonus_z } => (omen, after_z, bonus_z),
-            _ => (false, false, 0)
+        let (omen, astral_glow_of_mercury, after_z, bonus_z) = match *config {
+            CharacterSkillConfig::Mona { omen, astral_glow_of_mercury, after_z, bonus_z } => (omen, astral_glow_of_mercury, after_z, bonus_z),
+            _ => (false, 0.0, false, 0)
         };
 
         use MonaDamageEnum::*;
         let mut builder = D::new();
 
-        if omen {
-            builder.add_extra_bonus("Q技能：星异", MONA_SKILL.elemental_burst_bonus[s3]);
-
-            if context.character_common_data.constellation >= 1 {
-                builder.add_extra_enhance_vaporize("命座1：沉没的预言", 0.15);
-            }
-        }
-
-        if context.character_common_data.constellation >= 2 && after_z {
-            builder.add_extra_em("命座2：星月的连珠", 80.0);
-        }
-
-        if context.character_common_data.constellation >= 4 {
-            builder.add_extra_critical("命座4：灭绝的预言", 0.15);
-
-            if is_hexerei {
-                builder.add_extra_critical_damage("命座4：灭绝的预言", 0.15);
-            }
-        }
-
         if context.character_common_data.constellation >= 6 && s == Charged {
-            builder.add_extra_bonus("命座6：厄运的修辞", bonus_z as f64 * 0.6);
+            builder.add_extra_bonus("莫娜命座6", bonus_z as f64 * 0.6);
         }
 
         let ratio = match s {

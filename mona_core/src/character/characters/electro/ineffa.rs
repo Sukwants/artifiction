@@ -1,19 +1,4 @@
-use crate::attribute::*;
-use crate::character::character_common_data::CharacterCommonData;
-use crate::character::character_sub_stat::CharacterSubStatFamily;
-use crate::character::{CharacterConfig, CharacterName, CharacterStaticData};
-use crate::character::skill_config::CharacterSkillConfig;
-use crate::character::traits::{CharacterSkillMap, CharacterSkillMapItem, CharacterTrait};
-use crate::character::macros::{damage_enum, skill_map};
-use crate::common::{ChangeAttribute, Element, MoonglareReaction, Moonsign, SkillType, WeaponType};
-use crate::common::i18n::{locale, hit_n_dmg, plunging_dmg, charged_dmg};
-use crate::common::item_config_type::{ItemConfig, ItemConfigType};
-use crate::damage::damage_builder::DamageBuilder;
-use crate::damage::DamageContext;
-// use crate::target_functions::target_functions::IneffaDefaultTargetFunction;
-use crate::target_functions::TargetFunction;
-use crate::team::TeamQuantization;
-use crate::weapon::weapon_common_data::WeaponCommonData;
+use crate::character::characters::prelude::*;
 
 pub struct IneffaSkillType {
     pub a_dmg1: [f64; 15],
@@ -108,29 +93,38 @@ impl<A: Attribute> ChangeAttribute<A> for IneffaEffect {
                     atk * 0.06
                 }),
                 Box::new(move |atk, _, grad| (0.0, 0.0)),
-                "伊涅芙天赋：全相重构协议"
+                "伊涅芙天赋2"
+            );
+
+            attribute.add_edge_s1to1(
+                CharacterSelector::select_onfield_except_self(attribute),
+                AttributeType::Panel(AttributeName::ATK),
+                AttributeType::Panel(AttributeName::ElementalMastery),
+                Arc::new(move |atk, _| {
+                    atk * 0.06
+                }),
+                "伊涅芙天赋2",
+                EdgePriority::Common
             );
         }
 
-        attribute.add_edge1(
-            AttributeName::ATK,
-            AttributeName::IncreaseLunarCharged,
-            Box::new(move |atk, _| {
-                (atk * 0.00007).min(0.14)
-            }),
-            Box::new(move |atk, _, grad| (0.0, 0.0)),
-            "伊涅芙天赋：月兆祝赐·象拟中继"
+        attribute.add_edge_s1to1(
+            CharacterSelector::select_all(attribute),
+            AttributeType::Panel(AttributeName::ATK),
+            AttributeType::Invisible(InvisibleAttributeType::new_reaction(AttributeVariableType::MoonglareBase, ReactionType::LunarCharged)),
+            Arc::new(move |atk, _| (atk * 0.00007).min(0.14)),
+            "伊涅芙天赋3",
+            EdgePriority::Invisible
         );
 
         if self.has_c1 {
-            attribute.add_edge1(
-                AttributeName::ATK,
-                AttributeName::EnhanceLunarCharged,
-                Box::new(move |atk, _| {
-                    (atk * 0.00025).min(0.5)
-                }),
-                Box::new(move |atk, _, grad| (0.0, 0.0)),
-                "伊涅芙命座：循环整流引擎"
+            attribute.add_edge_s1to1(
+                CharacterSelector::select_all(attribute),
+                AttributeType::Panel(AttributeName::ATK),
+                AttributeType::Invisible(InvisibleAttributeType::new_reaction(AttributeVariableType::ReactionEnhance, ReactionType::LunarCharged)),
+                Arc::new(move |atk, _| (atk * 0.00025).min(0.5) ),
+                "伊涅芙命座1",
+                EdgePriority::Invisible
             );
         }
     }
@@ -198,6 +192,10 @@ impl CharacterTrait for Ineffa {
     type DamageEnumType = IneffaDamageEnum;
     type RoleEnum = ();
 
+    const DEFAULT_TAGS: Option<&'static [CharacterTag]> = Some(
+        &[CharacterTag::Moonsign]
+    );
+
     #[cfg(not(target_family = "wasm"))]
     const SKILL_MAP: CharacterSkillMap = CharacterSkillMap {
         skill1: skill_map!(
@@ -250,7 +248,7 @@ impl CharacterTrait for Ineffa {
 
         if s == EShield {
             builder.add_atk_ratio("护盾基础吸收量", INEFFA_SKILL.e_shield_additional[s2]);
-            builder.add_extra_damage("护盾额外吸收量", INEFFA_SKILL.e_shield_base[s2]);
+            builder.add_base("护盾额外吸收量", INEFFA_SKILL.e_shield_base[s2]);
             builder.shield(
                 &context.attribute,
                 s.get_element(),

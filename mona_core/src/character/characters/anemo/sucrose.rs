@@ -1,21 +1,5 @@
-use num_derive::FromPrimitive;
-use crate::attribute::*;
-use crate::character::character_common_data::CharacterCommonData;
-use crate::character::character_sub_stat::CharacterSubStatFamily;
-use crate::character::{CharacterConfig, CharacterName, CharacterStaticData};
-use crate::character::skill_config::CharacterSkillConfig;
-use crate::character::traits::{CharacterSkillMap, CharacterSkillMapItem, CharacterTrait};
-use crate::common::{ChangeAttribute, Element, SkillType, StatName, WeaponType};
-use crate::common::item_config_type::ItemConfig;
-use crate::damage::damage_builder::DamageBuilder;
-use crate::damage::DamageContext;
-use crate::target_functions::target_functions::anemo::sucrose_default::SucroseDefaultTargetFunction;
-use crate::target_functions::TargetFunction;
-use crate::team::TeamQuantization;
-use crate::weapon::weapon_common_data::WeaponCommonData;
-use strum::EnumCount;
-use strum_macros::{EnumCount as EnumCountMacro, EnumString};
-use crate::common::i18n::{charged_dmg, hit_n_dmg, locale, plunging_dmg};
+use crate::character::characters::prelude::*;
+use crate::target_functions::target_functions::SucroseDefaultTargetFunction;
 
 pub struct SucroseSkillType {
     pub normal_dmg1: [f64; 15],
@@ -75,7 +59,90 @@ pub const SUCROSE_STATIC_DATA: CharacterStaticData = CharacterStaticData {
     )
 };
 
-pub struct Sucrose;
+pub struct SucroseEffect {
+    pub hexerei_secret_rite: bool,
+    pub elements: ConfigElements8Multi,
+    pub common_data: CharacterCommonData,
+}
+
+impl<A: Attribute> ChangeAttribute<A> for SucroseEffect {
+    fn change_attribute(&self, attribute: &mut A) {
+        if self.common_data.has_talent1 {
+            if self.elements.cryo {
+                attribute.set_value_by_s(CharacterSelector::select_element(attribute, Element::Cryo),
+                    AttributeType::Panel(AttributeName::ElementalMastery), "砂糖天赋1", 50.0);
+            }
+            if self.elements.pyro {
+                attribute.set_value_by_s(CharacterSelector::select_element(attribute, Element::Pyro),
+                    AttributeType::Panel(AttributeName::ElementalMastery), "砂糖天赋1", 50.0);
+            }
+            if self.elements.hydro {
+                attribute.set_value_by_s(CharacterSelector::select_element(attribute, Element::Hydro),
+                    AttributeType::Panel(AttributeName::ElementalMastery), "砂糖天赋1", 50.0);
+            }
+            if self.elements.electro {
+                attribute.set_value_by_s(CharacterSelector::select_element(attribute, Element::Electro),
+                    AttributeType::Panel(AttributeName::ElementalMastery), "砂糖天赋1", 50.0);
+            }
+        }
+
+        if self.common_data.has_talent2 {
+            attribute.add_edge_s1to1(
+                CharacterSelector::select_all_except_self(attribute),
+                AttributeType::Panel(AttributeName::ElementalMastery),
+                AttributeType::Panel(AttributeName::ElementalMastery),
+                Arc::new(|em, _| em * 0.20),
+                "砂糖天赋2",
+                EdgePriority::Common,
+            );
+        }
+
+        if self.common_data.constellation >= 6 {
+            if self.elements.cryo {
+                attribute.set_value_by_s(CharacterSelector::select_all(attribute),
+                    AttributeType::Panel(AttributeName::BonusCryo), "砂糖命座6", 0.2);
+                attribute.set_value_by_s(CharacterSelector::select_by_tag(attribute, CharacterTag::Hexerei),
+                    AttributeType::Panel(AttributeName::BonusCryo), "砂糖命座6", 0.0857142);
+            }
+            if self.elements.pyro {
+                attribute.set_value_by_s(CharacterSelector::select_all(attribute),
+                    AttributeType::Panel(AttributeName::BonusPyro), "砂糖命座6", 0.2);
+                attribute.set_value_by_s(CharacterSelector::select_by_tag(attribute, CharacterTag::Hexerei),
+                    AttributeType::Panel(AttributeName::BonusPyro), "砂糖命座6", 0.0857142);
+            }
+            if self.elements.hydro {
+                attribute.set_value_by_s(CharacterSelector::select_all(attribute),
+                    AttributeType::Panel(AttributeName::BonusHydro), "砂糖命座6", 0.2);
+                attribute.set_value_by_s(CharacterSelector::select_by_tag(attribute, CharacterTag::Hexerei),
+                    AttributeType::Panel(AttributeName::BonusHydro), "砂糖命座6", 0.0857142);
+            }
+            if self.elements.electro {
+                attribute.set_value_by_s(CharacterSelector::select_all(attribute),
+                    AttributeType::Panel(AttributeName::BonusElectro), "砂糖命座6", 0.2);
+                attribute.set_value_by_s(CharacterSelector::select_by_tag(attribute, CharacterTag::Hexerei),
+                    AttributeType::Panel(AttributeName::BonusElectro), "砂糖命座6", 0.0857142);
+            }
+        }
+
+        if self.hexerei_secret_rite {
+            for skill in vec![SkillType::NormalAttack, SkillType::ChargedAttack, SkillType::PlungingAttackInAction, SkillType::PlungingAttackOnGround, SkillType::ElementalSkill, SkillType::ElementalBurst] {
+                attribute.set_value_by_s(
+                    CharacterSelector::select_all(attribute),
+                    AttributeType::Invisible(InvisibleAttributeType::new_skill(AttributeVariableType::Bonus, skill)),
+                    "砂糖天赋3",
+                    0.0571428,
+                );
+
+                attribute.set_value_by_s(
+                    CharacterSelector::select_by_tag(attribute, CharacterTag::Hexerei),
+                    AttributeType::Invisible(InvisibleAttributeType::new_skill(AttributeVariableType::Bonus, skill)),
+                    "砂糖天赋3",
+                    0.0714285,
+                );
+            }
+        }
+    }
+}
 
 #[derive(Copy, Clone, FromPrimitive, EnumString, EnumCountMacro)]
 pub enum SucroseDamageEnum {
@@ -126,6 +193,8 @@ impl Into<usize> for SucroseDamageEnum {
     }
 }
 
+pub struct Sucrose;
+
 #[derive(Copy, Clone, FromPrimitive)]
 pub enum SucroseRoleEnum {
     Aux
@@ -137,6 +206,10 @@ impl CharacterTrait for Sucrose {
     const SKILL: Self::SkillType = SUCROSE_SKILL;
     type DamageEnumType = SucroseDamageEnum;
     type RoleEnum = SucroseRoleEnum;
+
+    const DEFAULT_TAGS: Option<&'static [CharacterTag]> = Some(
+        &[CharacterTag::Hexerei]
+    );
 
     #[cfg(not(target_family = "wasm"))]
     const SKILL_MAP: CharacterSkillMap = CharacterSkillMap {
@@ -165,7 +238,17 @@ impl CharacterTrait for Sucrose {
     #[cfg(not(target_family = "wasm"))]
     const CONFIG_DATA: Option<&'static [ItemConfig]> = Some(&[
         ItemConfig::HEXEREI_SECRET_RITE_GLOBAL(false, ItemConfig::PRIORITY_CHARACTER),
-        ItemConfig::IS_HEXEREI(true, ItemConfig::PRIORITY_CHARACTER),
+        ItemConfig {
+            name: "elements",
+            title: locale!(
+                zh_cn: "扩散元素",
+                en: "Swirl Elements",
+            ),
+            config: ItemConfigType::ElementMulti { 
+                elements: &[Element::Pyro, Element::Hydro, Element::Electro, Element::Cryo],
+                default: ConfigElements8Multi { pyro: false, hydro: false, anemo: false, electro: false, dendro: false, cryo: false, geo: false, physical: false }, 
+            }
+        },
     ]);
 
     fn damage_internal<D: DamageBuilder>(context: &DamageContext<'_, D::AttributeType>, s: usize, config: &CharacterSkillConfig, fumo: Option<Element>) -> D::Result {
@@ -200,7 +283,15 @@ impl CharacterTrait for Sucrose {
     }
 
     fn new_effect<A: Attribute>(_common_data: &CharacterCommonData, _config: &CharacterConfig) -> Option<Box<dyn ChangeAttribute<A>>> {
-        None
+        let (hexerei_secret_rite, elements) = match *_config {
+            CharacterConfig::Sucrose { hexerei_secret_rite, elements } => (hexerei_secret_rite, elements),
+            _ => (false, ConfigElements8Multi::default()),
+        };
+        Some(Box::new(SucroseEffect {
+            hexerei_secret_rite,
+            elements,
+            common_data: _common_data.clone(),
+        }))
     }
 
     fn get_target_function_by_role(role_index: usize, _team: &TeamQuantization, _c: &CharacterCommonData, _w: &WeaponCommonData) -> Box<dyn TargetFunction> {

@@ -1,5 +1,8 @@
+use std::collections::HashSet;
+
 use crate::attribute::Attribute;
 use crate::character::character_common_data::CharacterCommonData;
+use crate::character::team_status::CharacterTag;
 use crate::character::{CharacterConfig, CharacterStaticData};
 use crate::character::skill_config::CharacterSkillConfig;
 use crate::common::{ChangeAttribute, MoonglareReaction, TransformativeType, SkillType};
@@ -35,6 +38,8 @@ pub trait CharacterTrait {
     type DamageEnumType: Copy + Clone + Into<usize>;
     // 角色定位枚举
     type RoleEnum;
+    // 角色默认标签
+    const DEFAULT_TAGS: Option<&'static [CharacterTag]> = None;
 
     // 角色技能映射
     #[cfg(not(target_family = "wasm"))]

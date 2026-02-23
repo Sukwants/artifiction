@@ -2,6 +2,7 @@ use super::character_static_data::{CharacterStaticData};
 use super::character_name::CharacterName;
 use super::character_sub_stat::{CharacterSubStat};
 use crate::attribute::*;
+use crate::character::team_status::CharacterTags;
 use crate::common::ChangeAttribute;
 use super::characters::get_static_data;
 use crate::character::CharacterConfig;
@@ -23,6 +24,8 @@ pub struct CharacterCommonData {
 
     pub static_data: CharacterStaticData,
     pub config: CharacterConfig,
+    pub tags: CharacterTags,
+    pub on_field: bool,
 }
 
 impl CharacterCommonData {
@@ -34,7 +37,9 @@ impl CharacterCommonData {
         skill1: usize,
         skill2: usize,
         skill3: usize,
-        config: &CharacterConfig
+        config: &CharacterConfig,
+        tags: &CharacterTags,
+        on_field: bool,
     ) -> CharacterCommonData {
         let data = get_static_data(name);
 
@@ -53,6 +58,8 @@ impl CharacterCommonData {
             skill2,
             skill3,
             config: config.clone(),
+            tags: tags.clone(),
+            on_field,
         }
     }
 

@@ -5,6 +5,7 @@ use mona::artifacts::effect_config::ArtifactEffectConfig;
 use mona::attribute::*;
 use mona::buffs::Buff;
 use mona::character::Character;
+use mona::character::team_status::CharacterStatus;
 use mona::common::StatName;
 use mona::enemies::Enemy;
 use mona::target_functions::TargetFunction;
@@ -25,7 +26,11 @@ impl<'a> ValueFunction<'a> {
         let artifact_list = ArtifactList {
             artifacts,
         };
-        let attribute = AttributeUtils::create_attribute_from_big_config(
+        let attribute = AttributeUtils::change_attribute_without_skill(
+            SimpleAttribute::new(
+                SimpleAttribute::new_with_base_edge(vec![CharacterStatus::new_single(0, self.character.common_data.name)]),
+                0
+            ),
             &artifact_list,
             &self.artifact_config,
             &self.character,

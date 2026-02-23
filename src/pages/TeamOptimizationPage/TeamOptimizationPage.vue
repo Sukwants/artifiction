@@ -130,7 +130,7 @@ import {ref} from "vue"
 
 import {convertArtifact} from "@/utils/converter"
 import {team_optimize} from "@/wasm"
-import {convertPresetToWasmInterface} from "@/utils/preset"
+import {convertPresetListToWasmInterface} from "@/utils/preset"
 import {deviceIsPC} from "@/utils/device"
 // @ts-ignore
 import ArtifactDisplay from "@/components/display/ArtifactDisplay.vue"
@@ -219,24 +219,47 @@ const showAttributeDrawer = ref(false)
 const wasmAttribute = ref(null as any)
 
 function wasmGetAttributeInterface(index: number) {
-    let artifacts: any[] = []
-    if (currentResultEntry.value) {
-        const artifactIds = Object.values(currentResultEntry.value[index])
-        const artifactsOldFormat: IArtifact[] = []
-        for (let artifactId of artifactIds) {
-            const a = artifactStore.artifacts.value.get(artifactId)
-            if (a) {
-                artifactsOldFormat.push(a)
+    let characters = []
+    let i = 0
+
+    for (let c of presets.value) {
+
+        let artifacts: any[] = []
+        if (currentResultEntry.value) {
+            const artifactIds = Object.values(currentResultEntry.value[i])
+            const artifactsOldFormat: IArtifact[] = []
+            for (let artifactId of artifactIds) {
+                const a = artifactStore.artifacts.value.get(artifactId)
+                if (a) {
+                    artifactsOldFormat.push(a)
+                }
             }
+            artifacts = artifactsOldFormat.map(a => convertArtifact(a))
         }
-        artifacts = artifactsOldFormat.map(a => convertArtifact(a))
+
+        let wasm: any = {}
+
+        wasm.character = c.item.character
+        wasm.weapon = c.item.weapon
+        if (c.item.artifactEffectMode === "custom") {
+            wasm.artifact_config = c.item.artifactConfig
+        }
+        wasm.buffs = c.item.buffs ?? []
+        wasm.artifacts = artifacts
+        wasm.skill = null
+
+        wasm.character_id = ++i
+        wasm.team_id = 0
+        if (i == 1) wasm.on_field = true
+        else wasm.on_field = false
+        
+        characters.push(wasm)
     }
 
     return {
-        character: presets.value[index].item.character,
-        weapon: presets.value[index].item.weapon,
-        buffs: presets.value[index].item.buffs,
-        artifacts,
+        characters: characters,
+
+        active_character_id: index + 1
     }
 }
 
@@ -269,7 +292,7 @@ const filteredArtifactsWasm = computed(() => {
 
 // do calculation
 const singleInterfaces = computed(() => {
-    return presets.value.map(x => convertPresetToWasmInterface(x.item))
+    return convertPresetListToWasmInterface(presets.value)
 })
 
 const optimizeTeamHyperParamInterface = {

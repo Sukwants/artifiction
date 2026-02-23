@@ -13,12 +13,9 @@ impl<A: Attribute> ArtifactEffect<A> for AubadeOfMorningstarAndMoonEffect {
     fn effect4(&self, attribute: &mut A) {
         let val = if self.moonsign.is_ascendant() { 0.60 } else { 0.20 };
         for reaction in [ReactionType::LunarCharged, ReactionType::LunarBloom, ReactionType::LunarCrystallize] {
-            // attribute.set_value_by_s(CharacterSelector::select_self_offfield(attribute),
-            //     AttributeType::Invisible(InvisibleAttributeType::new_reaction(AttributeVariableType::ReactionEnhance, reaction)),
-            //     "晨星与月的晓歌4", val);
-            attribute.set_value_by_s(CharacterSelector::select_self(attribute),
+            attribute.set_value_by_s(CharacterSelector::select_self_offfield(attribute),
                 AttributeType::Invisible(InvisibleAttributeType::new_reaction(AttributeVariableType::ReactionEnhance, reaction)),
-                "晨星与月的晓歌4", val * self.set4_rate);
+                "晨星与月的晓歌4", val);
         }
     }
 }

@@ -99,7 +99,7 @@ impl TargetFunction for DurinDefaultTargetFunction {
         };
 
         let (hexerei_secret_rite, essential_transmutation) = match &context.character_common_data.config {
-            CharacterConfig::Durin { hexerei_secret_rite, essential_transmutation } => (*hexerei_secret_rite, *essential_transmutation),
+            CharacterConfig::Durin { hexerei_secret_rite, essential_transmutation, .. } => (*hexerei_secret_rite, *essential_transmutation),
             _ => (false, 0),
         };
 
