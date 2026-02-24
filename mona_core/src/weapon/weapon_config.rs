@@ -73,6 +73,7 @@ pub enum WeaponConfig {
     AThousandBlazingSuns { rate1: f64, rate2: f64 },
     FlameforgedInsight { reaction: bool },
     MasterKey { reaction: bool, moonsign: Moonsign },
+    GestOfTheMightyWolf { stack: f64, hexerei_secret_rite: bool },
 
     // Polearm
     EngulfingLightning { rate: f64 },

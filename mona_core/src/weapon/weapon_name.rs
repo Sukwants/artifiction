@@ -165,6 +165,7 @@ pub enum WeaponName {
     SymphonistOfScents,
     FracturedHalo,
     BloodsoakedRuins,
+    GestOfTheMightyWolf,
 
     // catalyst
     // 1 star

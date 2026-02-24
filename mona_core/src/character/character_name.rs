@@ -149,4 +149,5 @@ pub enum CharacterName {
     Illuga,
     Columbina,
     Zibai,
+    Varka,
 }

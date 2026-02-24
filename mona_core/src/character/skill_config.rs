@@ -71,5 +71,6 @@ pub enum CharacterSkillConfig {
     Illuga { nightingales_song: bool },
     Columbina { activated_q: bool, stack_p1: usize, activated_c4: bool },
     Zibai { lunar_phase_shift: bool, activated_c1: bool, activated_c4: bool, stack_c6: usize },
+    Varka { azure_fang_oath: usize, c1_bonus: bool },
     NoConfig,
 }

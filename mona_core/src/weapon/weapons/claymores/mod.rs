@@ -39,6 +39,7 @@ pub use fruitful_hook::FruitfulHook;
 pub use a_thousand_blazing_suns::AThousandBlazingSuns;
 pub use flameforged_insight::FlameforgedInsight;
 pub use master_key::MasterKey;
+pub use gest_of_the_mighty_wolf::GestOfTheMightyWolf;
 
 pub mod wolfs_gravestone;
 pub mod skyward_pride;
@@ -81,3 +82,4 @@ pub mod fruitful_hook;
 pub mod a_thousand_blazing_suns;
 pub mod flameforged_insight;
 pub mod master_key;
+pub mod gest_of_the_mighty_wolf;
