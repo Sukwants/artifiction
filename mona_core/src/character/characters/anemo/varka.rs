@@ -1,4 +1,4 @@
-use crate::character::characters::{prelude::*, varesa::VARESA_SKILL};
+use crate::character::characters::prelude::*;
 
 pub struct VarkaSkillType {
     pub a_dmg1: [f64; 15],
@@ -371,7 +371,7 @@ impl CharacterTrait for Varka {
             return builder.none();
         }
 
-        if s.get_skill_type() == SkillType::NormalAttack || s.get_skill_type() == SkillType::ChargedAttack || s == EE1 || s == EE2 || s == EEZ1 || s == EEZ2 {
+        if context.character_common_data.has_talent2 && (s.get_skill_type() == SkillType::NormalAttack || s.get_skill_type() == SkillType::ChargedAttack || s == EE1 || s == EE2 || s == EEZ1 || s == EEZ2) {
             builder.add_extra_bonus("法尔伽天赋2", azure_fang_oath as f64 * 0.075);
         }
 

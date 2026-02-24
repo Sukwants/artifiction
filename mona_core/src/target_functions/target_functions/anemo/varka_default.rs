@@ -1,20 +1,5 @@
-use crate::artifacts::Artifact;
-use crate::artifacts::effect_config::ArtifactEffectConfig;
-use crate::attribute::*;
-use crate::character::{Character, CharacterConfig, CharacterName};
-use crate::character::character_common_data::CharacterCommonData;
+use crate::target_functions::target_functions::prelude::*;
 use crate::character::characters::Varka;
-use crate::character::skill_config::CharacterSkillConfig;
-use crate::character::prelude::CharacterTrait;
-use crate::common::i18n::locale;
-use crate::common::item_config_type::{ItemConfig, ItemConfigType};
-use crate::common::{moonsign, Moonsign};
-use crate::damage::{DamageContext, SimpleDamageBuilder};
-use crate::enemies::Enemy;
-use crate::target_functions::*;
-use crate::team::TeamQuantization;
-use crate::weapon::Weapon;
-use crate::weapon::weapon_common_data::WeaponCommonData;
 
 pub struct VarkaDefaultTargetFunction {
 }
@@ -79,7 +64,6 @@ impl TargetFunction for VarkaDefaultTargetFunction {
 
         let dmg_a = get_damage(Ty::EA1, &config)
             + get_damage(Ty::EA21, &config) + get_damage(Ty::EA22, &config)
-            + get_damage(Ty::EA31, &config) + get_damage(Ty::EA32, &config) 
             + get_damage(Ty::EA31, &config) + get_damage(Ty::EA32, &config)
             + get_damage(Ty::EA41, &config) + get_damage(Ty::EA42, &config)
             + get_damage(Ty::EA51, &config) + get_damage(Ty::EA52, &config);

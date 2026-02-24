@@ -1,16 +1,4 @@
-use crate::attribute::*;
-use crate::character::character_common_data::CharacterCommonData;
-use crate::common::{Moonsign, WeaponType};
-use super::super::super::weapon_effect::WeaponEffect;
-use crate::weapon::weapon_common_data::WeaponCommonData;
-use crate::common::i18n::locale;
-use crate::common::item_config_type::{ItemConfig, ItemConfigType};
-use crate::weapon::weapon_base_atk::WeaponBaseATKFamily;
-use crate::weapon::weapon_static_data::WeaponStaticData;
-use crate::weapon::weapon_sub_stat::WeaponSubStatFamily;
-use crate::weapon::weapon_trait::WeaponTrait;
-use crate::weapon::WeaponName;
-use super::super::super::weapon_config::WeaponConfig;
+use crate::weapon::weapons::prelude::*;
 
 pub struct GestOfTheMightyWolfEffect {
     pub stack: f64,
