@@ -110,6 +110,6 @@ impl TargetFunction for ZibaiDefaultTargetFunction {
         dmg_ea * 4.0
         + dmg_e * if moonsign.is_ascendant() { 4.0 } else { 2.0 } + if character.common_data.constellation >= 1 { dmg_e1 } else { 0.0 }
         + dmg_q
-        + dmg_lunar_crystallize * self.lunar_crystallize_coefficient
+        + dmg_lunar_crystallize * self.lunar_crystallize_coefficient * 6.0
     }
 }
