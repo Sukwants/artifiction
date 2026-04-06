@@ -71,5 +71,6 @@ pub enum CharacterConfig {
     Columbina { moonsign: Moonsign, main_element: Option<Element>, reacted_element: ConfigElements8Multi },
     Zibai { moonsign: Moonsign, geo_count: usize, hydro_count: usize },
     Varka { hexerei_secret_rite: bool, team_elements: ConfigElements8Multi, repeated_element: bool },
+    Linnea { moonsign: Moonsign, moondrift_harmony: bool },
     NoConfig,
 }

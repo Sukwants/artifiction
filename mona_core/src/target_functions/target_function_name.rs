@@ -127,4 +127,5 @@ pub enum TargetFunctionName {
     ColumbinaOnField,
     ZibaiDefault,
     VarkaDefault,
+    LinneaDefault,
 }

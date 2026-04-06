@@ -276,4 +276,5 @@ pub enum WeaponName {
     SilvershowerHeartstrings,
     AstralVulturesCrimsonPlumage,
     TheDaybreakChronicles,
+    GoldenFrostboundOath,
 }

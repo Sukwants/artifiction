@@ -44,6 +44,7 @@ pub use sequence_of_solitude::SequenceOfSolitude;
 pub use snare_hook::SnareHook;
 pub use the_daybreak_chronicles::TheDaybreakChronicles;
 pub use rainbow_serpents_rain_bow::RainbowSerpentsRainBow;
+pub use golden_frostbound_oath::GoldenFrostboundOath;
 
 pub mod polar_star;
 pub mod thundering_pulse;
@@ -91,3 +92,4 @@ pub mod sequence_of_solitude;
 pub mod snare_hook;
 pub mod the_daybreak_chronicles;
 pub mod rainbow_serpents_rain_bow;
+pub mod golden_frostbound_oath;
