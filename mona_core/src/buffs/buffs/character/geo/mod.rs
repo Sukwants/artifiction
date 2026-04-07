@@ -10,6 +10,7 @@ pub use aether_geo::BuffAetherGeoC1;
 pub use lumine_geo::BuffLumineGeoC1;
 pub use illuga::{BuffIllugaQ, BuffIllugaP1, BuffIllugaC4};
 pub use zibai::BuffZibaiP3;
+pub use linnea::{BuffLinneaP1, BuffLinneaP2, BuffLinneaP3, BuffLinneaC1, BuffLinneaC2, BuffLinneaC4, BuffLinneaC6};
 
 pub mod albedo;
 pub mod arataki_itto;
@@ -23,3 +24,4 @@ pub mod aether_geo;
 pub mod lumine_geo;
 pub mod illuga;
 pub mod zibai;
+pub mod linnea;
