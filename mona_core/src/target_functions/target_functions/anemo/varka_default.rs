@@ -70,9 +70,12 @@ impl TargetFunction for VarkaDefaultTargetFunction {
 
         let dmg_e = get_damage(Ty::E, &config);
 
-        let dmg_e1 = get_damage(Ty::EE1, &config_with_c1) + get_damage(Ty::EE2, &config_with_c1);
-        let dmg_e2 = get_damage(Ty::EE1, &config) + get_damage(Ty::EE2, &config);
+        let dmg_e1 = get_damage(Ty::EE1, &config_with_c1) + get_damage(Ty::EE2, &config_with_c1) + get_damage(Ty::C2E, &config_with_c1)
+            + if context.character_common_data.constellation >= 6 { get_damage(Ty::EEZ1, &config_with_c1) + get_damage(Ty::EEZ2, &config_with_c1) } else { 0.0 };
+            let dmg_e2 = get_damage(Ty::EE1, &config) + get_damage(Ty::EE2, &config) + get_damage(Ty::C2E, &config_with_c1)
+            + if context.character_common_data.constellation >= 6 { get_damage(Ty::EEZ1, &config) + get_damage(Ty::EEZ2, &config) } else { 0.0 };
 
-        dmg_e + dmg_a * 2.0 + dmg_e1 + if hexerei_secret_rite { dmg_e2 } else { 0.0 }
+        dmg_e + if context.character_common_data.constellation >= 1 { dmg_e1 } else { 0.0 }
+            + dmg_a * 2.0 + dmg_e1 + if hexerei_secret_rite { dmg_e2 } else { 0.0 }
     }
 }

@@ -176,6 +176,13 @@ pub enum BuffName {
     ColumbinaC6,
     ColumbinaC,
     ZibaiP3,
+    LinneaP1,
+    LinneaP2,
+    LinneaP3,
+    LinneaC1,
+    LinneaC2,
+    LinneaC4,
+    LinneaC6,
 
     AloyTalent1,
 
@@ -199,6 +206,7 @@ pub enum BuffName {
     FracturedHalo,
     NightweaversLookingGlass,
     AthameArtis,
+    GoldenFrostboundOath,
     
 
     ResonancePyro2,

@@ -192,7 +192,7 @@ impl VarkaDamageEnum {
         match *self {
             A1 | A21 | A22 | A31 | A32 | A41 | A42 | A51 | A52 | Z1 | Z2 | X1 | X2 | X3 => Element::Physical,
             E | EA21 | EA31 | EA42 | EA52 | EAZ2 | EE2 | EEZ2 | Q2 | C2E | C2Z => Element::Anemo,
-            EA1 | EA22 | EA32 | EA41 | EA51 | EAZ1 | EE1 | EEZ1 | Q1 => elemental_absorption.unwrap_or(Element::Anemo),
+            EA1 | EA22 | EA32 | EA41 | EA51 | EAZ1 | EE1 | EEZ1 | Q1 => elemental_absorption.unwrap_or(Element::Physical),
         }
     }
 

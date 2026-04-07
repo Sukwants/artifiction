@@ -627,7 +627,7 @@ impl<T: Attribute> AttributeCommon<T> for T {
         );
     }
 
-    fn add_edge_s1to1(
+    fn add_edge_s1to1(  // 从当前角色子图单个节点向被选中角色子图单个节点连边
         &mut self,
         character_selector: CharacterSelector,
         from: AttributeType,
@@ -649,7 +649,7 @@ impl<T: Attribute> AttributeCommon<T> for T {
         }
     }
 
-    fn add_edge_s2to1(
+    fn add_edge_s2to1(  // 从当前角色子图两个节点向被选中角色子图单个节点连边
         &mut self,
         character_selector: CharacterSelector,
         from1: AttributeType,
@@ -672,7 +672,7 @@ impl<T: Attribute> AttributeCommon<T> for T {
         }
     }
 
-    fn add_edge_s1ton(
+    fn add_edge_s1ton(  // 从被选中角色子图单个节点向该被选中角色子图单个节点连边
         &mut self,
         character_selector: CharacterSelector,
         from: AttributeType,
@@ -694,7 +694,7 @@ impl<T: Attribute> AttributeCommon<T> for T {
         }
     }
 
-    fn add_edge_s2ton(
+    fn add_edge_s2ton(  // 从被选中角色子图两个节点向该被选中角色子图单个节点连边
         &mut self,
         character_selector: CharacterSelector,
         from1: AttributeType,
@@ -723,7 +723,7 @@ impl<T: Attribute> AttributeCommon<T> for T {
             AttributeName::ATKPercentage,
             Arc::new(move |x, _| x * value),
             key,
-            EdgePriority::Common,
+            EdgePriority::Base,
         );
     }
 
@@ -743,7 +743,7 @@ impl<T: Attribute> AttributeCommon<T> for T {
             AttributeName::DEFPercentage,
             Arc::new(move |x, _| x * value),
             key,
-            EdgePriority::Common,
+            EdgePriority::Base,
         );
     }
 
@@ -763,7 +763,7 @@ impl<T: Attribute> AttributeCommon<T> for T {
             AttributeName::HPPercentage,
             Arc::new(move |x, _| x * value),
             key,
-            EdgePriority::Common,
+            EdgePriority::Base,
         );
     }
 

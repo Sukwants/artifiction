@@ -115,6 +115,10 @@ pub enum BuffConfig {
     ColumbinaC6 { reacted_element: ConfigElements8Multi },
     ColumbinaC { constellation: usize },
     ZibaiP3 { def: f64 },
+    LinneaP1 { moonsign: Moonsign },
+    LinneaP2 { def: f64 },
+    LinneaP3 { def: f64 },
+    LinneaC1 { def: f64, has_c6: bool },
 
     FreedomSworn { refine: usize },
     SongOfBrokenPines { refine: usize },
@@ -135,6 +139,7 @@ pub enum BuffConfig {
     FracturedHalo { refine: usize },
     NightweaversLookingGlass { refine: usize },
     AthameArtis { refine: usize, hexerei_secret_rite: bool },
+    GoldenFrostboundOath { refine: usize, rate: f64 },
 
     ResonanceCryo2 { rate: f64 },
     ResonanceGeo2 { rate1: f64, rate2: f64 },

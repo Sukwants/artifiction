@@ -9,6 +9,7 @@ pub mod navia_default;
 pub mod chiori_default;
 pub mod xilonen_default;
 pub mod zibai_default;
+pub mod linnea_default;
 
 pub use albedo_default::AlbedoDefaultTargetFunction;
 pub use arataki_itto_default::AratakiIttoDefaultTargetFunction;
@@ -21,3 +22,4 @@ pub use navia_default::NaviaDefaultTargetFunction;
 pub use chiori_default::ChioriDefaultTargetFunction;
 pub use xilonen_default::XilonenDefaultTargetFunction;
 pub use zibai_default::ZibaiDefaultTargetFunction;
+pub use linnea_default::LinneaDefaultTargetFunction;

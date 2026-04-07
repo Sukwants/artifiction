@@ -150,4 +150,5 @@ pub enum CharacterName {
     Columbina,
     Zibai,
     Varka,
+    Linnea,
 }

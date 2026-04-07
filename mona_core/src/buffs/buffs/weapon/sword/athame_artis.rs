@@ -16,7 +16,7 @@ impl<A: Attribute> Buff<A> for BuffAthameArtis {
     fn change_attribute(&self, attribute: &mut A) {
         let refine: f64 = self.refine as f64;
 
-        attribute.add_atk_percentage("黑蚀「白昼之刃」", (refine * 0.05 + 0.15) * if self.hexerei_secret_rite { 1.75 } else { 1.0 });
+        attribute.add_atk_percentage("黑蚀「白昼之刃」", (refine * 0.04 + 0.12) * if self.hexerei_secret_rite { 1.75 } else { 1.0 });
     }
 }
 

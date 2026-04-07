@@ -8,4 +8,5 @@ pub use crate::character::CharacterName;
 pub(crate) use crate::common::i18n::locale;
 pub use crate::common::item_config_type::{ItemConfig, ItemConfigType, ConfigElements8Multi};
 pub use crate::common::{ChangeAttribute, Element, MoonglareReaction, Moonsign, ReactionType, SkillType, WeaponType};
+pub use crate::weapon::WeaponName;
 pub use std::sync::Arc;
