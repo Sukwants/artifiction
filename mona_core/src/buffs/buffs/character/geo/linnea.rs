@@ -319,8 +319,8 @@ impl BuffMeta for BuffLinneaC6 {
     const META_DATA: BuffMetaData = BuffMetaData {
         name: BuffName::LinneaC6,
         name_locale: locale!(
-            zh_cn: "莉奈娅-「专家的直感觉」",
-            en: "Linnea-Expert Instinct"
+            zh_cn: "莉奈娅-「黄金猎犬之梦」",
+            en: "Linnea-Golden Beagle's Dream"
         ),
         image: BuffImage::Avatar(CharacterName::Linnea),
         genre: BuffGenre::Character,
