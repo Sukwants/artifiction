@@ -67,6 +67,15 @@ pub enum CharacterSkillConfig {
     Skirk { cunning_stacks: i32, seven_phase_mode: bool, havoc_extinction: bool, death_crossing_stacks: i32, void_rift_count: i32 },
     Nefer { veil_of_falsehood: usize, shadow_dance: bool },
     Jahoda { elemental_absorption: Element, activated_p2: bool },
+    Nicole {
+        grace_of_kenosis: bool,
+        guidance_of_theosis: bool,
+        guidance_element: Option<Element>,
+        pathfinder_blessing: bool,
+        arcane_projection_element: Option<Element>,
+        arcane_projection_hexerei: bool,
+        activated_c1: bool
+    },
     Durin { activated_res: bool, primordial_fusion: bool, cycle_of_enlightenment: bool, activated_reaction: bool },
     Illuga { nightingales_song: bool },
     Columbina { activated_q: bool, stack_p1: usize, activated_c4: bool },

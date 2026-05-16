@@ -145,6 +145,7 @@ pub enum CharacterName {
     Flins,
     Nefer,
     Jahoda,
+    Nicole,
     Durin,
     Illuga,
     Columbina,
