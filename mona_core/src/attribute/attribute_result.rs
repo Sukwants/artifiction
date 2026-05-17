@@ -4,7 +4,7 @@ use crate::character::team_status::{CharacterSelector, CharacterStatus, GetChara
 use crate::common::{Element, SkillType};
 use crate::damage::damage_builder::DamageBuilder;
 
-pub trait AttributeGraphResult {
+pub trait AttributeGraphResult: Clone {
     type ResultType;
 
     fn get_attribute_value(&self, node: AttributeNode) -> f64;
@@ -248,5 +248,12 @@ impl<ResultTy: AttributeGraphResult> GetCharacterMethod for AttributeResultWithC
 
     fn get_characters(&self) -> &Vec<CharacterStatus> {
         self.result.get_characters()
+    }
+
+    fn get_change_active_character(&self, character_id: usize) -> Self {
+        AttributeResultWithCharacter {
+            result: self.result.clone(),
+            character_id,
+        }
     }
 }

@@ -62,6 +62,7 @@ impl CharacterStatus {
     }
 }
 
+#[derive(Clone)]
 pub struct CharacterSelector {
     pub selector: Arc<dyn Fn(&CharacterStatus) -> bool>,
 }
@@ -72,6 +73,8 @@ pub trait GetCharacterMethod {
     fn get_character(&self) -> &CharacterStatus;
 
     fn get_characters(&self) -> &Vec<CharacterStatus>;
+
+    fn get_change_active_character(&self, character_id: usize) -> Self;
 }
 
 impl CharacterSelector {
@@ -82,6 +85,10 @@ impl CharacterSelector {
         CharacterSelector {
             selector: Arc::new(f),
         }
+    }
+
+    pub fn check(&self, status: &CharacterStatus) -> bool {
+        (self.selector)(status)
     }
 
     pub fn get_matched_list(&self, team: &Vec<CharacterStatus>) -> Vec<usize> {

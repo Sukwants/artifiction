@@ -362,6 +362,10 @@ pub type EdgeFunction = Arc<dyn Fn(f64, f64) -> f64>;
 
 其余能在 `AttributeResult` 中发现的接口均为历史原因存在的接口，不允许使用。
 
+#### Active Character
+
+`Attribute` 和 `AttributeResult` 中都打包有标记当前角色的 `character_id`，所有查询与修改接口都会默认作用于该 `character_id` 指示的角色，称为当前角色。可以通过调用 `get_change_active_character` 来获得更换当前角色后的 `Attribute` 或 `AttributeResult` 的拷贝，切换后所有倍率均作用于切换后的角色面板属性，在当前角色会触发“视为其他某个角色造成的伤害”效果的场景中可能会用到。
+
 ### 接口说明
 
 Attribute 系统入口文件为 `mona_core/src/attribute/attribute.rs`，可以参阅。
@@ -428,6 +432,8 @@ attribute.add_edge_s1ton(
 ```
 
 防御力与生命值上限同理。
+
+特别的，对于施加在敌人身上的减抗、减防效果，应当总是应用到所有人，即角色选择器应总是为 `CharacterSelector::select_all(attribute)`，以保证所有伤害都受到该效果的影响。
 
 ### 调用示例
 

@@ -122,3 +122,5 @@ impl CharacterTrait for Durin {
 - `name`：配置项的绑定名称，必须与 CharacterSkillConfig 中对应字段的名称一致。
 - `title`：配置项的显示名称，需要中英文两种语言。
 - `config`：配置项的类型定义，包含了配置项的类型、可选项、默认值等信息。可以使用的配置类型详见 `mona_docs/src/config.md`。
+
+请额外注意，天赋 1 和天赋 2 需要通过 `has_talent1` 和 `has_talent2` 来判断是否生效，命座需要通过 `common_data.constellation` 来判断是否生效。

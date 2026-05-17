@@ -95,7 +95,7 @@ pub enum EdgePriority {
     Last,
 }
 
-pub trait AttributeGraph {
+pub trait AttributeGraph: Clone {
     type EdgeHandle: Copy;
     type ResultType: AttributeGraphResult;
 
@@ -224,6 +224,13 @@ impl<GraphTy: AttributeGraph> GetCharacterMethod for AttributeWithCharacter<Grap
 
     fn get_characters(&self) -> &Vec<CharacterStatus> {
         self.attribute.get_characters()
+    }
+
+    fn get_change_active_character(&self, character_id: usize) -> Self {
+        AttributeWithCharacter {
+            attribute: self.attribute.clone(),
+            character_id,
+        }
     }
 }
 

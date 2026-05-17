@@ -148,3 +148,5 @@ impl CharacterTrait for Durin {
 - `config`：配置项的类型定义，包含了配置项的类型、可选项、默认值等信息。可以使用的配置类型详见 `mona_docs/src/config.md`。
 
 `new_effect` 函数用于将用户输入的配置项转换为 Effect 结构体，每一个配置项都应添加到 `mona::character::character_config::CharacterConfig` 中，并在 `new_effect` 函数中进行匹配解析。
+
+请额外注意，天赋 1 和天赋 2 需要通过 `has_talent1` 和 `has_talent2` 来判断是否生效，命座需要通过 `common_data.constellation` 来判断是否生效。
