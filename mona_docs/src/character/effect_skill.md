@@ -112,6 +112,10 @@ impl CharacterTrait for Durin {
 
 角色技能配置与角色配置的区别在于，角色技能配置应为计算过程中需要由 target_function 决定的配置项（如角色当前形态、某个效果是否触发），并需要写入到 `CharacterSkillConfig` 中（位于 `mona_core/src/character/skill_config.rs`）。
 
+具体划分原则如下：
+- **`CONFIG_DATA`（角色配置）**：存放不随技能释放变化的静态/半静态配置（如队伍中角色元素类型、月兆等级、元素转化类型），对应 `CharacterConfig` 枚举，在 `Effect::change_attribute` 中消费。
+- **`CONFIG_SKILL`（技能配置）**：存放随技能释放或实时状态动态变化的配置（如 buff 层数、某效果是否在此次触发中激活、命座提供的条件攻击力加成），对应 `CharacterSkillConfig` 枚举，在 `CharacterTrait::change_attribute` 中消费。这些配置项会被 target_function 决定其取值。
+
 `change_attribute` 接口实现部分包含了角色技能配置对属性的修改逻辑，应包含所有不由具体技能决定的属性修改逻辑，通过直接解析 `skill_config` 获取配置数据。接口调用方法参见 `mona_docs/src/attribute.md`。
 
 `CONFIG_SKILL` 包含了需要用户给出的配置项，每一个配置项应包含以下字段：

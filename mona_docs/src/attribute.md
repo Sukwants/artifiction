@@ -348,7 +348,7 @@ pub type EdgeFunction = Arc<dyn Fn(f64, f64) -> f64>;
 
 Attribute 系统入口文件为 `mona_core/src/attribute/attribute.rs`，可以参阅。
 
-对于所有接口传递的参数中，`key: &str` 均标识了当前属性的来源，包含发起角色与技能、发起武器或发起圣遗物及套装效果，如“杜林天赋1”、“杜林命座6”、“黑蚀被动”、“风起之日4”等。对于同一来源的属性，`key` 保持一致。
+对于所有接口传递的参数中，`key: &str` 均标识了当前属性的来源，包含发起角色与技能、发起武器或发起圣遗物及套装效果。
 
 如无特别说明，接口传递的参数中，`name: AttributeName` 均指面板属性或因历史原因存在的其他情况，`ty: AttributeType` 为新的标准实现，包含面板属性和非面板属性。对于非历史原因存在的调用，不允许使用 `name: AttributeName` 来指示非面板属性，面板属性可以自行选择使用 `name: AttributeName` 或 `ty: AttributeType` 来指示。
 
@@ -382,6 +382,34 @@ Attribute 对外提供的接口有：
 - `fn add_atk_percentage_base(&mut self, key: &str, value: f64)`：历史接口，不应使用。
 - `fn add_def_percentage_base(&mut self, key: &str, value: f64)`：历史接口，不应使用。
 - `fn add_hp_percentage_base(&mut self, key: &str, value: f64)`：历史接口，不应使用。
+
+### 来源命名
+
+`key` 的命名规范为“效果来源对象+效果来源位置”，如“杜林天赋1”、“杜林命座6”、“黑蚀被动”、“风起之日4”等，一般不需要对同一来源的不同效果进行区分，方便在 Attribute 系统中对效果进行合并。
+
+对于角色来源，应命名为“角色名+效果来源”。普通攻击、元素战技、元素爆发应命名为“技能A”、“技能E”、“技能Q”，天赋按照顺序依次命名为“天赋1”、“天赋2”、“天赋3”（不计算生活天赋），命座依次命名为“命座1”到“命座6”。  
+对于武器来源，一般直接命名为“武器名+‘被动’”即可，如“黑蚀被动”。  
+对于圣遗物来源，应命名为“套装名+n”，其中 n 为套装效果为几件套，如“风起之日4”。  
+对于 buff 来源，应命名为“buff来源对象-buff名称”，如 buff “杜林-「光灵遵神数显现」”应命名为“杜林-「光灵遵神数显现」”。  
+
+### 注意事项
+
+对于攻击力、防御力、生命值上限，共有四个有关属性：`ATKBase`、`ATKFixed`、`ATKPercentage`、`ATK`（防御力和生命值上限同理）。其中 `ATKBase` 指基础攻击力，除非明确提升基础攻击力，否则不得修改该属性；`ATKFixed` 指攻击力固定数值部分提升；`ATKPercentage` 指攻击力百分比部分提升，但使用方法不是直接将提升百分比加到该属性上，而是需要通过从 `ATKBase` 到 `ATKPercentage` 的相应比例的属性边来实现；`ATK` 是 `ATKBase`、`ATKFixed`、`ATKPercentage` 三者的实时和，基于攻击力的加成应当从 `ATK` 引出属性边来实现，不允许有指向 `ATK` 的属性边。
+
+`add_atk_percentage` 方法仅对当前角色生效。若需要为其他角色（如场上角色）添加攻击力百分比加成，应使用 `add_edge_s1ton` 配合对应的 `CharacterSelector`，在选中角色的 `ATKBase` 和 `ATKPercentage` 之间建边：
+
+```rust
+attribute.add_edge_s1ton(
+    CharacterSelector::select_onfield(attribute),
+    AttributeType::Panel(AttributeName::ATKBase),
+    AttributeType::Panel(AttributeName::ATKPercentage),
+    Arc::new(move |base: f64, _| base * 0.3),
+    "效果名称",
+    EdgePriority::Base,
+);
+```
+
+防御力与生命值上限同理。
 
 ### 调用示例
 

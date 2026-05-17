@@ -82,3 +82,25 @@ impl CharacterTrait for Durin {
 - 对于当前配置下不会触发的伤害、治疗或护盾，调用 `builder.none` 方法。
 
 原则上角色伤害计算部分不应出现 `builder.transformative` 方法。
+### 条件伤害处理
+
+某些伤害仅在特定条件下才能触发（如需要元素转化存在、需要解锁特定天赋或命座），应在计算倍率之前检查条件，不满足时返回 `builder.none()`：
+
+```rust
+// 需要元素转化才能触发的伤害
+if (s == P1 || s == C4E) && elemental_absorption == None {
+    return builder.none();
+}
+
+// 需要解锁天赋才能触发的伤害
+if s == P1 && !context.character_common_data.has_talent1 {
+    return builder.none();
+}
+
+// 需要特定命座才能触发的伤害
+if s == C4E && context.character_common_data.constellation < 4 {
+    return builder.none();
+}
+```
+
+注意检查顺序：先检查元素转化等数据条件，再检查天赋和命座条件。

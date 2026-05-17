@@ -144,3 +144,25 @@ pub enum MoonglareReaction {
 其中 `LunarCharged`、`LunarBloom`、`LunarCrystallize` 分别为通过角色技能触发的月感电、月绽放、月结晶伤害，`LunarChargedReaction`、`LunarCrystallizeReaction` 分别为通过元素反应触发的月感电、月结晶伤害。在 `DamageEnum` 中，原则上不允许出现效果为 `LunarChargedReaction`、`LunarCrystallizeReaction` 的技能。
 
 `CharacterTrait` 的实现中，前几个变量仿照上例即可。`DEFAULT_TAGS` 根据当前角色是否为月兆或魔导角色进行设置。`SKILL_MAP` 为所有需要对用户展示的技能以及相应名称，按照技能描述填写名称即可，对于部分天赋或命座中的技能，可通过“命座2伤害”等形式进行命名。
+### 命座伤害的拆分
+
+当一个命座产生的伤害可能由不同技能来源触发时（如命座4的弹射伤害既可能由元素战技触发也可能由元素爆发触发），应将该伤害拆分为多个 DamageEnum 变体，分别归入对应技能的 `skill_map` 中。拆分后在 `get_skill_type` 中也应分别返回对应的 `SkillType`：
+
+```rust
+damage_enum!(
+    XxxDamageEnum
+    C4E   // 命座4弹射-元素战技触发
+    C4Q   // 命座4弹射-元素爆发触发
+);
+
+impl XxxDamageEnum {
+    pub fn get_skill_type(&self) -> SkillType {
+        match *self {
+            C4E => SkillType::ElementalSkill,
+            C4Q => SkillType::ElementalBurst,
+        }
+    }
+}
+```
+
+在 `SKILL_MAP` 中，`C4E` 放入 `skill2`，`C4Q` 放入 `skill3`。两个变体可共用 `SkillType` 中的同一个 `f64` 字段。

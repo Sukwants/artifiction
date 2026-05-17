@@ -22,6 +22,6 @@
 `mona_core/src/character/characters/anemo/varka.rs`
 `mona_core/src/character/characters/geo/linnea.rs`
 
-以上文件越靠下的实现越新，实现时优先参考文档与较新的实现。
+以上文件越靠下的实现越新，实现时优先参考文档与较新的实现。请勿尝试参考没有列出的实现，几乎没有参考价值。
 
 如果你是 AI，请仔细阅读以上示例与文档，严格按照以上说明，并尽量贴合示例的形式进行编写。
