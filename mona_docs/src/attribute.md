@@ -286,7 +286,7 @@ mona::character::team_status
 pub type CharacterTags = HashSet<CharacterTag>
 ```
 
-其中 `CharacterTag` 是一个枚举类型，包含角色可能具有的标签，目前情况下包含“月兆”、“魔导”。
+其中 `CharacterTag` 是一个枚举类型，包含角色可能具有的标签，目前情况下包含“月兆”、“魔导”。一个角色为月兆角色当且仅当其具有“月兆”标签，一个角色为魔导角色当且仅当其具有“魔导”标签，可以通过判断角色是否具有特定标签来得出当前角色是否为月兆角色或魔导角色，也可以通过在选择器中判断来选取具有特定标签的角色。
 
 一般情况下使用 `CharacterSelector` 可直接调用 `CharacterSelector` 中已封装好的选择器，遇到较为复杂的情况再手动实现一个 `CharacterSelector` 实例。已有的选择器包括：
 
@@ -309,6 +309,18 @@ pub type CharacterTags = HashSet<CharacterTag>
 以上接口均需要通过传入 `attribute` 来获取当前角色的 `character_id` 和 `team_id`。如自行实现一个选择器，则可以通过 `attribute.get_character()` 接口获取当前角色的 `CharacterStatus` 来实现选择逻辑。注意 `Attribute` 与 `AttributeResult` 类型均是合法的可传入 `attribute` 的类型。
 
 具体实现见 `mona_core/src/character/team_status.rs`。
+
+#### GetCharacterMethod
+
+`Attribute` 和 `AttributeResult` 中都打包有标记当前角色的 `character_id`，所有查询与修改接口都会默认作用于该 `character_id` 指示的角色，称为当前角色。
+
+`Attribute` 和 `AttributeResult` 均实现了 `GetCharacterMethod` 接口，该接口有如下方法：
+
+- `pub fn get_character_id(&self) -> &usize`：获取当前角色的 `character_id`。
+- `pub fn get_character(&self) -> &CharacterStatus`：获取当前角色的 `CharacterStatus`。
+- `pub fn get_characters(&self) -> &Vec<CharacterStatus>`：获取当前角色所在队伍的所有角色的 `CharacterStatus` 的列表。
+- `pub fn get_characters_by_selector(&self, selector: CharacterSelector) -> Vec<&CharacterStatus>`：获取 `selector` 选择的角色的 `CharacterStatus` 的列表。
+- `pub fn get_change_active_character(&self, character_id: usize) -> Self`：获取更换当前角色后的 `Attribute` 或 `AttributeResult` 的拷贝，切换后所有倍率均作用于切换后的角色面板属性，在当前角色会触发“视为其他某个角色造成的伤害”效果的场景中可能会用到。
 
 #### EdgePriority
 
@@ -362,10 +374,6 @@ pub type EdgeFunction = Arc<dyn Fn(f64, f64) -> f64>;
 
 其余能在 `AttributeResult` 中发现的接口均为历史原因存在的接口，不允许使用。
 
-#### Active Character
-
-`Attribute` 和 `AttributeResult` 中都打包有标记当前角色的 `character_id`，所有查询与修改接口都会默认作用于该 `character_id` 指示的角色，称为当前角色。可以通过调用 `get_change_active_character` 来获得更换当前角色后的 `Attribute` 或 `AttributeResult` 的拷贝，切换后所有倍率均作用于切换后的角色面板属性，在当前角色会触发“视为其他某个角色造成的伤害”效果的场景中可能会用到。
-
 ### 接口说明
 
 Attribute 系统入口文件为 `mona_core/src/attribute/attribute.rs`，可以参阅。
@@ -379,11 +387,11 @@ Attribute 系统入口文件为 `mona_core/src/attribute/attribute.rs`，可以�
 Attribute 对外提供的接口有：
 
 - `fn set_value_by(&mut self, name: AttributeName, key: &str, value: f64)`：将当前角色的面板属性 `name` 提高 `value`。
-- `fn set_value_to(&mut self, name: AttributeName, key: &str, value: f64)`：将当前角色的面板属性 `name` 设定为 `value`。原则上不得在同一属性上同时使用 `set_value_by` 和 `set_value_to` 或使用多次 `set_value_to`。
+- `fn set_value_to(&mut self, name: AttributeName, key: &str, value: f64)`：将当前角色的面板属性 `name` 中键名为 `key` 的贡献的值设定为 `value`。原则上不得在同一键名上同时使用 `set_value_by` 和 `set_value_to` 或使用多次 `set_value_to`。
 - `fn set_value_by_t(&mut self, ty: AttributeType, key: &str, value: f64)`：将当前角色的属性 `ty` 提高 `value`。
-- `fn set_value_to_t(&mut self, ty: AttributeType, key: &str, value: f64)`：将当前角色的属性 `ty` 设定为 `value`。原则上不得在同一属性上同时使用 `set_value_by_t` 和 `set_value_to_t` 或使用多次 `set_value_to_t`。
+- `fn set_value_to_t(&mut self, ty: AttributeType, key: &str, value: f64)`：将当前角色的属性 `ty` 中键名为 `key` 的贡献的值设定为 `value`。原则上不得在同一键名上同时使用 `set_value_by_t` 和 `set_value_to_t` 或使用多次 `set_value_to_t`。
 - `fn set_value_by_s(&mut self, character_selector: CharacterSelector, ty: AttributeType, key: &str, value: f64)`：将 `character_selector` 选择的角色的属性 `ty` 提高 `value`。
-- `fn set_value_to_s(&mut self, character_selector: CharacterSelector, ty: AttributeType, key: &str, value: f64)`：将 `character_selector` 选择的角色的属性 `ty` 设定为 `value`。原则上不得在同一属性上同时使用 `set_value_by_s` 和 `set_value_to_s` 或使用多次 `set_value_to_s`。
+- `fn set_value_to_s(&mut self, character_selector: CharacterSelector, ty: AttributeType, key: &str, value: f64)`：将 `character_selector` 选择的角色的属性 `ty` 中键名为 `key` 的贡献设定为 `value`。原则上不得在同一键名上同时使用 `set_value_by_s` 和 `set_value_to_s` 或使用多次 `set_value_to_s`。
 - `fn add_edge_n1(&mut self, from: AttributeName, to: AttributeName, func: EdgeFunction, key: &str, priority: EdgePriority)`：添加从面板属性 `from` 到面板属性 `to` 的属性边，函数关系为 `func`，优先级为 `priority`。
 - `fn add_edge_n2(&mut self, from1: AttributeName, from2: AttributeName, to: AttributeName, func: EdgeFunction, key: &str, priority: EdgePriority)`：添加从面板属性 `from1` 和 `from2` 到面板属性 `to` 的属性边，函数关系为 `func`，优先级为 `priority`。
 - `fn add_edge_t1(&mut self, from: AttributeType, to: AttributeType, func: EdgeFunction, key: &str, priority: EdgePriority)`：添加从属性 `from` 到属性 `to` 的属性边，函数关系为 `func`，优先级为 `priority`。
@@ -396,6 +404,8 @@ Attribute 对外提供的接口有：
 - `fn add_def_percentage(&mut self, key: &str, value: f64)`：将当前角色的防御力提升 `value` 百分比。
 - `fn add_hp_percentage(&mut self, key: &str, value: f64)`：将当前角色的生命值上限提升 `value` 百分比。
 - `fn add_elemental_bonus(&mut self, key: &str, value: f64)`：将当前角色的所有元素伤害加成的面板属性提升 `value` 百分比。
+
+请注意，由于默认情况下同一来源的增益无法叠加，因此除非明确可以叠加的增益，其余均建议使用 `set_value_to` 等而非 `set_value_by` 等接口来实现，以避免错误叠加与重复计算。
 
 以下为历史接口，不应使用：
 
@@ -412,7 +422,7 @@ Attribute 对外提供的接口有：
 对于角色来源，应命名为“角色名+效果来源”。普通攻击、元素战技、元素爆发应命名为“技能A”、“技能E”、“技能Q”，天赋按照顺序依次命名为“天赋1”、“天赋2”、“天赋3”（不计算生活天赋），命座依次命名为“命座1”到“命座6”。  
 对于武器来源，一般直接命名为“武器名+‘被动’”即可，如“黑蚀被动”。  
 对于圣遗物来源，应命名为“套装名+n”，其中 n 为套装效果为几件套，如“风起之日4”。  
-对于 buff 来源，应命名为“buff来源对象-buff名称”，如 buff “杜林-「光灵遵神数显现」”应命名为“杜林-「光灵遵神数显现」”。  
+对于 buff 来源，应与其真实来源的命名规范保持一致，如 “哥伦比娅Q技能”、“哥伦比娅天赋3”、“哥伦比娅命座2”等。
 
 ### 注意事项
 
