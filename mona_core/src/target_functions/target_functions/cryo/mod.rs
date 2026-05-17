@@ -15,6 +15,7 @@ pub mod mika_default;
 pub mod freminet_default;
 pub mod wriothesley_default;
 pub mod citlali_default;
+pub mod lohen_default;
 
 pub use aloy_default::AloyDefaultTargetFunction;
 pub use chongyun_default::ChongyunDefaultTargetFunction;
@@ -33,3 +34,4 @@ pub use mika_default::MikaDefaultTargetFunction;
 pub use freminet_default::FreminetDefaultTargetFunction;
 pub use wriothesley_default::WriothesleyDefaultTargetFunction;
 pub use citlali_default::CitlaliDefaultTargetFunction;
+pub use lohen_default::LohenDefaultTargetFunction;

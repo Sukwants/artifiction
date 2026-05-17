@@ -129,4 +129,5 @@ pub enum TargetFunctionName {
     VarkaDefault,
     LinneaDefault,
     NicoleDefault,
+    LohenDefault,
 }

@@ -74,6 +74,6 @@ pub enum CharacterConfig {
     Linnea { moonsign: Moonsign, moondrift_harmony: bool },
     Prune { hexerei_secret_rite: bool, elemental_absorption: Option<Element> },
     Nicole { hexerei_secret_rite: bool },
-    Lohen { hexerei_secret_rite: bool, avg_will_to_win: f64 },
+    Lohen { hexerei_secret_rite: bool, avg_will_to_win: f64, activated_cryo_reaction: bool },
     NoConfig,
 }

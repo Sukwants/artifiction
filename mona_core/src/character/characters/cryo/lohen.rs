@@ -226,6 +226,14 @@ impl CharacterTrait for Lohen {
             ),
             config: ItemConfigType::Float { min: 0.0, max: 100.0, default: 80.0 }
         },
+        ItemConfig {
+            name: "activated_cryo_reaction",
+            title: locale!(
+                zh_cn: "触发冰元素相关反应（天赋2）",
+                en: "Activated Cryo reaction (Talent 2)"
+            ),
+            config: ItemConfigType::Bool { default: true }
+        },
     ]);
 
     #[cfg(not(target_family = "wasm"))]
@@ -235,14 +243,6 @@ impl CharacterTrait for Lohen {
             title: locale!(
                 zh_cn: "处于奇谋状态",
                 en: "In Masterstroke state"
-            ),
-            config: ItemConfigType::Bool { default: true }
-        },
-        ItemConfig {
-            name: "activated_cryo_reaction",
-            title: locale!(
-                zh_cn: "触发冰元素相关反应（天赋2）",
-                en: "Activated Cryo reaction (Talent 2)"
             ),
             config: ItemConfigType::Bool { default: true }
         },
@@ -257,15 +257,15 @@ impl CharacterTrait for Lohen {
     ]);
 
     fn change_attribute<A: Attribute>(attribute: &mut A, common_data: &CharacterCommonData, skill_config: &CharacterSkillConfig) {
-        let (hexerei_secret_rite, avg_will_to_win) = match &common_data.config {
-            CharacterConfig::Lohen { hexerei_secret_rite, avg_will_to_win } => (*hexerei_secret_rite, *avg_will_to_win),
-            _ => (false, 0.0),
+        let (hexerei_secret_rite, avg_will_to_win, activated_cryo_reaction) = match &common_data.config {
+            CharacterConfig::Lohen { hexerei_secret_rite, avg_will_to_win, activated_cryo_reaction } => (*hexerei_secret_rite, *avg_will_to_win, *activated_cryo_reaction),
+            _ => (false, 0.0, false),
         };
 
-        let (in_masterstroke, activated_cryo_reaction, evilsbane_blade) = match *skill_config {
-            CharacterSkillConfig::Lohen { in_masterstroke, activated_cryo_reaction, evilsbane_blade } =>
-                (in_masterstroke, activated_cryo_reaction, evilsbane_blade),
-            _ => (false, false, false),
+        let (in_masterstroke, evilsbane_blade) = match *skill_config {
+            CharacterSkillConfig::Lohen { in_masterstroke, evilsbane_blade } =>
+                (in_masterstroke, evilsbane_blade),
+            _ => (false, false),
         };
 
         // P2: 戏言的杰作 —— 奇谋状态下触发冰元素相关反应后8秒内，触发者与洛恩攻击力+15%
@@ -313,15 +313,15 @@ impl CharacterTrait for Lohen {
         let s: LohenDamageEnum = num::FromPrimitive::from_usize(s).unwrap();
         let (s1, s2, s3) = context.character_common_data.get_3_skill();
 
-        let (hexerei_secret_rite, avg_will_to_win) = match &context.character_common_data.config {
-            CharacterConfig::Lohen { hexerei_secret_rite, avg_will_to_win } => (*hexerei_secret_rite, *avg_will_to_win),
-            _ => (false, 0.0),
+        let (hexerei_secret_rite, avg_will_to_win, activated_cryo_reaction) = match &context.character_common_data.config {
+            CharacterConfig::Lohen { hexerei_secret_rite, avg_will_to_win, activated_cryo_reaction } => (*hexerei_secret_rite, *avg_will_to_win, *activated_cryo_reaction),
+            _ => (false, 0.0, false),
         };
 
-        let (in_masterstroke, activated_cryo_reaction, evilsbane_blade) = match *config {
-            CharacterSkillConfig::Lohen { in_masterstroke, activated_cryo_reaction, evilsbane_blade } =>
-                (in_masterstroke, activated_cryo_reaction, evilsbane_blade),
-            _ => (false, false, false),
+        let (in_masterstroke, evilsbane_blade) = match *config {
+            CharacterSkillConfig::Lohen { in_masterstroke, evilsbane_blade } =>
+                (in_masterstroke, evilsbane_blade),
+            _ => (false, false),
         };
 
         // 计算有效争胜层数：
@@ -418,9 +418,9 @@ impl CharacterTrait for Lohen {
     }
 
     fn new_effect<A: Attribute>(common_data: &CharacterCommonData, config: &CharacterConfig) -> Option<Box<dyn ChangeAttribute<A>>> {
-        let (hexerei_secret_rite, avg_will_to_win) = match *config {
-            CharacterConfig::Lohen { hexerei_secret_rite, avg_will_to_win } => (hexerei_secret_rite, avg_will_to_win),
-            _ => (false, 0.0),
+        let (hexerei_secret_rite, avg_will_to_win, _) = match *config {
+            CharacterConfig::Lohen { hexerei_secret_rite, avg_will_to_win, .. } => (hexerei_secret_rite, avg_will_to_win, ()),
+            _ => (false, 0.0, ()),
         };
         Some(Box::new(LohenEffect {
             hexerei_secret_rite,
