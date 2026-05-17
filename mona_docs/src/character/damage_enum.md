@@ -106,6 +106,8 @@ impl CharacterTrait for Durin {
 其中，通过宏 `damage_enum!` 声明 `DamageEnum` 枚举类型，应包含所有需要被计算的技能（包括用户需要和 target_function 需要），应当主要分为三部分：普通攻击、元素战技、元素爆发，根据每一个技能所属的描述部分分别严格对应 `A`、`E`、`Q` 开头的技能，其余还存在天赋描述、命座描述中产生的技能，对应 `P1`、`C2` 等形式开头的技能。  
 每个技能部分的命名根据技能产生影响的不同使用 `Heal`、`Shield` 表示治疗、护盾，一般情况伤害不作特别标识，同一技能的不同段数使用数字区分，有独立名称的技能可自行提取合适的表达（如首字母、缩写等）标识。在根据变量名无法明确区分的情况下，建议在注释中标明技能名称以供参考。
 
+对于一个造成多次相同倍率伤害的技能，应拆分为单次伤害和总伤害两个技能。
+
 对于 `DamageEnum`，需要实现 `get_element` 和 `get_skill_type` 等接口。  
 `get_element` 接口返回技能的元素类型，如为护盾返回护盾元素类型，如为治疗一般返回 `Element::Physical`。
 `get_skill_type` 接口返回技能的技能类型，一般根据通过普通攻击、重击、下落攻击、元素战技、元素爆发触发的技能类型即为对应类型，与该技能描述所在部分无必然关系，如元素战技描述中存在通过普通攻击触发的技能，则该技能类型应为 `SkillType::NormalAttack`。非当前角色操作触发的技能，如协同攻击，一般根据初始触发的技能类型进行判断。若存在“视为元素战技伤害”等描述，应严格按照该描述进行判断。  
@@ -144,7 +146,6 @@ pub enum MoonglareReaction {
 其中 `LunarCharged`、`LunarBloom`、`LunarCrystallize` 分别为通过角色技能触发的月感电、月绽放、月结晶伤害，`LunarChargedReaction`、`LunarCrystallizeReaction` 分别为通过元素反应触发的月感电、月结晶伤害。在 `DamageEnum` 中，原则上不允许出现效果为 `LunarChargedReaction`、`LunarCrystallizeReaction` 的技能。
 
 `CharacterTrait` 的实现中，前几个变量仿照上例即可。`DEFAULT_TAGS` 根据当前角色是否为月兆或魔导角色进行设置。`SKILL_MAP` 为所有需要对用户展示的技能以及相应名称，按照技能描述填写名称即可，对于部分天赋或命座中的技能，可通过“命座2伤害”等形式进行命名。
-### 命座伤害的拆分
 
 当一个命座产生的伤害可能由不同技能来源触发时（如命座4的弹射伤害既可能由元素战技触发也可能由元素爆发触发），应将该伤害拆分为多个 DamageEnum 变体，分别归入对应技能的 `skill_map` 中。拆分后在 `get_skill_type` 中也应分别返回对应的 `SkillType`：
 
