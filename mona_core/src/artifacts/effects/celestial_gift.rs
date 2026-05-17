@@ -25,7 +25,7 @@ impl<A: Attribute> ArtifactEffect<A> for CelestialGiftEffect {
 
         if self.hexerei_secret_rite {
             // Mortal Hymn (凡世颂歌): 40% for equip element + 40% for active element
-            attribute.set_value_by_s(
+            attribute.set_value_to_s(
                 CharacterSelector::select_all(attribute),
                 AttributeType::Panel(equip_bonus),
                 "天之美赐4",
@@ -35,7 +35,7 @@ impl<A: Attribute> ArtifactEffect<A> for CelestialGiftEffect {
             if let Some(active_el) = active_element {
                 if attribute.get_character().character_static_data.element != active_el {
                     let active_bonus = AttributeName::bonus_name_by_element(active_el);
-                    attribute.set_value_by_s(
+                    attribute.set_value_to_s(
                         CharacterSelector::select_all(attribute),
                         AttributeType::Panel(active_bonus),
                         "天之美赐4",
@@ -45,7 +45,7 @@ impl<A: Attribute> ArtifactEffect<A> for CelestialGiftEffect {
             }
         } else {
             // Light's Guidance (天光之引): 20% for equip element
-            attribute.set_value_by_s(
+            attribute.set_value_to_s(
                 CharacterSelector::select_all(attribute),
                 AttributeType::Panel(equip_bonus),
                 "天之美赐4",
