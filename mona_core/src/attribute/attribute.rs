@@ -232,6 +232,14 @@ impl<GraphTy: AttributeGraph> GetCharacterMethod for AttributeWithCharacter<Grap
             character_id,
         }
     }
+
+    fn get_characters_by_selector(&self, selector: CharacterSelector) -> Vec<&CharacterStatus> {
+        let list = selector.get_matched_list(self.get_characters());
+        self.get_characters()
+            .iter()
+            .filter(|c| list.contains(&c.character_id))
+            .collect()
+    }
 }
 
 pub trait AttributeCommon<T: Attribute> {

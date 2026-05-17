@@ -74,6 +74,8 @@ pub trait GetCharacterMethod {
 
     fn get_characters(&self) -> &Vec<CharacterStatus>;
 
+    fn get_characters_by_selector(&self, selector: CharacterSelector) -> Vec<&CharacterStatus>;
+
     fn get_change_active_character(&self, character_id: usize) -> Self;
 }
 

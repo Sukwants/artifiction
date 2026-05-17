@@ -39,8 +39,6 @@ pub trait AttributeResult: GetCharacterMethod {
 
     fn get_result_by_selector(&self, selector: CharacterSelector, ty: AttributeType) -> Self::ResultType;
 
-    fn get_characters_by_selector(&self, selector: CharacterSelector) -> Vec<&CharacterStatus>;
-
     fn get_em_all(&self) -> f64 {
         self.get_value(AttributeName::ElementalMastery)
             + self.get_value(AttributeName::ElementalMasteryExtra)
@@ -223,14 +221,6 @@ impl<ResultTy: AttributeGraphResult> AttributeResult for AttributeResultWithChar
             .collect();
         self.result.get_attribute_merge(nodes.as_slice())
     }
-
-    fn get_characters_by_selector(&self, selector: CharacterSelector) -> Vec<&CharacterStatus> {
-        let list = selector.get_matched_list(self.get_characters());
-        self.get_characters()
-            .iter()
-            .filter(|c| list.contains(&c.character_id))
-            .collect()
-    }
 }
 
 impl<ResultTy: AttributeGraphResult> GetCharacterMethod for AttributeResultWithCharacter<ResultTy> {
@@ -255,5 +245,13 @@ impl<ResultTy: AttributeGraphResult> GetCharacterMethod for AttributeResultWithC
             result: self.result.clone(),
             character_id,
         }
+    }
+
+    fn get_characters_by_selector(&self, selector: CharacterSelector) -> Vec<&CharacterStatus> {
+        let list = selector.get_matched_list(self.get_characters());
+        self.get_characters()
+            .iter()
+            .filter(|c| list.contains(&c.character_id))
+            .collect()
     }
 }
