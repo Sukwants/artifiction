@@ -83,6 +83,7 @@ pub enum ArtifactSetName {
     AubadeOfMorningstarAndMoon,
     ADayCarvedFromRisingWinds,
     CelestialGift,
+    DisenchantmentInDeepShadow,
 }
 
 impl ArtifactSetName {

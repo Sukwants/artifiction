@@ -234,6 +234,10 @@ pub struct ConfigCelestialGift {
     pub hexerei_secret_rite: bool,
 }
 
+#[derive(Serialize, Deserialize)]
+#[derive(Debug, Clone, Default)]
+pub struct ConfigDisenchantmentInDeepShadow {}
+
 #[derive(Default, Debug, Clone)]
 #[derive(Serialize, Deserialize)]
 pub struct ArtifactEffectConfig {
