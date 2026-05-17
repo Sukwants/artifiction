@@ -98,6 +98,7 @@ pub const DURIN_STATIC_DATA: CharacterStaticData = CharacterStaticData {
 `SkillType` 的定义部分包含了所有技能的数值，每一个技能包含一个长度为 15 的数组，分别对应角色技能等级 1-15 的数值，或者单一数值 `f64` 表示。请注意所有百分比数值均以小数形式表示。
 
 `StaticData` 部分包含了角色的静态数据，包括角色名称、元素、基础属性、武器类型、星级、技能名称等信息。  
+角色名称需要追加到 `mona::character::character_name::CharacterName` 中，无特殊说明直接追加到末尾。
 基础属性中 `hp`、`atk`、`def` 分别对应角色的生命值上限、基础攻击力、防御力，均为长度为 15 的数组，分别对应角色等级 1、20、20+、40、40+、50、50+、60、60+、70、70+、80、80+、90、100 时的数值，其中 `+` 代表突破后的数值。  
 `sub_stat` 对应角色的副属性，使用 `CharacterSubStatFamily`，定义位于 `mona_core/src/character/character_sub_stat.rs`，定义如下：
 

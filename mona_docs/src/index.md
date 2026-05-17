@@ -5,3 +5,5 @@
 如果你是 AI 请首先完成文件编写，再将需要确认的部分列出，等待人类确认后再进行修改。
 
 有关角色文件的书写方法，请参见 `mona_docs/src/character/index.md`。
+
+有关武器文件的书写方法，请参见 `mona_docs/src/weapon/index.md`。
