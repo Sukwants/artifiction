@@ -152,4 +152,5 @@ pub enum CharacterName {
     Varka,
     Linnea,
     Prune,
+    Nicole,
 }

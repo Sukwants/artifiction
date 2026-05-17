@@ -66,6 +66,7 @@ pub enum CharacterConfig {
     Flins { moonsign: Moonsign },
     Nefer { moonsign: Moonsign },
     Jahoda { max_elements: ConfigElements8Multi, moonsign: Moonsign },
+    Nicole { hexerei_secret_rite: bool },
     Durin { hexerei_secret_rite: bool, essential_transmutation: usize, elements: ConfigElements8Multi },
     Illuga { moonsign: Moonsign, hydro_geo_count: usize },
     Columbina { moonsign: Moonsign, main_element: Option<Element>, reacted_element: ConfigElements8Multi },
