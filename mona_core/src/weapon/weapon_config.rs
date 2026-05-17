@@ -102,6 +102,7 @@ pub enum WeaponConfig {
     ProspectorsShovel { moonsign: Moonsign },
     BloodsoakedRuins { rate: f64, requiem_of_ruin: bool },
     SacrificersStaff { stack: f64 },
+    DisasterAndRemorse { rate1: f64, rate2: f64, hexerei_secret_rite: bool },
 
     // Catalyst
     LostPrayerToTheSacredWinds { stack: f64 },

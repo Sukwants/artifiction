@@ -166,6 +166,7 @@ pub enum WeaponName {
     FracturedHalo,
     BloodsoakedRuins,
     GestOfTheMightyWolf,
+    DisasterAndRemorse,
 
     // catalyst
     // 1 star
