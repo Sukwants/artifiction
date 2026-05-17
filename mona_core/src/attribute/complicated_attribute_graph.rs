@@ -56,12 +56,14 @@ impl Node {
 #[derive(Clone)]
 pub struct ComplicatedAttributeGraphResult {
     pub map: HashMap<AttributeNode, Node>,
+    pub characters: Vec<CharacterStatus>,
 }
 
 impl ComplicatedAttributeGraphResult {
-    pub fn new() -> Self {
+    pub fn new(characters: Vec<CharacterStatus>) -> Self {
         ComplicatedAttributeGraphResult {
             map: HashMap::new(),
+            characters,
         }
     }
 
@@ -118,13 +120,16 @@ impl AttributeGraphResult for ComplicatedAttributeGraphResult {
     fn get_attribute_merge(&self, nodes: &[AttributeNode]) -> Self::ResultType {
         self.get_composition_merge(nodes)
     }
+
+    fn get_characters(&self) -> &Vec<CharacterStatus> {
+        &self.characters
+    }
 }
 
 #[derive(Clone)]
 pub struct ComplicatedAttributeGraph {
     pub nodes: ComplicatedAttributeGraphResult,
     pub edges: Vec<Edge>,
-    pub characters: Vec<CharacterStatus>,
 }
 
 impl AttributeGraph for ComplicatedAttributeGraph {
@@ -178,14 +183,13 @@ impl AttributeGraph for ComplicatedAttributeGraph {
 
     fn new_with_characters(characters: Vec<CharacterStatus>) -> Self {
         ComplicatedAttributeGraph {
-            nodes: ComplicatedAttributeGraphResult::new(),
+            nodes: ComplicatedAttributeGraphResult::new(characters),
             edges: Vec::new(),
-            characters,
         }
     }
 
     fn get_characters(&self) -> &Vec<CharacterStatus> {
-        &self.characters
+        &self.nodes.characters
     }
 
     fn solve(&self) -> Self::ResultType {

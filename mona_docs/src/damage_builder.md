@@ -11,7 +11,7 @@
 - `add_extra_atk`：添加额外攻击力。
 - `add_extra_def`：添加额外防御力。
 - `add_extra_hp`：添加额外生命值上限。
-- `add_extra_damage`：添加额外基础伤害，对应 `AttributeVariableType::BaseDamage`。
+- `add_extra_damage`：添加额外基础伤害，对应 `AttributeVariableType::BaseDamage`。如有任何基于非当前角色攻击力、防御力、生命值上限或元素精通的伤害，请将属性乘以倍率后通过该方法添加到 `builder` 中。
 - `add_extra_critical`：添加额外暴击率，对应 `AttributeVariableType::CriticalRate`。
 - `add_extra_critical_damage`：添加额外暴击伤害，对应 `AttributeVariableType::CriticalDamage`。
 - `add_extra_bonus`：添加额外伤害加成，对应 `AttributeVariableType::Bonus`。

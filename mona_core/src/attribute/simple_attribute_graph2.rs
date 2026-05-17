@@ -23,12 +23,14 @@ pub struct Edge {
 #[derive(Clone)]
 pub struct SimpleAttributeGraphResult {
     pub map: HashMap<AttributeNode, f64>,
+    pub characters: Vec<CharacterStatus>,
 }
 
 impl SimpleAttributeGraphResult {
-    pub fn new() -> Self {
+    pub fn new(characters: Vec<CharacterStatus>) -> Self {
         SimpleAttributeGraphResult {
             map: HashMap::new(),
+            characters,
         }
     }
 
@@ -69,13 +71,16 @@ impl AttributeGraphResult for SimpleAttributeGraphResult {
         }
         temp
     }
+
+    fn get_characters(&self) -> &Vec<CharacterStatus> {
+        &self.characters
+    }
 }
 
 #[derive(Clone)]
 pub struct SimpleAttributeGraph2 {
     pub nodes: SimpleAttributeGraphResult,
     pub edges: Vec<Edge>,
-    pub characters: Vec<CharacterStatus>,
 }
 
 impl AttributeGraph for SimpleAttributeGraph2 {
@@ -129,14 +134,13 @@ impl AttributeGraph for SimpleAttributeGraph2 {
 
     fn new_with_characters(characters: Vec<CharacterStatus>) -> Self {
         SimpleAttributeGraph2 {
-            nodes: SimpleAttributeGraphResult::new(),
+            nodes: SimpleAttributeGraphResult::new(characters),
             edges: Vec::new(),
-            characters,
         }
     }
 
     fn get_characters(&self) -> &Vec<CharacterStatus> {
-        &self.characters
+        &self.nodes.characters
     }
 
     fn solve(&self) -> Self::ResultType {

@@ -306,7 +306,7 @@ pub type CharacterTags = HashSet<CharacterTag>
 - `pub fn select_by_tag<A>(attribute: &A, tag: CharacterTag) -> Self`：选择附近具有特定标签的角色。  
 - `pub fn select_self_by_tag<A>(attribute: &A, tag: CharacterTag) -> Self`：当自己具有特定标签时选择自己，否则不选择任何角色。  
 
-以上接口均需要通过传入 `attribute` 来获取当前角色的 `character_id` 和 `team_id`。如自行实现一个选择器，则可以通过 `attribute.get_character()` 接口获取当前角色的 `CharacterStatus` 来实现选择逻辑。
+以上接口均需要通过传入 `attribute` 来获取当前角色的 `character_id` 和 `team_id`。如自行实现一个选择器，则可以通过 `attribute.get_character()` 接口获取当前角色的 `CharacterStatus` 来实现选择逻辑。注意 `Attribute` 与 `AttributeResult` 类型均是合法的可传入 `attribute` 的类型。
 
 具体实现见 `mona_core/src/character/team_status.rs`。
 
@@ -343,6 +343,24 @@ pub type EdgeFunction = Arc<dyn Fn(f64, f64) -> f64>;
 ```
 
 `EdgeFunction` 的函数签名为 `Fn(f64, f64) -> f64`，传入的参数分别为属性边的两个输入值，返回值为属性边的输出值。一般情况下，属性边只有一个输入值，此时不应使用另一个输入值。  
+
+#### AttributeResult
+
+定义位于 `mona_core/src/attribute/attribute_result.rs`，是由 `Attribute` 类型进行 `solve()` 方法后得到的计算结果，无法再进行修改操作，并可以进行以下查询操作：
+
+- `pub fn get_value(&self, name: AttributeName) -> f64`：查询当前角色面板属性 `name` 的值。原则上仅允许查询面板属性。
+- `pub fn get_result(&self, name: AttributeName) -> Self::ResultType`：查询当前角色面板属性 `name` 的计算结果，包含了贡献到该属性的来源信息。原则上仅允许查询面板属性。
+- `pub fn get_result_t(&self, ty: AttributeType) -> Self::ResultType`：查询当前角色属性 `ty` 的计算结果，包含了贡献到该属性的来源信息。
+- `pub fn get_result_merge(&self, names: &[AttributeName]) -> Self::ResultType`：查询当前角色面板属性 `names` 的计算结果，包含了贡献到这些属性的来源信息的合并结果。原则上不应在角色、武器、圣遗物等接口实现中使用。
+- `pub fn get_value_by_selector(&self, selector: CharacterSelector, ty: AttributeType) -> f64`：查询 `selector` 选择的角色的属性 `ty` 的值的和。
+- `pub fn get_result_by_selector(&self, selector: CharacterSelector, ty: AttributeType) -> Self::ResultType`：查询 `selector` 选择的角色的属性 `ty` 的计算结果的和，包含了贡献到这些属性的来源信息的合并结果。
+- `pub fn get_characters_by_selector(&self, selector: CharacterSelector) -> Vec<&CharacterStatus>`：查询 `selector` 选择的角色的 `CharacterStatus` 的列表。
+- `pub fn get_em_all(&self) -> f64`：查询当前角色的面板元素精通。
+- `pub fn get_atk(&self) -> f64`：查询当前角色的面板攻击力。
+- `pub fn get_hp(&self) -> f64`：查询当前角色的面板生命值上限。
+- `pub fn get_def(&self) -> f64`：查询当前角色的面板防御力。
+
+其余能在 `AttributeResult` 中发现的接口均为历史原因存在的接口，不允许使用。
 
 ### 接口说明
 
