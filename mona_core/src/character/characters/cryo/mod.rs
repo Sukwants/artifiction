@@ -35,3 +35,6 @@ pub use wriothesley::Wriothesley;
 pub use charlotte::Charlotte;
 pub use skirk::Skirk;
 pub use citlali::Citlali;
+
+pub mod lohen;
+pub use lohen::Lohen;

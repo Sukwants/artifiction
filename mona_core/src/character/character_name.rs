@@ -153,4 +153,5 @@ pub enum CharacterName {
     Linnea,
     Prune,
     Nicole,
+    Lohen,
 }

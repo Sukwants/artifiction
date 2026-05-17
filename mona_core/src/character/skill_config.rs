@@ -75,5 +75,6 @@ pub enum CharacterSkillConfig {
     Linnea { field_catalog: usize },
     Prune { tolling_rally: bool, swirl_trigger: bool, hunt_the_witch_stacks: usize, c6_atk: bool },
     Nicole { on_field_over_3s: bool },
+    Lohen { in_masterstroke: bool, activated_cryo_reaction: bool, evilsbane_blade: bool },
     NoConfig,
 }
