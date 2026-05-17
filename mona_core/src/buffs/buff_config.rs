@@ -114,6 +114,11 @@ pub enum BuffConfig {
     ColumbinaC2 { moonsign: Moonsign, main_element: Option<Element>, hp: f64 },
     ColumbinaC6 { reacted_element: ConfigElements8Multi },
     ColumbinaC { constellation: usize },
+    NicoleE { level_e: usize, atk: f64 },
+    NicoleGuidance { has_guidance: bool },
+    NicoleC2 { has_c2: bool, element: Element },
+    NicoleC4 { atk: f64 },
+    NicoleC6 { },
     ZibaiP3 { def: f64 },
     LinneaP1 { moonsign: Moonsign },
     LinneaP2 { def: f64 },
@@ -140,6 +145,7 @@ pub enum BuffConfig {
     NightweaversLookingGlass { refine: usize },
     AthameArtis { refine: usize, hexerei_secret_rite: bool },
     GoldenFrostboundOath { refine: usize, rate: f64 },
+    AngelosHeptades { refine: usize, atk: f64, hexerei_secret_rite: bool, off_field_hexerei: bool },
 
     ResonanceCryo2 { rate: f64 },
     ResonanceGeo2 { rate1: f64, rate2: f64 },
@@ -159,6 +165,13 @@ pub enum BuffConfig {
     ScrollOfTheHeroOfCinderCity4 { elements: ConfigElements8Multi, nightsouls_blessing: bool },
     NightOfTheSkysUnveiling4 { gleaming_moon_effect_count: usize },
     SilkenMoonsSerenade4 { moonsign: Moonsign, gleaming_moon_effect_count: usize },
+    CelestialGift4 { hexerei_secret_rite: bool, equip_element: Element, active_element: Element },
+
+    LohenP2 { has_buff: bool },
+    LohenC2 { has_buff: bool },
+
+    PruneP2 { atk: f64 },
+    PruneC6 { },
 
     NoConfig,
 }

@@ -175,6 +175,11 @@ pub enum BuffName {
     ColumbinaC2,
     ColumbinaC6,
     ColumbinaC,
+    NicoleE,
+    NicoleGuidance,
+    NicoleC2,
+    NicoleC4,
+    NicoleC6,
     ZibaiP3,
     LinneaP1,
     LinneaP2,
@@ -183,6 +188,11 @@ pub enum BuffName {
     LinneaC2,
     LinneaC4,
     LinneaC6,
+
+    LohenP2,
+    LohenC2,
+    PruneP2,
+    PruneC6,
 
     AloyTalent1,
 
@@ -207,6 +217,7 @@ pub enum BuffName {
     NightweaversLookingGlass,
     AthameArtis,
     GoldenFrostboundOath,
+    AngelosHeptades,
     
 
     ResonancePyro2,
@@ -234,4 +245,5 @@ pub enum BuffName {
     ScrollOfTheHeroOfCinderCity4,
     NightOfTheSkysUnveiling4,
     SilkenMoonsSerenade4,
+    CelestialGift4,
 }

@@ -8,6 +8,7 @@ pub mod song_of_days_past;
 pub mod scroll_of_the_hero_of_cinder_city;
 pub mod night_of_the_skys_unveiling;
 pub mod silken_moons_serenade;
+pub mod celestial_gift;
 
 pub use instructor::BuffInstructor4;
 pub use noblesse_oblige::BuffNoblesseOblige4;
@@ -19,3 +20,4 @@ pub use song_of_days_past::BuffSongOfDaysPast4;
 pub use scroll_of_the_hero_of_cinder_city::BuffScrollOfTheHeroOfCinderCity4;
 pub use night_of_the_skys_unveiling::BuffNightOfTheSkysUnveiling4;
 pub use silken_moons_serenade::BuffSilkenMoonsSerenade4;
+pub use celestial_gift::BuffCelestialGift4;
