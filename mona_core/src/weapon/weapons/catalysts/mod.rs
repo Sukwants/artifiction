@@ -48,6 +48,7 @@ pub use etherlight_spindlelute::EtherlightSpindlelute;
 pub use reliquary_of_truth::ReliquaryOfTruth;
 pub use dawning_frost::DawningFrost;
 pub use nocturnes_curtain_call::NocturnesCurtainCall;
+pub use angelos_heptades::AngelosHeptades;
 
 pub mod lost_prayer_to_the_sacred_winds;
 pub mod skyward_atlas;
@@ -99,3 +100,4 @@ pub mod etherlight_spindlelute;
 pub mod reliquary_of_truth;
 pub mod dawning_frost;
 pub mod nocturnes_curtain_call;
+pub mod angelos_heptades;

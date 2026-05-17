@@ -223,6 +223,7 @@ pub enum WeaponName {
     NightweaversLookingGlass,
     ReliquaryOfTruth,
     NocturnesCurtainCall,
+    AngelosHeptades,
 
     // bows
     // 1 star

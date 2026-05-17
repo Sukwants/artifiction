@@ -139,6 +139,7 @@ pub enum WeaponConfig {
     ReliquaryOfTruth { effect1: bool, effect2: bool },
     DawningFrost { rate1: f64, rate2: f64 },
     NocturnesCurtainCall { effect: bool },
+    AngelosHeptades { hexerei_secret_rite: bool },
 
     // Bow
     PolarStar { stack: usize },

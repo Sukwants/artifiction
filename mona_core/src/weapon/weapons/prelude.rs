@@ -11,3 +11,4 @@ pub use crate::weapon::weapon_trait::WeaponTrait;
 pub use crate::weapon::{WeaponConfig, WeaponName};
 pub use crate::weapon::weapon_base_atk::WeaponBaseATKFamily;
 pub use crate::weapon::weapon_sub_stat::WeaponSubStatFamily;
+pub use std::sync::Arc;
