@@ -66,6 +66,7 @@ pub use night_of_the_skys_unveiling::NightOfTheSkysUnveiling;
 pub use silken_moons_serenade::SilkenMoonsSerenade;
 pub use aubade_of_morningstar_and_moon::AubadeOfMorningstarAndMoon;
 pub use a_day_carved_from_rising_winds::ADayCarvedFromRisingWinds;
+pub use celestial_gift::CelestialGift;
 
 pub mod empty;
 pub mod adventurer;
@@ -127,6 +128,7 @@ pub mod night_of_the_skys_unveiling;
 pub mod silken_moons_serenade;
 pub mod aubade_of_morningstar_and_moon;
 pub mod a_day_carved_from_rising_winds;
+pub mod celestial_gift;
 
 pub fn get_effect<T: Attribute>(name: ArtifactSetName, config: &ArtifactEffectConfig, character: &Character<T>) -> Box<dyn ArtifactEffect<T>> {
     name.create_effect(config, &character.common_data)
