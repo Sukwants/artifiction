@@ -72,5 +72,6 @@ pub enum CharacterConfig {
     Zibai { moonsign: Moonsign, geo_count: usize, hydro_count: usize },
     Varka { hexerei_secret_rite: bool, team_elements: ConfigElements8Multi, repeated_element: bool },
     Linnea { moonsign: Moonsign, moondrift_harmony: bool },
+    Prune { hexerei_secret_rite: bool, elemental_absorption: Option<Element> },
     NoConfig,
 }

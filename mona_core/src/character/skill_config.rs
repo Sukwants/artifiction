@@ -73,5 +73,6 @@ pub enum CharacterSkillConfig {
     Zibai { lunar_phase_shift: bool, activated_c1: bool, activated_c4: bool, stack_c6: usize },
     Varka { azure_fang_oath: usize, c1_bonus: bool },
     Linnea { field_catalog: usize },
+    Prune { tolling_rally: bool, swirl_trigger: bool, hunt_the_witch_stacks: usize, c6_atk: bool },
     NoConfig,
 }
