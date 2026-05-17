@@ -66,7 +66,6 @@ pub enum CharacterConfig {
     Flins { moonsign: Moonsign },
     Nefer { moonsign: Moonsign },
     Jahoda { max_elements: ConfigElements8Multi, moonsign: Moonsign },
-    Nicole { hexerei_secret_rite: bool },
     Durin { hexerei_secret_rite: bool, essential_transmutation: usize, elements: ConfigElements8Multi },
     Illuga { moonsign: Moonsign, hydro_geo_count: usize },
     Columbina { moonsign: Moonsign, main_element: Option<Element>, reacted_element: ConfigElements8Multi },
@@ -74,5 +73,6 @@ pub enum CharacterConfig {
     Varka { hexerei_secret_rite: bool, team_elements: ConfigElements8Multi, repeated_element: bool },
     Linnea { moonsign: Moonsign, moondrift_harmony: bool },
     Prune { hexerei_secret_rite: bool, elemental_absorption: Option<Element> },
+    Nicole { hexerei_secret_rite: bool },
     NoConfig,
 }
