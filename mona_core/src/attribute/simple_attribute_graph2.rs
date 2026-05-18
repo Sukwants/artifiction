@@ -9,6 +9,8 @@ use crate::damage::SimpleDamageBuilder;
 use super::attribute::{AttributeGraph, AttributeNode, EdgeFunction, EdgePriority};
 use super::AttributeGraphResult;
 
+const SOLVE_RESULT_KEY: &str = "__solve_result__";
+
 #[derive(Clone)]
 pub struct Edge {
     pub from1: AttributeNode,
@@ -185,24 +187,21 @@ impl SimpleAttributeGraph2 {
             .collect();
         let mut temp = result.clone();
 
+        let get_node_value = |nodes: &HashMap<AttributeNode, f64>, node: AttributeNode| {
+            node.get_parents()
+                .iter()
+                .map(|pa| *nodes.get(pa).unwrap_or(&0.0))
+                .sum::<f64>()
+        };
+
         let solve_edge = |
             edge: &Edge,
             nodes_old: &HashMap<AttributeNode, f64>,
             nodes_new: &mut HashMap<AttributeNode, f64>,
             c: f64,
         | {
-            let from1_value = edge
-                .from1
-                .get_parents()
-                .iter()
-                .map(|pa| *nodes_old.get(pa).unwrap_or(&0.0))
-                .sum::<f64>();
-            let from2_value = edge
-                .from2
-                .get_parents()
-                .iter()
-                .map(|pa| *nodes_old.get(pa).unwrap_or(&0.0))
-                .sum::<f64>();
+            let from1_value = get_node_value(nodes_old, edge.from1);
+            let from2_value = get_node_value(nodes_old, edge.from2);
             let value = (edge.func)(from1_value, from2_value) * c;
             *nodes_new.entry(edge.to).or_insert(0.0) += value;
         };
@@ -241,7 +240,7 @@ impl SimpleAttributeGraph2 {
                 .into_iter()
                 .map(|(node, value)| {
                     let mut item = Node::default();
-                    item.set_value_by("result", value);
+                    item.set_value_by(SOLVE_RESULT_KEY, value);
                     (node, item)
                 })
                 .collect(),
