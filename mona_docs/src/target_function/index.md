@@ -69,7 +69,7 @@ fn target(
 此后按照角色的输出方式，依次调用伤害计算方法并传入相应技能配置的 `DamageContext` 实例和角色技能配置，通过一定方式加和得到一套技能配置的总伤害，有以下可用方法：
 
 - `pub fn damage<D>(context: &DamageContext<'_, D::AttributeType>, s: Self::DamageEnumType, config: &CharacterSkillConfig, fumo: Option<Element>) -> D::Result`：计算角色技能列表（`DamageEnum`）内已列出技能的伤害、护盾、治疗量，需要额外传入角色 `DamageEnum` 实例以确定具体技能。
-- `pub fn transformative_damage<D>(context: &DamageContext<'_, D::AttributeType>, transformative_type: TransformativeType) -> D::Result`：计算当前角色触发的聚变反应伤害，需要额外传入 `TransformativeReactionType` 实例以确定具体反应类型。
+- `pub fn transformative_damage<D>(context: &DamageContext<'_, D::AttributeType>, transformative_type: TransformativeType) -> D::Result`：计算当前角色触发的聚变反应伤害，需要额外传入 `TransformativeType` 实例以确定具体反应类型。
 - `pub fn moonglare_damage<D>(context: &DamageContext<'_, D::AttributeType>, lunar_type: MoonglareReaction) -> D::Result`：计算当前角色触发的月曜反应伤害，需要额外传入 `MoonglareReaction` 实例以确定具体反应类型。请注意这里仅用于计算狭义的月曜反应伤害（`MoonglareReaction::LunarChargedReaction` 或 `MoonglareReaction::LunarCrystallizeReaction`），不包括角色技能中可能存在的月曜反应伤害。该伤害结果没有乘以角色在反应中伤害系数，如果你是 AI，请根据用户指示确定系数。
 
 某些 target_function 可能存在特殊要求，如最低攻击力、最低充能效率，此时需要通过查询 `attribute` 中的相关属性来判断是否满足要求，如果不满足则直接返回 0。`attribute` 的查询方法参见 `mona_docs/src/attribute.md`。
