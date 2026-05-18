@@ -25,11 +25,17 @@ pub struct Node {
     pub values: HashMap<String, f64>,
 }
 
-impl Node {
-    pub fn new() -> Self {
+impl Default for Node {
+    fn default() -> Self {
         Node {
             values: HashMap::new(),
         }
+    }
+}
+
+impl Node {
+    pub fn new() -> Self {
+        Node::default()
     }
 
     pub fn sum(&self) -> f64 {
@@ -60,18 +66,14 @@ impl SimpleAttributeGraphResult {
     }
 
     pub fn get_attribute_mut(&mut self, node: AttributeNode) -> &mut Node {
-        self.map.entry(node).or_insert(Node::new())
-    }
-
-    pub fn get_attribute(&self, node: AttributeNode) -> Node {
-        self.map.get(&node).unwrap_or(&Node::new()).clone()
+        self.map.entry(node).or_default()
     }
 
     pub fn get_attribute_value(&self, node: AttributeNode) -> f64 {
         let mut temp = 0.0;
 
         for pa in node.get_parents() {
-            temp += self.get_attribute(pa).sum();
+            temp += self.map.get(&pa).map(Node::sum).unwrap_or(0.0);
         }
 
         temp
@@ -230,7 +232,7 @@ mod tests {
     use crate::attribute::AttributeName;
 
     #[test]
-    fn set_value_to_internal_matches_complicated_graph_behavior() {
+    fn set_value_to_parity_with_complicated_graph() {
         let node = AttributeNode::new_panel(0, AttributeName::ATKPercentage);
         let mut simple = SimpleAttributeGraph2::new_with_characters(Vec::new());
         let mut complicated = ComplicatedAttributeGraph::new_with_characters(Vec::new());
