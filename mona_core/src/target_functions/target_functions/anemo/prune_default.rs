@@ -55,7 +55,7 @@ impl TargetFunction for PruneDefaultTargetFunction {
             hp_percentage: 0.0,
             def_fixed: 0.0,
             def_percentage: 0.0,
-            recharge: 0.0,
+            recharge: 0.8,
             elemental_mastery: 0.0,
             critical: 0.0,
             critical_damage: 0.0,
@@ -80,7 +80,6 @@ impl TargetFunction for PruneDefaultTargetFunction {
             ],
             set_names: Some(vec![
                 ArtifactSetName::NoblesseOblige,
-                ArtifactSetName::BlizzardStrayer,
                 ArtifactSetName::ScrollOfTheHeroOfCinderCity,
             ]),
             very_critical_set_names: Some(vec![
