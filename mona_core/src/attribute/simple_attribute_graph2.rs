@@ -244,6 +244,14 @@ mod tests {
     use crate::attribute::{AttributeName, EdgePriority};
     use std::sync::Arc;
 
+    fn get_simple_node_value(graph: &SimpleAttributeGraph2, node: AttributeNode) -> f64 {
+        graph.nodes.get(&node).map(Node::sum).unwrap_or(0.0)
+    }
+
+    fn get_complicated_node_value(graph: &ComplicatedAttributeGraph, node: AttributeNode) -> f64 {
+        graph.nodes.get_attribute_value(node)
+    }
+
     fn add_pair_edges(simple: &mut SimpleAttributeGraph2, complicated: &mut ComplicatedAttributeGraph, from: AttributeNode, to: AttributeNode) {
         for key in ["edge_a", "edge_b"] {
             simple.add_edge(
@@ -279,12 +287,8 @@ mod tests {
         complicated.set_value_by_internal(node, "b", 0.3);
         complicated.set_value_to_internal(node, "a", 0.5);
 
-        let simple_value = simple
-            .nodes
-            .get(&node)
-            .map(Node::sum)
-            .unwrap_or(0.0);
-        let complicated_value = complicated.nodes.get_attribute_value(node);
+        let simple_value = get_simple_node_value(&simple, node);
+        let complicated_value = get_complicated_node_value(&complicated, node);
         assert_eq!(simple_value, complicated_value);
     }
 
