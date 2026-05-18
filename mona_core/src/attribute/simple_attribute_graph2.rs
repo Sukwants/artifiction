@@ -9,8 +9,6 @@ use crate::damage::SimpleDamageBuilder;
 use super::attribute::{AttributeGraph, AttributeNode, EdgeFunction, EdgePriority};
 use super::AttributeGraphResult;
 
-const SOLVE_RESULT_KEY: &str = "solve_result";
-
 #[derive(Clone)]
 pub struct Edge {
     pub from1: AttributeNode,
@@ -55,7 +53,7 @@ impl Node {
 
 #[derive(Clone)]
 pub struct SimpleAttributeGraphResult {
-    pub map: HashMap<AttributeNode, Node>,
+    pub map: HashMap<AttributeNode, f64>,
     pub characters: Vec<CharacterStatus>,
 }
 
@@ -67,15 +65,11 @@ impl SimpleAttributeGraphResult {
         }
     }
 
-    pub fn get_attribute_mut(&mut self, node: AttributeNode) -> &mut Node {
-        self.map.entry(node).or_default()
-    }
-
     pub fn get_attribute_value(&self, node: AttributeNode) -> f64 {
         let mut temp = 0.0;
 
         for pa in node.get_parents() {
-            temp += self.map.get(&pa).map(Node::sum).unwrap_or(0.0);
+            temp += self.map.get(&pa).copied().unwrap_or(0.0);
         }
 
         temp
@@ -108,7 +102,8 @@ impl AttributeGraphResult for SimpleAttributeGraphResult {
 
 #[derive(Clone)]
 pub struct SimpleAttributeGraph2 {
-    pub nodes: SimpleAttributeGraphResult,
+    pub nodes: HashMap<AttributeNode, Node>,
+    pub characters: Vec<CharacterStatus>,
     pub edges: Vec<Edge>,
 }
 
@@ -117,11 +112,11 @@ impl AttributeGraph for SimpleAttributeGraph2 {
     type ResultType = SimpleAttributeGraphResult;
 
     fn set_value_to_internal(&mut self, node: AttributeNode, key: &str, value: f64) {
-        self.nodes.get_attribute_mut(node).set_value_to(key, value);
+        self.nodes.entry(node).or_default().set_value_to(key, value);
     }
 
     fn set_value_by_internal(&mut self, node: AttributeNode, key: &str, value: f64) {
-        self.nodes.get_attribute_mut(node).set_value_by(key, value);
+        self.nodes.entry(node).or_default().set_value_by(key, value);
     }
 
     fn add_edge(
@@ -163,13 +158,14 @@ impl AttributeGraph for SimpleAttributeGraph2 {
 
     fn new_with_characters(characters: Vec<CharacterStatus>) -> Self {
         SimpleAttributeGraph2 {
-            nodes: SimpleAttributeGraphResult::new(characters),
+            nodes: HashMap::new(),
+            characters,
             edges: Vec::new(),
         }
     }
 
     fn get_characters(&self) -> &Vec<CharacterStatus> {
-        &self.nodes.characters
+        &self.characters
     }
 
     fn solve(&self) -> Self::ResultType {
@@ -181,7 +177,6 @@ impl SimpleAttributeGraph2 {
     pub fn solve(&self) -> SimpleAttributeGraphResult {
         let mut result: HashMap<AttributeNode, f64> = self
             .nodes
-            .map
             .iter()
             .map(|(node, values)| (*node, values.sum()))
             .collect();
@@ -236,15 +231,8 @@ impl SimpleAttributeGraph2 {
         }
 
         SimpleAttributeGraphResult {
-            map: result
-                .into_iter()
-                .map(|(node, value)| {
-                    let mut item = Node::default();
-                    item.set_value_by(SOLVE_RESULT_KEY, value);
-                    (node, item)
-                })
-                .collect(),
-            characters: self.nodes.characters.clone(),
+            map: result,
+            characters: self.characters.clone(),
         }
     }
 }
@@ -291,7 +279,13 @@ mod tests {
         complicated.set_value_by_internal(node, "b", 0.3);
         complicated.set_value_to_internal(node, "a", 0.5);
 
-        assert_eq!(simple.nodes.get_attribute_value(node), complicated.nodes.get_attribute_value(node));
+        let simple_value = simple
+            .nodes
+            .get(&node)
+            .map(Node::sum)
+            .unwrap_or(0.0);
+        let complicated_value = complicated.nodes.get_attribute_value(node);
+        assert_eq!(simple_value, complicated_value);
     }
 
     #[test]
