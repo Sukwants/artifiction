@@ -58,6 +58,10 @@ npm run serve
 npm run build
 ```
 
+## 维护
+
+如需新增内容，可以参考 `mona_docs/src/index.md` 中的说明。
+
 [//]: # (## Docker)
 
 [//]: # (```)
