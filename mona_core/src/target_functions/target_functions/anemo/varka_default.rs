@@ -40,15 +40,8 @@ impl TargetFunction for VarkaDefaultTargetFunction {
         Default::default()
     }
 
-    fn target(&self, attribute: &TargetFunctionAttributeType, character: &Character<TargetFunctionAttributeType>, weapon: &Weapon<TargetFunctionAttributeType>, artifacts: &[&Artifact], enemy: &Enemy) -> f64 {
-        let attribute = &attribute.solve();
-        let context: DamageContext<'_, TargetFunctionAttributeResultType> = DamageContext {
-            character_common_data: &character.common_data,
-            attribute,
-            enemy
-        };
-
-        let hexerei_secret_rite = match &context.character_common_data.config {
+    fn target(&self, attribute: &TargetFunctionAttributeType, character: &Character<TargetFunctionAttributeType>, _weapon: &Weapon<TargetFunctionAttributeType>, _artifacts: &[&Artifact], enemy: &Enemy) -> f64 {
+        let hexerei_secret_rite = match &character.common_data.config {
             CharacterConfig::Varka { hexerei_secret_rite, .. } => *hexerei_secret_rite,
             _ => false,
         };
@@ -56,26 +49,37 @@ impl TargetFunction for VarkaDefaultTargetFunction {
         let config = CharacterSkillConfig::Varka { azure_fang_oath: 4, c1_bonus: false };
         let config_with_c1 = CharacterSkillConfig::Varka { azure_fang_oath: 4, c1_bonus: true };
 
-        type Ty = <Varka as CharacterTrait>::DamageEnumType;
-
-        let get_damage = |s: Ty, config: &CharacterSkillConfig| -> f64 {
-            Varka::damage::<SimpleDamageBuilder>(&context, s, config, None).normal.expectation
+        let context = {
+            let mut attribute_temp = (*attribute).clone();
+            Varka::change_attribute::<TargetFunctionAttributeType>(&mut attribute_temp, &character.common_data, &config);
+            DamageContext { character_common_data: &character.common_data, attribute: &attribute_temp.solve(), enemy }
+        };
+        let context_with_c1 = {
+            let mut attribute_temp = (*attribute).clone();
+            Varka::change_attribute::<TargetFunctionAttributeType>(&mut attribute_temp, &character.common_data, &config_with_c1);
+            DamageContext { character_common_data: &character.common_data, attribute: &attribute_temp.solve(), enemy }
         };
 
-        let dmg_a = get_damage(Ty::EA1, &config)
-            + get_damage(Ty::EA21, &config) + get_damage(Ty::EA22, &config)
-            + get_damage(Ty::EA31, &config) + get_damage(Ty::EA32, &config)
-            + get_damage(Ty::EA41, &config) + get_damage(Ty::EA42, &config)
-            + get_damage(Ty::EA51, &config) + get_damage(Ty::EA52, &config);
+        type Ty = <Varka as CharacterTrait>::DamageEnumType;
 
-        let dmg_e = get_damage(Ty::E, &config);
+        let get_damage = |context: &DamageContext<'_, TargetFunctionAttributeResultType>, s: Ty, config: &CharacterSkillConfig| -> f64 {
+            Varka::damage::<SimpleDamageBuilder>(context, s, config, None).normal.expectation
+        };
 
-        let dmg_e1 = get_damage(Ty::EE1, &config_with_c1) + get_damage(Ty::EE2, &config_with_c1) + get_damage(Ty::C2E, &config_with_c1)
-            + if context.character_common_data.constellation >= 6 { get_damage(Ty::EEZ1, &config_with_c1) + get_damage(Ty::EEZ2, &config_with_c1) } else { 0.0 };
-            let dmg_e2 = get_damage(Ty::EE1, &config) + get_damage(Ty::EE2, &config) + get_damage(Ty::C2E, &config_with_c1)
-            + if context.character_common_data.constellation >= 6 { get_damage(Ty::EEZ1, &config) + get_damage(Ty::EEZ2, &config) } else { 0.0 };
+        let dmg_a = get_damage(&context, Ty::EA1, &config)
+            + get_damage(&context, Ty::EA21, &config) + get_damage(&context, Ty::EA22, &config)
+            + get_damage(&context, Ty::EA31, &config) + get_damage(&context, Ty::EA32, &config)
+            + get_damage(&context, Ty::EA41, &config) + get_damage(&context, Ty::EA42, &config)
+            + get_damage(&context, Ty::EA51, &config) + get_damage(&context, Ty::EA52, &config);
 
-        dmg_e + if context.character_common_data.constellation >= 1 { dmg_e1 } else { 0.0 }
+        let dmg_e = get_damage(&context, Ty::E, &config);
+
+        let dmg_e1 = get_damage(&context_with_c1, Ty::EE1, &config_with_c1) + get_damage(&context_with_c1, Ty::EE2, &config_with_c1) + get_damage(&context_with_c1, Ty::C2E, &config_with_c1)
+            + if character.common_data.constellation >= 6 { get_damage(&context_with_c1, Ty::EEZ1, &config_with_c1) + get_damage(&context_with_c1, Ty::EEZ2, &config_with_c1) } else { 0.0 };
+        let dmg_e2 = get_damage(&context, Ty::EE1, &config) + get_damage(&context, Ty::EE2, &config) + get_damage(&context_with_c1, Ty::C2E, &config_with_c1)
+            + if character.common_data.constellation >= 6 { get_damage(&context, Ty::EEZ1, &config) + get_damage(&context, Ty::EEZ2, &config) } else { 0.0 };
+
+        dmg_e + if character.common_data.constellation >= 1 { dmg_e1 } else { 0.0 }
             + dmg_a * 2.0 + dmg_e1 + if hexerei_secret_rite { dmg_e2 } else { 0.0 }
     }
 }
