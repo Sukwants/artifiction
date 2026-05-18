@@ -177,19 +177,34 @@ impl AttributeGraph for SimpleAttributeGraph2 {
 
 impl SimpleAttributeGraph2 {
     pub fn solve(&self) -> SimpleAttributeGraphResult {
-        let mut result = self.nodes.clone();
-        let mut temp = self.nodes.clone();
+        let mut result: HashMap<AttributeNode, f64> = self
+            .nodes
+            .map
+            .iter()
+            .map(|(node, values)| (*node, values.sum()))
+            .collect();
+        let mut temp = result.clone();
 
         let solve_edge = |
             edge: &Edge,
-            nodes_old: &SimpleAttributeGraphResult,
-            nodes_new: &mut SimpleAttributeGraphResult,
+            nodes_old: &HashMap<AttributeNode, f64>,
+            nodes_new: &mut HashMap<AttributeNode, f64>,
             c: f64,
         | {
-            let from1_value = nodes_old.get_attribute_value(edge.from1);
-            let from2_value = nodes_old.get_attribute_value(edge.from2);
+            let from1_value = edge
+                .from1
+                .get_parents()
+                .iter()
+                .map(|pa| *nodes_old.get(pa).unwrap_or(&0.0))
+                .sum::<f64>();
+            let from2_value = edge
+                .from2
+                .get_parents()
+                .iter()
+                .map(|pa| *nodes_old.get(pa).unwrap_or(&0.0))
+                .sum::<f64>();
             let value = (edge.func)(from1_value, from2_value) * c;
-            nodes_new.get_attribute_mut(edge.to).set_value_by(&edge.key, value);
+            *nodes_new.entry(edge.to).or_insert(0.0) += value;
         };
 
         let mut edge_lists = BTreeMap::new();
@@ -221,7 +236,17 @@ impl SimpleAttributeGraph2 {
             result = temp.clone();
         }
 
-        result
+        SimpleAttributeGraphResult {
+            map: result
+                .into_iter()
+                .map(|(node, value)| {
+                    let mut item = Node::default();
+                    item.set_value_by("result", value);
+                    (node, item)
+                })
+                .collect(),
+            characters: self.nodes.characters.clone(),
+        }
     }
 }
 
@@ -229,7 +254,8 @@ impl SimpleAttributeGraph2 {
 mod tests {
     use super::*;
     use crate::attribute::complicated_attribute_graph::ComplicatedAttributeGraph;
-    use crate::attribute::AttributeName;
+    use crate::attribute::{AttributeName, EdgePriority};
+    use std::sync::Arc;
 
     #[test]
     fn set_value_to_parity_with_complicated_graph() {
@@ -246,5 +272,60 @@ mod tests {
         complicated.set_value_to_internal(node, "a", 0.5);
 
         assert_eq!(simple.nodes.get_attribute_value(node), complicated.nodes.get_attribute_value(node));
+    }
+
+    #[test]
+    fn solve_result_matches_complicated_graph_behavior() {
+        let from = AttributeNode::new_panel(0, AttributeName::ATKPercentage);
+        let to = AttributeNode::new_panel(0, AttributeName::ATK);
+        let mut simple = SimpleAttributeGraph2::new_with_characters(Vec::new());
+        let mut complicated = ComplicatedAttributeGraph::new_with_characters(Vec::new());
+
+        simple.set_value_by_internal(from, "a", 0.2);
+        simple.set_value_by_internal(from, "b", 0.3);
+        simple.set_value_to_internal(from, "a", 0.5);
+        simple.add_edge(
+            from,
+            from,
+            to,
+            Arc::new(|x1, _x2| x1),
+            "edge_a",
+            EdgePriority::Common,
+        );
+        simple.add_edge(
+            from,
+            from,
+            to,
+            Arc::new(|x1, _x2| x1),
+            "edge_b",
+            EdgePriority::Common,
+        );
+
+        complicated.set_value_by_internal(from, "a", 0.2);
+        complicated.set_value_by_internal(from, "b", 0.3);
+        complicated.set_value_to_internal(from, "a", 0.5);
+        complicated.add_edge(
+            from,
+            from,
+            to,
+            Arc::new(|x1, _x2| x1),
+            "edge_a",
+            EdgePriority::Common,
+        );
+        complicated.add_edge(
+            from,
+            from,
+            to,
+            Arc::new(|x1, _x2| x1),
+            "edge_b",
+            EdgePriority::Common,
+        );
+
+        let simple_solved = simple.solve();
+        let complicated_solved = complicated.solve();
+        assert_eq!(
+            simple_solved.get_attribute_value(to),
+            complicated_solved.get_attribute_value(to)
+        );
     }
 }
