@@ -21,8 +21,33 @@ pub struct Edge {
 }
 
 #[derive(Clone)]
+pub struct Node {
+    pub values: HashMap<String, f64>,
+}
+
+impl Node {
+    pub fn new() -> Self {
+        Node {
+            values: HashMap::new(),
+        }
+    }
+
+    pub fn sum(&self) -> f64 {
+        self.values.values().sum::<f64>()
+    }
+
+    pub fn set_value_by(&mut self, key: &str, value: f64) {
+        *self.values.entry(String::from(key)).or_insert(0.0) += value;
+    }
+
+    pub fn set_value_to(&mut self, key: &str, value: f64) {
+        *self.values.entry(String::from(key)).or_insert(0.0) = value;
+    }
+}
+
+#[derive(Clone)]
 pub struct SimpleAttributeGraphResult {
-    pub map: HashMap<AttributeNode, f64>,
+    pub map: HashMap<AttributeNode, Node>,
     pub characters: Vec<CharacterStatus>,
 }
 
@@ -34,19 +59,19 @@ impl SimpleAttributeGraphResult {
         }
     }
 
-    pub fn get_attribute_mut(&mut self, node: AttributeNode) -> &mut f64 {
-        self.map.entry(node).or_insert(0.0)
+    pub fn get_attribute_mut(&mut self, node: AttributeNode) -> &mut Node {
+        self.map.entry(node).or_insert(Node::new())
     }
 
-    pub fn get_attribute(&self, node: AttributeNode) -> f64 {
-        *self.map.get(&node).unwrap_or(&0.0)
+    pub fn get_attribute(&self, node: AttributeNode) -> Node {
+        self.map.get(&node).unwrap_or(&Node::new()).clone()
     }
 
     pub fn get_attribute_value(&self, node: AttributeNode) -> f64 {
         let mut temp = 0.0;
 
         for pa in node.get_parents() {
-            temp += self.get_attribute(pa);
+            temp += self.get_attribute(pa).sum();
         }
 
         temp
@@ -67,7 +92,7 @@ impl AttributeGraphResult for SimpleAttributeGraphResult {
     fn get_attribute_merge(&self, nodes: &[AttributeNode]) -> f64 {
         let mut temp = 0.0;
         for node in nodes.iter() {
-            temp += self.get_attribute(*node);
+            temp += self.get_attribute_value(*node);
         }
         temp
     }
@@ -88,11 +113,11 @@ impl AttributeGraph for SimpleAttributeGraph2 {
     type ResultType = SimpleAttributeGraphResult;
 
     fn set_value_to_internal(&mut self, node: AttributeNode, key: &str, value: f64) {
-        *self.nodes.get_attribute_mut(node) = value;
+        self.nodes.get_attribute_mut(node).set_value_to(key, value);
     }
 
     fn set_value_by_internal(&mut self, node: AttributeNode, key: &str, value: f64) {
-        *self.nodes.get_attribute_mut(node) += value;
+        self.nodes.get_attribute_mut(node).set_value_by(key, value);
     }
 
     fn add_edge(
@@ -162,7 +187,7 @@ impl SimpleAttributeGraph2 {
             let from1_value = nodes_old.get_attribute_value(edge.from1);
             let from2_value = nodes_old.get_attribute_value(edge.from2);
             let value = (edge.func)(from1_value, from2_value) * c;
-            *nodes_new.get_attribute_mut(edge.to) += value;
+            nodes_new.get_attribute_mut(edge.to).set_value_by(&edge.key, value);
         };
 
         let mut edge_lists = BTreeMap::new();
@@ -195,5 +220,29 @@ impl SimpleAttributeGraph2 {
         }
 
         result
+    }
+}
+
+#[cfg(test)]
+mod tests {
+    use super::*;
+    use crate::attribute::complicated_attribute_graph::ComplicatedAttributeGraph;
+    use crate::attribute::AttributeName;
+
+    #[test]
+    fn set_value_to_internal_matches_complicated_graph_behavior() {
+        let node = AttributeNode::new_panel(0, AttributeName::ATKPercentage);
+        let mut simple = SimpleAttributeGraph2::new_with_characters(Vec::new());
+        let mut complicated = ComplicatedAttributeGraph::new_with_characters(Vec::new());
+
+        simple.set_value_by_internal(node, "a", 0.2);
+        simple.set_value_by_internal(node, "b", 0.3);
+        simple.set_value_to_internal(node, "a", 0.5);
+
+        complicated.set_value_by_internal(node, "a", 0.2);
+        complicated.set_value_by_internal(node, "b", 0.3);
+        complicated.set_value_to_internal(node, "a", 0.5);
+
+        assert_eq!(simple.nodes.get_attribute_value(node), complicated.nodes.get_attribute_value(node));
     }
 }
