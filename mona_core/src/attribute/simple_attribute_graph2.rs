@@ -9,7 +9,7 @@ use crate::damage::SimpleDamageBuilder;
 use super::attribute::{AttributeGraph, AttributeNode, EdgeFunction, EdgePriority};
 use super::AttributeGraphResult;
 
-const SOLVE_RESULT_KEY: &str = "__solve_result__";
+const SOLVE_RESULT_KEY: &str = "solve_result";
 
 #[derive(Clone)]
 pub struct Edge {
@@ -187,7 +187,7 @@ impl SimpleAttributeGraph2 {
             .collect();
         let mut temp = result.clone();
 
-        let get_node_value = |nodes: &HashMap<AttributeNode, f64>, node: AttributeNode| {
+        let sum_parent_values = |nodes: &HashMap<AttributeNode, f64>, node: AttributeNode| {
             node.get_parents()
                 .iter()
                 .map(|pa| *nodes.get(pa).unwrap_or(&0.0))
@@ -200,8 +200,8 @@ impl SimpleAttributeGraph2 {
             nodes_new: &mut HashMap<AttributeNode, f64>,
             c: f64,
         | {
-            let from1_value = get_node_value(nodes_old, edge.from1);
-            let from2_value = get_node_value(nodes_old, edge.from2);
+            let from1_value = sum_parent_values(nodes_old, edge.from1);
+            let from2_value = sum_parent_values(nodes_old, edge.from2);
             let value = (edge.func)(from1_value, from2_value) * c;
             *nodes_new.entry(edge.to).or_insert(0.0) += value;
         };
@@ -256,6 +256,27 @@ mod tests {
     use crate::attribute::{AttributeName, EdgePriority};
     use std::sync::Arc;
 
+    fn add_pair_edges(simple: &mut SimpleAttributeGraph2, complicated: &mut ComplicatedAttributeGraph, from: AttributeNode, to: AttributeNode) {
+        for key in ["edge_a", "edge_b"] {
+            simple.add_edge(
+                from,
+                from,
+                to,
+                Arc::new(|x1, _x2| x1),
+                key,
+                EdgePriority::Common,
+            );
+            complicated.add_edge(
+                from,
+                from,
+                to,
+                Arc::new(|x1, _x2| x1),
+                key,
+                EdgePriority::Common,
+            );
+        }
+    }
+
     #[test]
     fn set_value_to_parity_with_complicated_graph() {
         let node = AttributeNode::new_panel(0, AttributeName::ATKPercentage);
@@ -283,42 +304,10 @@ mod tests {
         simple.set_value_by_internal(from, "a", 0.2);
         simple.set_value_by_internal(from, "b", 0.3);
         simple.set_value_to_internal(from, "a", 0.5);
-        simple.add_edge(
-            from,
-            from,
-            to,
-            Arc::new(|x1, _x2| x1),
-            "edge_a",
-            EdgePriority::Common,
-        );
-        simple.add_edge(
-            from,
-            from,
-            to,
-            Arc::new(|x1, _x2| x1),
-            "edge_b",
-            EdgePriority::Common,
-        );
-
         complicated.set_value_by_internal(from, "a", 0.2);
         complicated.set_value_by_internal(from, "b", 0.3);
         complicated.set_value_to_internal(from, "a", 0.5);
-        complicated.add_edge(
-            from,
-            from,
-            to,
-            Arc::new(|x1, _x2| x1),
-            "edge_a",
-            EdgePriority::Common,
-        );
-        complicated.add_edge(
-            from,
-            from,
-            to,
-            Arc::new(|x1, _x2| x1),
-            "edge_b",
-            EdgePriority::Common,
-        );
+        add_pair_edges(&mut simple, &mut complicated, from, to);
 
         let simple_solved = simple.solve();
         let complicated_solved = complicated.solve();
