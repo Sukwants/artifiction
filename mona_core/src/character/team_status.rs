@@ -1,4 +1,4 @@
-use crate::attribute::Attribute;
+use crate::attribute::{Attribute, AttributeResult};
 use crate::character::{CharacterName, CharacterStaticData};
 use crate::common::Element;
 use crate::common::i18n::{locale, I18nLocale};
@@ -62,8 +62,21 @@ impl CharacterStatus {
     }
 }
 
+#[derive(Clone)]
 pub struct CharacterSelector {
     pub selector: Arc<dyn Fn(&CharacterStatus) -> bool>,
+}
+
+pub trait GetCharacterMethod {
+    fn get_character_id(&self) -> &usize;
+
+    fn get_character(&self) -> &CharacterStatus;
+
+    fn get_characters(&self) -> &Vec<CharacterStatus>;
+
+    fn get_characters_by_selector(&self, selector: CharacterSelector) -> Vec<&CharacterStatus>;
+
+    fn get_change_active_character(&self, character_id: usize) -> Self;
 }
 
 impl CharacterSelector {
@@ -76,6 +89,10 @@ impl CharacterSelector {
         }
     }
 
+    pub fn check(&self, status: &CharacterStatus) -> bool {
+        (self.selector)(status)
+    }
+
     pub fn get_matched_list(&self, team: &Vec<CharacterStatus>) -> Vec<usize> {
         let mut list: Vec<usize> = Vec::new();
         for status in team.iter() {
@@ -86,42 +103,42 @@ impl CharacterSelector {
         list
     }
 
-    pub fn select_self<A: Attribute>(attribute: &A) -> Self {
+    pub fn select_self<A: GetCharacterMethod>(attribute: &A) -> Self {
         let character_id = attribute.get_character().character_id;
         CharacterSelector {
             selector: Arc::new(move |status: &CharacterStatus| status.character_id == character_id ),
         }
     }
 
-    pub fn select_self_onfield<A: Attribute>(attribute: &A) -> Self {
+    pub fn select_self_onfield<A: GetCharacterMethod>(attribute: &A) -> Self {
         let character_id = attribute.get_character().character_id;
         CharacterSelector {
             selector: Arc::new(move |status: &CharacterStatus| status.character_id == character_id && status.on_field ),
         }
     }
 
-    pub fn select_self_offfield<A: Attribute>(attribute: &A) -> Self {
+    pub fn select_self_offfield<A: GetCharacterMethod>(attribute: &A) -> Self {
         let character_id = attribute.get_character().character_id;
         CharacterSelector {
             selector: Arc::new(move |status: &CharacterStatus| status.character_id == character_id && !status.on_field ),
         }
     }
 
-    pub fn select_onfield<A: Attribute>(attribute: &A) -> Self {
+    pub fn select_onfield<A: GetCharacterMethod>(attribute: &A) -> Self {
         let team_id = attribute.get_character().team_id;
         CharacterSelector {
             selector: Arc::new(move |status: &CharacterStatus| status.on_field && status.team_id == team_id ),
         }
     }
 
-    pub fn select_offfield<A: Attribute>(attribute: &A) -> Self {
+    pub fn select_offfield<A: GetCharacterMethod>(attribute: &A) -> Self {
         let team_id = attribute.get_character().team_id;
         CharacterSelector {
             selector: Arc::new(move |status: &CharacterStatus| !status.on_field && status.team_id == team_id ),
         }
     }
 
-    pub fn select_onfield_except_self<A: Attribute>(attribute: &A) -> Self {
+    pub fn select_onfield_except_self<A: GetCharacterMethod>(attribute: &A) -> Self {
         let character_id = attribute.get_character().character_id;
         let team_id = attribute.get_character().team_id;
         CharacterSelector {
@@ -129,14 +146,14 @@ impl CharacterSelector {
         }
     }
 
-    pub fn select_team<A: Attribute>(attribute: &A) -> Self {
+    pub fn select_team<A: GetCharacterMethod>(attribute: &A) -> Self {
         let team_id = attribute.get_character().team_id;
         CharacterSelector {
             selector: Arc::new(move |status: &CharacterStatus| status.team_id == team_id ),
         }
     }
 
-    pub fn select_team_except_self<A: Attribute>(attribute: &A) -> Self {
+    pub fn select_team_except_self<A: GetCharacterMethod>(attribute: &A) -> Self {
         let character_id = attribute.get_character().character_id;
         let team_id = attribute.get_character().team_id;
         CharacterSelector {
@@ -144,45 +161,45 @@ impl CharacterSelector {
         }
     }
 
-    pub fn select_all<A: Attribute>(attribute: &A) -> Self {
+    pub fn select_all<A: GetCharacterMethod>(attribute: &A) -> Self {
         CharacterSelector {
             selector: Arc::new(move |status: &CharacterStatus| true ),
         }
     }
 
-    pub fn select_all_onfield<A: Attribute>(attribute: &A) -> Self {
+    pub fn select_all_onfield<A: GetCharacterMethod>(attribute: &A) -> Self {
         CharacterSelector {
             selector: Arc::new(move |status: &CharacterStatus| status.on_field ),
         }
     }
 
-    pub fn select_all_onfield_except_self<A: Attribute>(attribute: &A) -> Self {
+    pub fn select_all_onfield_except_self<A: GetCharacterMethod>(attribute: &A) -> Self {
         let character_id = attribute.get_character().character_id;
         CharacterSelector {
             selector: Arc::new(move |status: &CharacterStatus| status.on_field && status.character_id != character_id ),
         }
     }
 
-    pub fn select_all_except_self<A: Attribute>(attribute: &A) -> Self {
+    pub fn select_all_except_self<A: GetCharacterMethod>(attribute: &A) -> Self {
         let character_id = attribute.get_character().character_id;
         CharacterSelector {
             selector: Arc::new(move |status: &CharacterStatus| status.character_id != character_id ),
         }
     }
 
-    pub fn select_element<A: Attribute>(attribute: &A, element: Element) -> Self {
+    pub fn select_element<A: GetCharacterMethod>(attribute: &A, element: Element) -> Self {
         CharacterSelector {
             selector: Arc::new(move |status: &CharacterStatus| status.character_static_data.element == element ),
         }
     }
 
-    pub fn select_by_tag<A: Attribute>(attribute: &A, tag: CharacterTag) -> Self {
+    pub fn select_by_tag<A: GetCharacterMethod>(attribute: &A, tag: CharacterTag) -> Self {
         CharacterSelector {
             selector: Arc::new(move |status: &CharacterStatus| status.tags.contains(&tag) ),
         }
     }
 
-    pub fn select_self_by_tag<A: Attribute>(attribute: &A, tag: CharacterTag) -> Self {
+    pub fn select_self_by_tag<A: GetCharacterMethod>(attribute: &A, tag: CharacterTag) -> Self {
         let character_id = attribute.get_character().character_id;
         CharacterSelector {
             selector: Arc::new(move |status: &CharacterStatus| status.tags.contains(&tag) && status.character_id == character_id ),

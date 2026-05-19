@@ -1,10 +1,10 @@
 use super::{AttributeName, AttributeNode, AttributeType};
 use crate::attribute::{ComplicatedAttributeGraphResult, SimpleAttributeGraphResult};
-use crate::character::team_status::CharacterStatus;
+use crate::character::team_status::{CharacterSelector, CharacterStatus, GetCharacterMethod};
 use crate::common::{Element, SkillType};
 use crate::damage::damage_builder::DamageBuilder;
 
-pub trait AttributeGraphResult {
+pub trait AttributeGraphResult: Clone {
     type ResultType;
 
     fn get_attribute_value(&self, node: AttributeNode) -> f64;
@@ -12,6 +12,8 @@ pub trait AttributeGraphResult {
     fn get_attribute(&self, node: AttributeNode) -> Self::ResultType;
 
     fn get_attribute_merge(&self, nodes: &[AttributeNode]) -> Self::ResultType;
+
+    fn get_characters(&self) -> &Vec<CharacterStatus>;
 }
 
 pub struct AttributeResultWithCharacter<ResultTy: AttributeGraphResult> {
@@ -22,7 +24,7 @@ pub struct AttributeResultWithCharacter<ResultTy: AttributeGraphResult> {
 pub type SimpleAttributeResult = AttributeResultWithCharacter<SimpleAttributeGraphResult>;
 pub type ComplicatedAttributeResult = AttributeResultWithCharacter<ComplicatedAttributeGraphResult>;
 
-pub trait AttributeResult {
+pub trait AttributeResult: GetCharacterMethod {
     type ResultType;
 
     fn get_value(&self, name: AttributeName) -> f64;
@@ -32,6 +34,10 @@ pub trait AttributeResult {
     fn get_result_t(&self, ty: AttributeType) -> Self::ResultType;
 
     fn get_result_merge(&self, names: &[AttributeName]) -> Self::ResultType;
+
+    fn get_value_by_selector(&self, selector: CharacterSelector, ty: AttributeType) -> f64;
+
+    fn get_result_by_selector(&self, selector: CharacterSelector, ty: AttributeType) -> Self::ResultType;
 
     fn get_em_all(&self) -> f64 {
         self.get_value(AttributeName::ElementalMastery)
@@ -195,5 +201,57 @@ impl<ResultTy: AttributeGraphResult> AttributeResult for AttributeResultWithChar
             .map(|&name| AttributeNode::new_panel(self.character_id, name))
             .collect();
         self.result.get_attribute_merge(nodes.as_slice())
+    }
+
+    fn get_value_by_selector(&self, selector: CharacterSelector, ty: AttributeType) -> f64 {
+        let list = selector.get_matched_list(self.get_characters());
+        list.iter()
+            .filter_map(|&id| {
+                let node = AttributeNode::new(id, ty);
+                Some(self.result.get_attribute_value(node))
+            })
+            .sum()
+    }
+
+    fn get_result_by_selector(&self, selector: CharacterSelector, ty: AttributeType) -> Self::ResultType {
+        let list = selector.get_matched_list(self.get_characters());
+        let nodes: Vec<AttributeNode> = list
+            .iter()
+            .map(|&id| AttributeNode::new(id, ty))
+            .collect();
+        self.result.get_attribute_merge(nodes.as_slice())
+    }
+}
+
+impl<ResultTy: AttributeGraphResult> GetCharacterMethod for AttributeResultWithCharacter<ResultTy> {
+    fn get_character_id(&self) -> &usize {
+        &self.character_id
+    }
+
+    fn get_character(&self) -> &CharacterStatus {
+        let characters = self.get_characters();
+        characters
+            .iter()
+            .find(|c| c.character_id == self.character_id)
+            .unwrap()
+    }
+
+    fn get_characters(&self) -> &Vec<CharacterStatus> {
+        self.result.get_characters()
+    }
+
+    fn get_change_active_character(&self, character_id: usize) -> Self {
+        AttributeResultWithCharacter {
+            result: self.result.clone(),
+            character_id,
+        }
+    }
+
+    fn get_characters_by_selector(&self, selector: CharacterSelector) -> Vec<&CharacterStatus> {
+        let list = selector.get_matched_list(self.get_characters());
+        self.get_characters()
+            .iter()
+            .filter(|c| list.contains(&c.character_id))
+            .collect()
     }
 }

@@ -166,6 +166,7 @@ pub enum WeaponName {
     FracturedHalo,
     BloodsoakedRuins,
     GestOfTheMightyWolf,
+    DisasterAndRemorse,
 
     // catalyst
     // 1 star
@@ -223,6 +224,7 @@ pub enum WeaponName {
     NightweaversLookingGlass,
     ReliquaryOfTruth,
     NocturnesCurtainCall,
+    AngelosHeptades,
 
     // bows
     // 1 star

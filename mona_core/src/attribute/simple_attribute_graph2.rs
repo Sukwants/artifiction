@@ -21,30 +21,55 @@ pub struct Edge {
 }
 
 #[derive(Clone)]
+pub struct Node {
+    pub values: HashMap<String, f64>,
+}
+
+impl Default for Node {
+    fn default() -> Self {
+        Node {
+            values: HashMap::new(),
+        }
+    }
+}
+
+impl Node {
+    pub fn new() -> Self {
+        Node::default()
+    }
+
+    pub fn sum(&self) -> f64 {
+        self.values.values().sum::<f64>()
+    }
+
+    pub fn set_value_by(&mut self, key: &str, value: f64) {
+        *self.values.entry(String::from(key)).or_insert(0.0) += value;
+    }
+
+    pub fn set_value_to(&mut self, key: &str, value: f64) {
+        *self.values.entry(String::from(key)).or_insert(0.0) = value;
+    }
+}
+
+#[derive(Clone)]
 pub struct SimpleAttributeGraphResult {
     pub map: HashMap<AttributeNode, f64>,
+    pub characters: Vec<CharacterStatus>,
 }
 
 impl SimpleAttributeGraphResult {
-    pub fn new() -> Self {
+    pub fn new(characters: Vec<CharacterStatus>) -> Self {
         SimpleAttributeGraphResult {
             map: HashMap::new(),
+            characters,
         }
-    }
-
-    pub fn get_attribute_mut(&mut self, node: AttributeNode) -> &mut f64 {
-        self.map.entry(node).or_insert(0.0)
-    }
-
-    pub fn get_attribute(&self, node: AttributeNode) -> f64 {
-        *self.map.get(&node).unwrap_or(&0.0)
     }
 
     pub fn get_attribute_value(&self, node: AttributeNode) -> f64 {
         let mut temp = 0.0;
 
         for pa in node.get_parents() {
-            temp += self.get_attribute(pa);
+            temp += self.map.get(&pa).copied().unwrap_or(0.0);
         }
 
         temp
@@ -65,17 +90,21 @@ impl AttributeGraphResult for SimpleAttributeGraphResult {
     fn get_attribute_merge(&self, nodes: &[AttributeNode]) -> f64 {
         let mut temp = 0.0;
         for node in nodes.iter() {
-            temp += self.get_attribute(*node);
+            temp += self.get_attribute_value(*node);
         }
         temp
+    }
+
+    fn get_characters(&self) -> &Vec<CharacterStatus> {
+        &self.characters
     }
 }
 
 #[derive(Clone)]
 pub struct SimpleAttributeGraph2 {
-    pub nodes: SimpleAttributeGraphResult,
-    pub edges: Vec<Edge>,
+    pub nodes: HashMap<AttributeNode, Node>,
     pub characters: Vec<CharacterStatus>,
+    pub edges: Vec<Edge>,
 }
 
 impl AttributeGraph for SimpleAttributeGraph2 {
@@ -83,11 +112,11 @@ impl AttributeGraph for SimpleAttributeGraph2 {
     type ResultType = SimpleAttributeGraphResult;
 
     fn set_value_to_internal(&mut self, node: AttributeNode, key: &str, value: f64) {
-        *self.nodes.get_attribute_mut(node) = value;
+        self.nodes.entry(node).or_default().set_value_to(key, value);
     }
 
     fn set_value_by_internal(&mut self, node: AttributeNode, key: &str, value: f64) {
-        *self.nodes.get_attribute_mut(node) += value;
+        self.nodes.entry(node).or_default().set_value_by(key, value);
     }
 
     fn add_edge(
@@ -129,9 +158,9 @@ impl AttributeGraph for SimpleAttributeGraph2 {
 
     fn new_with_characters(characters: Vec<CharacterStatus>) -> Self {
         SimpleAttributeGraph2 {
-            nodes: SimpleAttributeGraphResult::new(),
-            edges: Vec::new(),
+            nodes: HashMap::new(),
             characters,
+            edges: Vec::new(),
         }
     }
 
@@ -146,19 +175,30 @@ impl AttributeGraph for SimpleAttributeGraph2 {
 
 impl SimpleAttributeGraph2 {
     pub fn solve(&self) -> SimpleAttributeGraphResult {
-        let mut result = self.nodes.clone();
-        let mut temp = self.nodes.clone();
+        let mut result: HashMap<AttributeNode, f64> = self
+            .nodes
+            .iter()
+            .map(|(node, values)| (*node, values.sum()))
+            .collect();
+        let mut temp = result.clone();
+
+        let sum_parent_values = |nodes: &HashMap<AttributeNode, f64>, node: AttributeNode| {
+            node.get_parents()
+                .iter()
+                .map(|pa| *nodes.get(pa).unwrap_or(&0.0))
+                .sum::<f64>()
+        };
 
         let solve_edge = |
             edge: &Edge,
-            nodes_old: &SimpleAttributeGraphResult,
-            nodes_new: &mut SimpleAttributeGraphResult,
+            nodes_old: &HashMap<AttributeNode, f64>,
+            nodes_new: &mut HashMap<AttributeNode, f64>,
             c: f64,
         | {
-            let from1_value = nodes_old.get_attribute_value(edge.from1);
-            let from2_value = nodes_old.get_attribute_value(edge.from2);
+            let from1_value = sum_parent_values(nodes_old, edge.from1);
+            let from2_value = sum_parent_values(nodes_old, edge.from2);
             let value = (edge.func)(from1_value, from2_value) * c;
-            *nodes_new.get_attribute_mut(edge.to) += value;
+            *nodes_new.entry(edge.to).or_insert(0.0) += value;
         };
 
         let mut edge_lists = BTreeMap::new();
@@ -190,6 +230,88 @@ impl SimpleAttributeGraph2 {
             result = temp.clone();
         }
 
-        result
+        SimpleAttributeGraphResult {
+            map: result,
+            characters: self.characters.clone(),
+        }
+    }
+}
+
+#[cfg(test)]
+mod tests {
+    use super::*;
+    use crate::attribute::complicated_attribute_graph::ComplicatedAttributeGraph;
+    use crate::attribute::{AttributeName, EdgePriority};
+    use std::sync::Arc;
+
+    fn get_simple_node_value(graph: &SimpleAttributeGraph2, node: AttributeNode) -> f64 {
+        graph.nodes.get(&node).map(Node::sum).unwrap_or(0.0)
+    }
+
+    fn get_complicated_node_value(graph: &ComplicatedAttributeGraph, node: AttributeNode) -> f64 {
+        graph.nodes.get_attribute_value(node)
+    }
+
+    fn add_pair_edges(simple: &mut SimpleAttributeGraph2, complicated: &mut ComplicatedAttributeGraph, from: AttributeNode, to: AttributeNode) {
+        for key in ["edge_a", "edge_b"] {
+            simple.add_edge(
+                from,
+                from,
+                to,
+                Arc::new(|x1, _x2| x1),
+                key,
+                EdgePriority::Common,
+            );
+            complicated.add_edge(
+                from,
+                from,
+                to,
+                Arc::new(|x1, _x2| x1),
+                key,
+                EdgePriority::Common,
+            );
+        }
+    }
+
+    #[test]
+    fn set_value_to_parity_with_complicated_graph() {
+        let node = AttributeNode::new_panel(0, AttributeName::ATKPercentage);
+        let mut simple = SimpleAttributeGraph2::new_with_characters(Vec::new());
+        let mut complicated = ComplicatedAttributeGraph::new_with_characters(Vec::new());
+
+        simple.set_value_by_internal(node, "a", 0.2);
+        simple.set_value_by_internal(node, "b", 0.3);
+        simple.set_value_to_internal(node, "a", 0.5);
+
+        complicated.set_value_by_internal(node, "a", 0.2);
+        complicated.set_value_by_internal(node, "b", 0.3);
+        complicated.set_value_to_internal(node, "a", 0.5);
+
+        let simple_value = get_simple_node_value(&simple, node);
+        let complicated_value = get_complicated_node_value(&complicated, node);
+        assert_eq!(simple_value, complicated_value);
+    }
+
+    #[test]
+    fn solve_result_matches_complicated_graph_behavior() {
+        let from = AttributeNode::new_panel(0, AttributeName::ATKPercentage);
+        let to = AttributeNode::new_panel(0, AttributeName::ATK);
+        let mut simple = SimpleAttributeGraph2::new_with_characters(Vec::new());
+        let mut complicated = ComplicatedAttributeGraph::new_with_characters(Vec::new());
+
+        simple.set_value_by_internal(from, "a", 0.2);
+        simple.set_value_by_internal(from, "b", 0.3);
+        simple.set_value_to_internal(from, "a", 0.5);
+        complicated.set_value_by_internal(from, "a", 0.2);
+        complicated.set_value_by_internal(from, "b", 0.3);
+        complicated.set_value_to_internal(from, "a", 0.5);
+        add_pair_edges(&mut simple, &mut complicated, from, to);
+
+        let simple_solved = simple.solve();
+        let complicated_solved = complicated.solve();
+        assert_eq!(
+            simple_solved.get_attribute_value(to),
+            complicated_solved.get_attribute_value(to)
+        );
     }
 }

@@ -3,7 +3,7 @@ pub use crate::character::character_common_data::CharacterCommonData;
 pub use crate::character::character_sub_stat::CharacterSubStatFamily;
 pub(crate) use crate::character::macros::{damage_enum, skill_map};
 pub use crate::character::skill_config::CharacterSkillConfig;
-pub use crate::character::team_status::{CharacterSelector, CharacterStatus, CharacterTag, CharacterTags};
+pub use crate::character::team_status::{CharacterSelector, CharacterStatus, CharacterTag, CharacterTags, GetCharacterMethod};
 pub use crate::character::traits::{CharacterSkillMap, CharacterSkillMapItem, CharacterTrait};
 pub use crate::character::{CharacterConfig, CharacterName, CharacterStaticData};
 pub(crate) use crate::common::i18n::{charged_dmg, hit_n_dmg, locale, plunging_dmg};

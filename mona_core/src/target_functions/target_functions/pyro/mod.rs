@@ -17,6 +17,7 @@ pub mod mavuika_default;
 pub mod aether_pyro_default;
 pub mod lumine_pyro_default;
 pub mod durin_default;
+pub mod nicole_default;
 
 pub use amber_default::AmberDefaultTargetFunction;
 pub use bennett_damage::BennettDamageTargetFunction;
@@ -37,3 +38,4 @@ pub use mavuika_default::MavuikaDefaultTargetFunction;
 pub use aether_pyro_default::AetherPyroDefaultTargetFunction;
 pub use lumine_pyro_default::LuminePyroDefaultTargetFunction;
 pub use durin_default::DurinDefaultTargetFunction;
+pub use nicole_default::NicoleDefaultTargetFunction;

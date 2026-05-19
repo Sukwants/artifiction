@@ -22,4 +22,7 @@ pub mod kamisato_ayaka;
 pub mod mika;
 pub mod rosaria;
 pub mod shenhe;
+pub use lohen::{BuffLohenP2, BuffLohenC2};
+
 pub mod layla;
+pub mod lohen;

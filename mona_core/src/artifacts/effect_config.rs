@@ -228,6 +228,16 @@ pub struct ConfigADayCarvedFromRisingWinds {
     pub set4_rate: f64,
 }
 
+#[derive(Serialize, Deserialize)]
+#[derive(Debug, Clone, Default)]
+pub struct ConfigCelestialGift {
+    pub hexerei_secret_rite: bool,
+}
+
+#[derive(Serialize, Deserialize)]
+#[derive(Debug, Clone, Default)]
+pub struct ConfigDisenchantmentInDeepShadow {}
+
 #[derive(Default, Debug, Clone)]
 #[derive(Serialize, Deserialize)]
 pub struct ArtifactEffectConfig {
@@ -270,6 +280,7 @@ pub struct ArtifactEffectConfig {
     pub config_silken_moons_serenade: ConfigSilkenMoonsSerenade,
     pub config_aubade_of_morningstar_and_moon: ConfigAubadeOfMorningstarAndMoon,
     pub config_a_day_carved_from_rising_winds: ConfigADayCarvedFromRisingWinds,
+    pub config_celestial_gift: ConfigCelestialGift,
 }
 
 #[derive(Serialize, Deserialize)]
@@ -314,6 +325,7 @@ pub struct ArtifactConfigInterface {
     pub config_silken_moons_serenade: Option<ConfigSilkenMoonsSerenade>,
     pub config_aubade_of_morningstar_and_moon: Option<ConfigAubadeOfMorningstarAndMoon>,
     pub config_a_day_carved_from_rising_winds: Option<ConfigADayCarvedFromRisingWinds>,
+    pub config_celestial_gift: Option<ConfigCelestialGift>,
 }
 
 impl ArtifactConfigInterface {
@@ -358,6 +370,7 @@ impl ArtifactConfigInterface {
             config_silken_moons_serenade: self.config_silken_moons_serenade.unwrap_or_default(),
             config_aubade_of_morningstar_and_moon: self.config_aubade_of_morningstar_and_moon.unwrap_or_default(),
             config_a_day_carved_from_rising_winds: self.config_a_day_carved_from_rising_winds.unwrap_or_default(),
+            config_celestial_gift: self.config_celestial_gift.unwrap_or_default(),
         }
     }
 }
@@ -495,6 +508,11 @@ impl ArtifactEffectConfigBuilder {
 
     pub fn a_day_carved_from_rising_winds(&mut self, is_hexerei: bool, set4_rate: f64) -> &mut Self {
         self.config.config_a_day_carved_from_rising_winds.set4_rate = set4_rate;
+        self
+    }
+
+    pub fn celestial_gift(&mut self, hexerei_secret_rite: bool) -> &mut Self {
+        self.config.config_celestial_gift.hexerei_secret_rite = hexerei_secret_rite;
         self
     }
 }

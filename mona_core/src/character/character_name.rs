@@ -151,4 +151,7 @@ pub enum CharacterName {
     Zibai,
     Varka,
     Linnea,
+    Prune,
+    Nicole,
+    Lohen,
 }

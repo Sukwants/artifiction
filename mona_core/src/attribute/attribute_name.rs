@@ -34,7 +34,7 @@ pub enum AttributeName {
 
     HPBase,
     HPFixed,
-    HPPercentage,
+    HPPercentage,  // 并非防御力百分比，如需添加百分比攻击请使用 add_edge: DEFBase -> DEFPercentage 或 add_atk_percentage
     HP,
 
     ATKBase,
@@ -44,7 +44,7 @@ pub enum AttributeName {
 
     DEFBase,
     DEFFixed,
-    DEFPercentage,
+    DEFPercentage,  // 并非生命值上限百分比，如需添加百分比攻击请使用 add_edge: HPBase -> HPPercentage 或 add_atk_percentage
     DEF,
 
     // not character attributes, but needed

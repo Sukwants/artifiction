@@ -10,6 +10,7 @@ pub use chevreuse::{BuffChevreuseP1, BuffChevreuseP2, BuffChevreuseC6};
 pub use aether_pyro::{BuffAetherPyroC1, BuffAetherPyroC2};
 pub use lumine_pyro::{BuffLuminePyroC1, BuffLuminePyroC2};
 pub use durin::{BuffDurinP1, BuffDurinC1, BuffDurinC2, BuffDurinC6};
+pub use nicole::{BuffNicoleE, BuffNicoleGuidance, BuffNicoleC2, BuffNicoleC4, BuffNicoleC6};
 
 pub mod bennett;
 pub mod hu_tao;
@@ -23,3 +24,4 @@ pub mod chevreuse;
 pub mod aether_pyro;
 pub mod lumine_pyro;
 pub mod durin;
+pub mod nicole;

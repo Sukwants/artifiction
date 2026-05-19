@@ -71,5 +71,8 @@ pub enum TargetFunctionConfig {
     ColumbinaOnField {},
     ZibaiDefault { lunar_crystallize_coefficient: f64 },
     LinneaDefault { lunar_crystallize_coefficient: f64, def_demand: f64 },
+    NicoleDefault { recharge_demand: f64 },
+    PruneDefault { recharge_demand: f64 },
+    LohenDefault {},
     NoConfig,
 }

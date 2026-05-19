@@ -5,7 +5,7 @@ use crate::attribute::complicated_attribute_graph::ComplicatedAttributeGraph;
 use crate::attribute::simple_attribute_graph2::SimpleAttributeGraph2;
 use crate::attribute::typing::{EdgeFunctionBwd, EdgeFunctionFwd};
 use crate::attribute::{self, AttributeGraphResult, AttributeResult, AttributeResultWithCharacter};
-use crate::character::team_status::{CharacterSelector, CharacterStatus};
+use crate::character::team_status::{CharacterSelector, CharacterStatus, GetCharacterMethod};
 use crate::character::CharacterStaticData;
 use crate::common::{Element, SkillType};
 
@@ -95,7 +95,7 @@ pub enum EdgePriority {
     Last,
 }
 
-pub trait AttributeGraph {
+pub trait AttributeGraph: Clone {
     type EdgeHandle: Copy;
     type ResultType: AttributeGraphResult;
 
@@ -124,7 +124,7 @@ pub trait AttributeGraph {
     fn solve(&self) -> Self::ResultType;
 }
 
-pub trait Attribute {
+pub trait Attribute: GetCharacterMethod {
     type GraphTy: AttributeGraph;
     type ResultType: AttributeResult;
 
@@ -147,12 +147,6 @@ pub trait Attribute {
     ) -> <Self::GraphTy as AttributeGraph>::EdgeHandle;
 
     fn remove_edge(&mut self, handle: <Self::GraphTy as AttributeGraph>::EdgeHandle);
-
-    fn get_character_id(&self) -> &usize;
-
-    fn get_character(&self) -> &CharacterStatus;
-
-    fn get_characters(&self) -> &Vec<CharacterStatus>;
 
     fn solve(&self) -> Self::ResultType;
 }
@@ -207,6 +201,15 @@ impl<GraphTy: AttributeGraph> Attribute for AttributeWithCharacter<GraphTy> {
         self.attribute.remove_edge(handle);
     }
 
+    fn solve(&self) -> Self::ResultType {
+        AttributeResultWithCharacter {
+            result: self.attribute.solve(),
+            character_id: self.character_id,
+        }
+    }
+}
+
+impl<GraphTy: AttributeGraph> GetCharacterMethod for AttributeWithCharacter<GraphTy> {
     fn get_character_id(&self) -> &usize {
         &self.character_id
     }
@@ -223,11 +226,19 @@ impl<GraphTy: AttributeGraph> Attribute for AttributeWithCharacter<GraphTy> {
         self.attribute.get_characters()
     }
 
-    fn solve(&self) -> Self::ResultType {
-        AttributeResultWithCharacter {
-            result: self.attribute.solve(),
-            character_id: self.character_id,
+    fn get_change_active_character(&self, character_id: usize) -> Self {
+        AttributeWithCharacter {
+            attribute: self.attribute.clone(),
+            character_id,
         }
+    }
+
+    fn get_characters_by_selector(&self, selector: CharacterSelector) -> Vec<&CharacterStatus> {
+        let list = selector.get_matched_list(self.get_characters());
+        self.get_characters()
+            .iter()
+            .filter(|c| list.contains(&c.character_id))
+            .collect()
     }
 }
 

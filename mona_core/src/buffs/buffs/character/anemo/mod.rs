@@ -26,4 +26,7 @@ pub mod lanyan;
 pub mod ifa;
 pub mod aether_anemo;
 pub mod lumine_anemo;
+pub use prune::{BuffPruneP2, BuffPruneC6};
+
 pub mod jahoda;
+pub mod prune;

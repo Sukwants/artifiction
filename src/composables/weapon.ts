@@ -1,4 +1,4 @@
-const DEFAULT_WEAPON = "GoldenFrostboundOath";
+const DEFAULT_WEAPON = "AngelosHeptades";
 
 import type {WeaponName, WeaponType} from "@/types/weapon"
 // @ts-ignore
