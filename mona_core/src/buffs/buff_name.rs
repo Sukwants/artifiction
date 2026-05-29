@@ -61,6 +61,7 @@ pub enum BuffName {
     JeanC4,
     MonaQ,
     MonaC1,
+    MonaTalent3,
     VentiP3,
     VentiC2,
     VentiC4,

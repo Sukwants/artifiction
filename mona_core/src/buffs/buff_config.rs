@@ -41,6 +41,7 @@ pub enum BuffConfig {
     SucroseC6 { element: Element, is_hexerei: bool },
     MonaC1 { off_field: bool },
     MonaQ { c4: bool, skill3: usize, is_hexerei: bool },
+    MonaTalent3 { hexerei_secret_rite: bool, stack: f64 },
     VentiC6 { elemental_absorption: Option<Element> },
     AlbedoTalent3 { def: f64, is_hexerei: bool },
     AlbedoC4 { silver_isotoma: bool },
