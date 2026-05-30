@@ -6,6 +6,8 @@ use crate::buffs::buff_name::BuffName;
 use crate::character::CharacterName;
 use crate::character::characters::Mona;
 use crate::character::traits::CharacterTrait;
+use crate::character::team_status::CharacterSelector;
+use crate::common::ReactionType;
 use crate::common::item_config_type::{ItemConfig, ItemConfigType};
 use crate::enemies::Enemy;
 
@@ -136,6 +138,70 @@ impl BuffMeta for BuffMonaC1 {
         };
         Box::new(BuffMonaC1 {
             off_field,
+        })
+    }
+}
+
+
+pub struct BuffMonaTalent3 {
+    pub hexerei_secret_rite: bool,
+    pub stack: f64,
+}
+
+impl<A: Attribute> Buff<A> for BuffMonaTalent3 {
+    fn change_attribute(&self, attribute: &mut A) {
+        let val = self.stack * 0.05;
+        if self.hexerei_secret_rite {
+            attribute.set_value_by_t(
+                AttributeType::Invisible(InvisibleAttributeType::new(
+                    AttributeVariableType::ReactionEnhance,
+                    None, None, Some(ReactionType::Vaporize),
+                )),
+                "莫娜天赋3",
+                val,
+            );
+        }
+    }
+}
+
+impl BuffMeta for BuffMonaTalent3 {
+    #[cfg(not(target_family = "wasm"))]
+    const META_DATA: BuffMetaData = BuffMetaData {
+        name: BuffName::MonaTalent3,
+        name_locale: crate::common::i18n::locale!(
+            zh_cn: "莫娜-「魔女的前夜礼·天步真原」",
+            en: "Mona-Witch's Eve Rite: Genesis of Starsigns",
+        ),
+        image: BuffImage::Avatar(CharacterName::Mona),
+        genre: BuffGenre::Character,
+        description: Some(crate::common::i18n::locale!(
+            zh_cn: "莫娜天赋3：魔导·秘仪：队伍中自己的其他角色对敌人触发蒸发反应时，将消耗所有的「水星天的辉光」，每消耗一层都会使本次蒸发反应造成的伤害提升5%。",
+            en: "Mona Talent 3: Hexerei: Secret Rite: When other party members trigger a Vaporize reaction on an enemy, all Astral Glow of Mercury stacks are consumed. Each stack consumed increases the damage of that Vaporize reaction by 5%.",
+        )),
+        from: BuffFrom::Character(CharacterName::Mona),
+    };
+
+    #[cfg(not(target_family = "wasm"))]
+    const CONFIG: Option<&'static [ItemConfig]> = Some(&[
+        ItemConfig::HEXEREI_SECRET_RITE_GLOBAL(false, ItemConfig::PRIORITY_BUFF),
+        ItemConfig {
+            name: "stack",
+            title: crate::common::i18n::locale!(
+                zh_cn: "「水星天的辉光」平均层数",
+                en: "Avg. Astral Glow of Mercury Stacks",
+            ),
+            config: ItemConfigType::Float { min: 0.0, max: 3.0, default: 0.0 }
+        },
+    ]);
+
+    fn create<A: Attribute>(b: &BuffConfig) -> Box<dyn Buff<A>> {
+        let (hexerei_secret_rite, stack) = match *b {
+            BuffConfig::MonaTalent3 { hexerei_secret_rite, stack } => (hexerei_secret_rite, stack),
+            _ => (false, 0.0)
+        };
+        Box::new(BuffMonaTalent3 {
+            hexerei_secret_rite,
+            stack,
         })
     }
 }
