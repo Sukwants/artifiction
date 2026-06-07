@@ -116,6 +116,14 @@ pub enum ReactionType {
 }
 
 impl ReactionType {
+    pub fn get_moonglare_reaction() -> Vec<ReactionType> {
+        vec![
+            ReactionType::LunarCharged,
+            ReactionType::LunarBloom,
+            ReactionType::LunarCrystallize,
+        ]
+    }
+    
     pub fn get_reaction_from_transformative_type(transformative_type: TransformativeType) -> ReactionType {
         match transformative_type {
             TransformativeType::SwirlCryo => ReactionType::CryoSwirl,
