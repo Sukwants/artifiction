@@ -74,6 +74,7 @@ pub enum CharacterSkillConfig {
     Varka { azure_fang_oath: usize, c1_bonus: bool },
     Linnea { field_catalog: usize },
     Prune { tolling_rally: bool, swirl_trigger: bool, hunt_the_witch_stacks: usize, c6_atk: bool },
+    Sucrose { talent1_coverage: f64, talent2_coverage: f64, c6_coverage: f64, small_wind_spirit_coverage: f64, large_wind_spirit_coverage: f64 },
     Nicole { on_field_over_3s: bool },
     Lohen { in_masterstroke: bool, evilsbane_blade: bool },
     NoConfig,
