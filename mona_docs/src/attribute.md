@@ -134,6 +134,7 @@ pub enum AttributeVariableType {
 - “按照一定百分比，提升某种伤害的暴击伤害”指 `CriticalDamage` 部分。请注意，若描述为“按照一定百分比，提升角色的暴击伤害”等不指示特定伤害类型的描述，则应指 `AttributeName::CriticalDamageBase` 的面板属性。
 - “按照一定百分比，提升队伍中角色造成的特定反应的基础伤害”指 `MoonglareBase` 部分。
 - “造成的特定反应伤害擢升一定百分比”指 `MoonglareElevate` 部分。
+- 特别的，对于作用于所有月曜反应的效果，应当使用 `ReactionType::get_moonglare_reaction()` 来获取所有月曜反应的列表，以保证良好的可扩展性。
 
 对于治疗效果：
 
@@ -405,7 +406,7 @@ Attribute 对外提供的接口有：
 - `fn add_hp_percentage(&mut self, key: &str, value: f64)`：将当前角色的生命值上限提升 `value` 百分比。
 - `fn add_elemental_bonus(&mut self, key: &str, value: f64)`：将当前角色的所有元素伤害加成的面板属性提升 `value` 百分比。
 
-请注意，由于默认情况下同一来源的增益无法叠加，因此除非明确可以叠加的增益，其余均建议使用 `set_value_to` 等而非 `set_value_by` 等接口来实现，以避免错误叠加与重复计算。
+请注意，由于默认情况下同一来源的增益无法叠加（包括同名武器的同名效果、同名圣遗物的同名效果），因此除非明确可以叠加的增益（如“多件同名武器产生的此效果可以叠加”），其余均建议使用 `set_value_to`、`set_value_to_t`、`set_value_to_s` 等而非 `set_value_by`、`set_value_by_t`、`set_value_by_s` 等接口来实现，以避免错误叠加与重复计算。
 
 以下为历史接口，不应使用：
 
@@ -426,11 +427,37 @@ Attribute 对外提供的接口有：
 
 ### 注意事项
 
+#### 攻击力 / 防御力 / 生命值上限
+
+> 本条极易出错，请在实现前后仔细确认。
+
 对于攻击力、防御力、生命值上限，共有四个有关属性：`ATKBase`、`ATKFixed`、`ATKPercentage`、`ATK`（防御力和生命值上限同理）。其中 `ATKBase` 指基础攻击力，除非明确提升基础攻击力，否则不得修改该属性；`ATKFixed` 指攻击力固定数值部分提升；`ATKPercentage` 指攻击力百分比部分提升，但使用方法不是直接将提升百分比加到该属性上，而是需要通过从 `ATKBase` 到 `ATKPercentage` 的相应比例的属性边来实现；`ATK` 是 `ATKBase`、`ATKFixed`、`ATKPercentage` 三者的实时和，基于攻击力的加成应当从 `ATK` 引出属性边来实现，不允许有指向 `ATK` 的属性边。
 
-`add_atk_percentage` 方法仅对当前角色生效。若需要为其他角色（如场上角色）添加攻击力百分比加成，应使用 `add_edge_s1ton` 配合对应的 `CharacterSelector`，在选中角色的 `ATKBase` 和 `ATKPercentage` 之间建边：
+具体的：
+
+| 属性 | 含义 | 如何修改 |
+|------|------|---------|
+| `ATKBase` | 基础攻击力 | 除非明确说"提升基础攻击力"，否则**不得修改** |
+| `ATKFixed` | 攻击力固定数值 | 可直接 `set_value_to` 或 `set_value_by` |
+| `ATKPercentage` | 攻击力百分比 | **不可直接 `set_value_to` 或 `set_value_by`**，必须通过 `ATKBase -> ATKPercentage` 的属性边实现 |
+| `ATK` | 最终攻击力 | 不允许有指向 `ATK` 的属性边，所有攻击力加成应按照固定数值或百分比应用到 `ATKFixed` 或 `ATKPercentage`。基于攻击力的加成应从 `ATK` 引出边 |
+
+防御力（`DEF`）和生命值上限（`HP`）同理。
+
+**常见错误 vs 正确做法：**
 
 ```rust
+// 错误：直接给 ATKPercentage / HPPercentage 设值
+attribute.set_value_to(AttributeName::ATKPercentage, "key", 0.25);
+attribute.set_value_to_t(AttributeType::Panel(AttributeName::HPPercentage), "key", 0.25);
+attribute.set_value_by_s(selector, AttributeType::Panel(AttributeName::ATKPercentage), "key", 0.25);
+
+// 正确：对当前角色，使用便捷方法
+attribute.add_atk_percentage("key", 0.25);
+attribute.add_hp_percentage("key", 0.25);
+attribute.add_def_percentage("key", 0.25);
+
+// 正确：对其他角色（场上/全队等），使用 add_edge_s1ton
 attribute.add_edge_s1ton(
     CharacterSelector::select_onfield(attribute),
     AttributeType::Panel(AttributeName::ATKBase),
@@ -441,9 +468,21 @@ attribute.add_edge_s1ton(
 );
 ```
 
-防御力与生命值上限同理。
+> `add_atk_percentage` 仅对当前角色生效。为其他角色添加时，必须用 `add_edge_s1ton`（在**被选中角色自身**的 Base → Percentage 间建边），**不可**用 `add_edge_s1to1`（那会从当前角色建边）。
 
-特别的，对于施加在敌人身上的减抗、减防效果，应当总是应用到所有人，即角色选择器应总是为 `CharacterSelector::select_all(attribute)`，以保证所有伤害都受到该效果的影响。
+#### 减抗 / 减防
+
+对于施加在敌人身上的减抗（`ResMinus`）、减防（`DefMinus`）效果，应**总是**使用 `CharacterSelector::select_all(attribute)`，以保证所有伤害都受到该效果的影响：
+
+```rust
+// 正确
+attribute.set_value_to_s(
+    CharacterSelector::select_all(attribute),
+    AttributeType::Invisible(InvisibleAttributeType::new_element(AttributeVariableType::ResMinus, Element::Geo)),
+    "效果名称",
+    value,
+);
+```
 
 ### 调用示例
 
