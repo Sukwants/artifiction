@@ -14,7 +14,8 @@ impl<A: Attribute> WeaponEffect<A> for AngelosHeptadesEffect {
 
         // 先导之光：基于装备者攻击力，每1000点提升当前场上角色伤害
         // 从装备者 ATK 引属性边到自身通用伤害加成
-        attribute.add_edge_t1(
+        attribute.add_edge_s1to1(
+            CharacterSelector::select_self_onfield(attribute),
             AttributeType::Panel(AttributeName::ATK),
             AttributeType::Invisible(InvisibleAttributeType::new_any(AttributeVariableType::Bonus)),
             Arc::new(move |atk: f64, _| {
