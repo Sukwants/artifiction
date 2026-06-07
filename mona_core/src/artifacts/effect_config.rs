@@ -155,6 +155,12 @@ pub struct ConfigNymphsDream {
 
 #[derive(Serialize, Deserialize)]
 #[derive(Debug, Clone, Default)]
+pub struct ConfigViridescentVenerer {
+    pub element: ConfigElements8Multi,
+}
+
+#[derive(Serialize, Deserialize)]
+#[derive(Debug, Clone, Default)]
 pub struct ConfigVourukashasGlow {
     pub stack: f64,
 }
@@ -259,6 +265,7 @@ pub struct ArtifactEffectConfig {
     pub config_tenacity_of_the_millelith: ConfigRate,
     pub config_thundersoother: ConfigRate,
     pub config_vermillion_hereafter: ConfigVermillionHereafter,
+    pub config_viridescent_venerer: ConfigViridescentVenerer,
     pub config_echoes_of_an_offering: ConfigEchoesOfAnOffering,
     pub config_deepwood_memories: ConfigRate,
     pub config_gilded_dreams: ConfigGildedDreams,
@@ -303,6 +310,7 @@ pub struct ArtifactConfigInterface {
     pub config_shimenawas_reminiscence: Option<ConfigRate>,
     pub config_tenacity_of_the_millelith: Option<ConfigRate>,
     pub config_thundersoother: Option<ConfigRate>,
+    pub config_viridescent_venerer: Option<ConfigViridescentVenerer>,
     pub config_vermillion_hereafter: Option<ConfigVermillionHereafter>,
     pub config_echoes_of_an_offering: Option<ConfigEchoesOfAnOffering>,
     pub config_deepwood_memories: Option<ConfigRate>,
@@ -348,6 +356,7 @@ impl ArtifactConfigInterface {
             config_shimenawas_reminiscence: self.config_shimenawas_reminiscence.unwrap_or(Default::default()),
             config_tenacity_of_the_millelith: self.config_tenacity_of_the_millelith.unwrap_or(Default::default()),
             config_thundersoother: self.config_thundersoother.unwrap_or(Default::default()),
+            config_viridescent_venerer: self.config_viridescent_venerer.unwrap_or(Default::default()),
             config_vermillion_hereafter: self.config_vermillion_hereafter.unwrap_or(Default::default()),
             config_echoes_of_an_offering: self.config_echoes_of_an_offering.unwrap_or(Default::default()),
             config_deepwood_memories: self.config_deepwood_memories.unwrap_or(Default::default()),

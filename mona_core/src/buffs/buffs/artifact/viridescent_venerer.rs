@@ -15,7 +15,7 @@ pub struct BuffViridescentVenerer4 {
 impl<A: Attribute> Buff<A> for BuffViridescentVenerer4 {
     fn change_attribute(&self, attribute: &mut A) {
         let name = AttributeName::res_minus_name_by_element(self.element);
-        attribute.set_value_by(name, "BUFF: 翠绿之影4", 0.4);
+        attribute.set_value_to(name, "翠绿之影4", 0.4);
     }
 }
 
