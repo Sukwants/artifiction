@@ -337,7 +337,7 @@ impl CharacterTrait for Nicole {
             }
 
             if hexerei_secret_rite && onfield_status.tags.contains(&CharacterTag::Hexerei) {
-                builder.add_extra_damage("尼可天赋3", onfield_attribute.get_atk() * 3.0);
+                builder.add_extra_damage("尼可天赋3", context.attribute.get_atk() * 3.0);
             }
 
             builder.damage(
