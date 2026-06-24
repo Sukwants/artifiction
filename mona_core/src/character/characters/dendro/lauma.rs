@@ -183,7 +183,7 @@ impl<A: Attribute> ChangeAttribute<A> for LaumaEffect {
         attribute.add_edge_s1to1(
             CharacterSelector::select_all(attribute),
             AttributeType::Panel(AttributeName::ElementalMastery),
-            AttributeType::Invisible(InvisibleAttributeType::new_reaction(AttributeVariableType::MoonglareBase, ReactionType::LunarBloom)),
+            AttributeType::Invisible(InvisibleAttributeType::new_reaction(AttributeVariableType::ElevativeBase, ReactionType::LunarBloom)),
             Arc::new(move |em: f64, _| (em * 0.000175).min(0.14) ),
             "菈乌玛天赋3",
             EdgePriority::Invisible,
@@ -254,7 +254,7 @@ impl<A: Attribute> ChangeAttribute<A> for LaumaEffect {
         if self.has_c6 && self.moonsign.is_ascendant() {
             attribute.set_value_by_s(
                 CharacterSelector::select_all(attribute),
-                AttributeType::Invisible(InvisibleAttributeType::new_reaction(AttributeVariableType::MoonglareElevate, ReactionType::LunarBloom)),
+                AttributeType::Invisible(InvisibleAttributeType::new_reaction(AttributeVariableType::ElevativeElevate, ReactionType::LunarBloom)),
                 "菈乌玛命座6",
                 0.25
             );
@@ -287,11 +287,11 @@ impl LaumaDamageEnum {
         Element::Dendro
     }
 
-    pub fn get_lunar_type(&self) -> MoonglareReaction {
+    pub fn get_lunar_type(&self) -> ElevativeReaction {
         use LaumaDamageEnum::*;
         match *self {
-            EHold2 | C6E | C6A => MoonglareReaction::LunarBloom,
-            _ => MoonglareReaction::None,
+            EHold2 | C6E | C6A => ElevativeReaction::LunarBloom,
+            _ => ElevativeReaction::None,
         }
     }
 
@@ -304,7 +304,7 @@ impl LaumaDamageEnum {
             X2 | X3 => SkillType::PlungingAttackOnGround,
             E | EHold1 | EFrostgroveSanctuary => SkillType::ElementalSkill,
             // QBloomIncrease | QLunarBloomIncrease => SkillType::ElementalBurst,
-            EHold2 | C6E | C6A => SkillType::Moonglare,
+            EHold2 | C6E | C6A => SkillType::Elevative,
         }
     }
 }
@@ -381,7 +381,7 @@ impl CharacterTrait for Lauma {
         use LaumaDamageEnum::*;
         let mut builder = D::new();
 
-        if s.get_skill_type() == SkillType::Moonglare {
+        if s.get_skill_type() == SkillType::Elevative {
             let ratio = match s {
                 EHold2 => LAUMA_SKILL.e_hold_dmg2[s2],
                 C6E => LAUMA_SKILL.c6_e_dmg,
@@ -391,7 +391,7 @@ impl CharacterTrait for Lauma {
 
             builder.add_em_ratio("技能倍率", ratio);
 
-            builder.moonglare(
+            builder.elevative(
                 &context.attribute,
                 &context.enemy,
                 s.get_element(),

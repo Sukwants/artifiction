@@ -295,7 +295,7 @@ export default {
         bloom: "绽放",
         hyperbloom: "超绽放",
         burgeon: "烈绽放",
-        moonglare: "月曜反应",
+        elevative: "擢升反应",
         lunar_charged_reaction: "月感电",
         lunar_charged: "月感电伤害",
         lunar_bloom: "月绽放伤害",

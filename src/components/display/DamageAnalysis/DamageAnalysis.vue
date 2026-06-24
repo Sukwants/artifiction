@@ -7,7 +7,7 @@
             <el-radio-button v-if="hasDamageSpread" label="DamageSpread">蔓激化</el-radio-button>
             <el-radio-button v-if="hasDamageAggravate" label="DamageAggravate">超激化</el-radio-button>
             <el-radio-button v-if="hasTransformativeDamage" label="TransformativeDamage">{{ get_name_from_transformative_type(this.TransformativeDamage.transformative_type) }}</el-radio-button>
-            <el-radio-button v-if="hasMoonglareDamage" label="MoonglareDamage">{{ get_name_from_lunar_type(this.MoonglareDamage.lunar_type) }}</el-radio-button>
+            <el-radio-button v-if="hasElevativeDamage" label="ElevativeDamage">{{ get_name_from_lunar_type(this.ElevativeDamage.lunar_type) }}</el-radio-button>
             <el-radio-button v-if="hasHeal" label="Heal">治疗</el-radio-button>
             <el-radio-button v-if="hasShield" label="Shield">护盾</el-radio-button>
             <el-radio-button v-if="hasNumber" label="Number">数值</el-radio-button>
@@ -89,8 +89,8 @@
                     title="伤害加成"
                 ></damage-analysis-util>
                 <damage-analysis-util
-                    v-if="this.damageType == 'MoonglareDamage'"
-                    :arr="result.moonglare_base"
+                    v-if="this.damageType == 'ElevativeDamage'"
+                    :arr="result.elevative_base"
                     title="基础提升"
                 ></damage-analysis-util>
                 <damage-analysis-util
@@ -111,7 +111,7 @@
             </div>
         </div>
 
-        <div v-if="this.damageType === 'DamageMelt' || this.damageType === 'DamageVaporize' || this.damageType === 'TransformativeDamage' || this.damageType === 'MoonglareDamage'" >
+        <div v-if="this.damageType === 'DamageMelt' || this.damageType === 'DamageVaporize' || this.damageType === 'TransformativeDamage' || this.damageType === 'ElevativeDamage'" >
             <div class="big-title reaction-region">反应区</div>
             <div class="header-row">
                 <div style="min-width: 100px">
@@ -169,11 +169,11 @@
                 ></damage-analysis-util>
             </div>
         </div>
-        <div v-if="this.damageType == 'MoonglareDamage'">
+        <div v-if="this.damageType == 'ElevativeDamage'">
             <div class="big-title critical-region">擢升</div>
             <div class="header-row">
                 <damage-analysis-util
-                    :arr="result.moonglare_elevate"
+                    :arr="result.elevative_elevate"
                     title="月曜反应擢升"
                 ></damage-analysis-util>
             </div>
@@ -249,7 +249,7 @@ export default {
             DamageSpread: null,
             DamageAggravate: null,
             TransformativeDamage: null,
-            MoonglareDamage: null,
+            ElevativeDamage: null,
             Heal: null,
             Shield: null,
             Number: null,
@@ -273,10 +273,10 @@ export default {
                 this.Heal = init_value(analysis.Heal)
                 this.damageType = "Heal"
             } else this.Heal = null
-            if (analysis.MoonglareDamage) {
-                this.MoonglareDamage = init_value(analysis.MoonglareDamage)
-                this.damageType = "MoonglareDamage"
-            } else this.MoonglareDamage = null
+            if (analysis.ElevativeDamage) {
+                this.ElevativeDamage = init_value(analysis.ElevativeDamage)
+                this.damageType = "ElevativeDamage"
+            } else this.ElevativeDamage = null
             if (analysis.TransformativeDamage) {
                 this.TransformativeDamage = init_value(analysis.TransformativeDamage)
                 this.damageType = "TransformativeDamage"
@@ -364,7 +364,7 @@ export default {
             return damage
         },
 
-        calc_MoonglareDamage(result) {
+        calc_ElevativeDamage(result) {
             let base_damage = sum(result.atk) * sum(result.atk_ratio)
                 + sum(result.hp) * sum(result.hp_ratio)
                 + sum(result.def) * sum(result.def_ratio)
@@ -373,8 +373,8 @@ export default {
                 + result.reaction_base;
 
             let damage = (base_damage
-                * (1 + sum(result.moonglare_base))
-                * (1 + sum(result.moonglare_elevate))
+                * (1 + sum(result.elevative_base))
+                * (1 + sum(result.elevative_elevate))
                 * result.reaction_coefficient * (1 + sum(result.reaction_enhance))
                 + sum(result.reaction_extra))
                 * (1 + min(sum(result.critical_rate), 1.0) * sum(result.critical_damage))
@@ -435,8 +435,8 @@ export default {
                     return this.calc_Damage(this.DamageAggravate)
                 } else if (this.damageType == "TransformativeDamage") {
                     return this.calc_TransformativeDamage(this.TransformativeDamage)
-                } else if (this.damageType == "MoonglareDamage") {
-                    return this.calc_MoonglareDamage(this.MoonglareDamage)
+                } else if (this.damageType == "ElevativeDamage") {
+                    return this.calc_ElevativeDamage(this.ElevativeDamage)
                 } else if (this.damageType == "Heal") {
                     return this.calc_Heal(this.Heal)
                 } else if (this.damageType == "Shield") {
@@ -510,8 +510,8 @@ export default {
         hasTransformativeDamage() {
             return this.TransformativeDamage != null
         },
-        hasMoonglareDamage() {
-            return this.MoonglareDamage != null
+        hasElevativeDamage() {
+            return this.ElevativeDamage != null
         },
         hasHeal() {
             return this.Heal != null
@@ -531,7 +531,7 @@ export default {
                 DamageSpread: this.$data.DamageSpread,
                 DamageAggravate: this.$data.DamageAggravate,
                 TransformativeDamage: this.$data.TransformativeDamage,
-                MoonglareDamage: this.$data.MoonglareDamage,
+                ElevativeDamage: this.$data.ElevativeDamage,
                 Heal: this.$data.Heal,
                 Shield: this.$data.Shield,
                 Number: this.$data.Number,

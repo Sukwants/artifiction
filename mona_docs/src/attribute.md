@@ -98,8 +98,8 @@ pub enum AttributeVariableType {
 
     ReactionExtra, // 反应额外提升
 
-    MoonglareBase, // 月曜反应基础提升
-    MoonglareElevate, // 月曜反应擢升
+    ElevativeBase, // 月曜反应基础提升
+    ElevativeElevate, // 月曜反应擢升
 
     HealingBonus, // 治疗加成
     IncomingHealingBonus, // 受治疗加成
@@ -132,9 +132,9 @@ pub enum AttributeVariableType {
 - “基于特定数值，提升特定反应的伤害”指 `ReactionExtra` 部分。
 - “按照一定百分比，提升某种伤害的暴击率”指 `CriticalRate` 部分。请注意，若描述为“按照一定百分比，提升角色的暴击率”等不指示特定伤害类型的描述，则应指 `AttributeName::CriticalBase` 的面板属性。
 - “按照一定百分比，提升某种伤害的暴击伤害”指 `CriticalDamage` 部分。请注意，若描述为“按照一定百分比，提升角色的暴击伤害”等不指示特定伤害类型的描述，则应指 `AttributeName::CriticalDamageBase` 的面板属性。
-- “按照一定百分比，提升队伍中角色造成的特定反应的基础伤害”指 `MoonglareBase` 部分。
-- “造成的特定反应伤害擢升一定百分比”指 `MoonglareElevate` 部分。
-- 特别的，对于作用于所有月曜反应的效果，应当使用 `ReactionType::get_moonglare_reaction()` 来获取所有月曜反应的列表，以保证良好的可扩展性。
+- “按照一定百分比，提升队伍中角色造成的特定反应的基础伤害”指 `ElevativeBase` 部分。
+- “造成的特定反应伤害擢升一定百分比”指 `ElevativeElevate` 部分。
+- 特别的，对于作用于所有月曜反应的效果，应当使用 `ReactionType::get_elevative_reaction()` 来获取所有月曜反应的列表，以保证良好的可扩展性。
 
 对于治疗效果：
 
@@ -152,7 +152,7 @@ pub enum AttributeVariableType {
 - “降低敌人的某种元素抗性”、“降低敌人所有元素抗性与物理抗性”指 `ResMinus` 部分。
 - “降低敌人的防御力”指 `DefMinus` 部分。
 
-`InvisibleAttributeType` 中的 `element`、`skill`、`reaction` 字段用来指示当前非面板属性作用的特定元素、技能或反应类型，如没有指示则为 `None`，具体类型如下：
+`InvisibleAttributeType` 中的 `element`、`skill`、`reaction` 字段用来指示当前非面板属性作用的特定元素、技能或反应类型，如没有指示则为 `None`，将会匹配任意值，具体类型如下：
 
 ```rust
 mona::common::element
@@ -178,11 +178,11 @@ pub enum SkillType {
     PlungingAttackOnGround,     // 下落攻击坠地冲击
     ElementalSkill,             // 元素战技
     ElementalBurst,             // 元素爆发
-    Moonglare,                  // 月曜反应
+    Elevative,                  // 月曜反应
 }
 ```
 
-请注意，任何技能触发的月曜反应伤害（月感电、月绽放、月结晶）的技能类型都必须是 `SkillType::Moonglare`。
+请注意，任何技能触发的月曜反应伤害（月感电、月绽放、月结晶）的技能类型都必须是 `SkillType::Elevative`。
 
 ```rust
 mona::common::reaction_type
@@ -553,7 +553,7 @@ attribute.set_value_to_s(
 attribute.add_edge_s1to1(
     CharacterSelector::select_all(attribute),
     AttributeType::Panel(AttributeName::ElementalMastery),
-    AttributeType::Invisible(InvisibleAttributeType::new_reaction(AttributeVariableType::MoonglareBase, ReactionType::LunarBloom)),
+    AttributeType::Invisible(InvisibleAttributeType::new_reaction(AttributeVariableType::ElevativeBase, ReactionType::LunarBloom)),
     Arc::new(move |em: f64, _| (em * 0.000175).min(0.14) ),
     "菈乌玛天赋3",
     EdgePriority::Invisible,

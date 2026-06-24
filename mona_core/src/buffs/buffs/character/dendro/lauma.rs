@@ -268,7 +268,7 @@ pub struct BuffLaumaC6 {
 impl<A: Attribute> Buff<A> for BuffLaumaC6 {
     fn change_attribute(&self, attribute: &mut A) {
         attribute.set_value_by_t(AttributeType::Invisible(InvisibleAttributeType::new(
-            AttributeVariableType::MoonglareElevate,
+            AttributeVariableType::ElevativeElevate,
             None,
             None,
             Some(ReactionType::LunarBloom),

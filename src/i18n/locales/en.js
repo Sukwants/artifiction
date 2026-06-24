@@ -293,7 +293,7 @@ export default {
         bloom: "Bloom",
         hyperbloom: "HyperBloom",
         burgeon: "Burgeon",
-        moonglare: "Mooglare",
+        elevative: "Elevative Reaction",
         lunar_charged_reaction: "Lunar-Charged",
         lunar_charged: "Lunar-Charged DMG",
         lunar_bloom: "Lunar-Bloom DMG",

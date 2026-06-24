@@ -11,9 +11,9 @@ use mona::character::characters::damage;
 use mona::character::skill_config::CharacterSkillConfig;
 use mona::character::team_status::CharacterStatus;
 use mona::character::traits::CharacterTrait;
-use mona::common::{Element, MoonglareReaction, TransformativeType, CharacterFullInfo};
+use mona::common::{Element, ElevativeReaction, TransformativeType, CharacterFullInfo};
 use mona::damage::{ComplicatedDamageBuilder, DamageAnalysis, DamageContext, DamageResult, SimpleDamageBuilder};
-use mona::damage::damage_analysis::{EventAnalysis, TransformativeDamageAnalysisForAll, MoonglareDamageAnalysisForAll};
+use mona::damage::damage_analysis::{EventAnalysis, TransformativeDamageAnalysisForAll, ElevativeDamageAnalysisForAll};
 use mona::damage::damage_builder::DamageBuilder;
 use mona::damage::damage_result::SimpleDamageResult;
 use mona::enemies::Enemy;
@@ -118,7 +118,7 @@ impl CalculatorInterface {
         result.serialize(&s).unwrap()
     }
 
-    pub fn get_moonglare_damage(value: JsValue) -> JsValue {
+    pub fn get_elevative_damage(value: JsValue) -> JsValue {
         utils::set_panic_hook();
 
         let input: CalculatorConfigInterface = serde_wasm_bindgen::from_value(value).unwrap();
@@ -131,7 +131,7 @@ impl CalculatorInterface {
             Default::default()
         };
 
-        let result = CalculatorInterface::get_damage_moonglare_internal(
+        let result = CalculatorInterface::get_damage_elevative_internal(
             &characters,
             &enemy,
             input.active_character_id,
@@ -208,11 +208,11 @@ impl CalculatorInterface {
         result
     }
 
-    pub fn get_damage_moonglare_internal(
+    pub fn get_damage_elevative_internal(
         characters: &Vec<CharacterFullInfo<ComplicatedAttribute>>,
         enemy: &Enemy,
         active_character_id: usize,
-    ) -> MoonglareDamageAnalysisForAll {
+    ) -> ElevativeDamageAnalysisForAll {
 
         let attribute = AttributeUtils::create_attribute_from_list(&characters, active_character_id);
         let active_character = CharacterFullInfo::get_character(&characters, active_character_id);
@@ -225,21 +225,21 @@ impl CalculatorInterface {
 
         let builder = ComplicatedDamageBuilder::new();
 
-        let get_damage = |lunar_type: MoonglareReaction| -> EventAnalysis {
-            builder.moonglare(
+        let get_damage = |lunar_type: ElevativeReaction| -> EventAnalysis {
+            builder.elevative(
                 &context.attribute,
                 &context.enemy,
                 lunar_type.get_element().unwrap(),
                 lunar_type,
-                mona::common::SkillType::Moonglare,
+                mona::common::SkillType::Elevative,
                 context.character_common_data.level,
                 None,
             )
         };
 
-        let result = MoonglareDamageAnalysisForAll {
-            lunar_charged_reaction: get_damage(MoonglareReaction::LunarChargedReaction),
-            lunar_crystallize_reaction: get_damage(MoonglareReaction::LunarCrystallizeReaction),
+        let result = ElevativeDamageAnalysisForAll {
+            lunar_charged_reaction: get_damage(ElevativeReaction::LunarChargedReaction),
+            lunar_crystallize_reaction: get_damage(ElevativeReaction::LunarCrystallizeReaction),
         };
 
         result

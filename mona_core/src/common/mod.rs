@@ -5,7 +5,7 @@ pub use change_attribute::ChangeAttribute;
 pub use skill_type::SkillType;
 pub use crate::damage::damage_result::DamageResult;
 pub use entry_type::EntryType;
-pub use reaction_type::{ReactionType, TransformativeType, MoonglareReaction};
+pub use reaction_type::{ReactionType, TransformativeType, ElevativeReaction};
 pub use moonsign::Moonsign;
 pub use character_full_info::CharacterFullInfo;
 

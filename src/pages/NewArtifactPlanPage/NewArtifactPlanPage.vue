@@ -630,10 +630,10 @@
                 ></transformative-damage>
 
                 <h3 class="common-title2" style="margin-top: 24px">{{ t("calcPage.dmg3") }}</h3>
-                <moonglare-damage
-                    :data="characterMoonglareDamage"
+                <elevative-damage
+                    :data="characterElevativeDamage"
                     :handleDisplayEventAnalysis="handleDisplayEventAnalysis"
-                ></moonglare-damage>
+                ></elevative-damage>
             </el-col>
 
             <el-col :sm="24" :md="6" class="right-container mona-scroll-hidden">
@@ -681,7 +681,7 @@ import { buffData } from "@buff"
 import WeaponDisplay from "@/components/display/WeaponDisplay.vue"
 import SaveAsKumi from "./SaveAsKumi.vue"
 import TransformativeDamage from "./TransformativeDamage"
-import MoonglareDamage from "./MoonglareDamage.vue"
+import ElevativeDamage from "./ElevativeDamage.vue"
 import ValueDisplay from "./ValueDisplay"
 import EnemyConfigComponent from "./EnemyConfig"
 import SelectArtifactMainStat from "@c/select/SelectArtifactMainStat"
@@ -1357,8 +1357,8 @@ const characterTransformativeDamage = computed(() => {
     // return ret
 })
 
-const characterMoonglareDamage = computed(() => {
-    const result = mona.CalculatorInterface.get_moonglare_damage(damageAnalysisWasmInterface.value)
+const characterElevativeDamage = computed(() => {
+    const result = mona.CalculatorInterface.get_elevative_damage(damageAnalysisWasmInterface.value)
     return result
 })
 

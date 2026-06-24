@@ -129,7 +129,7 @@ impl<A: Attribute> ChangeAttribute<A> for FlinsEffect {
         attribute.add_edge_s1to1(
             CharacterSelector::select_all(attribute),
             AttributeType::Panel(AttributeName::ATK),
-            AttributeType::Invisible(InvisibleAttributeType::new_reaction(AttributeVariableType::MoonglareBase, ReactionType::LunarCharged)),
+            AttributeType::Invisible(InvisibleAttributeType::new_reaction(AttributeVariableType::ElevativeBase, ReactionType::LunarCharged)),
             Arc::new(move |atk, _| (atk * 0.00007).min(0.14) ),
             "菲林斯天赋3",
             EdgePriority::Invisible
@@ -145,7 +145,7 @@ impl<A: Attribute> ChangeAttribute<A> for FlinsEffect {
 
         if self.has_c6 {
             attribute.set_value_by_t(AttributeType::Invisible(InvisibleAttributeType::new(
-                AttributeVariableType::MoonglareElevate,
+                AttributeVariableType::ElevativeElevate,
                 None,
                 None,
                 Some(ReactionType::LunarCharged),
@@ -190,12 +190,12 @@ impl FlinsDamageEnum {
         }
     }
 
-    pub fn get_lunar_type(&self) -> MoonglareReaction {
+    pub fn get_lunar_type(&self) -> ElevativeReaction {
         use FlinsDamageEnum::*;
         match *self {
-            LunarCharged => MoonglareReaction::LunarChargedReaction,
-            Q2 | Q3 | QTS | QTSA | C2 => MoonglareReaction::LunarCharged,
-            _ => MoonglareReaction::None,
+            LunarCharged => ElevativeReaction::LunarChargedReaction,
+            Q2 | Q3 | QTS | QTSA | C2 => ElevativeReaction::LunarCharged,
+            _ => ElevativeReaction::None,
         }
     }
 
@@ -208,7 +208,7 @@ impl FlinsDamageEnum {
             X2 | X3 => SkillType::PlungingAttackOnGround,
             ENS => SkillType::ElementalSkill,
             Q1 => SkillType::ElementalBurst,
-            Q2 | Q3 | QTS | QTSA | C2 | LunarCharged => SkillType::Moonglare,
+            Q2 | Q3 | QTS | QTSA | C2 | LunarCharged => SkillType::Elevative,
         }
     }
 }
@@ -274,7 +274,7 @@ impl CharacterTrait for Flins {
         use FlinsDamageEnum::*;
         let mut builder = D::new();
 
-        if s.get_skill_type() == SkillType::Moonglare {
+        if s.get_skill_type() == SkillType::Elevative {
             let ratio = match s {
                 Q2 => FLINS_SKILL.q_dmg2[s3],
                 Q3 => FLINS_SKILL.q_dmg3[s3],
@@ -287,7 +287,7 @@ impl CharacterTrait for Flins {
 
             builder.add_atk_ratio("技能倍率", ratio);
 
-            builder.moonglare(
+            builder.elevative(
                 &context.attribute,
                 &context.enemy,
                 s.get_element(),

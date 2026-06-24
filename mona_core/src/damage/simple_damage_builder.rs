@@ -1,5 +1,5 @@
 use crate::attribute::*;
-use crate::common::{element, DamageResult, Element, MoonglareReaction, SkillType, ReactionType, TransformativeType};
+use crate::common::{element, DamageResult, Element, ElevativeReaction, SkillType, ReactionType, TransformativeType};
 use crate::damage::damage_builder::DamageBuilder;
 use crate::damage::damage_result::SimpleDamageResult;
 use crate::damage::level_coefficient::LEVEL_MULTIPLIER;
@@ -314,7 +314,7 @@ impl DamageBuilder for SimpleDamageBuilder {
         SimpleDamageResult::new_normal(damage)
     }
 
-    fn moonglare(&self, attribute: &Self::AttributeType, enemy: &Enemy, element: Element, lunar_type: MoonglareReaction, skill: SkillType, character_level: usize, fumo: Option<Element>) -> Self::Result {
+    fn elevative(&self, attribute: &Self::AttributeType, enemy: &Enemy, element: Element, lunar_type: ElevativeReaction, skill: SkillType, character_level: usize, fumo: Option<Element>) -> Self::Result {
         let atk = attribute.get_atk() + self.extra_atk;
         let def = attribute.get_def() + self.extra_def;
         let hp = attribute.get_hp() + self.extra_hp;
@@ -343,14 +343,14 @@ impl DamageBuilder for SimpleDamageBuilder {
         let critical_rate
             = attribute.get_critical_rate(element, skill)
             + self.extra_critical_rate
-            + attribute.get_value(AttributeName::critical_rate_name_by_moonglare_reaction(lunar_type).unwrap())
+            + attribute.get_value(AttributeName::critical_rate_name_by_elevative_reaction(lunar_type).unwrap())
             + attribute.get_result_t(get_attribute_type(AttributeVariableType::CriticalRate));
         let critical_rate = critical_rate.clamp(0.0, 1.0);
 
         let critical_damage
             = attribute.get_critical_damage(element, skill)
             + self.extra_critical_damage
-            + attribute.get_value(AttributeName::critical_damage_name_by_moonglare_reaction(lunar_type).unwrap())
+            + attribute.get_value(AttributeName::critical_damage_name_by_elevative_reaction(lunar_type).unwrap())
             + attribute.get_result_t(get_attribute_type(AttributeVariableType::CriticalDamage));
 
         let resistance_ratio = {
@@ -359,38 +359,38 @@ impl DamageBuilder for SimpleDamageBuilder {
             enemy.get_resistance_ratio(element, res_minus)
         };
 
-        let enhance = Reaction::moonglare(em) + self.extra_reaction_enhance + attribute.get_value(AttributeName::EnhanceMoonglare)
+        let enhance = Reaction::elevative(em) + self.extra_reaction_enhance + attribute.get_value(AttributeName::EnhanceElevative)
             + match lunar_type {
-            MoonglareReaction::LunarChargedReaction | MoonglareReaction::LunarCharged => attribute.get_value(AttributeName::EnhanceLunarCharged),
-            MoonglareReaction::LunarBloom => attribute.get_value(AttributeName::EnhanceLunarBloom),
+            ElevativeReaction::LunarChargedReaction | ElevativeReaction::LunarCharged => attribute.get_value(AttributeName::EnhanceLunarCharged),
+            ElevativeReaction::LunarBloom => attribute.get_value(AttributeName::EnhanceLunarBloom),
             _ => 0.0
         } + attribute.get_result_t(get_attribute_type(AttributeVariableType::ReactionEnhance));
         
         let extra_increase = self.extra_reaction_extra + match lunar_type {
-            MoonglareReaction::LunarChargedReaction | MoonglareReaction::LunarCharged => attribute.get_value(AttributeName::ExtraIncreaseLunarCharged),
-            MoonglareReaction::LunarBloom => attribute.get_value(AttributeName::ExtraIncreaseLunarBloom),
+            ElevativeReaction::LunarChargedReaction | ElevativeReaction::LunarCharged => attribute.get_value(AttributeName::ExtraIncreaseLunarCharged),
+            ElevativeReaction::LunarBloom => attribute.get_value(AttributeName::ExtraIncreaseLunarBloom),
             _ => 0.0
         } + attribute.get_result_t(get_attribute_type(AttributeVariableType::ReactionExtra));
 
         let increase = match lunar_type {
-            MoonglareReaction::LunarChargedReaction | MoonglareReaction::LunarCharged => attribute.get_value(AttributeName::IncreaseLunarCharged),
-            MoonglareReaction::LunarBloom => attribute.get_value(AttributeName::IncreaseLunarBloom),
+            ElevativeReaction::LunarChargedReaction | ElevativeReaction::LunarCharged => attribute.get_value(AttributeName::IncreaseLunarCharged),
+            ElevativeReaction::LunarBloom => attribute.get_value(AttributeName::IncreaseLunarBloom),
             _ => 0.0
-        } + attribute.get_result_t(get_attribute_type(AttributeVariableType::MoonglareBase));
+        } + attribute.get_result_t(get_attribute_type(AttributeVariableType::ElevativeBase));
 
         let elevate = match lunar_type {
-            MoonglareReaction::LunarChargedReaction | MoonglareReaction::LunarCharged => attribute.get_value(AttributeName::ElevateLunarCharged),
-            MoonglareReaction::LunarBloom => attribute.get_value(AttributeName::ElevateLunarBloom),
+            ElevativeReaction::LunarChargedReaction | ElevativeReaction::LunarCharged => attribute.get_value(AttributeName::ElevateLunarCharged),
+            ElevativeReaction::LunarBloom => attribute.get_value(AttributeName::ElevateLunarBloom),
             _ => 0.0
-        } + attribute.get_result_t(get_attribute_type(AttributeVariableType::MoonglareElevate));
+        } + attribute.get_result_t(get_attribute_type(AttributeVariableType::ElevativeElevate));
 
         let reaction_base = LEVEL_MULTIPLIER[character_level - 1];
         let reaction_coefficient = lunar_type.get_reaction_coefficient();
 
         let damage = {
             let dmg = match lunar_type {
-                MoonglareReaction::LunarChargedReaction | MoonglareReaction::LunarCrystallizeReaction => reaction_base,
-                MoonglareReaction::LunarCharged | MoonglareReaction::LunarBloom | MoonglareReaction::LunarCrystallize => base_damage,
+                ElevativeReaction::LunarChargedReaction | ElevativeReaction::LunarCrystallizeReaction => reaction_base,
+                ElevativeReaction::LunarCharged | ElevativeReaction::LunarBloom | ElevativeReaction::LunarCrystallize => base_damage,
                 _ => panic!()
             } * reaction_coefficient * (1.0 + enhance) * (1.0 + increase) + extra_increase;
             DamageResult {

@@ -100,7 +100,7 @@ impl TargetFunction for LinneaDefaultTargetFunction {
             Linnea::damage::<SimpleDamageBuilder>(&context, Ty::E1, &config, None).normal.expectation * 2.0
             + Linnea::damage::<SimpleDamageBuilder>(&context, Ty::E2, &config, None).normal.expectation;
 
-        let dmg_lunar_crystallize = Linnea::moonglare_damage::<SimpleDamageBuilder>(&context, MoonglareReaction::LunarCrystallizeReaction).normal.expectation;
+        let dmg_lunar_crystallize = Linnea::elevative_damage::<SimpleDamageBuilder>(&context, ElevativeReaction::LunarCrystallizeReaction).normal.expectation;
 
         dmg_e * 6.0
         + dmg_lunar_crystallize * self.lunar_crystallize_coefficient * (

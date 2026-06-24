@@ -40,7 +40,7 @@ import {useI18n} from "@/i18n/i18n";
 import { Histogram } from '@element-plus/icons-vue'
 
 export default {
-    name: "MoonglareDamage",
+    name: "ElevativeDamage",
     props: {
         data: {},
         handleDisplayEventAnalysis: {
@@ -64,9 +64,9 @@ export default {
 
             const push = (name) => {
                 temp.push({
-                    expectation: r(this.data[name]?.MoonglareDamage?.result?.expectation) ?? NO_DATA,
-                    critical: r(this.data[name]?.MoonglareDamage?.result?.critical) ?? NO_DATA,
-                    nonCritical: r(this.data[name]?.MoonglareDamage?.result?.non_critical) ?? NO_DATA,
+                    expectation: r(this.data[name]?.ElevativeDamage?.result?.expectation) ?? NO_DATA,
+                    critical: r(this.data[name]?.ElevativeDamage?.result?.critical) ?? NO_DATA,
+                    nonCritical: r(this.data[name]?.ElevativeDamage?.result?.non_critical) ?? NO_DATA,
                     name: this.t(`dmg.${name}`),
                     key: name,
                 })

@@ -30,7 +30,7 @@ impl<A: Attribute> ArtifactEffect<A> for NightOfTheSkysUnveilingEffect {
             _ => {}
         }
 
-        attribute.set_value_to_s(CharacterSelector::select_all(attribute), AttributeType::Panel(AttributeName::EnhanceMoonglare), "圣遗物套装效果：「月辉明光」效果", 0.1 * self.gleaming_moon_effect_count as f64);
+        attribute.set_value_to_s(CharacterSelector::select_all(attribute), AttributeType::Panel(AttributeName::EnhanceElevative), "圣遗物套装效果：「月辉明光」效果", 0.1 * self.gleaming_moon_effect_count as f64);
     }
 }
 

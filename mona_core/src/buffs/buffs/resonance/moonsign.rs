@@ -8,7 +8,7 @@ pub struct BuffMoonsignPyro {
 impl<A: Attribute> Buff<A> for BuffMoonsignPyro {
     fn change_attribute(&self, attribute: &mut A) {
         let value = (self.atk / 100.0 * 0.009).min(0.36);
-        for reaction in ReactionType::get_moonglare_reaction() {
+        for reaction in ReactionType::get_lunar_reaction_list() {
             let ty = AttributeType::Invisible(InvisibleAttributeType::new_reaction(AttributeVariableType::ReactionEnhance, reaction));
             if self.global {
                 attribute.set_value_to_s(CharacterSelector::select_all(attribute), ty, "月荫-火", value);
@@ -76,7 +76,7 @@ pub struct BuffMoonsignHydro {
 impl<A: Attribute> Buff<A> for BuffMoonsignHydro {
     fn change_attribute(&self, attribute: &mut A) {
         let value = (self.hp / 1000.0 * 0.006).min(0.36);
-        for reaction in ReactionType::get_moonglare_reaction() {
+        for reaction in ReactionType::get_lunar_reaction_list() {
             let ty = AttributeType::Invisible(InvisibleAttributeType::new_reaction(AttributeVariableType::ReactionEnhance, reaction));
             if self.global {
                 attribute.set_value_to_s(CharacterSelector::select_all(attribute), ty, "月荫-水", value);
@@ -144,7 +144,7 @@ pub struct BuffMoonsignAnemo {
 impl<A: Attribute> Buff<A> for BuffMoonsignAnemo {
     fn change_attribute(&self, attribute: &mut A) {
         let value = (self.em / 100.0 * 0.0225).min(0.36);
-        for reaction in ReactionType::get_moonglare_reaction() {
+        for reaction in ReactionType::get_lunar_reaction_list() {
             let ty = AttributeType::Invisible(InvisibleAttributeType::new_reaction(AttributeVariableType::ReactionEnhance, reaction));
             if self.global {
                 attribute.set_value_to_s(CharacterSelector::select_all(attribute), ty, "月荫-风", value);
@@ -212,7 +212,7 @@ pub struct BuffMoonsignElectro {
 impl<A: Attribute> Buff<A> for BuffMoonsignElectro {
     fn change_attribute(&self, attribute: &mut A) {
         let value = (self.atk / 100.0 * 0.009).min(0.36);
-        for reaction in ReactionType::get_moonglare_reaction() {
+        for reaction in ReactionType::get_lunar_reaction_list() {
             let ty = AttributeType::Invisible(InvisibleAttributeType::new_reaction(AttributeVariableType::ReactionEnhance, reaction));
             if self.global {
                 attribute.set_value_to_s(CharacterSelector::select_all(attribute), ty, "月荫-雷", value);
@@ -280,7 +280,7 @@ pub struct BuffMoonsignDendro {
 impl<A: Attribute> Buff<A> for BuffMoonsignDendro {
     fn change_attribute(&self, attribute: &mut A) {
         let value = (self.em / 100.0 * 0.0225).min(0.36);
-        for reaction in ReactionType::get_moonglare_reaction() {
+        for reaction in ReactionType::get_lunar_reaction_list() {
             let ty = AttributeType::Invisible(InvisibleAttributeType::new_reaction(AttributeVariableType::ReactionEnhance, reaction));
             if self.global {
                 attribute.set_value_to_s(CharacterSelector::select_all(attribute), ty, "月荫-草", value);
@@ -348,7 +348,7 @@ pub struct BuffMoonsignCryo {
 impl<A: Attribute> Buff<A> for BuffMoonsignCryo {
     fn change_attribute(&self, attribute: &mut A) {
         let value = (self.atk / 100.0 * 0.009).min(0.36);
-        for reaction in ReactionType::get_moonglare_reaction() {
+        for reaction in ReactionType::get_lunar_reaction_list() {
             let ty = AttributeType::Invisible(InvisibleAttributeType::new_reaction(AttributeVariableType::ReactionEnhance, reaction));
             if self.global {
                 attribute.set_value_to_s(CharacterSelector::select_all(attribute), ty, "月荫-冰", value);
@@ -416,7 +416,7 @@ pub struct BuffMoonsignGeo {
 impl<A: Attribute> Buff<A> for BuffMoonsignGeo {
     fn change_attribute(&self, attribute: &mut A) {
         let value = (self.def / 100.0 * 0.01).min(0.36);
-        for reaction in ReactionType::get_moonglare_reaction() {
+        for reaction in ReactionType::get_lunar_reaction_list() {
             let ty = AttributeType::Invisible(InvisibleAttributeType::new_reaction(AttributeVariableType::ReactionEnhance, reaction));
             if self.global {
                 attribute.set_value_to_s(CharacterSelector::select_all(attribute), ty, "月荫-岩", value);

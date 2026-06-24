@@ -1,4 +1,4 @@
-use crate::common::MoonglareReaction;
+use crate::common::ElevativeReaction;
 use crate::damage::transformative_damage::TransformativeDamage;
 use serde::{Deserialize, Serialize};
 use std::ops::Mul;

@@ -121,8 +121,8 @@ impl TargetFunction for ColumbinaOffFieldTargetFunction {
             } else { 0.0 };
         let dmg_q = Columbina::damage::<SimpleDamageBuilder>(&context1, Ty::Q, &config1, None).normal.expectation;
 
-        let dmg_lunar_charged = Columbina::moonglare_damage::<SimpleDamageBuilder>(&context1, MoonglareReaction::LunarChargedReaction).normal.expectation;
-        let dmg_lunar_crystallize = Columbina::moonglare_damage::<SimpleDamageBuilder>(&context1, MoonglareReaction::LunarCrystallizeReaction).normal.expectation;
+        let dmg_lunar_charged = Columbina::elevative_damage::<SimpleDamageBuilder>(&context1, ElevativeReaction::LunarChargedReaction).normal.expectation;
+        let dmg_lunar_crystallize = Columbina::elevative_damage::<SimpleDamageBuilder>(&context1, ElevativeReaction::LunarCrystallizeReaction).normal.expectation;
 
         (dmg_e1 + dmg_e2 * if main_element == Some(Element::Dendro) { 5.0 } else { 1.0 }
             + dmg_q + dmg_lunar_charged * self.lunar_charged_coefficient + dmg_lunar_crystallize * self.lunar_crystallize_coefficient) * demand_ratio

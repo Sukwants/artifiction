@@ -67,7 +67,7 @@ impl<A: Attribute> Buff<A> for BuffFlinsC6 {
 
         if self.moonsign.is_ascendant() {
             attribute.set_value_by_t(AttributeType::Invisible(InvisibleAttributeType::new(
-                AttributeVariableType::MoonglareElevate,
+                AttributeVariableType::ElevativeElevate,
                 None,
                 None,
                 Some(ReactionType::LunarCharged),

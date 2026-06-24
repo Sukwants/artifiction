@@ -17,7 +17,7 @@ pub struct BuffNightOfTheSkysUnveiling4 {
 
 impl<A: Attribute> Buff<A> for BuffNightOfTheSkysUnveiling4 {
     fn change_attribute(&self, attribute: &mut A) {
-        attribute.set_value_to(AttributeName::EnhanceMoonglare, "圣遗物套装效果：「月辉明光」效果", 0.1 * self.gleaming_moon_effect_count as f64);
+        attribute.set_value_to(AttributeName::EnhanceElevative, "圣遗物套装效果：「月辉明光」效果", 0.1 * self.gleaming_moon_effect_count as f64);
     }
 }
 

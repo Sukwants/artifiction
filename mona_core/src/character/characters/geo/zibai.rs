@@ -98,7 +98,7 @@ impl<A: Attribute> ChangeAttribute<A> for ZibaiEffect {
         attribute.add_edge_s1to1(
             CharacterSelector::select_all(attribute),
             AttributeType::Panel(AttributeName::DEF),
-            AttributeType::Invisible(InvisibleAttributeType::new_reaction(AttributeVariableType::MoonglareBase, ReactionType::LunarCrystallize)),
+            AttributeType::Invisible(InvisibleAttributeType::new_reaction(AttributeVariableType::ElevativeBase, ReactionType::LunarCrystallize)),
             Arc::new(|def: f64, _| (def / 100.0 * 0.007).min(0.14) ),
             "兹白天赋3",
             EdgePriority::Invisible,
@@ -141,11 +141,11 @@ impl ZibaiDamageEnum {
         }
     }
 
-    pub fn get_lunar_type(&self) -> MoonglareReaction {
+    pub fn get_lunar_type(&self) -> ElevativeReaction {
         use ZibaiDamageEnum::*;
         match *self {
-            EA4E | E2 | Q2 => MoonglareReaction::LunarCrystallize,
-            _ => MoonglareReaction::None,
+            EA4E | E2 | Q2 => ElevativeReaction::LunarCrystallize,
+            _ => ElevativeReaction::None,
         }
     }
 
@@ -158,7 +158,7 @@ impl ZibaiDamageEnum {
             X2 | X3 => SkillType::PlungingAttackOnGround,
             E1 => SkillType::ElementalSkill,
             Q1 => SkillType::ElementalBurst,
-            EA4E | E2 | Q2 => SkillType::Moonglare,
+            EA4E | E2 | Q2 => SkillType::Elevative,
         }
     }
 }
@@ -369,8 +369,8 @@ impl CharacterTrait for Zibai {
             }
         }
 
-        if s.get_lunar_type() != MoonglareReaction::None {
-            builder.moonglare(
+        if s.get_lunar_type() != ElevativeReaction::None {
+            builder.elevative(
                 &context.attribute,
                 &context.enemy,
                 s.get_element(),

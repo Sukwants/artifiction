@@ -60,7 +60,7 @@ impl TransformativeType {
 }
 
 #[derive(Debug, Serialize, Deserialize, Hash, Eq, PartialEq, Copy, Clone)]
-pub enum MoonglareReaction {
+pub enum ElevativeReaction {
     LunarChargedReaction,       // 月感电
     LunarCharged,               // 广义月感电
     LunarBloom,
@@ -69,23 +69,23 @@ pub enum MoonglareReaction {
     None,
 }
 
-impl MoonglareReaction {
+impl ElevativeReaction {
     pub fn get_element(&self) -> Option<Element> {
         match *self {
-            MoonglareReaction::LunarChargedReaction | MoonglareReaction::LunarCharged => Some(Element::Electro),
-            MoonglareReaction::LunarBloom => Some(Element::Dendro),
-            MoonglareReaction::LunarCrystallizeReaction | MoonglareReaction::LunarCrystallize => Some(Element::Geo),
+            ElevativeReaction::LunarChargedReaction | ElevativeReaction::LunarCharged => Some(Element::Electro),
+            ElevativeReaction::LunarBloom => Some(Element::Dendro),
+            ElevativeReaction::LunarCrystallizeReaction | ElevativeReaction::LunarCrystallize => Some(Element::Geo),
             _ => None
         }
     }
 
     pub fn get_reaction_coefficient(&self) -> f64 {
         match *self {
-            MoonglareReaction::LunarChargedReaction => 1.8,
-            MoonglareReaction::LunarCharged => 3.0,
-            MoonglareReaction::LunarBloom => 1.0,
-            MoonglareReaction::LunarCrystallizeReaction => 0.96,
-            MoonglareReaction::LunarCrystallize => 1.6,
+            ElevativeReaction::LunarChargedReaction => 1.8,
+            ElevativeReaction::LunarCharged => 3.0,
+            ElevativeReaction::LunarBloom => 1.0,
+            ElevativeReaction::LunarCrystallizeReaction => 0.96,
+            ElevativeReaction::LunarCrystallize => 1.6,
             _ => panic!()
         }
     }
@@ -116,7 +116,7 @@ pub enum ReactionType {
 }
 
 impl ReactionType {
-    pub fn get_moonglare_reaction() -> Vec<ReactionType> {
+    pub fn get_lunar_reaction_list() -> Vec<ReactionType> {
         vec![
             ReactionType::LunarCharged,
             ReactionType::LunarBloom,
@@ -141,12 +141,12 @@ impl ReactionType {
             TransformativeType::Crystallize => ReactionType::Crystallize,
         }
     }
-    pub fn get_reaction_from_lunar_type(lunar_type: MoonglareReaction) -> Option<ReactionType> {
+    pub fn get_reaction_from_lunar_type(lunar_type: ElevativeReaction) -> Option<ReactionType> {
         match lunar_type {
-            MoonglareReaction::LunarChargedReaction | MoonglareReaction::LunarCharged => Some(ReactionType::LunarCharged),
-            MoonglareReaction::LunarBloom => Some(ReactionType::LunarBloom),
-            MoonglareReaction::LunarCrystallizeReaction | MoonglareReaction::LunarCrystallize => Some(ReactionType::LunarCrystallize),
-            MoonglareReaction::None => None,
+            ElevativeReaction::LunarChargedReaction | ElevativeReaction::LunarCharged => Some(ReactionType::LunarCharged),
+            ElevativeReaction::LunarBloom => Some(ReactionType::LunarBloom),
+            ElevativeReaction::LunarCrystallizeReaction | ElevativeReaction::LunarCrystallize => Some(ReactionType::LunarCrystallize),
+            ElevativeReaction::None => None,
         }
     }
 }

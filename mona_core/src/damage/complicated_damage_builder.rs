@@ -4,8 +4,8 @@ use num_traits::Inv;
 
 use crate::attribute::*;
 use crate::buffs::buffs::base_dmg;
-use crate::common::{DamageResult, Element, TransformativeType, MoonglareReaction, ReactionType, SkillType};
-use crate::damage::damage_analysis::{DamageAnalysis, DamageAnalysisWithPossibleReaction, EventAnalysis, HealAnalysis, MoonglareDamageAnalysis, NumberAnalysis, ShieldAnalysis, TransformativeDamageAnalysis};
+use crate::common::{DamageResult, Element, TransformativeType, ElevativeReaction, ReactionType, SkillType};
+use crate::damage::damage_analysis::{DamageAnalysis, DamageAnalysisWithPossibleReaction, EventAnalysis, HealAnalysis, ElevativeDamageAnalysis, NumberAnalysis, ShieldAnalysis, TransformativeDamageAnalysis};
 use crate::enemies::Enemy;
 use crate::common::EntryType;
 use crate::damage::damage_builder::{DamageBuilder};
@@ -388,12 +388,12 @@ impl DamageBuilder for ComplicatedDamageBuilder {
         })
     }
 
-    fn moonglare(
+    fn elevative(
         &self,
         attribute: &Self::AttributeType,
         enemy: &Enemy,
         element: Element,
-        lunar_type: MoonglareReaction,
+        lunar_type: ElevativeReaction,
         skill: SkillType,
         character_level: usize,
         fumo: Option<Element>
@@ -444,7 +444,7 @@ impl DamageBuilder for ComplicatedDamageBuilder {
         let res_minus = res_minus_comp.sum();
         let resistance_ratio = enemy.get_resistance_ratio(element, res_minus);
 
-        let enhance_comp = self.get_enhance_moonglare_composition(attribute, lunar_type)
+        let enhance_comp = self.get_enhance_elevative_composition(attribute, lunar_type)
             .merge_with(&attribute.get_result_t(get_attribute_type(AttributeVariableType::ReactionEnhance)));
         let enhance = enhance_comp.sum();
 
@@ -452,24 +452,24 @@ impl DamageBuilder for ComplicatedDamageBuilder {
             .merge_with(&attribute.get_result_t(get_attribute_type(AttributeVariableType::ReactionExtra)));
         let extra_increase = extra_increase_comp.sum();
 
-        let increase_comp = self.get_increase_moonglare_composition(attribute, lunar_type)
-            .merge_with(&attribute.get_result_t(get_attribute_type(AttributeVariableType::MoonglareBase)));
+        let increase_comp = self.get_increase_elevative_composition(attribute, lunar_type)
+            .merge_with(&attribute.get_result_t(get_attribute_type(AttributeVariableType::ElevativeBase)));
         let increase = increase_comp.sum();
 
-        let elevate_comp = self.get_elevate_moonglare_composition(attribute, lunar_type)
-            .merge_with(&attribute.get_result_t(get_attribute_type(AttributeVariableType::MoonglareElevate)));
+        let elevate_comp = self.get_elevate_elevative_composition(attribute, lunar_type)
+            .merge_with(&attribute.get_result_t(get_attribute_type(AttributeVariableType::ElevativeElevate)));
         let elevate = elevate_comp.sum();
 
         let reaction_base = match lunar_type {
-            MoonglareReaction::LunarChargedReaction | MoonglareReaction::LunarCrystallizeReaction => LEVEL_MULTIPLIER[character_level - 1],
+            ElevativeReaction::LunarChargedReaction | ElevativeReaction::LunarCrystallizeReaction => LEVEL_MULTIPLIER[character_level - 1],
             _ => 0.0,
         };
         let reaction_coefficient = lunar_type.get_reaction_coefficient();
 
         let damage = {
             let dmg = match lunar_type {
-                MoonglareReaction::LunarChargedReaction | MoonglareReaction::LunarCrystallizeReaction => reaction_base,
-                MoonglareReaction::LunarCharged | MoonglareReaction::LunarBloom | MoonglareReaction::LunarCrystallize => base_damage,
+                ElevativeReaction::LunarChargedReaction | ElevativeReaction::LunarCrystallizeReaction => reaction_base,
+                ElevativeReaction::LunarCharged | ElevativeReaction::LunarBloom | ElevativeReaction::LunarCrystallize => base_damage,
                 _ => panic!()
             } * reaction_coefficient * (1.0 + enhance) * (1.0 + increase) + extra_increase;
             DamageResult {
@@ -479,7 +479,7 @@ impl DamageBuilder for ComplicatedDamageBuilder {
             } * resistance_ratio * (1.0 + elevate)
         };
 
-        EventAnalysis::MoonglareDamage(MoonglareDamageAnalysis {
+        EventAnalysis::ElevativeDamage(ElevativeDamageAnalysis {
             element: element,
             lunar_type: lunar_type,
 
@@ -499,8 +499,8 @@ impl DamageBuilder for ComplicatedDamageBuilder {
             critical_rate: critical_comp.0,
             critical_damage: critical_damage_comp.0,
             res_minus: res_minus_comp.0,
-            moonglare_base: increase_comp.0,
-            moonglare_elevate: elevate_comp.0,
+            elevative_base: increase_comp.0,
+            elevative_elevate: elevate_comp.0,
 
             result: damage
         })
@@ -779,13 +779,13 @@ impl ComplicatedDamageBuilder {
         comp
     }
 
-    fn get_enhance_moonglare_composition(&self, attribute: &AttributeTy, lunar_type: MoonglareReaction) -> EntryType {
-        let mut comp = attribute.get_result(AttributeName::enhance_name_by_moonglare_reaction(lunar_type).unwrap_or(AttributeName::NULL));
+    fn get_enhance_elevative_composition(&self, attribute: &AttributeTy, lunar_type: ElevativeReaction) -> EntryType {
+        let mut comp = attribute.get_result(AttributeName::enhance_name_by_elevative_reaction(lunar_type).unwrap_or(AttributeName::NULL));
         comp.merge(&self.extra_reaction_enhance);
-        comp.merge(&attribute.get_result(AttributeName::EnhanceMoonglare));
+        comp.merge(&attribute.get_result(AttributeName::EnhanceElevative));
         let em = &self.extra_em.sum() + attribute.get_em_all();
         if em > 0.0 {
-            comp.add_value("精通", Reaction::moonglare(em));
+            comp.add_value("精通", Reaction::elevative(em));
         }
         comp
     }
@@ -796,13 +796,13 @@ impl ComplicatedDamageBuilder {
         comp
     }
 
-    fn get_increase_moonglare_composition(&self, attribute: &AttributeTy, lunar_type: MoonglareReaction) -> EntryType {
-        let mut comp = attribute.get_result(AttributeName::increase_name_by_moonglare_reaction(lunar_type).unwrap_or(AttributeName::NULL));
+    fn get_increase_elevative_composition(&self, attribute: &AttributeTy, lunar_type: ElevativeReaction) -> EntryType {
+        let mut comp = attribute.get_result(AttributeName::increase_name_by_elevative_reaction(lunar_type).unwrap_or(AttributeName::NULL));
         comp
     }
 
-    fn get_elevate_moonglare_composition(&self, attribute: &AttributeTy, lunar_type: MoonglareReaction) -> EntryType {
-        let mut comp = attribute.get_result(AttributeName::elevate_name_by_moonglare_reaction(lunar_type).unwrap_or(AttributeName::NULL));
+    fn get_elevate_elevative_composition(&self, attribute: &AttributeTy, lunar_type: ElevativeReaction) -> EntryType {
+        let mut comp = attribute.get_result(AttributeName::elevate_name_by_elevative_reaction(lunar_type).unwrap_or(AttributeName::NULL));
         comp
     }
 
@@ -819,9 +819,9 @@ impl ComplicatedDamageBuilder {
         comp
     }
 
-    fn get_critical_damage_moonglare_composition(&self, attribute: &AttributeTy, element: Element, lunar_type: MoonglareReaction, skill: SkillType) -> EntryType {
+    fn get_critical_damage_elevative_composition(&self, attribute: &AttributeTy, element: Element, lunar_type: ElevativeReaction, skill: SkillType) -> EntryType {
         let mut comp = self.get_critical_damage_composition(attribute, element, skill);
-        comp.merge(&attribute.get_result(AttributeName::critical_damage_name_by_moonglare_reaction(lunar_type).unwrap()));
+        comp.merge(&attribute.get_result(AttributeName::critical_damage_name_by_elevative_reaction(lunar_type).unwrap()));
         comp
     }
 
@@ -839,9 +839,9 @@ impl ComplicatedDamageBuilder {
         comp
     }
 
-    fn get_critical_moonglare_composition(&self, attribute: &AttributeTy, element: Element, lunar_type: MoonglareReaction, skill: SkillType) -> EntryType {
+    fn get_critical_elevative_composition(&self, attribute: &AttributeTy, element: Element, lunar_type: ElevativeReaction, skill: SkillType) -> EntryType {
         let mut comp = self.get_critical_composition(attribute, element, skill);
-        comp.merge(&attribute.get_result(AttributeName::critical_rate_name_by_moonglare_reaction(lunar_type).unwrap()));
+        comp.merge(&attribute.get_result(AttributeName::critical_rate_name_by_elevative_reaction(lunar_type).unwrap()));
 
         comp
     }
