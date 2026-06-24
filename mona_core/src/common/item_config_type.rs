@@ -280,4 +280,7 @@ impl ItemConfig {
     pub const fn IS_HEXEREI(default: bool, priority: usize) -> ItemConfig {
         return ItemConfig { name: "is_hexerei", title: locale!(zh_cn: "当前角色为魔导角色", en: "Current Character Is Hexerei Character"), config: ItemConfigType::GlobalLinkBool { default, global_link: GlobalLinkConfig { key: "is_hexerei", priority, team_shared: false } } };
     }
+    pub const fn STELLAR_CONDUCT_APPLICATION_COUNT(default: i32, priority: usize) -> ItemConfig {
+        return ItemConfig { name: "stellar_conduct_application_count", title: locale!(zh_cn: "星超导附着次数", en: "Stellar Conduct Application Count"), config: ItemConfigType::GlobalLinkInt { min: 0, max: 12, default, global_link: GlobalLinkConfig { key: "stellar_conduct_application_count", priority, team_shared: true } } };
+    }
 }
