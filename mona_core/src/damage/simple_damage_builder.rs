@@ -367,14 +367,13 @@ impl DamageBuilder for SimpleDamageBuilder {
 
         let elevate = attribute.get_result_t(get_attribute_type(AttributeVariableType::ElevativeElevate));
 
-        let reaction_base = LEVEL_MULTIPLIER[character_level - 1];
-        let reaction_coefficient = elevative_type.get_reaction_coefficient();
+        let reaction_base = elevative_type.get_reaction_base(character_level);
+        let reaction_coefficient = elevative_type.get_reaction_coefficient() * (1.0 + attribute.get_value_t(
+            get_attribute_type(AttributeVariableType::ElevativeCoefficient)
+        ));
 
         let damage = {
-            let dmg = match elevative_type {
-                ElevativeReaction::LunarChargedReaction | ElevativeReaction::LunarCrystallizeReaction => reaction_base,
-                ElevativeReaction::LunarCharged | ElevativeReaction::LunarBloom | ElevativeReaction::LunarCrystallize => base_damage,
-            } * reaction_coefficient * (1.0 + enhance) * (1.0 + increase) + extra_increase;
+            let dmg = (base_damage + reaction_base) * reaction_coefficient * (1.0 + enhance) * (1.0 + increase) + extra_increase;
             DamageResult {
                 critical: dmg * (1.0 + critical_damage),
                 non_critical: dmg,

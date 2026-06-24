@@ -194,6 +194,7 @@ pub enum AttributeVariableType {
 
     ReactionExtra, // 反应额外提升
 
+    ElevativeCoefficient, // 擢升反应倍率提升
     ElevativeBase, // 擢升反应基础提升
     ElevativeElevate, // 擢升反应擢升
 

@@ -66,6 +66,8 @@ pub enum ElevativeReaction {
     LunarBloom,
     LunarCrystallizeReaction,   // 月结晶
     LunarCrystallize,           // 广义月结晶
+    StellarConductCryo,         // 视为星超导反应伤害的冰元素伤害
+    StellarConductElectro,      // 视为星超导反应伤害的雷元素伤害
 }
 
 impl ElevativeReaction {
@@ -78,6 +80,13 @@ impl ElevativeReaction {
         }
     }
 
+    pub fn get_reaction_base(&self, character_level: usize) -> f64 {
+        match *self {
+            ElevativeReaction::LunarChargedReaction | ElevativeReaction::LunarCrystallizeReaction => LEVEL_MULTIPLIER[character_level - 1],
+            _ => 0.0,
+        }
+    }
+
     pub fn get_reaction_coefficient(&self) -> f64 {
         match *self {
             ElevativeReaction::LunarChargedReaction => 1.8,
@@ -85,6 +94,8 @@ impl ElevativeReaction {
             ElevativeReaction::LunarBloom => 1.0,
             ElevativeReaction::LunarCrystallizeReaction => 0.96,
             ElevativeReaction::LunarCrystallize => 1.6,
+            ElevativeReaction::StellarConductCryo => 1.0,
+            ElevativeReaction::StellarConductElectro => 1.0,
         }
     }
 }
@@ -111,6 +122,7 @@ pub enum ReactionType {
     LunarCharged,
     LunarBloom,
     LunarCrystallize,
+    StellarConduct,
 }
 
 impl ReactionType {
@@ -144,6 +156,7 @@ impl ReactionType {
             ElevativeReaction::LunarChargedReaction | ElevativeReaction::LunarCharged => ReactionType::LunarCharged,
             ElevativeReaction::LunarBloom => ReactionType::LunarBloom,
             ElevativeReaction::LunarCrystallizeReaction | ElevativeReaction::LunarCrystallize => ReactionType::LunarCrystallize,
+            ElevativeReaction::StellarConductCryo | ElevativeReaction::StellarConductElectro => ReactionType::StellarConduct,
         }
     }
 }
