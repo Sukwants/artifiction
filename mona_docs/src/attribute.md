@@ -98,8 +98,9 @@ pub enum AttributeVariableType {
 
     ReactionExtra, // 反应额外提升
 
-    ElevativeBase, // 月曜反应基础提升
-    ElevativeElevate, // 月曜反应擢升
+    ElevativeCoefficient, // 擢升反应倍率提升
+    ElevativeBase, // 擢升反应基础提升
+    ElevativeElevate, // 擢升反应擢升
 
     HealingBonus, // 治疗加成
     IncomingHealingBonus, // 受治疗加成
@@ -126,7 +127,7 @@ pub enum AttributeVariableType {
 - “某种反应可以造成暴击，暴击率为”指 `CriticalRate` 部分。
 - “某种反应可以造成暴击，暴击伤害为”指 `CriticalDamage` 部分。
 
-对于月曜反应（月感电、月绽放、月结晶）伤害：
+对于擢升反应（月感电、月绽放、月结晶、星超导）伤害：
 
 - “按照一定百分比，提升特定反应的伤害”指 `ReactionEnhance` 部分。
 - “基于特定数值，提升特定反应的伤害”指 `ReactionExtra` 部分。
@@ -134,7 +135,8 @@ pub enum AttributeVariableType {
 - “按照一定百分比，提升某种伤害的暴击伤害”指 `CriticalDamage` 部分。请注意，若描述为“按照一定百分比，提升角色的暴击伤害”等不指示特定伤害类型的描述，则应指 `AttributeName::CriticalDamageBase` 的面板属性。
 - “按照一定百分比，提升队伍中角色造成的特定反应的基础伤害”指 `ElevativeBase` 部分。
 - “造成的特定反应伤害擢升一定百分比”指 `ElevativeElevate` 部分。
-- 特别的，对于作用于所有月曜反应的效果，应当使用 `ReactionType::get_elevative_reaction()` 来获取所有月曜反应的列表，以保证良好的可扩展性。
+- 特别的，对于作用于所有月曜反应（包含月感电、月绽放、月结晶）的效果，应当使用 `ReactionType::get_elevative_reaction()` 来获取所有月曜反应的列表，以保证良好的可扩展性。
+- 特别的，星超导伤害的基础倍率与月曜反应不同，由冰、雷元素附着次数决定，因此对于任何会触发星超导伤害的角色，需要通过角色配置来获取当前附着次数，附着次数达到 $0 \sim 12$ 次时，会分别产生 $[0, 0.45, 0.5, 0.54, 0.6, 0.64, 0.71, 0.75, 0.79, 0.85, 0.89, 0.95, 1.0]$ 的额外基础倍率，该额外基础倍率应当通过 `ElevativeCoefficient` 部分进行加成，且 `ElevativeCoefficient` 仅会受到上述描述的加成效果影响，其他加成效果不应影响该部分。
 
 对于治疗效果：
 
@@ -178,11 +180,11 @@ pub enum SkillType {
     PlungingAttackOnGround,     // 下落攻击坠地冲击
     ElementalSkill,             // 元素战技
     ElementalBurst,             // 元素爆发
-    Elevative,                  // 月曜反应
+    Elevative,                  // 擢升反应
 }
 ```
 
-请注意，任何技能触发的月曜反应伤害（月感电、月绽放、月结晶）的技能类型都必须是 `SkillType::Elevative`。
+请注意，任何技能触发的擢升反应伤害（月感电、月绽放、月结晶、星超导）的技能类型都必须是 `SkillType::Elevative`。
 
 ```rust
 mona::common::reaction_type

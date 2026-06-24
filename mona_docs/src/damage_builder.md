@@ -102,7 +102,7 @@ pub fn none(&self) -> Self::Result
 
 - `damage` 方法用于计算普通伤害，需要传入 `attribute` 以获取属性，`enemy` 以传入敌人信息，`element` 和 `skill_type` 为伤害元素类型和技能类型，`character_level` 为角色等级，`fumo` 为可选的附魔元素类型。
 - `transformative` 方法用于计算聚变反应（扩散、超载、感电、碎冰、超导、绽放、烈绽放、超绽放、燃烧、结晶）伤害或护盾量，需要额外传入 `transformative_type` 以标识反应类型。
-- `Elevative` 方法用于计算月曜反应（月感电、月绽放、月结晶）伤害，需要额外传入 `elevative_type` 以标识月曜反应类型。
+- `elevative` 方法用于计算擢升反应（月感电、月绽放、月结晶、星超导）伤害，需要额外传入 `elevative_type` 以标识擢升反应类型。
 - `heal` 方法用于计算治疗量，仅需传入 `attribute`。
 - `shield` 方法用于计算护盾量，需要传入 `attribute` 和 `element` 以获取属性和护盾元素类型。
 - `number` 方法用于纯数值结果，不受任何属性加成，如“基础伤害提升数值”。
