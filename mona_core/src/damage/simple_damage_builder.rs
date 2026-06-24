@@ -299,7 +299,7 @@ impl DamageBuilder for SimpleDamageBuilder {
             TransformativeType::Crystallize => 0.0,
         } + attribute.get_result_t(get_attribute_type(AttributeVariableType::ReactionEnhance));
         
-        let extra_increase = self.extra_reaction_extra + attribute.get_result(AttributeName::extra_increase_name_by_reaction(reaction).unwrap_or(AttributeName::NULL))
+        let extra_increase = self.extra_reaction_extra
             + attribute.get_result_t(get_attribute_type(AttributeVariableType::ReactionExtra));
 
         let damage = {
@@ -343,14 +343,12 @@ impl DamageBuilder for SimpleDamageBuilder {
         let critical_rate
             = attribute.get_critical_rate(element, skill)
             + self.extra_critical_rate
-            + attribute.get_value(AttributeName::critical_rate_name_by_elevative_reaction(lunar_type))
             + attribute.get_result_t(get_attribute_type(AttributeVariableType::CriticalRate));
         let critical_rate = critical_rate.clamp(0.0, 1.0);
 
         let critical_damage
             = attribute.get_critical_damage(element, skill)
             + self.extra_critical_damage
-            + attribute.get_value(AttributeName::critical_damage_name_by_elevative_reaction(lunar_type))
             + attribute.get_result_t(get_attribute_type(AttributeVariableType::CriticalDamage));
 
         let resistance_ratio = {
@@ -359,30 +357,15 @@ impl DamageBuilder for SimpleDamageBuilder {
             enemy.get_resistance_ratio(element, res_minus)
         };
 
-        let enhance = Reaction::elevative(em) + self.extra_reaction_enhance + attribute.get_value(AttributeName::EnhanceElevative)
-            + match lunar_type {
-            ElevativeReaction::LunarChargedReaction | ElevativeReaction::LunarCharged => attribute.get_value(AttributeName::EnhanceLunarCharged),
-            ElevativeReaction::LunarBloom => attribute.get_value(AttributeName::EnhanceLunarBloom),
-            ElevativeReaction::LunarCrystallizeReaction | ElevativeReaction::LunarCrystallize => 0.0,
-        } + attribute.get_result_t(get_attribute_type(AttributeVariableType::ReactionEnhance));
+        let enhance = Reaction::elevative(em) + self.extra_reaction_enhance
+            + attribute.get_result_t(get_attribute_type(AttributeVariableType::ReactionEnhance));
         
-        let extra_increase = self.extra_reaction_extra + match lunar_type {
-            ElevativeReaction::LunarChargedReaction | ElevativeReaction::LunarCharged => attribute.get_value(AttributeName::ExtraIncreaseLunarCharged),
-            ElevativeReaction::LunarBloom => attribute.get_value(AttributeName::ExtraIncreaseLunarBloom),
-            ElevativeReaction::LunarCrystallizeReaction | ElevativeReaction::LunarCrystallize => 0.0,
-        } + attribute.get_result_t(get_attribute_type(AttributeVariableType::ReactionExtra));
+        let extra_increase = self.extra_reaction_extra
+            + attribute.get_result_t(get_attribute_type(AttributeVariableType::ReactionExtra));
 
-        let increase = match lunar_type {
-            ElevativeReaction::LunarChargedReaction | ElevativeReaction::LunarCharged => attribute.get_value(AttributeName::IncreaseLunarCharged),
-            ElevativeReaction::LunarBloom => attribute.get_value(AttributeName::IncreaseLunarBloom),
-            ElevativeReaction::LunarCrystallizeReaction | ElevativeReaction::LunarCrystallize => 0.0,
-        } + attribute.get_result_t(get_attribute_type(AttributeVariableType::ElevativeBase));
+        let increase = attribute.get_result_t(get_attribute_type(AttributeVariableType::ElevativeBase));
 
-        let elevate = match lunar_type {
-            ElevativeReaction::LunarChargedReaction | ElevativeReaction::LunarCharged => attribute.get_value(AttributeName::ElevateLunarCharged),
-            ElevativeReaction::LunarBloom => attribute.get_value(AttributeName::ElevateLunarBloom),
-            ElevativeReaction::LunarCrystallizeReaction | ElevativeReaction::LunarCrystallize => 0.0,
-        } + attribute.get_result_t(get_attribute_type(AttributeVariableType::ElevativeElevate));
+        let elevate = attribute.get_result_t(get_attribute_type(AttributeVariableType::ElevativeElevate));
 
         let reaction_base = LEVEL_MULTIPLIER[character_level - 1];
         let reaction_coefficient = lunar_type.get_reaction_coefficient();

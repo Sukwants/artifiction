@@ -1,16 +1,4 @@
-use crate::attribute::*;
-use crate::character::character_common_data::CharacterCommonData;
-use crate::common::{Moonsign, WeaponType};
-use super::super::super::weapon_effect::WeaponEffect;
-use crate::weapon::weapon_common_data::WeaponCommonData;
-use crate::common::i18n::locale;
-use crate::common::item_config_type::{ItemConfig, ItemConfigType};
-use crate::weapon::weapon_base_atk::WeaponBaseATKFamily;
-use crate::weapon::weapon_static_data::WeaponStaticData;
-use crate::weapon::weapon_sub_stat::WeaponSubStatFamily;
-use crate::weapon::weapon_trait::WeaponTrait;
-use crate::weapon::WeaponName;
-use super::super::super::weapon_config::WeaponConfig;
+use crate::weapon::weapons::prelude::*;
 
 pub struct ProspectorsShovelEffect {
     pub moonsign: Moonsign,
@@ -23,7 +11,7 @@ impl<T: Attribute> WeaponEffect<T> for ProspectorsShovelEffect {
         attribute.set_value_by(AttributeName::EnhanceElectroCharged, "Buff: 掘金之锹「当机立断」", refine * 0.12 + 0.36);
 
         let val = (refine * 0.03 + 0.09) * if self.moonsign.is_ascendant() { 2.0 } else { 1.0 };
-        attribute.set_value_by(AttributeName::EnhanceLunarCharged, "Buff: 掘金之锹「当机立断」", val);
+        attribute.set_value_by_t(AttributeType::Invisible(InvisibleAttributeType::new_reaction(AttributeVariableType::ReactionEnhance, ReactionType::LunarCharged)), "Buff: 掘金之锹「当机立断」", val);
     }
 }
 

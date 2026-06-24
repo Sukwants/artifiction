@@ -1,13 +1,4 @@
-use crate::artifacts::artifact_trait::{ArtifactMetaData, ArtifactTrait};
-use crate::artifacts::ArtifactSetName;
-use crate::artifacts::effect::ArtifactEffect;
-use crate::artifacts::effect_config::ArtifactEffectConfig;
-use crate::attribute::*;
-use crate::character::character_common_data::CharacterCommonData;
-use crate::character::team_status::CharacterSelector;
-use crate::common::i18n::locale;
-use crate::common::item_config_type::{ItemConfig, ItemConfigType};
-use crate::common::Moonsign;
+use crate::artifacts::effects::prelude::*;
 
 pub struct NightOfTheSkysUnveilingEffect {
     pub moonsign: Moonsign,
@@ -30,7 +21,17 @@ impl<A: Attribute> ArtifactEffect<A> for NightOfTheSkysUnveilingEffect {
             _ => {}
         }
 
-        attribute.set_value_to_s(CharacterSelector::select_all(attribute), AttributeType::Panel(AttributeName::EnhanceElevative), "圣遗物套装效果：「月辉明光」效果", 0.1 * self.gleaming_moon_effect_count as f64);
+        for reaction in ReactionType::get_lunar_reaction_list() {
+            attribute.set_value_to_s(
+                CharacterSelector::select_all(attribute),
+                AttributeType::Invisible(InvisibleAttributeType::new_reaction(
+                    AttributeVariableType::ReactionEnhance,
+                    reaction,
+                )),
+                "圣遗物套装效果：「月辉明光」效果",
+                0.1 * self.gleaming_moon_effect_count as f64,
+            );
+        }
     }
 }
 

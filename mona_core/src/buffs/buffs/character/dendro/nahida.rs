@@ -1,13 +1,5 @@
 use std::cmp::max;
-use crate::attribute::*;
-use crate::buffs::{Buff, BuffConfig};
-use crate::buffs::buff::BuffMeta;
-use crate::buffs::buff_meta::{BuffFrom, BuffGenre, BuffImage, BuffMetaData};
-use crate::buffs::buff_name::BuffName;
-use crate::character::CharacterName;
-use crate::common::ReactionType;
-use crate::common::i18n::locale;
-use crate::common::item_config_type::{ItemConfig, ItemConfigType};
+use crate::buffs::buffs::prelude::*;
 use crate::enemies::Enemy;
 
 pub struct BuffNahidaTalent1 {
@@ -97,8 +89,8 @@ impl<A: Attribute> Buff<A> for BuffNahidaC2 {
             AttributeVariableType::CriticalRate, None, None, Some(ReactionType::Burning),
         )), "纳西妲「正等善见之根」", 0.2);
 
-        attribute.set_value_by(AttributeName::CriticalDamageLunarBloom, "纳西妲「正等善见之根」", 0.2);
-        attribute.set_value_by(AttributeName::CriticalLunarBloom, "纳西妲「正等善见之根」", 0.1);
+        attribute.set_value_by_t(AttributeType::Invisible(InvisibleAttributeType::new_reaction(AttributeVariableType::CriticalDamage, ReactionType::LunarBloom)), "纳西妲「正等善见之根」", 0.2);
+        attribute.set_value_by_t(AttributeType::Invisible(InvisibleAttributeType::new_reaction(AttributeVariableType::CriticalRate, ReactionType::LunarBloom)), "纳西妲「正等善见之根」", 0.1);
     }
 }
 

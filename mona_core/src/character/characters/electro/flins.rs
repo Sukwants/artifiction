@@ -99,7 +99,7 @@ pub struct FlinsEffect {
 impl<A: Attribute> ChangeAttribute<A> for FlinsEffect {
     fn change_attribute(&self, attribute: &mut A) {
         if self.has_p1 && self.moonsign.is_ascendant() {
-            attribute.set_value_by(AttributeName::EnhanceLunarCharged, "菲林斯天赋1", 0.2);
+            attribute.set_value_by_t(AttributeType::Invisible(InvisibleAttributeType::new_reaction(AttributeVariableType::ReactionEnhance, ReactionType::LunarCharged)), "菲林斯天赋1", 0.2);
         }
 
         if self.has_p2 {

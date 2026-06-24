@@ -1,11 +1,4 @@
-use crate::attribute::*;
-use crate::buffs::{Buff, BuffConfig};
-use crate::buffs::buff::BuffMeta;
-use crate::buffs::buff_meta::{BuffFrom, BuffGenre, BuffImage, BuffMetaData};
-use crate::buffs::buff_name::BuffName;
-use crate::character::CharacterName;
-use crate::common::i18n::locale;
-use crate::common::item_config_type::{ItemConfig, ItemConfigType};
+use crate::buffs::buffs::prelude::*;
 
 pub struct BuffIfa {
     pub re_count: usize,
@@ -18,7 +11,7 @@ impl<A: Attribute> Buff<A> for BuffIfa {
         attribute.set_value_by(AttributeName::EnhanceSwirlHydro, "伊法「救援要义」", self.re_count as f64 * 0.015);
         attribute.set_value_by(AttributeName::EnhanceSwirlElectro, "伊法「救援要义」", self.re_count as f64 * 0.015);
         attribute.set_value_by(AttributeName::EnhanceElectroCharged, "伊法「救援要义」", self.re_count as f64 * 0.015);
-        attribute.set_value_by(AttributeName::EnhanceLunarCharged, "伊法「救援要义」", self.re_count as f64 * 0.002);
+        attribute.set_value_by_t(AttributeType::Invisible(InvisibleAttributeType::new_reaction(AttributeVariableType::ReactionEnhance, ReactionType::LunarCharged)), "伊法「救援要义」", self.re_count as f64 * 0.002);
     }
 }
 

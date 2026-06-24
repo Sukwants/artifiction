@@ -1,11 +1,5 @@
-use crate::attribute::*;
-use crate::buffs::{Buff, BuffConfig};
-use crate::buffs::buff::BuffMeta;
-use crate::buffs::buff_meta::{BuffFrom, BuffGenre, BuffImage, BuffMetaData};
-use crate::buffs::buff_name::BuffName;
-use crate::common::item_config_type::ItemConfig;
+use crate::buffs::buffs::prelude::*;
 use crate::enemies::Enemy;
-use crate::weapon::WeaponName;
 
 pub struct BuffFracturedHalo {
     refine: usize
@@ -14,7 +8,7 @@ pub struct BuffFracturedHalo {
 impl<A: Attribute> Buff<A> for BuffFracturedHalo {
     fn change_attribute(&self, attribute: &mut A) {
 
-        attribute.set_value_by(AttributeName::EnhanceLunarCharged, "BUFF: 支离轮光「流电圣敕」", self.refine as f64 * 0.1 + 0.3);
+        attribute.set_value_by_t(AttributeType::Invisible(InvisibleAttributeType::new_reaction(AttributeVariableType::ReactionEnhance, ReactionType::LunarCharged)), "BUFF: 支离轮光「流电圣敕」", self.refine as f64 * 0.1 + 0.3);
     }
 }
 

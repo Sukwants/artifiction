@@ -1,13 +1,5 @@
+use crate::buffs::buffs::prelude::*;
 use crate::artifacts::ArtifactSetName;
-use crate::attribute::*;
-use crate::buffs::{Buff, BuffConfig};
-use crate::buffs::buff::BuffMeta;
-use crate::buffs::buff_meta::{BuffFrom, BuffGenre, BuffImage, BuffMetaData};
-use crate::buffs::buff_name::BuffName;
-#[cfg(not(target_family = "wasm"))]
-use crate::common::i18n::locale;
-use crate::common::item_config_type::{ItemConfig, ItemConfigType};
-use crate::common::Moonsign;
 use crate::enemies::Enemy;
 
 pub struct BuffSilkenMoonsSerenade4 {
@@ -27,7 +19,9 @@ impl<A: Attribute> Buff<A> for BuffSilkenMoonsSerenade4 {
             _ => {}
         }
 
-        attribute.set_value_to(AttributeName::EnhanceElevative, "圣遗物套装效果：「月辉明光」效果", 0.1 * self.gleaming_moon_effect_count as f64);
+        for reaction in ReactionType::get_lunar_reaction_list() {
+            attribute.set_value_to_t(AttributeType::Invisible(InvisibleAttributeType::new_reaction(AttributeVariableType::ReactionEnhance, reaction)), "圣遗物套装效果：「月辉明光」效果", 0.1 * self.gleaming_moon_effect_count as f64);
+        }
     }
 }
 

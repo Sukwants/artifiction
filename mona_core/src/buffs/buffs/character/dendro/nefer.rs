@@ -1,12 +1,4 @@
-use crate::attribute::*;
-use crate::buffs::{Buff, BuffConfig};
-use crate::buffs::buff::BuffMeta;
-use crate::buffs::buff_meta::{BuffFrom, BuffGenre, BuffImage, BuffMetaData};
-use crate::buffs::buff_name::BuffName;
-use crate::character::CharacterName;
-use crate::common::i18n::locale;
-use crate::common::item_config_type::{ItemConfig, ItemConfigType};
-use crate::common::Moonsign;
+use crate::buffs::buffs::prelude::*;
 
 pub struct BuffNeferP3 {
     pub em: f64,
@@ -14,7 +6,7 @@ pub struct BuffNeferP3 {
 
 impl<A: Attribute> Buff<A> for BuffNeferP3 {
     fn change_attribute(&self, attribute: &mut A) {
-        attribute.set_value_by(AttributeName::IncreaseLunarBloom, "奈芙尔「月兆祝赐·廊下暮影」", (self.em * 0.000175).min(0.14));
+        attribute.set_value_by_t(AttributeType::Invisible(InvisibleAttributeType::new_reaction(AttributeVariableType::ElevativeBase, ReactionType::LunarBloom)), "奈芙尔「月兆祝赐·廊下暮影」", (self.em * 0.000175).min(0.14));
     }
 }
 

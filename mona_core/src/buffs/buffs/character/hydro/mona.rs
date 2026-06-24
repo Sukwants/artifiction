@@ -1,14 +1,6 @@
-use crate::attribute::*;
-use crate::buffs::{Buff, BuffConfig};
-use crate::buffs::buff::BuffMeta;
-use crate::buffs::buff_meta::{BuffFrom, BuffGenre, BuffImage, BuffMetaData};
-use crate::buffs::buff_name::BuffName;
-use crate::character::CharacterName;
+use crate::buffs::buffs::prelude::*;
 use crate::character::characters::Mona;
 use crate::character::traits::CharacterTrait;
-use crate::character::team_status::CharacterSelector;
-use crate::common::ReactionType;
-use crate::common::item_config_type::{ItemConfig, ItemConfigType};
 use crate::enemies::Enemy;
 
 pub struct BuffMonaQ {
@@ -91,7 +83,7 @@ impl<A: Attribute> Buff<A> for BuffMonaC1 {
     fn change_attribute(&self, attribute: &mut A) {
         let val = if self.off_field { 0.24 } else { 0.15 };
         attribute.set_value_by(AttributeName::EnhanceElectroCharged, "BUFF: 莫娜一命「沉没的预言」", val);
-        attribute.set_value_by(AttributeName::EnhanceLunarCharged, "BUFF: 莫娜一命「沉没的预言」", val);
+        attribute.set_value_by_t(AttributeType::Invisible(InvisibleAttributeType::new_reaction(AttributeVariableType::ReactionEnhance, ReactionType::LunarCharged)), "BUFF: 莫娜一命「沉没的预言」", val);
         attribute.set_value_by(AttributeName::EnhanceVaporize, "BUFF: 莫娜一命「沉没的预言」", val);
         attribute.set_value_by(AttributeName::EnhanceSwirlHydro, "BUFF: 莫娜一命「沉没的预言」", val);
     }

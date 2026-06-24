@@ -1,15 +1,4 @@
-use crate::attribute::*;
-use crate::character::character_common_data::CharacterCommonData;
-use crate::common::i18n::locale;
-use crate::common::item_config_type::{ItemConfig, ItemConfigType};
-use crate::common::WeaponType;
-use crate::weapon::weapon_common_data::WeaponCommonData;
-use crate::weapon::weapon_effect::WeaponEffect;
-use crate::weapon::weapon_static_data::WeaponStaticData;
-use crate::weapon::weapon_trait::WeaponTrait;
-use crate::weapon::{WeaponConfig, WeaponName};
-use crate::weapon::weapon_base_atk::WeaponBaseATKFamily;
-use crate::weapon::weapon_sub_stat::WeaponSubStatFamily;
+use crate::weapon::weapons::prelude::*;
 
 pub struct NightweaversLookingGlassEffect {
     pub effect1: bool,
@@ -31,7 +20,15 @@ impl<A: Attribute> WeaponEffect<A> for NightweaversLookingGlassEffect {
             attribute.set_value_by(AttributeName::EnhanceBloom, "纺夜天镜：「终北圣言」与「朔月诗篇」", 0.9 + 0.3 * data.refine as f64);
             attribute.set_value_by(AttributeName::EnhanceHyperbloom, "纺夜天镜：「终北圣言」与「朔月诗篇」", 0.6 + 0.2 * data.refine as f64);
             attribute.set_value_by(AttributeName::EnhanceBurgeon, "纺夜天镜：「终北圣言」与「朔月诗篇」", 0.6 + 0.2 * data.refine as f64);
-            attribute.set_value_by(AttributeName::EnhanceLunarBloom, "纺夜天镜：「终北圣言」与「朔月诗篇」", 0.3 + 0.1 * data.refine as f64);
+            attribute.set_value_by_s(
+                CharacterSelector::select_all(attribute),
+                AttributeType::Invisible(InvisibleAttributeType::new_reaction(
+                    AttributeVariableType::ReactionEnhance,
+                    ReactionType::LunarBloom,
+                )),
+                "纺夜天镜：「终北圣言」与「朔月诗篇」",
+                0.3 + 0.1 * data.refine as f64,
+            );
         }
 
     }

@@ -1,12 +1,4 @@
-use crate::attribute::*;
-use crate::buffs::{Buff, BuffConfig};
-use crate::buffs::buff::BuffMeta;
-use crate::buffs::buff_meta::{BuffFrom, BuffGenre, BuffImage, BuffMetaData};
-use crate::buffs::buff_name::BuffName;
-use crate::character::CharacterName;
-use crate::common::i18n::locale;
-use crate::common::item_config_type::{ItemConfig, ItemConfigType};
-use crate::common::{Moonsign, ReactionType};
+use crate::buffs::buffs::prelude::*;
 use crate::character::characters::dendro::lauma::LAUMA_SKILL;
 
 pub struct BuffLaumaE {
@@ -72,10 +64,10 @@ impl<A: Attribute> Buff<A> for BuffLaumaQ {
         let q_bloom_increase = LAUMA_SKILL.q_bloom_increase[self.level_q - 1] + if self.has_c2 { LAUMA_SKILL.c2_bloom_increase } else { 0.0 };
         let q_lunar_bloom_increase = LAUMA_SKILL.q_lunar_bloom_increase[self.level_q - 1] + if self.has_c2 { LAUMA_SKILL.c2_lunar_bloom_increase } else { 0.0 };
 
-        attribute.set_value_by(AttributeName::ExtraIncreaseBloom,"菈乌玛「苍色祷歌」",self.em * q_bloom_increase);
-        attribute.set_value_by(AttributeName::ExtraIncreaseHyperBloom,"菈乌玛「苍色祷歌」",self.em * q_bloom_increase);
-        attribute.set_value_by(AttributeName::ExtraIncreaseBurgeon,"菈乌玛「苍色祷歌」",self.em * q_bloom_increase);
-        attribute.set_value_by(AttributeName::ExtraIncreaseLunarBloom,"菈乌玛「苍色祷歌」",self.em * q_lunar_bloom_increase);
+        attribute.set_value_by_t(AttributeType::Invisible(InvisibleAttributeType::new_reaction(AttributeVariableType::ReactionExtra, ReactionType::Bloom)), "菈乌玛「苍色祷歌」", self.em * q_bloom_increase);
+        attribute.set_value_by_t(AttributeType::Invisible(InvisibleAttributeType::new_reaction(AttributeVariableType::ReactionExtra, ReactionType::Hyperbloom)), "菈乌玛「苍色祷歌」", self.em * q_bloom_increase);
+        attribute.set_value_by_t(AttributeType::Invisible(InvisibleAttributeType::new_reaction(AttributeVariableType::ReactionExtra, ReactionType::Burgeon)), "菈乌玛「苍色祷歌」", self.em * q_bloom_increase);
+        attribute.set_value_by_t(AttributeType::Invisible(InvisibleAttributeType::new_reaction(AttributeVariableType::ReactionExtra, ReactionType::LunarBloom)), "菈乌玛「苍色祷歌」", self.em * q_lunar_bloom_increase);
     }
 }
 
@@ -167,9 +159,9 @@ impl<A: Attribute> Buff<A> for BuffLaumaP1 {
                 )), "菈乌玛「奉向霜夜的明光」", 0.15);
         }
         if self.moonsign == Moonsign::Ascendant {
-            attribute.set_value_by(AttributeName::CriticalDamageLunarBloom, "菈乌玛「奉向霜夜的明光」", 0.2);
+            attribute.set_value_by_t(AttributeType::Invisible(InvisibleAttributeType::new_reaction(AttributeVariableType::CriticalDamage, ReactionType::LunarBloom)), "菈乌玛「奉向霜夜的明光」", 0.2);
 
-            attribute.set_value_by(AttributeName::CriticalLunarBloom, "菈乌玛「奉向霜夜的明光」", 0.1);
+            attribute.set_value_by_t(AttributeType::Invisible(InvisibleAttributeType::new_reaction(AttributeVariableType::CriticalRate, ReactionType::LunarBloom)), "菈乌玛「奉向霜夜的明光」", 0.1);
         }
     }
 }
@@ -217,7 +209,7 @@ pub struct BuffLaumaP3 {
 
 impl<A: Attribute> Buff<A> for BuffLaumaP3 {
     fn change_attribute(&self, attribute: &mut A) {
-        attribute.set_value_by(AttributeName::IncreaseLunarBloom, "菈乌玛「月兆祝赐·千籁恩宠」", (self.em * 0.000175).min(0.14));
+        attribute.set_value_by_t(AttributeType::Invisible(InvisibleAttributeType::new_reaction(AttributeVariableType::ElevativeBase, ReactionType::LunarBloom)), "菈乌玛「月兆祝赐·千籁恩宠」", (self.em * 0.000175).min(0.14));
     }
 }
 

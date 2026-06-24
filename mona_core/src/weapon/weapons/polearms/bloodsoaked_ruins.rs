@@ -1,15 +1,4 @@
-use crate::attribute::*;
-use crate::character::character_common_data::CharacterCommonData;
-use crate::common::i18n::locale;
-use crate::common::item_config_type::{ItemConfig, ItemConfigType};
-use crate::common::WeaponType;
-use crate::weapon::weapon_base_atk::WeaponBaseATKFamily;
-use crate::weapon::weapon_common_data::WeaponCommonData;
-use crate::weapon::weapon_effect::WeaponEffect;
-use crate::weapon::weapon_static_data::WeaponStaticData;
-use crate::weapon::weapon_sub_stat::WeaponSubStatFamily;
-use crate::weapon::{WeaponConfig, WeaponName};
-use crate::weapon::weapon_trait::WeaponTrait;
+use crate::weapon::weapons::prelude::*;
 
 pub struct BloodsoakedRuinsEffect {
     rate: f64,
@@ -34,7 +23,7 @@ impl BloodsoakedRuinsEffect {
 impl<T: Attribute> WeaponEffect<T> for BloodsoakedRuinsEffect {
     fn apply(&self, data: &WeaponCommonData, attribute: &mut T) {
         let refine = data.refine as f64;
-        attribute.set_value_by(AttributeName::EnhanceLunarCharged, "血染荒城被动", (refine * 0.12 + 0.24) * self.rate);
+        attribute.set_value_by_t(AttributeType::Invisible(InvisibleAttributeType::new_reaction(AttributeVariableType::ReactionEnhance, ReactionType::LunarCharged)), "血染荒城被动", (refine * 0.12 + 0.24) * self.rate);
         if self.requiem_of_ruin {
             attribute.set_value_by(AttributeName::CriticalDamageBase, "血染荒城：「荒落的挽歌」", refine * 0.07 + 0.21);
         }
