@@ -190,12 +190,12 @@ impl FlinsDamageEnum {
         }
     }
 
-    pub fn get_lunar_type(&self) -> ElevativeReaction {
+    pub fn get_lunar_type(&self) -> Option<ElevativeReaction> {
         use FlinsDamageEnum::*;
         match *self {
-            LunarCharged => ElevativeReaction::LunarChargedReaction,
-            Q2 | Q3 | QTS | QTSA | C2 => ElevativeReaction::LunarCharged,
-            _ => ElevativeReaction::None,
+            LunarCharged => Some(ElevativeReaction::LunarChargedReaction),
+            Q2 | Q3 | QTS | QTSA | C2 => Some(ElevativeReaction::LunarCharged),
+            _ => None,
         }
     }
 
@@ -291,7 +291,7 @@ impl CharacterTrait for Flins {
                 &context.attribute,
                 &context.enemy,
                 s.get_element(),
-                s.get_lunar_type(),
+                s.get_lunar_type().unwrap(),
                 s.get_skill_type(),
                 context.character_common_data.level,
                 fumo,

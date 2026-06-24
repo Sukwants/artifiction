@@ -120,11 +120,11 @@ impl CharacterTrait for Durin {
 特别的，如果该角色会触发月曜反应伤害，则需要额外实现 `get_lunar_type` 接口，示例如下：
 
 ```rust
-pub fn get_lunar_type(&self) -> ElevativeReaction {
+pub fn get_lunar_type(&self) -> Option<ElevativeReaction> {
     use LaumaDamageEnum::*;
     match *self {
-        EHold2 | C6E | C6A => ElevativeReaction::LunarBloom,
-        _ => ElevativeReaction::None,
+        EHold2 | C6E | C6A => Some(ElevativeReaction::LunarBloom),
+        _ => None,
     }
 }
 ```

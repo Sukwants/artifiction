@@ -197,11 +197,11 @@ impl LinneaDamageEnum {
         }
     }
 
-    pub fn get_lunar_type(&self) -> ElevativeReaction {
+    pub fn get_lunar_type(&self) -> Option<ElevativeReaction> {
         use LinneaDamageEnum::*;
         match *self {
-            E2 | E3 => ElevativeReaction::LunarCrystallize,
-            _ => ElevativeReaction::None,
+            E2 | E3 => Some(ElevativeReaction::LunarCrystallize),
+            _ => None,
         }
     }
 
@@ -371,12 +371,12 @@ impl CharacterTrait for Linnea {
                 _ => unreachable!(),
             }
     
-            if s.get_lunar_type() != ElevativeReaction::None {
+            if let Some(lunar_type) = s.get_lunar_type() {
                 builder.elevative(
                     &context.attribute,
                     &context.enemy,
                     s.get_element(),
-                    s.get_lunar_type(),
+                    lunar_type,
                     s.get_skill_type(),
                     context.character_common_data.level,
                     fumo,

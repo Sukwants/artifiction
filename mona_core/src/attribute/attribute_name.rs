@@ -365,30 +365,27 @@ impl AttributeName {
         }
     }
 
-    pub fn enhance_name_by_elevative_reaction(lunar_type: ElevativeReaction) -> Option<AttributeName> {
+    pub fn enhance_name_by_elevative_reaction(lunar_type: ElevativeReaction) -> AttributeName {
         match lunar_type {
-            ElevativeReaction::None => None,
-            ElevativeReaction::LunarChargedReaction | ElevativeReaction::LunarCharged => Some(AttributeName::EnhanceLunarCharged),
-            ElevativeReaction::LunarBloom => Some(AttributeName::EnhanceLunarBloom),
-            _ => Some(AttributeName::NULL),
+            ElevativeReaction::LunarChargedReaction | ElevativeReaction::LunarCharged => AttributeName::EnhanceLunarCharged,
+            ElevativeReaction::LunarBloom => AttributeName::EnhanceLunarBloom,
+            _ => AttributeName::NULL,
         }
     }
 
-    pub fn increase_name_by_elevative_reaction(lunar_type: ElevativeReaction) -> Option<AttributeName> {
+    pub fn increase_name_by_elevative_reaction(lunar_type: ElevativeReaction) -> AttributeName {
         match lunar_type {
-            ElevativeReaction::None => None,
-            ElevativeReaction::LunarChargedReaction | ElevativeReaction::LunarCharged => Some(AttributeName::IncreaseLunarCharged),
-            ElevativeReaction::LunarBloom => Some(AttributeName::IncreaseLunarBloom),
-            _ => Some(AttributeName::NULL),
+            ElevativeReaction::LunarChargedReaction | ElevativeReaction::LunarCharged => AttributeName::IncreaseLunarCharged,
+            ElevativeReaction::LunarBloom => AttributeName::IncreaseLunarBloom,
+            _ => AttributeName::NULL,
         }
     }
 
-    pub fn elevate_name_by_elevative_reaction(lunar_type: ElevativeReaction) -> Option<AttributeName> {
+    pub fn elevate_name_by_elevative_reaction(lunar_type: ElevativeReaction) -> AttributeName {
         match lunar_type {
-            ElevativeReaction::None => None,
-            ElevativeReaction::LunarChargedReaction | ElevativeReaction::LunarCharged => Some(AttributeName::ElevateLunarCharged),
-            ElevativeReaction::LunarBloom => Some(AttributeName::ElevateLunarBloom),
-            _ => Some(AttributeName::NULL),
+            ElevativeReaction::LunarChargedReaction | ElevativeReaction::LunarCharged => AttributeName::ElevateLunarCharged,
+            ElevativeReaction::LunarBloom => AttributeName::ElevateLunarBloom,
+            _ => AttributeName::NULL,
         }
     }
 
@@ -427,12 +424,11 @@ impl AttributeName {
         }
     }
 
-    pub fn critical_rate_name_by_elevative_reaction(lunar_type: ElevativeReaction) -> Option<AttributeName> {
+    pub fn critical_rate_name_by_elevative_reaction(lunar_type: ElevativeReaction) -> AttributeName {
         match lunar_type {
-            ElevativeReaction::None => None,
-            ElevativeReaction::LunarChargedReaction | ElevativeReaction::LunarCharged => Some(AttributeName::CriticalLunarCharged),
-            ElevativeReaction::LunarBloom => Some(AttributeName::CriticalLunarBloom),
-            _ => Some(AttributeName::NULL),
+            ElevativeReaction::LunarChargedReaction | ElevativeReaction::LunarCharged => AttributeName::CriticalLunarCharged,
+            ElevativeReaction::LunarBloom => AttributeName::CriticalLunarBloom,
+            _ => AttributeName::NULL,
         }
     }
 
@@ -460,12 +456,11 @@ impl AttributeName {
         }
     }
 
-    pub fn critical_damage_name_by_elevative_reaction(lunar_type: ElevativeReaction) -> Option<AttributeName> {
+    pub fn critical_damage_name_by_elevative_reaction(lunar_type: ElevativeReaction) -> AttributeName {
         match lunar_type {
-            ElevativeReaction::None => None,
-            ElevativeReaction::LunarChargedReaction | ElevativeReaction::LunarCharged => Some(AttributeName::CriticalDamageLunarCharged),
-            ElevativeReaction::LunarBloom => Some(AttributeName::CriticalDamageLunarBloom),
-            _ => Some(AttributeName::NULL),
+            ElevativeReaction::LunarChargedReaction | ElevativeReaction::LunarCharged => AttributeName::CriticalDamageLunarCharged,
+            ElevativeReaction::LunarBloom => AttributeName::CriticalDamageLunarBloom,
+            _ => AttributeName::NULL,
         }
     }
 

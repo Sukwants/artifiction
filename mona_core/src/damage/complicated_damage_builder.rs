@@ -398,7 +398,7 @@ impl DamageBuilder for ComplicatedDamageBuilder {
         character_level: usize,
         fumo: Option<Element>
     ) -> Self::Result {
-        let reaction = ReactionType::get_reaction_from_lunar_type(lunar_type).unwrap();
+        let reaction = ReactionType::get_reaction_from_lunar_type(lunar_type);
         
         let get_attribute_type = |variable: AttributeVariableType| -> AttributeType {
             AttributeType::Invisible(InvisibleAttributeType::new(
@@ -462,7 +462,7 @@ impl DamageBuilder for ComplicatedDamageBuilder {
 
         let reaction_base = match lunar_type {
             ElevativeReaction::LunarChargedReaction | ElevativeReaction::LunarCrystallizeReaction => LEVEL_MULTIPLIER[character_level - 1],
-            _ => 0.0,
+            ElevativeReaction::LunarCharged | ElevativeReaction::LunarBloom | ElevativeReaction::LunarCrystallize => 0.0,
         };
         let reaction_coefficient = lunar_type.get_reaction_coefficient();
 
@@ -470,7 +470,6 @@ impl DamageBuilder for ComplicatedDamageBuilder {
             let dmg = match lunar_type {
                 ElevativeReaction::LunarChargedReaction | ElevativeReaction::LunarCrystallizeReaction => reaction_base,
                 ElevativeReaction::LunarCharged | ElevativeReaction::LunarBloom | ElevativeReaction::LunarCrystallize => base_damage,
-                _ => panic!()
             } * reaction_coefficient * (1.0 + enhance) * (1.0 + increase) + extra_increase;
             DamageResult {
                 critical: dmg * (1.0 + critical_damage),
@@ -780,7 +779,7 @@ impl ComplicatedDamageBuilder {
     }
 
     fn get_enhance_elevative_composition(&self, attribute: &AttributeTy, lunar_type: ElevativeReaction) -> EntryType {
-        let mut comp = attribute.get_result(AttributeName::enhance_name_by_elevative_reaction(lunar_type).unwrap_or(AttributeName::NULL));
+        let mut comp = attribute.get_result(AttributeName::enhance_name_by_elevative_reaction(lunar_type));
         comp.merge(&self.extra_reaction_enhance);
         comp.merge(&attribute.get_result(AttributeName::EnhanceElevative));
         let em = &self.extra_em.sum() + attribute.get_em_all();
@@ -797,12 +796,12 @@ impl ComplicatedDamageBuilder {
     }
 
     fn get_increase_elevative_composition(&self, attribute: &AttributeTy, lunar_type: ElevativeReaction) -> EntryType {
-        let mut comp = attribute.get_result(AttributeName::increase_name_by_elevative_reaction(lunar_type).unwrap_or(AttributeName::NULL));
+        let mut comp = attribute.get_result(AttributeName::increase_name_by_elevative_reaction(lunar_type));
         comp
     }
 
     fn get_elevate_elevative_composition(&self, attribute: &AttributeTy, lunar_type: ElevativeReaction) -> EntryType {
-        let mut comp = attribute.get_result(AttributeName::elevate_name_by_elevative_reaction(lunar_type).unwrap_or(AttributeName::NULL));
+        let mut comp = attribute.get_result(AttributeName::elevate_name_by_elevative_reaction(lunar_type));
         comp
     }
 
@@ -821,7 +820,7 @@ impl ComplicatedDamageBuilder {
 
     fn get_critical_damage_elevative_composition(&self, attribute: &AttributeTy, element: Element, lunar_type: ElevativeReaction, skill: SkillType) -> EntryType {
         let mut comp = self.get_critical_damage_composition(attribute, element, skill);
-        comp.merge(&attribute.get_result(AttributeName::critical_damage_name_by_elevative_reaction(lunar_type).unwrap()));
+        comp.merge(&attribute.get_result(AttributeName::critical_damage_name_by_elevative_reaction(lunar_type)));
         comp
     }
 
@@ -841,7 +840,7 @@ impl ComplicatedDamageBuilder {
 
     fn get_critical_elevative_composition(&self, attribute: &AttributeTy, element: Element, lunar_type: ElevativeReaction, skill: SkillType) -> EntryType {
         let mut comp = self.get_critical_composition(attribute, element, skill);
-        comp.merge(&attribute.get_result(AttributeName::critical_rate_name_by_elevative_reaction(lunar_type).unwrap()));
+        comp.merge(&attribute.get_result(AttributeName::critical_rate_name_by_elevative_reaction(lunar_type)));
 
         comp
     }

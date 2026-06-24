@@ -160,12 +160,12 @@ impl IneffaDamageEnum {
         }
     }
 
-    pub fn get_lunar_type(&self) -> ElevativeReaction {
+    pub fn get_lunar_type(&self) -> Option<ElevativeReaction> {
         use IneffaDamageEnum::*;
         match *self {
-            LunarCharged => ElevativeReaction::LunarChargedReaction,
-            P1 | C2 | C6 => ElevativeReaction::LunarCharged,
-            _ => ElevativeReaction::None,
+            LunarCharged => Some(ElevativeReaction::LunarChargedReaction),
+            P1 | C2 | C6 => Some(ElevativeReaction::LunarCharged),
+            _ => None,
         }
     }
 
@@ -268,7 +268,7 @@ impl CharacterTrait for Ineffa {
                 &context.attribute,
                 &context.enemy,
                 s.get_element(),
-                s.get_lunar_type(),
+                s.get_lunar_type().unwrap(),
                 s.get_skill_type(),
                 context.character_common_data.level,
                 fumo,

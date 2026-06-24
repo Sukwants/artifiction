@@ -66,7 +66,6 @@ pub enum ElevativeReaction {
     LunarBloom,
     LunarCrystallizeReaction,   // 月结晶
     LunarCrystallize,           // 广义月结晶
-    None,
 }
 
 impl ElevativeReaction {
@@ -86,7 +85,6 @@ impl ElevativeReaction {
             ElevativeReaction::LunarBloom => 1.0,
             ElevativeReaction::LunarCrystallizeReaction => 0.96,
             ElevativeReaction::LunarCrystallize => 1.6,
-            _ => panic!()
         }
     }
 }
@@ -141,12 +139,11 @@ impl ReactionType {
             TransformativeType::Crystallize => ReactionType::Crystallize,
         }
     }
-    pub fn get_reaction_from_lunar_type(lunar_type: ElevativeReaction) -> Option<ReactionType> {
+    pub fn get_reaction_from_lunar_type(lunar_type: ElevativeReaction) -> ReactionType {
         match lunar_type {
-            ElevativeReaction::LunarChargedReaction | ElevativeReaction::LunarCharged => Some(ReactionType::LunarCharged),
-            ElevativeReaction::LunarBloom => Some(ReactionType::LunarBloom),
-            ElevativeReaction::LunarCrystallizeReaction | ElevativeReaction::LunarCrystallize => Some(ReactionType::LunarCrystallize),
-            ElevativeReaction::None => None,
+            ElevativeReaction::LunarChargedReaction | ElevativeReaction::LunarCharged => ReactionType::LunarCharged,
+            ElevativeReaction::LunarBloom => ReactionType::LunarBloom,
+            ElevativeReaction::LunarCrystallizeReaction | ElevativeReaction::LunarCrystallize => ReactionType::LunarCrystallize,
         }
     }
 }

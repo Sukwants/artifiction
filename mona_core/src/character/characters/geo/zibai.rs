@@ -141,11 +141,11 @@ impl ZibaiDamageEnum {
         }
     }
 
-    pub fn get_lunar_type(&self) -> ElevativeReaction {
+    pub fn get_lunar_type(&self) -> Option<ElevativeReaction> {
         use ZibaiDamageEnum::*;
         match *self {
-            EA4E | E2 | Q2 => ElevativeReaction::LunarCrystallize,
-            _ => ElevativeReaction::None,
+            EA4E | E2 | Q2 => Some(ElevativeReaction::LunarCrystallize),
+            _ => None,
         }
     }
 
@@ -369,12 +369,12 @@ impl CharacterTrait for Zibai {
             }
         }
 
-        if s.get_lunar_type() != ElevativeReaction::None {
+        if let Some(lunar_type) = s.get_lunar_type() {
             builder.elevative(
                 &context.attribute,
                 &context.enemy,
                 s.get_element(),
-                s.get_lunar_type(),
+                lunar_type,
                 s.get_skill_type(),
                 context.character_common_data.level,
                 fumo,

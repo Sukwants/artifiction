@@ -214,17 +214,17 @@ impl ColumbinaDamageEnum {
         }
     }
 
-    pub fn get_lunar_type(&self, main_element: Option<Element>) -> ElevativeReaction {
+    pub fn get_lunar_type(&self, main_element: Option<Element>) -> Option<ElevativeReaction> {
         use ColumbinaDamageEnum::*;
         match *self {
-            ZM => ElevativeReaction::LunarBloom,
+            ZM => Some(ElevativeReaction::LunarBloom),
             EGI => match main_element {
-                Some(Element::Electro) => ElevativeReaction::LunarCharged,
-                Some(Element::Dendro) => ElevativeReaction::LunarBloom,
-                Some(Element::Geo) => ElevativeReaction::LunarCrystallize,
-                _ => ElevativeReaction::None,
+                Some(Element::Electro) => Some(ElevativeReaction::LunarCharged),
+                Some(Element::Dendro) => Some(ElevativeReaction::LunarBloom),
+                Some(Element::Geo) => Some(ElevativeReaction::LunarCrystallize),
+                _ => None,
             },
-            _ => ElevativeReaction::None,
+            _ => None,
         }
     }
 
@@ -428,12 +428,12 @@ impl CharacterTrait for Columbina {
         }
 
         if s == ZM || s == EGI {
-            if s.get_lunar_type(main_element) != ElevativeReaction::None {
+            if let Some(lunar_type) = s.get_lunar_type(main_element) {
                 builder.elevative(
                     &context.attribute,
                     &context.enemy,
                     s.get_element(main_element),
-                    s.get_lunar_type(main_element),
+                    lunar_type,
                     s.get_skill_type(),
                     context.character_common_data.level,
                     fumo,
