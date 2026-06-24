@@ -51,7 +51,7 @@ pub struct TransformativeDamageAnalysis {
 #[derive(Debug, Serialize, Deserialize)]
 pub struct ElevativeDamageAnalysis {
     pub element: Element,
-    pub lunar_type: ElevativeReaction,
+    pub elevative_type: ElevativeReaction,
     
     pub atk: HashMap<String, f64>,
     pub atk_ratio: HashMap<String, f64>,

@@ -68,7 +68,7 @@ export default {
             } else if (this.analysisFromWasm.TransformativeDamage != undefined) {
                 push(this.analysisFromWasm.TransformativeDamage.result, this.t(`dmg.${toSnake(this.analysisFromWasm.TransformativeDamage.transformative_type)}`))
             } else if (this.analysisFromWasm.ElevativeDamage != undefined) {
-                push(this.analysisFromWasm.ElevativeDamage.result, this.t(`dmg.${toSnake(this.analysisFromWasm.ElevativeDamage.lunar_type)}`))
+                push(this.analysisFromWasm.ElevativeDamage.result, this.t(`dmg.${toSnake(this.analysisFromWasm.ElevativeDamage.elevative_type)}`))
             } else if (this.analysisFromWasm.Damage != undefined) {
 
                 push(this.analysisFromWasm.Damage.normal.result, this.t(`dmg.${this.analysisFromWasm.Damage.normal.element}`))

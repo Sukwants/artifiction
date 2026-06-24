@@ -7,7 +7,7 @@
             <el-radio-button v-if="hasDamageSpread" label="DamageSpread">蔓激化</el-radio-button>
             <el-radio-button v-if="hasDamageAggravate" label="DamageAggravate">超激化</el-radio-button>
             <el-radio-button v-if="hasTransformativeDamage" label="TransformativeDamage">{{ get_name_from_transformative_type(this.TransformativeDamage.transformative_type) }}</el-radio-button>
-            <el-radio-button v-if="hasElevativeDamage" label="ElevativeDamage">{{ get_name_from_lunar_type(this.ElevativeDamage.lunar_type) }}</el-radio-button>
+            <el-radio-button v-if="hasElevativeDamage" label="ElevativeDamage">{{ get_name_from_elevative_type(this.ElevativeDamage.elevative_type) }}</el-radio-button>
             <el-radio-button v-if="hasHeal" label="Heal">治疗</el-radio-button>
             <el-radio-button v-if="hasShield" label="Shield">护盾</el-radio-button>
             <el-radio-button v-if="hasNumber" label="Number">数值</el-radio-button>
@@ -480,7 +480,7 @@ export default {
             return map[transformative_type]
         },
 
-        get_name_from_lunar_type(lunar_type) {
+        get_name_from_elevative_type(elevative_type) {
             const map = {
                 "LunarChargedReaction": "月感电",
                 "LunarCharged": "月感电伤害",
@@ -488,7 +488,7 @@ export default {
                 "LunarCrystallizeReaction": "月结晶",
                 "LunarCrystallize": "月结晶伤害",
             }
-            return map[lunar_type]
+            return map[elevative_type]
         },
     },
     computed: {

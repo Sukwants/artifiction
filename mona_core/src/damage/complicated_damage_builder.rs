@@ -393,12 +393,12 @@ impl DamageBuilder for ComplicatedDamageBuilder {
         attribute: &Self::AttributeType,
         enemy: &Enemy,
         element: Element,
-        lunar_type: ElevativeReaction,
+        elevative_type: ElevativeReaction,
         skill: SkillType,
         character_level: usize,
         fumo: Option<Element>
     ) -> Self::Result {
-        let reaction = ReactionType::get_reaction_from_lunar_type(lunar_type);
+        let reaction = ReactionType::get_reaction_from_elevative_type(elevative_type);
         
         let get_attribute_type = |variable: AttributeVariableType| -> AttributeType {
             AttributeType::Invisible(InvisibleAttributeType::new(
@@ -444,7 +444,7 @@ impl DamageBuilder for ComplicatedDamageBuilder {
         let res_minus = res_minus_comp.sum();
         let resistance_ratio = enemy.get_resistance_ratio(element, res_minus);
 
-        let enhance_comp = self.get_enhance_elevative_composition(attribute, lunar_type)
+        let enhance_comp = self.get_enhance_elevative_composition(attribute, elevative_type)
             .merge_with(&attribute.get_result_t(get_attribute_type(AttributeVariableType::ReactionEnhance)));
         let enhance = enhance_comp.sum();
 
@@ -452,22 +452,22 @@ impl DamageBuilder for ComplicatedDamageBuilder {
             .merge_with(&attribute.get_result_t(get_attribute_type(AttributeVariableType::ReactionExtra)));
         let extra_increase = extra_increase_comp.sum();
 
-        let increase_comp = self.get_increase_elevative_composition(attribute, lunar_type)
+        let increase_comp = self.get_increase_elevative_composition(attribute, elevative_type)
             .merge_with(&attribute.get_result_t(get_attribute_type(AttributeVariableType::ElevativeBase)));
         let increase = increase_comp.sum();
 
-        let elevate_comp = self.get_elevate_elevative_composition(attribute, lunar_type)
+        let elevate_comp = self.get_elevate_elevative_composition(attribute, elevative_type)
             .merge_with(&attribute.get_result_t(get_attribute_type(AttributeVariableType::ElevativeElevate)));
         let elevate = elevate_comp.sum();
 
-        let reaction_base = match lunar_type {
+        let reaction_base = match elevative_type {
             ElevativeReaction::LunarChargedReaction | ElevativeReaction::LunarCrystallizeReaction => LEVEL_MULTIPLIER[character_level - 1],
             ElevativeReaction::LunarCharged | ElevativeReaction::LunarBloom | ElevativeReaction::LunarCrystallize => 0.0,
         };
-        let reaction_coefficient = lunar_type.get_reaction_coefficient();
+        let reaction_coefficient = elevative_type.get_reaction_coefficient();
 
         let damage = {
-            let dmg = match lunar_type {
+            let dmg = match elevative_type {
                 ElevativeReaction::LunarChargedReaction | ElevativeReaction::LunarCrystallizeReaction => reaction_base,
                 ElevativeReaction::LunarCharged | ElevativeReaction::LunarBloom | ElevativeReaction::LunarCrystallize => base_damage,
             } * reaction_coefficient * (1.0 + enhance) * (1.0 + increase) + extra_increase;
@@ -480,7 +480,7 @@ impl DamageBuilder for ComplicatedDamageBuilder {
 
         EventAnalysis::ElevativeDamage(ElevativeDamageAnalysis {
             element: element,
-            lunar_type: lunar_type,
+            elevative_type: elevative_type,
 
             atk: atk_comp.0,
             atk_ratio: atk_ratio_comp.0,
@@ -778,7 +778,7 @@ impl ComplicatedDamageBuilder {
         comp
     }
 
-    fn get_enhance_elevative_composition(&self, attribute: &AttributeTy, _lunar_type: ElevativeReaction) -> EntryType {
+    fn get_enhance_elevative_composition(&self, attribute: &AttributeTy, _elevative_type: ElevativeReaction) -> EntryType {
         let mut comp = self.extra_reaction_enhance.clone();
         let em = &self.extra_em.sum() + attribute.get_em_all();
         if em > 0.0 {
@@ -791,11 +791,11 @@ impl ComplicatedDamageBuilder {
         self.extra_reaction_extra.clone()
     }
 
-    fn get_increase_elevative_composition(&self, _attribute: &AttributeTy, _lunar_type: ElevativeReaction) -> EntryType {
+    fn get_increase_elevative_composition(&self, _attribute: &AttributeTy, _elevative_type: ElevativeReaction) -> EntryType {
         EntryType::new()
     }
 
-    fn get_elevate_elevative_composition(&self, _attribute: &AttributeTy, _lunar_type: ElevativeReaction) -> EntryType {
+    fn get_elevate_elevative_composition(&self, _attribute: &AttributeTy, _elevative_type: ElevativeReaction) -> EntryType {
         EntryType::new()
     }
 
@@ -812,7 +812,7 @@ impl ComplicatedDamageBuilder {
         comp
     }
 
-    fn get_critical_damage_elevative_composition(&self, attribute: &AttributeTy, element: Element, _lunar_type: ElevativeReaction, skill: SkillType) -> EntryType {
+    fn get_critical_damage_elevative_composition(&self, attribute: &AttributeTy, element: Element, _elevative_type: ElevativeReaction, skill: SkillType) -> EntryType {
         self.get_critical_damage_composition(attribute, element, skill)
     }
 
@@ -830,7 +830,7 @@ impl ComplicatedDamageBuilder {
         comp
     }
 
-    fn get_critical_elevative_composition(&self, attribute: &AttributeTy, element: Element, _lunar_type: ElevativeReaction, skill: SkillType) -> EntryType {
+    fn get_critical_elevative_composition(&self, attribute: &AttributeTy, element: Element, _elevative_type: ElevativeReaction, skill: SkillType) -> EntryType {
         self.get_critical_composition(attribute, element, skill)
     }
 

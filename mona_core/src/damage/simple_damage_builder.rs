@@ -314,13 +314,13 @@ impl DamageBuilder for SimpleDamageBuilder {
         SimpleDamageResult::new_normal(damage)
     }
 
-    fn elevative(&self, attribute: &Self::AttributeType, enemy: &Enemy, element: Element, lunar_type: ElevativeReaction, skill: SkillType, character_level: usize, fumo: Option<Element>) -> Self::Result {
+    fn elevative(&self, attribute: &Self::AttributeType, enemy: &Enemy, element: Element, elevative_type: ElevativeReaction, skill: SkillType, character_level: usize, fumo: Option<Element>) -> Self::Result {
         let atk = attribute.get_atk() + self.extra_atk;
         let def = attribute.get_def() + self.extra_def;
         let hp = attribute.get_hp() + self.extra_hp;
         let em = self.extra_em + attribute.get_em_all();
 
-        let reaction = ReactionType::get_reaction_from_lunar_type(lunar_type);
+        let reaction = ReactionType::get_reaction_from_elevative_type(elevative_type);
         
         let get_attribute_type = |variable: AttributeVariableType| -> AttributeType {
             AttributeType::Invisible(InvisibleAttributeType::new(
@@ -368,10 +368,10 @@ impl DamageBuilder for SimpleDamageBuilder {
         let elevate = attribute.get_result_t(get_attribute_type(AttributeVariableType::ElevativeElevate));
 
         let reaction_base = LEVEL_MULTIPLIER[character_level - 1];
-        let reaction_coefficient = lunar_type.get_reaction_coefficient();
+        let reaction_coefficient = elevative_type.get_reaction_coefficient();
 
         let damage = {
-            let dmg = match lunar_type {
+            let dmg = match elevative_type {
                 ElevativeReaction::LunarChargedReaction | ElevativeReaction::LunarCrystallizeReaction => reaction_base,
                 ElevativeReaction::LunarCharged | ElevativeReaction::LunarBloom | ElevativeReaction::LunarCrystallize => base_damage,
             } * reaction_coefficient * (1.0 + enhance) * (1.0 + increase) + extra_increase;

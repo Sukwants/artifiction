@@ -117,10 +117,10 @@ impl CharacterTrait for Durin {
 
 特别的，如果该角色存在伤害元素类型与配置相关的情况（如染色伤害），则 `get_element` 接口的实现需要新增参数、进行判断并返回相应元素类型。
 
-特别的，如果该角色会触发月曜反应伤害，则需要额外实现 `get_lunar_type` 接口，示例如下：
+特别的，如果该角色会触发月曜反应伤害，则需要额外实现 `get_elevative_type` 接口，示例如下：
 
 ```rust
-pub fn get_lunar_type(&self) -> Option<ElevativeReaction> {
+pub fn get_elevative_type(&self) -> Option<ElevativeReaction> {
     use LaumaDamageEnum::*;
     match *self {
         EHold2 | C6E | C6A => Some(ElevativeReaction::LunarBloom),
@@ -139,7 +139,6 @@ pub enum ElevativeReaction {
     LunarBloom,
     LunarCrystallizeReaction,   // 月结晶
     LunarCrystallize,           // 广义月结晶
-    None,
 }
 ```
 

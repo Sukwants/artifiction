@@ -225,12 +225,12 @@ impl CalculatorInterface {
 
         let builder = ComplicatedDamageBuilder::new();
 
-        let get_damage = |lunar_type: ElevativeReaction| -> EventAnalysis {
+        let get_damage = |elevative_type: ElevativeReaction| -> EventAnalysis {
             builder.elevative(
                 &context.attribute,
                 &context.enemy,
-                lunar_type.get_element().unwrap(),
-                lunar_type,
+                elevative_type.get_element().unwrap(),
+                elevative_type,
                 mona::common::SkillType::Elevative,
                 context.character_common_data.level,
                 None,

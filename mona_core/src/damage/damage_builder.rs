@@ -77,7 +77,7 @@ pub trait DamageBuilder {
         attribute: &Self::AttributeType,
         enemy: &Enemy,
         element: Element,
-        lunar_type: ElevativeReaction,
+        elevative_type: ElevativeReaction,
         skill_type: SkillType,
         character_level: usize,
         fumo: Option<Element>

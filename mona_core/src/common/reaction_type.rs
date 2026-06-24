@@ -139,8 +139,8 @@ impl ReactionType {
             TransformativeType::Crystallize => ReactionType::Crystallize,
         }
     }
-    pub fn get_reaction_from_lunar_type(lunar_type: ElevativeReaction) -> ReactionType {
-        match lunar_type {
+    pub fn get_reaction_from_elevative_type(elevative_type: ElevativeReaction) -> ReactionType {
+        match elevative_type {
             ElevativeReaction::LunarChargedReaction | ElevativeReaction::LunarCharged => ReactionType::LunarCharged,
             ElevativeReaction::LunarBloom => ReactionType::LunarBloom,
             ElevativeReaction::LunarCrystallizeReaction | ElevativeReaction::LunarCrystallize => ReactionType::LunarCrystallize,

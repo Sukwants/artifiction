@@ -61,13 +61,13 @@ pub trait CharacterTrait {
         builder.transformative(context.attribute, context.enemy, transformative_type, context.character_common_data.level)
     }
 
-    fn elevative_damage<D: DamageBuilder>(context: &DamageContext<'_, D::AttributeType>, lunar_type: ElevativeReaction) -> D::Result {
+    fn elevative_damage<D: DamageBuilder>(context: &DamageContext<'_, D::AttributeType>, elevative_type: ElevativeReaction) -> D::Result {
         let builder = D::new();
         builder.elevative(
             context.attribute,
             context.enemy,
-            lunar_type.get_element().unwrap(),
-            lunar_type,
+            elevative_type.get_element().unwrap(),
+            elevative_type,
             SkillType::Elevative,
             context.character_common_data.level,
             None,
