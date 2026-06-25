@@ -426,12 +426,7 @@ impl CharacterTrait for Sandrone {
             C6B_SC_TOTAL => SANDRONE_SKILL.c6_beam_extra_sc_atk * SANDRONE_SKILL.c6_beam_extra_count,
         };
 
-        // C4、C6 是额外攻击力比例伤害
-        if s == C4 || s == C6B || s == C6B_TOTAL || s == C6B_SC || s == C6B_SC_TOTAL {
-            builder.add_extra_damage("技能倍率", ratio * context.attribute.get_atk());
-        } else {
-            builder.add_atk_ratio("技能倍率", ratio);
-        }
+        builder.add_atk_ratio("技能倍率", ratio);
 
         // C2: 辉映·星超导 — 冷凝射线暴伤+40%，每层再+20%
         if context.character_common_data.constellation >= 2 && c2_beam_stack > 0 {
