@@ -98,6 +98,8 @@ impl ElevativeReaction {
             ElevativeReaction::StellarConductElectro => 1.0,
         }
     }
+
+    pub const STELLAR_CONDUCT_EXTRA_COEFFICIENT: [f64; 13] = [0.0, 0.45, 0.5, 0.54, 0.6, 0.64, 0.71, 0.75, 0.79, 0.85, 0.89, 0.95, 1.0];
 }
 
 #[derive(Debug, Serialize, Deserialize, Hash, Eq, PartialEq, Copy, Clone)]
