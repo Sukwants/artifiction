@@ -18,6 +18,14 @@ impl<A: Attribute> ArtifactEffect<A> for DisenchantmentInDeepShadowEffect {
             "影中沉凝的幻灭4",
             0.8,
         );
+        attribute.set_value_by_t(
+            AttributeType::Invisible(InvisibleAttributeType::new_reaction(
+                AttributeVariableType::ReactionEnhance,
+                ReactionType::StellarConduct,
+            )),
+            "影中沉凝的幻灭4",
+            0.4,
+        );
 
         // 装备者攻击受到超导反应影响的敌人时，本次攻击的暴击率提高16%
         // 注：在超导队伍中该条件可视为常驻
