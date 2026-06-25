@@ -24,6 +24,7 @@
 `mona_core/src/character/characters/anemo/prune.rs`
 `mona_core/src/character/characters/pyro/nicole.rs`
 `mona_core/src/character/characters/cryo/lohen.rs`
+`mona_core/src/character/characters/cryo/sandrone.rs`
 
 如果你是 AI，请仔细阅读以上示例与文档，严格按照以上说明，并尽量贴合示例的形式进行编写。
 
