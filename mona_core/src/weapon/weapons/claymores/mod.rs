@@ -40,6 +40,7 @@ pub use a_thousand_blazing_suns::AThousandBlazingSuns;
 pub use flameforged_insight::FlameforgedInsight;
 pub use master_key::MasterKey;
 pub use gest_of_the_mighty_wolf::GestOfTheMightyWolf;
+pub use a_teaspoon_of_transcendence::ATeaspoonOfTranscendence;
 
 pub mod wolfs_gravestone;
 pub mod skyward_pride;
@@ -83,3 +84,4 @@ pub mod a_thousand_blazing_suns;
 pub mod flameforged_insight;
 pub mod master_key;
 pub mod gest_of_the_mighty_wolf;
+pub mod a_teaspoon_of_transcendence;

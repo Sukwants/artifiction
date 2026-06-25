@@ -118,6 +118,7 @@ pub enum WeaponName {
     Verdict,
     FangOfTheMountainKing,
     AThousandBlazingSuns,
+    ATeaspoonOfTranscendence,
 
     // polearm
     // 1 star
