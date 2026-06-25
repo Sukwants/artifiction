@@ -228,11 +228,12 @@ impl TargetFunction for CynoDefaultTargetFunction {
         };
         type S = <Cyno as CharacterTrait>::DamageEnumType;
         let config = CharacterSkillConfig::Cyno { under_judication: true };
-        let dmg_normal1: SimpleDamageResult = Cyno::damage::<SimpleDamageBuilder>(&context, S::QNormal1, &config, None);
-        let dmg_normal2 = Cyno::damage::<SimpleDamageBuilder>(&context, S::QNormal2, &config, None);
-        let dmg_normal3 = Cyno::damage::<SimpleDamageBuilder>(&context, S::QNormal3, &config, None);
-        let dmg_normal4 = Cyno::damage::<SimpleDamageBuilder>(&context, S::QNormal4, &config, None);
-        let dmg_normal5 = Cyno::damage::<SimpleDamageBuilder>(&context, S::QNormal5, &config, None);
+        let dmg_normal1: SimpleDamageResult = Cyno::damage::<SimpleDamageBuilder>(&context, S::Q1, &config, None);
+        let dmg_normal2 = Cyno::damage::<SimpleDamageBuilder>(&context, S::Q2, &config, None);
+        let dmg_normal3 = Cyno::damage::<SimpleDamageBuilder>(&context, S::Q3, &config, None);
+        let dmg_normal41 = Cyno::damage::<SimpleDamageBuilder>(&context, S::Q41, &config, None);
+        let dmg_normal42 = Cyno::damage::<SimpleDamageBuilder>(&context, S::Q42, &config, None);
+        let dmg_normal5 = Cyno::damage::<SimpleDamageBuilder>(&context, S::Q5, &config, None);
         let dmg_e2 = Cyno::damage::<SimpleDamageBuilder>(&context, S::E2, &config, None);
         let dmg_e3 = Cyno::damage::<SimpleDamageBuilder>(&context, S::E3, &config, None);
         let config_tf = CharacterSkillConfig::Cyno { under_judication: false };
@@ -259,7 +260,7 @@ impl TargetFunction for CynoDefaultTargetFunction {
         let normal1_normal = dmg_normal1.normal.expectation;
         let normal2_normal = dmg_normal2.normal.expectation;
         let normal3_normal = dmg_normal3.normal.expectation;
-        let normal4_normal = dmg_normal4.normal.expectation;
+        let normal4_normal = dmg_normal41.normal.expectation + dmg_normal42.normal.expectation;
         let normal5_normal = dmg_normal5.normal.expectation;
         let e2_normal = dmg_e2.normal.expectation;
         let e3_normal = dmg_e3.normal.expectation;

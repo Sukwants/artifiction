@@ -23,7 +23,7 @@ pub enum CharacterConfig {
     Yoimiya { talent1_level: f64 },
     Collei { background: bool },
     Tighnari { talent1_ratio: f64, c2_ratio: f64 },
-    Cyno { c2_stack: f64, after_q: bool },
+    Cyno { c2_stack: f64, after_q: bool, stellar_conduct_application_count: i32, in_pole_star_field: bool },
     Nilou { golden_rate: f64 },
     Candace { c2_rate: f64 },
     Nahida { c4_e_count: usize },
