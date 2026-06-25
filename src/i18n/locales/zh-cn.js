@@ -301,6 +301,8 @@ export default {
         lunar_bloom: "月绽放伤害",
         lunar_crystallize_reaction: "月结晶",
         lunar_crystallize: "月结晶伤害",
+        stellar_conduct_cryo: "星超导伤害",
+        stellar_conduct_electro: "星超导伤害",
     },
     res: {
         Pyro: "火抗",

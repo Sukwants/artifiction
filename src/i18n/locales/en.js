@@ -299,6 +299,8 @@ export default {
         lunar_bloom: "Lunar-Bloom DMG",
         lunar_crystallize_reaction: "Lunar-Crystallize",
         lunar_crystallize: "Lunar-Crystallize DMG",
+        stellar_conduct_cryo: "Stellar-Conduct DMG",
+        stellar_conduct_electro: "Stellar-Conduct DMG",
     },
     res: {
         Pyro: "Pyro Res",

@@ -174,7 +174,7 @@
             <div class="header-row">
                 <damage-analysis-util
                     :arr="result.elevative_elevate"
-                    title="月曜反应擢升"
+                    title="擢升反应擢升"
                 ></damage-analysis-util>
             </div>
         </div>
@@ -487,6 +487,8 @@ export default {
                 "LunarBloom": "月绽放伤害",
                 "LunarCrystallizeReaction": "月结晶",
                 "LunarCrystallize": "月结晶伤害",
+                "StellarConductCryo": "星超导伤害",
+                "StellarConductElectro": "星超导伤害",
             }
             return map[elevative_type]
         },
