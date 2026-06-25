@@ -154,4 +154,5 @@ pub enum CharacterName {
     Prune,
     Nicole,
     Lohen,
+    Sandrone,
 }

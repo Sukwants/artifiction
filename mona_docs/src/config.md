@@ -144,5 +144,6 @@ pub struct GlobalLinkConfig {
 - `ItemConfig::MOONSIGN_GLOBAL`：月兆配置项。在与月兆相关的角色、武器、圣遗物、buff 等配置中需要出现该配置项，需要传入相应的默认值和优先级。
 - `ItemConfig::HEXEREI_SECRET_RITE_GLOBAL`：魔导配置项。在与魔导相关的角色、武器、圣遗物、buff 等配置中需要出现该配置项，需要传入相应的默认值和优先级。
 - `ItemConfig::STELLAR_CONDUCT_APPLICATION_COUNT`： 星超导附着次数配置项。在与星超导相关的角色中需要出现该配置项，需要传入相应的默认值和优先级。请注意，该配置项的值应当决定星超导反应伤害的额外基础倍率，附着次数达到 $0 \sim 12$ 次时的额外基础倍率从 `ElevativeReaction::STELLAR_CONDUCT_EXTRA_COEFFICIENT` 数组中获取，该额外基础倍率应当通过 `ElevativeCoefficient` 部分进行加成。
+- `ItemConfig::IN_POLESTAR_FIELD`：极星辉域配置项。在与星超导相关的角色中需要出现该配置项，需要传入相应的默认值和优先级。
 
 此外，`ItemConfig` 中已给出的配置项均可自行在合适的位置使用。

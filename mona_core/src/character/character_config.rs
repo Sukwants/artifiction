@@ -75,5 +75,6 @@ pub enum CharacterConfig {
     Prune { hexerei_secret_rite: bool, elemental_absorption: Option<Element> },
     Nicole { hexerei_secret_rite: bool },
     Lohen { hexerei_secret_rite: bool, avg_will_to_win: f64, activated_cryo_reaction: bool },
+    Sandrone { hexerei_secret_rite: bool, in_pole_star_field: bool, decoding_power: f64, stellar_conduct_application_count: i32 },
     NoConfig,
 }
