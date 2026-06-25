@@ -118,7 +118,6 @@ pub const SANDRONE_STATIC_DATA: CharacterStaticData = CharacterStaticData {
 };
 
 pub struct SandroneEffect {
-    pub hexerei_secret_rite: bool,
     pub in_pole_star_field: bool,
     pub decoding_power: f64,
     pub stellar_conduct_application_count: i32,
@@ -257,9 +256,7 @@ impl CharacterTrait for Sandrone {
     type DamageEnumType = SandroneDamageEnum;
     type RoleEnum = ();
 
-    const DEFAULT_TAGS: Option<&'static [CharacterTag]> = Some(
-        &[CharacterTag::Hexerei]
-    );
+    const DEFAULT_TAGS: Option<&'static [CharacterTag]> = None;
 
     #[cfg(not(target_family = "wasm"))]
     const SKILL_MAP: CharacterSkillMap = CharacterSkillMap {
@@ -275,6 +272,11 @@ impl CharacterTrait for Sandrone {
             X1 plunging_dmg!(1)
             X2 plunging_dmg!(2)
             X3 plunging_dmg!(3)
+            C4 locale!(zh_cn: "命座4协同攻击", en: "C4 Coordinated Attack")
+            C6B locale!(zh_cn: "命座6集束射线（单段）", en: "C6 Condensed Cluster Beam (per hit)")
+            C6B_TOTAL locale!(zh_cn: "命座6集束射线总伤害", en: "C6 Condensed Cluster Beam Total DMG")
+            C6B_SC locale!(zh_cn: "命座6集束射线星超导（单段）", en: "C6 Condensed Cluster Beam Stellar-Conduct (per hit)")
+            C6B_SC_TOTAL locale!(zh_cn: "命座6集束射线星超导总伤害", en: "C6 Condensed Cluster Beam Stellar-Conduct Total DMG")
         ),
         skill2: skill_map!(
             SandroneDamageEnum
@@ -293,7 +295,6 @@ impl CharacterTrait for Sandrone {
 
     #[cfg(not(target_family = "wasm"))]
     const CONFIG_DATA: Option<&'static [ItemConfig]> = Some(&[
-        ItemConfig::HEXEREI_SECRET_RITE_GLOBAL(false, ItemConfig::PRIORITY_CHARACTER),
         ItemConfig::STELLAR_CONDUCT_APPLICATION_COUNT(0, ItemConfig::PRIORITY_CHARACTER),
         ItemConfig::IN_POLESTAR_FIELD(true, ItemConfig::PRIORITY_CHARACTER),
         ItemConfig {
@@ -324,56 +325,40 @@ impl CharacterTrait for Sandrone {
             ),
             config: ItemConfigType::Int { min: 0, max: 3, default: 3 }
         },
-        ItemConfig {
-            name: "activated_c4",
-            title: locale!(
-                zh_cn: "触发命座4协同攻击",
-                en: "Activate C4 Coordinated Attack"
-            ),
-            config: ItemConfigType::Bool { default: true }
-        },
-        ItemConfig {
-            name: "activated_c6",
-            title: locale!(
-                zh_cn: "触发命座6集束射线",
-                en: "Activate C6 Condensed Cluster Beam"
-            ),
-            config: ItemConfigType::Bool { default: true }
-        },
     ]);
 
     fn change_attribute<A: Attribute>(attribute: &mut A, common_data: &CharacterCommonData, skill_config: &CharacterSkillConfig) {
-        let (hexerei_secret_rite, in_pole_star_field, decoding_power, stellar_conduct_application_count) = match &common_data.config {
-            CharacterConfig::Sandrone { hexerei_secret_rite, in_pole_star_field, decoding_power, stellar_conduct_application_count } =>
-                (*hexerei_secret_rite, *in_pole_star_field, *decoding_power, *stellar_conduct_application_count),
-            _ => (false, false, 0.0, 0),
+        let (in_pole_star_field, decoding_power, stellar_conduct_application_count) = match &common_data.config {
+            CharacterConfig::Sandrone { in_pole_star_field, decoding_power, stellar_conduct_application_count, .. } =>
+                (*in_pole_star_field, *decoding_power, *stellar_conduct_application_count),
+            _ => (false, 0.0, 0),
         };
 
-        let (refined_tactics_stacks, c2_beam_stack, activated_c4, activated_c6) = match *skill_config {
-            CharacterSkillConfig::Sandrone { refined_tactics_stacks, c2_beam_stack, activated_c4, activated_c6 } =>
-                (refined_tactics_stacks, c2_beam_stack, activated_c4, activated_c6),
-            _ => (0, 0, false, false),
+        let (refined_tactics_stacks, c2_beam_stack) = match *skill_config {
+            CharacterSkillConfig::Sandrone { refined_tactics_stacks, c2_beam_stack, .. } =>
+                (refined_tactics_stacks, c2_beam_stack),
+            _ => (0, 0),
         };
 
-        let _ = (attribute, hexerei_secret_rite, in_pole_star_field, decoding_power, stellar_conduct_application_count, refined_tactics_stacks, c2_beam_stack, activated_c4, activated_c6);
+        let _ = (attribute, in_pole_star_field, decoding_power, stellar_conduct_application_count, refined_tactics_stacks, c2_beam_stack);
     }
 
     fn damage_internal<D: DamageBuilder>(context: &DamageContext<'_, D::AttributeType>, s: usize, config: &CharacterSkillConfig, fumo: Option<Element>) -> D::Result {
         let s: SandroneDamageEnum = num::FromPrimitive::from_usize(s).unwrap();
         let (s1, s2, s3) = context.character_common_data.get_3_skill();
 
-        let (hexerei_secret_rite, in_pole_star_field, decoding_power, stellar_conduct_application_count) = match &context.character_common_data.config {
-            CharacterConfig::Sandrone { hexerei_secret_rite, in_pole_star_field, decoding_power, stellar_conduct_application_count } =>
-                (*hexerei_secret_rite, *in_pole_star_field, *decoding_power, *stellar_conduct_application_count),
-            _ => (false, false, 0.0, 0),
+        let (in_pole_star_field, decoding_power, stellar_conduct_application_count) = match &context.character_common_data.config {
+            CharacterConfig::Sandrone { in_pole_star_field, decoding_power, stellar_conduct_application_count, .. } =>
+                (*in_pole_star_field, *decoding_power, *stellar_conduct_application_count),
+            _ => (false, 0.0, 0),
         };
 
-        let _ = (hexerei_secret_rite, stellar_conduct_application_count);
+        let _ = stellar_conduct_application_count;
 
-        let (refined_tactics_stacks, c2_beam_stack, activated_c4, activated_c6) = match *config {
-            CharacterSkillConfig::Sandrone { refined_tactics_stacks, c2_beam_stack, activated_c4, activated_c6 } =>
-                (refined_tactics_stacks, c2_beam_stack, activated_c4, activated_c6),
-            _ => (0, 0, false, false),
+        let (refined_tactics_stacks, c2_beam_stack) = match *config {
+            CharacterSkillConfig::Sandrone { refined_tactics_stacks, c2_beam_stack, .. } =>
+                (refined_tactics_stacks, c2_beam_stack),
+            _ => (0, 0),
         };
 
         use SandroneDamageEnum::*;
@@ -388,13 +373,7 @@ impl CharacterTrait for Sandrone {
         if s == C4 && context.character_common_data.constellation < 4 {
             return builder.none();
         }
-        if s == C4 && !activated_c4 {
-            return builder.none();
-        }
         if (s == C6B || s == C6B_TOTAL || s == C6B_SC || s == C6B_SC_TOTAL) && context.character_common_data.constellation < 6 {
-            return builder.none();
-        }
-        if (s == C6B || s == C6B_TOTAL || s == C6B_SC || s == C6B_SC_TOTAL) && !activated_c6 {
             return builder.none();
         }
 
@@ -485,13 +464,12 @@ impl CharacterTrait for Sandrone {
     }
 
     fn new_effect<A: Attribute>(common_data: &CharacterCommonData, config: &CharacterConfig) -> Option<Box<dyn ChangeAttribute<A>>> {
-        let (hexerei_secret_rite, in_pole_star_field, decoding_power, stellar_conduct_application_count) = match *config {
-            CharacterConfig::Sandrone { hexerei_secret_rite, in_pole_star_field, decoding_power, stellar_conduct_application_count } =>
-                (hexerei_secret_rite, in_pole_star_field, decoding_power, stellar_conduct_application_count),
-            _ => (false, false, 0.0, 0),
+        let (in_pole_star_field, decoding_power, stellar_conduct_application_count) = match *config {
+            CharacterConfig::Sandrone { in_pole_star_field, decoding_power, stellar_conduct_application_count, .. } =>
+                (in_pole_star_field, decoding_power, stellar_conduct_application_count),
+            _ => (false, 0.0, 0),
         };
         Some(Box::new(SandroneEffect {
-            hexerei_secret_rite,
             in_pole_star_field,
             decoding_power,
             stellar_conduct_application_count,
