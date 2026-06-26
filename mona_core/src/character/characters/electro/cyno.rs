@@ -107,17 +107,17 @@ impl<A: Attribute> ChangeAttribute<A> for CynoEffect {
     fn change_attribute(&self, attribute: &mut A) {
         // Pactsworn Pathclearer: +100 EM
         if self.after_q {
-            attribute.set_value_by(AttributeName::ElementalMastery, "「启途誓使」精通加成", 100.0);
+            attribute.set_value_to(AttributeName::ElementalMastery, "赛诺启途誓使", 100.0);
 
             // C1 Together We Rise: +200 EM
             if self.common_data.constellation >= 1 {
-                attribute.set_value_by(AttributeName::ElementalMastery, "「偕日共升」精通加成", CYNO_SKILL.c1_em_bonus);
+                attribute.set_value_to(AttributeName::ElementalMastery, "赛诺命座1", CYNO_SKILL.c1_em_bonus);
             }
         }
 
         // C2: Electro DMG bonus per stack (from Cyno's own NAs)
         if self.common_data.constellation >= 2 {
-            attribute.set_value_by(AttributeName::BonusElectro, "赛诺命座2·雷伤加成", CYNO_SKILL.c2_electro_per_stack * self.c2_stack);
+            attribute.set_value_to(AttributeName::BonusElectro, "赛诺命座2", CYNO_SKILL.c2_electro_per_stack * self.c2_stack);
         }
 
         // Stellar-Conduct application count → ElevativeCoefficient
@@ -147,7 +147,6 @@ damage_enum!(
     E1
     E2
     E3
-    E_SC
     Q1
     Q2
     Q3
@@ -159,7 +158,6 @@ damage_enum!(
     QX2
     QX3
     C6B
-    C6S
 );
 
 impl CynoDamageEnum {
@@ -167,7 +165,7 @@ impl CynoDamageEnum {
         use CynoDamageEnum::*;
         match *self {
             A1 | A2 | A31 | A32 | A4 | Z | X1 | X2 | X3 => Element::Physical,
-            E1 | E2 | E3 | E_SC | Q1 | Q2 | Q3 | Q41 | Q42 | Q5 | QZ | QX1 | QX2 | QX3 | C6B | C6S => Element::Electro,
+            E1 | E2 | E3 | Q1 | Q2 | Q3 | Q41 | Q42 | Q5 | QZ | QX1 | QX2 | QX3 | C6B => Element::Electro,
         }
     }
 
@@ -179,14 +177,13 @@ impl CynoDamageEnum {
             X1 | QX1 => SkillType::PlungingAttackInAction,
             X2 | X3 | QX2 | QX3 => SkillType::PlungingAttackOnGround,
             E1 | E2 | E3 | C6B => SkillType::ElementalSkill,
-            E_SC | C6S => SkillType::Elevative,
         }
     }
 
-    pub fn get_elevative_type(&self) -> Option<ElevativeReaction> {
+    pub fn get_elevative_type(&self, in_pole_star_field: bool) -> Option<ElevativeReaction> {
         use CynoDamageEnum::*;
         match *self {
-            E_SC | C6S => Some(ElevativeReaction::StellarConductElectro),
+            E3 | C6B if in_pole_star_field => Some(ElevativeReaction::StellarConductElectro),
             _ => None,
         }
     }
@@ -253,14 +250,12 @@ impl CharacterTrait for Cyno {
             QX2 locale!(zh_cn: "启途誓使：低空坠地冲击伤害", en: "Pactsworn Pathclearer: Low Plunging DMG")
             QX3 locale!(zh_cn: "启途誓使：高空坠地冲击伤害", en: "Pactsworn Pathclearer: High Plunging DMG")
             C6B locale!(zh_cn: "命座6渡荒之雷", en: "C6 Duststalker Bolt")
-            C6S locale!(zh_cn: "命座6渡荒之雷·星偕", en: "C6 Duststalker Bolt - Starsame")
         ),
         skill2: skill_map!(
             CynoDamageEnum
             E1 locale!(zh_cn: "技能伤害", en: "Skill DMG")
             E2 locale!(zh_cn: "启途誓使：冥祭", en: "Pactsworn Pathclearer: Mortuary Rite DMG")
             E3 locale!(zh_cn: "启途誓使：渡荒之雷", en: "Pactsworn Pathclearer: Duststalker Bolt DMG")
-            E_SC locale!(zh_cn: "启途誓使：渡荒之雷·星偕", en: "Pactsworn Pathclearer: Duststalker Bolt - Starsame")
         ),
         skill3: None,
     };
@@ -293,7 +288,7 @@ impl CharacterTrait for Cyno {
             name: "under_judication",
             title: locale!(
                 zh_cn: "触发「裁定」效果",
-                en: "Enable 「Judication」",
+                en: "Enable \"Judication\"",
             ),
             config: ItemConfigType::Bool { default: true },
         },
@@ -333,20 +328,18 @@ impl CharacterTrait for Cyno {
 
         use CynoDamageEnum::*;
 
-        // Starsame (Stellar-Conduct) damage requires Polestar Field
-        if matches!(s, E_SC | C6S) && !in_pole_star_field {
-            return D::new().none();
-        }
-
         // C6 bolts require constellation >= 6
-        if matches!(s, C6B | C6S) && context.character_common_data.constellation < 6 {
+        if s == C6B && context.character_common_data.constellation < 6 {
             return D::new().none();
         }
 
         // P1 bolts require talent1
-        if matches!(s, E3 | E_SC) && !context.character_common_data.has_talent1 {
+        if s == E3 && !context.character_common_data.has_talent1 {
             return D::new().none();
         }
+
+        // E3/C6B become Stellar-Conduct when in Polestar Field
+        let is_stellar_conduct = matches!(s, E3 | C6B) && in_pole_star_field;
 
         let mut builder = D::new();
 
@@ -362,8 +355,7 @@ impl CharacterTrait for Cyno {
             X3 => CYNO_SKILL.x_dmg3[s1],
             E1 => CYNO_SKILL.e_dmg[s2],
             E2 => CYNO_SKILL.e_mortuary[s2],
-            E3 => CYNO_SKILL.p1_bolt_atk_ratio,
-            E_SC => CYNO_SKILL.p1_starsame_atk_ratio,
+            E3 => if is_stellar_conduct { CYNO_SKILL.p1_starsame_atk_ratio } else { CYNO_SKILL.p1_bolt_atk_ratio },
             Q1 => CYNO_SKILL.q_dmg1[s3],
             Q2 => CYNO_SKILL.q_dmg2[s3],
             Q3 => CYNO_SKILL.q_dmg3[s3],
@@ -374,16 +366,15 @@ impl CharacterTrait for Cyno {
             QX1 => CYNO_SKILL.q_x_dmg1[s3],
             QX2 => CYNO_SKILL.q_x_dmg2[s3],
             QX3 => CYNO_SKILL.q_x_dmg3[s3],
-            C6B => CYNO_SKILL.p1_bolt_atk_ratio,
-            C6S => CYNO_SKILL.p1_starsame_atk_ratio,
+            C6B => if is_stellar_conduct { CYNO_SKILL.p1_starsame_atk_ratio } else { CYNO_SKILL.p1_bolt_atk_ratio },
         };
 
         builder.add_atk_ratio("技能倍率", ratio);
 
         // P1 Judication: 35% bonus for Mortuary Rite and Duststalker Bolts
         if under_judication && context.character_common_data.has_talent1 {
-            if matches!(s, E2 | E3 | E_SC) {
-                builder.add_extra_bonus("「裁定」效果", CYNO_SKILL.p1_judication_bonus);
+            if matches!(s, E2 | E3) {
+                builder.add_extra_bonus("赛诺天赋1", CYNO_SKILL.p1_judication_bonus);
             }
         }
 
@@ -393,17 +384,12 @@ impl CharacterTrait for Cyno {
 
             // Q Normal Attacks: 150% EM
             if matches!(s, Q1 | Q2 | Q3 | Q41 | Q42 | Q5) {
-                builder.add_extra_damage("天赋2：「九弓的执命」普攻加成", em * CYNO_SKILL.p2_na_em_ratio);
+                builder.add_extra_damage("赛诺天赋2", em * CYNO_SKILL.p2_na_em_ratio);
             }
 
-            // Duststalker Bolts: 250% EM
+            // Duststalker Bolts / Starsame: different EM scaling based on mode
             if matches!(s, E3 | C6B) {
-                builder.add_extra_damage("天赋2：「九弓的执命」渡荒之雷加成", em * CYNO_SKILL.p2_bolt_em_ratio);
-            }
-
-            // Starsame Bolts: 600% EM
-            if matches!(s, E_SC | C6S) {
-                builder.add_extra_damage("天赋2：「九弓的执命」星偕加成", em * CYNO_SKILL.p2_starsame_em_ratio);
+                builder.add_extra_damage("赛诺天赋2", em * if is_stellar_conduct { CYNO_SKILL.p2_starsame_em_ratio } else { CYNO_SKILL.p2_bolt_em_ratio });
             }
         }
 
@@ -412,20 +398,19 @@ impl CharacterTrait for Cyno {
             && after_q
             && context.character_common_data.constellation >= 1
             && c2_stack > 0.0
+            && is_stellar_conduct
         {
-            if matches!(s, E_SC | C6S) {
-                builder.add_extra_reaction_enhance("赛诺命座2·星超导", CYNO_SKILL.c2_sc_per_stack * c2_stack);
-            }
+            builder.add_extra_reaction_enhance("赛诺命座2", CYNO_SKILL.c2_sc_per_stack * c2_stack);
         }
 
         // Determine if this is Stellar-Conduct (elevative) damage
-        if let Some(elevative_type) = s.get_elevative_type() {
+        if let Some(elevative_type) = s.get_elevative_type(in_pole_star_field) {
             builder.elevative(
                 &context.attribute,
                 &context.enemy,
                 s.get_element(),
                 elevative_type,
-                s.get_skill_type(),
+                SkillType::Elevative,
                 context.character_common_data.level,
                 fumo,
             )
