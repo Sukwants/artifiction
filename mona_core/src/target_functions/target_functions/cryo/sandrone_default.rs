@@ -60,8 +60,14 @@ impl TargetFunction for SandroneDefaultTargetFunction {
                 StatName::ATKPercentage,
             ],
             set_names: Some(vec![
+                ArtifactSetName::GladiatorsFinale,
+                ArtifactSetName::BlizzardStrayer,
+                ArtifactSetName::MarechausseeHunter,
+                ArtifactSetName::FinaleOfTheDeepGalleries,
             ]),
             very_critical_set_names: Some(vec![
+                ArtifactSetName::DisenchantmentInDeepShadow,
+                ArtifactSetName::GildedDreams,
             ]),
             normal_threshold: TargetFunctionOptConfig::DEFAULT_NORMAL_THRESHOLD,
             critical_threshold: TargetFunctionOptConfig::DEFAULT_CRITICAL_THRESHOLD,

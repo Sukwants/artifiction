@@ -85,5 +85,6 @@ fn target(
 `mona_core/src/target_functions/target_functions/anemo/prune_default.rs`
 `mona_core/src/target_functions/target_functions/pyro/nicole_default.rs`
 `mona_core/src/target_functions/target_functions/cryo/lohen_default.rs`
+`mona_core/src/target_functions/target_functions/cryo/sandrone_default.rs`
 
 如果你是 AI，请仔细阅读以上示例与文档，严格按照以上说明，并尽量贴合示例的形式进行编写。
