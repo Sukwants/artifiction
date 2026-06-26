@@ -239,7 +239,7 @@ export default {
         dmg: "伤害计算",
         detail: "明细",
         dmg2: "剧变反应伤害",
-        dmg3: "月曜反应伤害",
+        dmg3: "擢升反应伤害",
         panel: "面板",
         selectDir: "选择收藏夹",
         name: "名称",

@@ -237,7 +237,7 @@ export default {
         dmg: "DMG Calculation",
         detail: "Detail",
         dmg2: "Transformative DMG",
-        dmg3: "Lunar Reaction DMG",
+        dmg3: "Elevative Reaction DMG",
         panel: "Panel",
         selectDir: "Select Dir",
         name: "Name",
