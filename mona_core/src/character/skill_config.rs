@@ -77,6 +77,6 @@ pub enum CharacterSkillConfig {
     Sucrose { talent1_coverage: f64, talent2_coverage: f64, c6_coverage: f64, small_wind_spirit_coverage: f64, large_wind_spirit_coverage: f64 },
     Nicole { on_field_over_3s: bool },
     Lohen { in_masterstroke: bool, evilsbane_blade: bool },
-    Sandrone { refined_tactics_stacks: usize, c2_beam_stack: usize },
+    Sandrone { decoding_power: f64, refined_tactics_stacks: usize, c2_beam_stack: usize },
     NoConfig,
 }

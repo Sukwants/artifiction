@@ -16,6 +16,7 @@ pub mod freminet_default;
 pub mod wriothesley_default;
 pub mod citlali_default;
 pub mod lohen_default;
+pub mod sandrone_default;
 
 pub use aloy_default::AloyDefaultTargetFunction;
 pub use chongyun_default::ChongyunDefaultTargetFunction;
@@ -35,3 +36,4 @@ pub use freminet_default::FreminetDefaultTargetFunction;
 pub use wriothesley_default::WriothesleyDefaultTargetFunction;
 pub use citlali_default::CitlaliDefaultTargetFunction;
 pub use lohen_default::LohenDefaultTargetFunction;
+pub use sandrone_default::SandroneDefaultTargetFunction;

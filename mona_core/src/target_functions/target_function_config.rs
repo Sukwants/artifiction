@@ -74,5 +74,6 @@ pub enum TargetFunctionConfig {
     NicoleDefault { recharge_demand: f64 },
     PruneDefault { recharge_demand: f64 },
     LohenDefault {},
+    SandroneDefault {},
     NoConfig,
 }

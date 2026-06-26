@@ -119,7 +119,6 @@ pub const SANDRONE_STATIC_DATA: CharacterStaticData = CharacterStaticData {
 
 pub struct SandroneEffect {
     pub in_pole_star_field: bool,
-    pub decoding_power: f64,
     pub stellar_conduct_application_count: i32,
     pub common_data: CharacterCommonData,
 }
@@ -196,23 +195,18 @@ damage_enum!(
     A3
     ZS
     ZB
-    ZB_SC
     ZO
     X1
     X2
     X3
     E1
     E2
-    E_SC
     Q_BOMB
     Q_BOMB_TOTAL
     Q_RAY
-    Q_RAY_SC
     C4
     C6B
     C6B_TOTAL
-    C6B_SC
-    C6B_SC_TOTAL
 );
 
 impl SandroneDamageEnum {
@@ -220,8 +214,7 @@ impl SandroneDamageEnum {
         use SandroneDamageEnum::*;
         match *self {
             A1 | A2 | A3 | X1 | X2 | X3 => Element::Physical,
-            ZS | ZB | ZO | E1 | E2 | Q_BOMB | Q_BOMB_TOTAL | Q_RAY | C6B | C6B_TOTAL => Element::Cryo,
-            ZB_SC | E_SC | Q_RAY_SC | C4 | C6B_SC | C6B_SC_TOTAL => Element::Cryo,
+            _ => Element::Cryo,
         }
     }
 
@@ -229,19 +222,19 @@ impl SandroneDamageEnum {
         use SandroneDamageEnum::*;
         match *self {
             A1 | A2 | A3 => SkillType::NormalAttack,
-            ZS | ZB | ZO => SkillType::ChargedAttack,
+            ZS | ZB | ZO | C6B | C6B_TOTAL => SkillType::ChargedAttack,
             X1 => SkillType::PlungingAttackInAction,
             X2 | X3 => SkillType::PlungingAttackOnGround,
             E1 | E2 => SkillType::ElementalSkill,
             Q_BOMB | Q_BOMB_TOTAL | Q_RAY => SkillType::ElementalBurst,
-            ZB_SC | E_SC | Q_RAY_SC | C4 | C6B | C6B_TOTAL | C6B_SC | C6B_SC_TOTAL => SkillType::Elevative,
+            C4 => SkillType::Elevative,
         }
     }
 
     pub fn get_elevative_type(&self) -> Option<ElevativeReaction> {
         use SandroneDamageEnum::*;
         match *self {
-            ZB_SC | E_SC | Q_RAY_SC | C4 | C6B_SC | C6B_SC_TOTAL => Some(ElevativeReaction::StellarConductCryo),
+            ZB | E2 | Q_RAY | C6B | C6B_TOTAL | C4 => Some(ElevativeReaction::StellarConductCryo),
             _ => None,
         }
     }
@@ -267,7 +260,6 @@ impl CharacterTrait for Sandrone {
             A3 hit_n_dmg!(3)
             ZS locale!(zh_cn: "重击扫射伤害", en: "Charged Attack Sweeping Fire DMG")
             ZB locale!(zh_cn: "重击冷凝射线伤害", en: "Charged Attack Condensed Beam DMG")
-            ZB_SC locale!(zh_cn: "重击冷凝射线星超导伤害", en: "Charged Attack Condensed Beam Stellar-Conduct DMG")
             ZO locale!(zh_cn: "功率过载时伤害", en: "DMG When in Power Overdrive")
             X1 plunging_dmg!(1)
             X2 plunging_dmg!(2)
@@ -275,21 +267,17 @@ impl CharacterTrait for Sandrone {
             C4 locale!(zh_cn: "命座4协同攻击", en: "C4 Coordinated Attack")
             C6B locale!(zh_cn: "命座6集束射线（单段）", en: "C6 Condensed Cluster Beam (per hit)")
             C6B_TOTAL locale!(zh_cn: "命座6集束射线总伤害", en: "C6 Condensed Cluster Beam Total DMG")
-            C6B_SC locale!(zh_cn: "命座6集束射线星超导（单段）", en: "C6 Condensed Cluster Beam Stellar-Conduct (per hit)")
-            C6B_SC_TOTAL locale!(zh_cn: "命座6集束射线星超导总伤害", en: "C6 Condensed Cluster Beam Stellar-Conduct Total DMG")
         ),
         skill2: skill_map!(
             SandroneDamageEnum
-            E1 locale!(zh_cn: "棱晶弹伤害", en: "Prism Shot DMG")
+            E1 locale!(zh_cn: "棱晶弹第一发伤害", en: "Prism Shot 1st Hit DMG")
             E2 locale!(zh_cn: "棱晶弹第二发伤害", en: "Prism Shot 2nd Hit DMG")
-            E_SC locale!(zh_cn: "棱晶弹星超导伤害", en: "Prism Shot Stellar-Conduct DMG")
         ),
         skill3: skill_map!(
             SandroneDamageEnum
             Q_BOMB locale!(zh_cn: "轰炸伤害（单段）", en: "Bombardment DMG (per hit)")
             Q_BOMB_TOTAL locale!(zh_cn: "轰炸总伤害", en: "Bombardment Total DMG")
             Q_RAY locale!(zh_cn: "聚能光束伤害", en: "Convective Inhibition Ray DMG")
-            Q_RAY_SC locale!(zh_cn: "聚能光束星超导伤害", en: "Convective Inhibition Ray Stellar-Conduct DMG")
         )
     };
 
@@ -297,6 +285,10 @@ impl CharacterTrait for Sandrone {
     const CONFIG_DATA: Option<&'static [ItemConfig]> = Some(&[
         ItemConfig::STELLAR_CONDUCT_APPLICATION_COUNT(0, ItemConfig::PRIORITY_CHARACTER),
         ItemConfig::IN_POLESTAR_FIELD(true, ItemConfig::PRIORITY_CHARACTER),
+    ]);
+
+    #[cfg(not(target_family = "wasm"))]
+    const CONFIG_SKILL: Option<&'static [ItemConfig]> = Some(&[
         ItemConfig {
             name: "decoding_power",
             title: locale!(
@@ -305,10 +297,6 @@ impl CharacterTrait for Sandrone {
             ),
             config: ItemConfigType::Float { min: 0.0, max: 100.0, default: 50.0 }
         },
-    ]);
-
-    #[cfg(not(target_family = "wasm"))]
-    const CONFIG_SKILL: Option<&'static [ItemConfig]> = Some(&[
         ItemConfig {
             name: "refined_tactics_stacks",
             title: locale!(
@@ -328,16 +316,16 @@ impl CharacterTrait for Sandrone {
     ]);
 
     fn change_attribute<A: Attribute>(attribute: &mut A, common_data: &CharacterCommonData, skill_config: &CharacterSkillConfig) {
-        let (in_pole_star_field, decoding_power, stellar_conduct_application_count) = match &common_data.config {
-            CharacterConfig::Sandrone { in_pole_star_field, decoding_power, stellar_conduct_application_count, .. } =>
-                (*in_pole_star_field, *decoding_power, *stellar_conduct_application_count),
-            _ => (false, 0.0, 0),
+        let (in_pole_star_field, stellar_conduct_application_count) = match &common_data.config {
+            CharacterConfig::Sandrone { in_pole_star_field, stellar_conduct_application_count, .. } =>
+                (*in_pole_star_field, *stellar_conduct_application_count),
+            _ => (false, 0),
         };
 
-        let (refined_tactics_stacks, c2_beam_stack) = match *skill_config {
-            CharacterSkillConfig::Sandrone { refined_tactics_stacks, c2_beam_stack, .. } =>
-                (refined_tactics_stacks, c2_beam_stack),
-            _ => (0, 0),
+        let (decoding_power, refined_tactics_stacks, c2_beam_stack) = match *skill_config {
+            CharacterSkillConfig::Sandrone { decoding_power, refined_tactics_stacks, c2_beam_stack, .. } =>
+                (decoding_power, refined_tactics_stacks, c2_beam_stack),
+            _ => (0.0, 0, 0),
         };
 
         let _ = (attribute, in_pole_star_field, decoding_power, stellar_conduct_application_count, refined_tactics_stacks, c2_beam_stack);
@@ -347,50 +335,56 @@ impl CharacterTrait for Sandrone {
         let s: SandroneDamageEnum = num::FromPrimitive::from_usize(s).unwrap();
         let (s1, s2, s3) = context.character_common_data.get_3_skill();
 
-        let (in_pole_star_field, decoding_power, stellar_conduct_application_count) = match &context.character_common_data.config {
-            CharacterConfig::Sandrone { in_pole_star_field, decoding_power, stellar_conduct_application_count, .. } =>
-                (*in_pole_star_field, *decoding_power, *stellar_conduct_application_count),
-            _ => (false, 0.0, 0),
+        let (in_pole_star_field, stellar_conduct_application_count) = match &context.character_common_data.config {
+            CharacterConfig::Sandrone { in_pole_star_field, stellar_conduct_application_count, .. } =>
+                (*in_pole_star_field, *stellar_conduct_application_count),
+            _ => (false, 0),
         };
 
         let _ = stellar_conduct_application_count;
 
-        let (refined_tactics_stacks, c2_beam_stack) = match *config {
-            CharacterSkillConfig::Sandrone { refined_tactics_stacks, c2_beam_stack, .. } =>
-                (refined_tactics_stacks, c2_beam_stack),
-            _ => (0, 0),
+        let (decoding_power, refined_tactics_stacks, c2_beam_stack) = match *config {
+            CharacterSkillConfig::Sandrone { decoding_power, refined_tactics_stacks, c2_beam_stack, .. } =>
+                (decoding_power, refined_tactics_stacks, c2_beam_stack),
+            _ => (0.0, 0, 0),
         };
 
         use SandroneDamageEnum::*;
         let mut builder = D::new();
 
-        // 需要处于极星辉域中（辉映·星超导状态）才能触发的星超导伤害
-        if (s == ZB_SC || s == E_SC || s == Q_RAY_SC) && !in_pole_star_field {
-            return builder.none();
-        }
-
         // 需要命座才能触发的伤害
         if s == C4 && context.character_common_data.constellation < 4 {
             return builder.none();
         }
-        if (s == C6B || s == C6B_TOTAL || s == C6B_SC || s == C6B_SC_TOTAL) && context.character_common_data.constellation < 6 {
+        if (s == C6B || s == C6B_TOTAL) && context.character_common_data.constellation < 6 {
             return builder.none();
         }
+
+        // 当前技能是否由 in_pole_star_field 决定为星超导伤害（C4 始终为星超导）
+        let is_stellar_conduct = matches!(s, C4)
+            || (in_pole_star_field && matches!(s, ZB | E2 | Q_RAY | C6B | C6B_TOTAL));
 
         let ratio = match s {
             A1 => SANDRONE_SKILL.a_dmg1[s1],
             A2 => SANDRONE_SKILL.a_dmg2[s1],
             A3 => SANDRONE_SKILL.a_dmg3[s1],
             ZS => SANDRONE_SKILL.a_z_dmg_sweep[s1],
-            ZB => SANDRONE_SKILL.a_z_dmg_beam[s1],
-            ZB_SC => SANDRONE_SKILL.a_z_dmg_beam_sc[s1],
+            ZB => if is_stellar_conduct {
+                SANDRONE_SKILL.a_z_dmg_beam_sc[s1]
+            } else {
+                SANDRONE_SKILL.a_z_dmg_beam[s1]
+            },
             ZO => SANDRONE_SKILL.a_z_dmg_overdrive[s1],
             X1 => SANDRONE_SKILL.x_dmg1[s1],
             X2 => SANDRONE_SKILL.x_dmg2[s1],
             X3 => SANDRONE_SKILL.x_dmg3[s1],
             E1 => SANDRONE_SKILL.e_dmg[s2],
             E2 => {
-                let base = SANDRONE_SKILL.e_dmg[s2];
+                let base = if is_stellar_conduct {
+                    SANDRONE_SKILL.e_dmg_sc[s2]
+                } else {
+                    SANDRONE_SKILL.e_dmg[s2]
+                };
                 // P1: 解算功率>50时第二发棱晶弹造成400%伤害
                 if context.character_common_data.has_talent1 && decoding_power > 50.0 {
                     base * SANDRONE_SKILL.p1_second_shot_multiplier
@@ -398,51 +392,51 @@ impl CharacterTrait for Sandrone {
                     base
                 }
             },
-            E_SC => SANDRONE_SKILL.e_dmg_sc[s2],
             Q_BOMB => SANDRONE_SKILL.q_dmg_bomb[s3],
             Q_BOMB_TOTAL => SANDRONE_SKILL.q_dmg_bomb[s3] * 3.0,
             Q_RAY => {
-                let base = SANDRONE_SKILL.q_dmg_ray[s3];
-                // P1: 改进战术层数 → 聚能光束造成 100% + 层数×10% 伤害
-                if context.character_common_data.has_talent1 && in_pole_star_field && refined_tactics_stacks > 0 {
-                    base * (1.0 + refined_tactics_stacks as f64 * SANDRONE_SKILL.p1_tactics_per_stack)
+                let base = if is_stellar_conduct {
+                    SANDRONE_SKILL.q_dmg_ray_sc[s3]
                 } else {
-                    base
-                }
-            },
-            Q_RAY_SC => {
-                let base = SANDRONE_SKILL.q_dmg_ray_sc[s3];
-                // P1: 改进战术层数 → 聚能光束（星超导）同样享受加成
-                if context.character_common_data.has_talent1 && refined_tactics_stacks > 0 {
+                    SANDRONE_SKILL.q_dmg_ray[s3]
+                };
+                // P1: 改进战术层数 → 聚能光束造成 100% + 层数×10% 伤害（需星超导状态）
+                if context.character_common_data.has_talent1 && is_stellar_conduct && refined_tactics_stacks > 0 {
                     base * (1.0 + refined_tactics_stacks as f64 * SANDRONE_SKILL.p1_tactics_per_stack)
                 } else {
                     base
                 }
             },
             C4 => SANDRONE_SKILL.c4_atk_ratio,
-            C6B => SANDRONE_SKILL.c6_beam_extra_atk,
-            C6B_TOTAL => SANDRONE_SKILL.c6_beam_extra_atk * SANDRONE_SKILL.c6_beam_extra_count,
-            C6B_SC => SANDRONE_SKILL.c6_beam_extra_sc_atk,
-            C6B_SC_TOTAL => SANDRONE_SKILL.c6_beam_extra_sc_atk * SANDRONE_SKILL.c6_beam_extra_count,
+            C6B => if is_stellar_conduct {
+                SANDRONE_SKILL.c6_beam_extra_sc_atk
+            } else {
+                SANDRONE_SKILL.c6_beam_extra_atk
+            },
+            C6B_TOTAL => (if is_stellar_conduct {
+                SANDRONE_SKILL.c6_beam_extra_sc_atk
+            } else {
+                SANDRONE_SKILL.c6_beam_extra_atk
+            }) * SANDRONE_SKILL.c6_beam_extra_count,
         };
 
         builder.add_atk_ratio("技能倍率", ratio);
 
-        // C2: 辉映·星超导 — 冷凝射线暴伤+40%，每层再+20%
+        // C2: 冷凝射线暴伤+40%，每层再+20%
         if context.character_common_data.constellation >= 2 && c2_beam_stack > 0 {
-            if s == ZB || s == ZB_SC {
+            if s == ZB {
                 builder.add_extra_critical_damage("桑多涅命座2", 0.4 + c2_beam_stack as f64 * 0.2);
             }
         }
 
         // 判断是否为星超导擢升伤害
-        if let Some(elevative_type) = s.get_elevative_type() {
+        if is_stellar_conduct {
             builder.elevative(
                 &context.attribute,
                 &context.enemy,
                 s.get_element(),
-                elevative_type,
-                s.get_skill_type(),
+                ElevativeReaction::StellarConductCryo,
+                SkillType::Elevative,
                 context.character_common_data.level,
                 fumo,
             )
@@ -459,14 +453,13 @@ impl CharacterTrait for Sandrone {
     }
 
     fn new_effect<A: Attribute>(common_data: &CharacterCommonData, config: &CharacterConfig) -> Option<Box<dyn ChangeAttribute<A>>> {
-        let (in_pole_star_field, decoding_power, stellar_conduct_application_count) = match *config {
-            CharacterConfig::Sandrone { in_pole_star_field, decoding_power, stellar_conduct_application_count, .. } =>
-                (in_pole_star_field, decoding_power, stellar_conduct_application_count),
-            _ => (false, 0.0, 0),
+        let (in_pole_star_field, stellar_conduct_application_count) = match *config {
+            CharacterConfig::Sandrone { in_pole_star_field, stellar_conduct_application_count, .. } =>
+                (in_pole_star_field, stellar_conduct_application_count),
+            _ => (false, 0),
         };
         Some(Box::new(SandroneEffect {
             in_pole_star_field,
-            decoding_power,
             stellar_conduct_application_count,
             common_data: common_data.clone(),
         }))

@@ -131,4 +131,5 @@ pub enum TargetFunctionName {
     NicoleDefault,
     PruneDefault,
     LohenDefault,
+    SandroneDefault,
 }
