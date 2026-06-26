@@ -12,7 +12,7 @@ impl<A: Attribute> WeaponEffect<A> for ATeaspoonOfTranscendenceEffect {
         attribute.add_atk_percentage("超越之匙被动", 0.21 + 0.07 * refine);
 
         if self.stack > 0.0 {
-            attribute.set_value_by_t(AttributeType::Invisible(InvisibleAttributeType::new_reaction(
+            attribute.set_value_to_t(AttributeType::Invisible(InvisibleAttributeType::new_reaction(
                 AttributeVariableType::ReactionEnhance,
                 ReactionType::StellarConduct,
             )), "超越之匙被动", (0.12 + 0.04 * refine) * self.stack);

@@ -152,7 +152,7 @@ impl<A: Attribute> ChangeAttribute<A> for SandroneEffect {
 
         // C1: 鎏金未凋，夕暮已远 — 队伍星超导反应伤害+30%
         if self.common_data.constellation >= 1 {
-            attribute.set_value_by_s(
+            attribute.set_value_to_s(
                 CharacterSelector::select_all(attribute),
                 AttributeType::Invisible(InvisibleAttributeType::new_reaction(
                     AttributeVariableType::ReactionEnhance,
@@ -165,7 +165,7 @@ impl<A: Attribute> ChangeAttribute<A> for SandroneEffect {
 
         // C6: 水仙梦醒，且望晨光 — 星超导反应伤害擢升20%
         if self.common_data.constellation >= 6 {
-            attribute.set_value_by_t(
+            attribute.set_value_to_t(
                 AttributeType::Invisible(InvisibleAttributeType::new_reaction(
                     AttributeVariableType::ElevativeElevate,
                     ReactionType::StellarConduct,
