@@ -1,15 +1,4 @@
-use crate::attribute::*;
-use crate::character::character_common_data::CharacterCommonData;
-use crate::common::i18n::locale;
-use crate::common::item_config_type::ItemConfig;
-use crate::common::WeaponType;
-use crate::weapon::weapon_common_data::WeaponCommonData;
-use crate::weapon::weapon_effect::WeaponEffect;
-use crate::weapon::weapon_static_data::WeaponStaticData;
-use crate::weapon::weapon_trait::WeaponTrait;
-use crate::weapon::{WeaponConfig, WeaponName};
-use crate::weapon::weapon_base_atk::WeaponBaseATKFamily;
-use crate::weapon::weapon_sub_stat::WeaponSubStatFamily;
+use crate::weapon::weapons::prelude::*;
 
 pub struct CashflowSupervisionEffect {
     pub stack: f64,
@@ -22,6 +11,11 @@ impl<A: Attribute> WeaponEffect<A> for CashflowSupervisionEffect {
         attribute.add_atk_percentage("金流监督被动", 0.12 + 0.04 * refine);
         attribute.set_value_by(AttributeName::BonusNormalAttack, "金流监督被动", (0.012 + 0.04 * refine) * self.stack);
         attribute.set_value_by(AttributeName::BonusChargedAttack, "金流监督被动", (0.105 + 0.035 * refine) * self.stack);
+        attribute.set_value_to_t(AttributeType::Invisible(InvisibleAttributeType::new_reaction(
+                AttributeVariableType::ReactionEnhance,
+                ReactionType::StellarConduct,
+            )), "金流监督被动", (0.105 + 0.035 * refine) * self.stack
+        );
     }
 }
 

@@ -62,6 +62,7 @@ pub enum TargetFunctionConfig {
     DehyaDefault { melt_rate: f64, vaporize_rate: f64, e_count: usize },
     MikaDefault { recharge_demand: f64, crit_demand: f64 },
     WriothesleyDefault { punch_ratio: f64, melt_rate:f64 },
+    WriothesleyStellarConduct {},
     MualaniDefault { vaporize_rate: f64 },
     IneffaDefault { lunar_charged_coefficient: f64 },
     LaumaDefault { bloom_count: usize, hyperbloom_count: usize, burgeon_count: usize },
