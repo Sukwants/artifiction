@@ -77,5 +77,6 @@ pub enum CharacterConfig {
     Lohen { hexerei_secret_rite: bool, avg_will_to_win: f64, activated_cryo_reaction: bool },
     Sandrone { in_pole_star_field: bool, stellar_conduct_application_count: i32 },
     YaeMiko { in_pole_star_field: bool, stellar_conduct_application_count: i32 },
+    Qiqi { in_pole_star_field: bool, stellar_conduct_application_count: i32 },
     NoConfig,
 }

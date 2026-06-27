@@ -79,5 +79,6 @@ pub enum CharacterSkillConfig {
     Lohen { in_masterstroke: bool, evilsbane_blade: bool },
     Sandrone { decoding_power: f64, refined_tactics_stacks: usize, c2_beam_stack: usize },
     YaeMiko { sesshou_sakura_level: usize, sesshou_sakura_count: usize, p3_enhanced: bool },
+    Qiqi { cryo_affected: bool, c6_stacks: bool },
     NoConfig,
 }
