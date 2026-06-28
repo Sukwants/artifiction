@@ -295,7 +295,7 @@ impl CharacterTrait for Sandrone {
                 zh_cn: "解算功率（施放元素战技时）",
                 en: "Decoding Power (when casting Elemental Skill)"
             ),
-            config: ItemConfigType::Float { min: 0.0, max: 100.0, default: 50.0 }
+            config: ItemConfigType::Float { min: 0.0, max: 100.0, default: 100.0 }
         },
         ItemConfig {
             name: "refined_tactics_stacks",
