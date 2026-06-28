@@ -174,6 +174,11 @@ pub enum BuffConfig {
     LohenP2 { has_buff: bool },
     LohenC2 { has_buff: bool },
 
+    QiqiP1 { in_pole_star_field: bool },
+    QiqiP3 { in_pole_star_field: bool },
+    QiqiC2 { in_pole_star_field: bool },
+    QiqiC6 { qiqi_atk: f64 },
+
     PruneP2 { atk: f64 },
     PruneC6 { },
 
