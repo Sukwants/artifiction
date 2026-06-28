@@ -295,7 +295,7 @@ impl CharacterTrait for Sandrone {
                 zh_cn: "改进战术层数（天赋1，施放元素爆发时清除）",
                 en: "Refined Tactics Stacks (Talent 1, cleared upon Elemental Burst)"
             ),
-            config: ItemConfigType::Int { min: 0, max: 10, default: 5 }
+            config: ItemConfigType::Int { min: 0, max: 10, default: 10 }
         },
         ItemConfig {
             name: "c2_beam_stack",
