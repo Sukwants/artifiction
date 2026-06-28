@@ -71,7 +71,7 @@ pub enum BuffName {
     VentiC6,
     KleeC2,
     KleeC6,
-    DionaC6G50,
+    DionaC6,
     XinyanTalent2,
     XinyanC4,
     ZhongliShield,

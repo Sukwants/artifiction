@@ -64,6 +64,7 @@ pub enum BuffConfig {
     YelanC4 { count: usize },
     TighnariC4 { after_reaction: bool },
     DoriC4 { hp_below50: bool, energy_below50: bool },
+    DionaC6 { hp_above_50: bool, in_pole_star_field: bool },
     CandaceTalent2 { hp: f64 },
     NilouTalent2 { hp: f64 },
     NahidaTalent1 { max_em: f64 },

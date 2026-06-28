@@ -81,5 +81,6 @@ pub enum CharacterSkillConfig {
     Sandrone { decoding_power: f64, refined_tactics_stacks: usize, c2_beam_stack: usize },
     YaeMiko { sesshou_sakura_level: usize, sesshou_sakura_count: usize, p3_enhanced: bool },
     Qiqi { cryo_affected: bool, c6_stacks: bool },
+    Diona { in_signature_mix: bool, hp_above_50: bool },
     NoConfig,
 }
