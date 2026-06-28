@@ -74,6 +74,7 @@ pub enum BuffConfig {
     KavehQ { q_level: usize, rate: f64 },
     BaizhuTalent2 { hp: f64, rate: f64 },
     BaizhuC4 { rate: f64 },
+    BeidouC6 { in_pole_star_field: bool },
     LynetteP1 { el_count: usize },
     FurinaQ { level_q: usize, fanfare: usize, rate: f64 },
     ChevreuseP2 { hp: f64 },

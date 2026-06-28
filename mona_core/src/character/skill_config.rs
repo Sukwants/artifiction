@@ -22,6 +22,7 @@ pub enum CharacterSkillConfig {
     Mona { omen: bool, astral_glow_of_mercury: f64, after_z: bool, bonus_z: usize },
     Venti { activated_q: bool, breeze_blow: bool },
     Albedo { lower50: bool, activated_q: bool, fatal_count: usize, crystallize_shield: bool },
+    Beidou { under_q: bool, perfect_counter: bool },
     Klee { boom_badge: usize, active: bool, activated_q: bool, activated_c1: bool },
     Aloy { coil_count: usize },
     AratakiItto { after_q: bool },
