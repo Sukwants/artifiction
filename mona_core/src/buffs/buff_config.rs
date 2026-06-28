@@ -92,6 +92,7 @@ pub enum BuffConfig {
     CitlaliC6 { stack: f64 },
     YumemizukiMizukiC1 { em: f64 },
     YumemizukiMizukiC2 { em: f64 },
+    YumemizukiMizukiP3 { em: f64 },
     IansanQ { nightsoul_point: usize, atk: f64, level_q: usize },
     EscoffierTalent2 { hydro_cryo_count: usize },
     EscoffierC2 { atk: f64 },

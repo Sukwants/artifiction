@@ -145,6 +145,7 @@ pub enum BuffName {
     CitlaliC2,
     CitlaliC6,
     LanyanC4,
+    YumemizukiMizukiP3,
     YumemizukiMizukiC1,
     YumemizukiMizukiC2,
     IansanQ,

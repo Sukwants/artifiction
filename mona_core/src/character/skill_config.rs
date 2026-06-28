@@ -82,5 +82,6 @@ pub enum CharacterSkillConfig {
     YaeMiko { sesshou_sakura_level: usize, sesshou_sakura_count: usize, p3_enhanced: bool },
     Qiqi { cryo_affected: bool, c6_stacks: bool },
     Diona { in_signature_mix: bool, hp_above_50: bool },
+    YumemizukiMizuki { in_dreamdrifter: bool, p3_boost_active: bool },
     NoConfig,
 }

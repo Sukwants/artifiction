@@ -178,7 +178,8 @@ pub enum AttributeName {
     ExtraDmgPhysical,
 
     // introduced because of YumemizukiMizuki C1
-    SwirlExtraDmg,
+    // SwirlExtraDmg,
+    // 实现写哪去了？
 }
 
 #[derive(Hash, Eq, PartialEq, Clone, Copy)]
