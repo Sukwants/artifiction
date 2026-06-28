@@ -259,7 +259,7 @@ impl DamageBuilder for SimpleDamageBuilder {
         let get_attribute_type = |variable: AttributeVariableType| -> AttributeType {
             AttributeType::Invisible(InvisibleAttributeType::new(
                 variable,
-                None,
+                element,
                 None,
                 Some(reaction),
             ))
