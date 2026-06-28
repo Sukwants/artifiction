@@ -95,7 +95,7 @@ pub const YAE_MIKO_STATIC_DATA: CharacterStaticData = CharacterStaticData {
 
 pub struct YaeMikoEffect {
     pub in_polestar_field: bool,
-    pub stellar_conduct_application_count: i32,
+    pub stellar_conduct_application_count: usize,
     pub common_data: CharacterCommonData,
 }
 
@@ -175,15 +175,7 @@ impl<A: Attribute> ChangeAttribute<A> for YaeMikoEffect {
         }
 
         // 星超导附着次数 → ElevativeCoefficient
-        let coefficient = ElevativeReaction::STELLAR_CONDUCT_EXTRA_COEFFICIENT[self.stellar_conduct_application_count as usize];
-        attribute.set_value_to_t(
-            AttributeType::Invisible(InvisibleAttributeType::new_reaction(
-                AttributeVariableType::ElevativeCoefficient,
-                ReactionType::StellarConduct,
-            )),
-            "星超导附着次数",
-            coefficient,
-        );
+        ElevativeReaction::apply_stellar_conduct_extra_coefficient(attribute, self.stellar_conduct_application_count);
     }
 }
 

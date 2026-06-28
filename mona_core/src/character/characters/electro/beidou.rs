@@ -79,22 +79,11 @@ pub const BEIDOU_STATIC_DATA: CharacterStaticData = CharacterStaticData {
 
 pub struct BeidouEffect {
     pub in_polestar_field: bool,
-    pub stellar_conduct_application_count: i32,
     pub common_data: CharacterCommonData,
 }
 
 impl<A: Attribute> ChangeAttribute<A> for BeidouEffect {
     fn change_attribute(&self, attribute: &mut A) {
-        // 星超导附着次数 → ElevativeCoefficient
-        let coefficient = ElevativeReaction::STELLAR_CONDUCT_EXTRA_COEFFICIENT[self.stellar_conduct_application_count as usize];
-        attribute.set_value_to_t(
-            AttributeType::Invisible(InvisibleAttributeType::new_reaction(
-                AttributeVariableType::ElevativeCoefficient,
-                ReactionType::StellarConduct,
-            )),
-            "星超导附着次数",
-            coefficient,
-        );
     }
 }
 
@@ -180,7 +169,6 @@ impl CharacterTrait for Beidou {
 
     #[cfg(not(target_family = "wasm"))]
     const CONFIG_DATA: Option<&'static [ItemConfig]> = Some(&[
-        ItemConfig::STELLAR_CONDUCT_APPLICATION_COUNT(0, ItemConfig::PRIORITY_CHARACTER),
         ItemConfig::IN_POLESTAR_FIELD(false, ItemConfig::PRIORITY_CHARACTER),
     ]);
 
@@ -205,10 +193,9 @@ impl CharacterTrait for Beidou {
     ]);
 
     fn change_attribute<A: Attribute>(attribute: &mut A, common_data: &CharacterCommonData, skill_config: &CharacterSkillConfig) {
-        let (in_polestar_field, stellar_conduct_application_count) = match &common_data.config {
-            CharacterConfig::Beidou { in_polestar_field, stellar_conduct_application_count } =>
-                (*in_polestar_field, *stellar_conduct_application_count),
-            _ => (false, 0),
+        let in_polestar_field = match &common_data.config {
+            CharacterConfig::Beidou { in_polestar_field } => *in_polestar_field,
+            _ => false,
         };
 
         let (under_q, perfect_counter) = match *skill_config {
@@ -261,8 +248,6 @@ impl CharacterTrait for Beidou {
                 );
             }
         }
-
-        let _ = (in_polestar_field, stellar_conduct_application_count);
     }
 
     fn damage_internal<D: DamageBuilder>(context: &DamageContext<'_, D::AttributeType>, s: usize, config: &CharacterSkillConfig, fumo: Option<Element>) -> D::Result {
@@ -312,14 +297,12 @@ impl CharacterTrait for Beidou {
     }
 
     fn new_effect<A: Attribute>(common_data: &CharacterCommonData, config: &CharacterConfig) -> Option<Box<dyn ChangeAttribute<A>>> {
-        let (in_polestar_field, stellar_conduct_application_count) = match *config {
-            CharacterConfig::Beidou { in_polestar_field, stellar_conduct_application_count } =>
-                (in_polestar_field, stellar_conduct_application_count),
-            _ => (false, 0),
+        let in_polestar_field = match *config {
+            CharacterConfig::Beidou { in_polestar_field } => in_polestar_field,
+            _ => false,
         };
         Some(Box::new(BeidouEffect {
             in_polestar_field,
-            stellar_conduct_application_count,
             common_data: common_data.clone(),
         }))
     }

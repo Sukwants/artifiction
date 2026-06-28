@@ -1,4 +1,5 @@
 use serde::{Serialize, Deserialize};
+use crate::attribute::*;
 use crate::common::Element;
 use crate::damage::level_coefficient::{LEVEL_MULTIPLIER, CRYSTALLIZE_BASE};
 
@@ -100,6 +101,17 @@ impl ElevativeReaction {
     }
 
     pub const STELLAR_CONDUCT_EXTRA_COEFFICIENT: [f64; 13] = [0.0, 0.45, 0.5, 0.54, 0.6, 0.64, 0.71, 0.75, 0.79, 0.85, 0.89, 0.95, 1.0];
+    pub fn apply_stellar_conduct_extra_coefficient<A: Attribute>(attribute: &mut A, application_count: usize) {
+        let coefficient = ElevativeReaction::STELLAR_CONDUCT_EXTRA_COEFFICIENT[application_count];
+        attribute.set_value_to_t(
+            AttributeType::Invisible(InvisibleAttributeType::new_reaction(
+                AttributeVariableType::ElevativeCoefficient,
+                ReactionType::StellarConduct,
+            )),
+            "星超导附着次数",
+            coefficient,
+        );
+    }
 }
 
 #[derive(Debug, Serialize, Deserialize, Hash, Eq, PartialEq, Copy, Clone)]

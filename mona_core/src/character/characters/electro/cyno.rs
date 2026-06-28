@@ -97,7 +97,7 @@ pub const CYNO_SKILL: CynoSkillType = CynoSkillType {
 
 pub struct CynoEffect {
     pub in_polestar_field: bool,
-    pub stellar_conduct_application_count: i32,
+    pub stellar_conduct_application_count: usize,
     pub after_q: bool,
     pub c2_stack: f64,
     pub common_data: CharacterCommonData,
@@ -121,15 +121,7 @@ impl<A: Attribute> ChangeAttribute<A> for CynoEffect {
         }
 
         // Stellar-Conduct application count → ElevativeCoefficient
-        let coefficient = ElevativeReaction::STELLAR_CONDUCT_EXTRA_COEFFICIENT[self.stellar_conduct_application_count as usize];
-        attribute.set_value_to_t(
-            AttributeType::Invisible(InvisibleAttributeType::new_reaction(
-                AttributeVariableType::ElevativeCoefficient,
-                ReactionType::StellarConduct,
-            )),
-            "星超导附着次数",
-            coefficient,
-        );
+        ElevativeReaction::apply_stellar_conduct_extra_coefficient(attribute, self.stellar_conduct_application_count);
     }
 }
 
