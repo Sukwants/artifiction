@@ -94,7 +94,7 @@ pub const DIONA_STATIC_DATA: CharacterStaticData = CharacterStaticData {
 };
 
 pub struct DionaEffect {
-    pub in_pole_star_field: bool,
+    pub in_polestar_field: bool,
     pub common_data: CharacterCommonData,
 }
 
@@ -121,7 +121,7 @@ impl<A: Attribute> ChangeAttribute<A> for DionaEffect {
             );
 
             // 辉映·星超导：处于极星辉域中时，超导、星超导反应伤害提升40%
-            if self.in_pole_star_field {
+            if self.in_polestar_field {
                 attribute.set_value_to_t(
                     AttributeType::Invisible(InvisibleAttributeType::new_reaction(
                         AttributeVariableType::ReactionEnhance,
@@ -356,12 +356,12 @@ impl CharacterTrait for Diona {
     }
 
     fn new_effect<A: Attribute>(common_data: &CharacterCommonData, config: &CharacterConfig) -> Option<Box<dyn ChangeAttribute<A>>> {
-        let in_pole_star_field = match *config {
-            CharacterConfig::Diona { in_pole_star_field } => in_pole_star_field,
+        let in_polestar_field = match *config {
+            CharacterConfig::Diona { in_polestar_field } => in_polestar_field,
             _ => false,
         };
         Some(Box::new(DionaEffect {
-            in_pole_star_field,
+            in_polestar_field,
             common_data: common_data.clone(),
         }))
     }

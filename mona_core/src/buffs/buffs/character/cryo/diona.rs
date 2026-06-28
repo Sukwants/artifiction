@@ -3,7 +3,7 @@ use crate::buffs::buffs::prelude::*;
 
 pub struct BuffDionaC6 {
     pub hp_above_50: bool,
-    pub in_pole_star_field: bool,
+    pub in_polestar_field: bool,
 }
 
 impl<A: Attribute> Buff<A> for BuffDionaC6 {
@@ -24,7 +24,7 @@ impl<A: Attribute> Buff<A> for BuffDionaC6 {
             );
         }
 
-        if self.in_pole_star_field {
+        if self.in_polestar_field {
             // 辉映·星超导：处在最烈特调领域内的角色造成的超导、星超导反应伤害提升40%
             attribute.set_value_to_t(
                 AttributeType::Invisible(InvisibleAttributeType::new_reaction(
@@ -83,13 +83,13 @@ impl BuffMeta for BuffDionaC6 {
     ]);
 
     fn create<A: Attribute>(b: &BuffConfig) -> Box<dyn Buff<A>> {
-        let (hp_above_50, in_pole_star_field) = match *b {
-            BuffConfig::DionaC6 { hp_above_50, in_pole_star_field } => (hp_above_50, in_pole_star_field),
+        let (hp_above_50, in_polestar_field) = match *b {
+            BuffConfig::DionaC6 { hp_above_50, in_polestar_field } => (hp_above_50, in_polestar_field),
             _ => (true, true)
         };
         Box::new(BuffDionaC6 {
             hp_above_50,
-            in_pole_star_field,
+            in_polestar_field,
         })
     }
 }

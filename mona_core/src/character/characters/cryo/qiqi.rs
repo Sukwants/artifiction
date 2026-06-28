@@ -120,7 +120,7 @@ pub const QIQI_STATIC_DATA: CharacterStaticData = CharacterStaticData {
 };
 
 pub struct QiqiEffect {
-    pub in_pole_star_field: bool,
+    pub in_polestar_field: bool,
     pub stellar_conduct_application_count: i32,
     pub common_data: CharacterCommonData,
 }
@@ -129,7 +129,7 @@ impl<A: Attribute> ChangeAttribute<A> for QiqiEffect {
     fn change_attribute(&self, attribute: &mut A) {
         // P1: 延命妙法 — E状态下角色触发元素反应时受治疗加成+20%
         // E技能跟随当前场上角色，近似100%覆盖
-        if self.in_pole_star_field && self.common_data.has_talent1 {
+        if self.in_polestar_field && self.common_data.has_talent1 {
             attribute.set_value_to_s(
                 CharacterSelector::select_all(attribute),
                 AttributeType::Invisible(InvisibleAttributeType::new_any(AttributeVariableType::IncomingHealingBonus)),
@@ -140,7 +140,7 @@ impl<A: Attribute> ChangeAttribute<A> for QiqiEffect {
 
         // P3: 辉映·星超导 — 寒病鬼差持续期间，队伍中超导/星超导反应伤害+50%
         // E技能15s持续/15s冷却，近似100%覆盖
-        if self.in_pole_star_field {
+        if self.in_polestar_field {
             attribute.set_value_to_s(
                 CharacterSelector::select_team(attribute),
                 AttributeType::Invisible(InvisibleAttributeType::new_reaction(
@@ -162,7 +162,7 @@ impl<A: Attribute> ChangeAttribute<A> for QiqiEffect {
         }
 
         // C2: 辉映·星超导 — 攻击力+50%
-        if self.in_pole_star_field && self.common_data.constellation >= 2 {
+        if self.in_polestar_field && self.common_data.constellation >= 2 {
             attribute.set_value_by_t(
                 AttributeType::Panel(AttributeName::ATKPercentage),
                 "七七命座2",
@@ -236,9 +236,9 @@ impl QiqiDamageEnum {
         }
     }
 
-    pub fn get_elevative_type(&self, in_pole_star_field: bool) -> Option<ElevativeReaction> {
+    pub fn get_elevative_type(&self, in_polestar_field: bool) -> Option<ElevativeReaction> {
         use QiqiDamageEnum::*;
-        if !in_pole_star_field {
+        if !in_polestar_field {
             return None;
         }
         match *self {
@@ -347,9 +347,9 @@ impl CharacterTrait for Qiqi {
         let s: QiqiDamageEnum = num::FromPrimitive::from_usize(s).unwrap();
         let (s1, s2, s3) = context.character_common_data.get_3_skill();
 
-        let (in_pole_star_field, stellar_conduct_application_count) = match &context.character_common_data.config {
-            CharacterConfig::Qiqi { in_pole_star_field, stellar_conduct_application_count } =>
-                (*in_pole_star_field, *stellar_conduct_application_count),
+        let (in_polestar_field, stellar_conduct_application_count) = match &context.character_common_data.config {
+            CharacterConfig::Qiqi { in_polestar_field, stellar_conduct_application_count } =>
+                (*in_polestar_field, *stellar_conduct_application_count),
             _ => (false, 0),
         };
         let _ = stellar_conduct_application_count;
@@ -429,7 +429,7 @@ impl CharacterTrait for Qiqi {
         }
 
         // 判断是否为星超导擢升伤害
-        if s.get_elevative_type(in_pole_star_field).is_some() {
+        if s.get_elevative_type(in_polestar_field).is_some() {
             builder.elevative(
                 &context.attribute,
                 &context.enemy,
@@ -452,13 +452,13 @@ impl CharacterTrait for Qiqi {
     }
 
     fn new_effect<A: Attribute>(common_data: &CharacterCommonData, config: &CharacterConfig) -> Option<Box<dyn ChangeAttribute<A>>> {
-        let (in_pole_star_field, stellar_conduct_application_count) = match *config {
-            CharacterConfig::Qiqi { in_pole_star_field, stellar_conduct_application_count } =>
-                (in_pole_star_field, stellar_conduct_application_count),
+        let (in_polestar_field, stellar_conduct_application_count) = match *config {
+            CharacterConfig::Qiqi { in_polestar_field, stellar_conduct_application_count } =>
+                (in_polestar_field, stellar_conduct_application_count),
             _ => (false, 0),
         };
         Some(Box::new(QiqiEffect {
-            in_pole_star_field,
+            in_polestar_field,
             stellar_conduct_application_count,
             common_data: common_data.clone(),
         }))

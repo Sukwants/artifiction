@@ -81,8 +81,8 @@ impl TargetFunction for YaeMikoDefaultTargetFunction {
         let ctx_e_p3 = DamageContext { character_common_data: &character.common_data, attribute: &solved_e_p3, enemy };
 
         // 从角色配置读取极星辉域状态
-        let in_pole_star_field = match &character.common_data.config {
-            CharacterConfig::YaeMiko { in_pole_star_field, .. } => *in_pole_star_field,
+        let in_polestar_field = match &character.common_data.config {
+            CharacterConfig::YaeMiko { in_polestar_field, .. } => *in_polestar_field,
             _ => false,
         };
 
@@ -140,7 +140,7 @@ impl TargetFunction for YaeMikoDefaultTargetFunction {
 
         // 天赋3星超导额外伤害 (仅极星辉域下生效, 从角色配置读取)
         let mut dmg_sum_p3_sc = 0.0;
-        if in_pole_star_field {
+        if in_polestar_field {
             let dmg_p3_sc = YaeMiko::damage::<SimpleDamageBuilder>(&ctx_e_p3, S::P3_SC, &config_e_p3, None);
             dmg_sum_p3_sc = dmg_p3_sc.normal.expectation * p3_count;
         }

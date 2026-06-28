@@ -62,7 +62,7 @@ pub const WRIOTHESLEY_STATIC_DATA: CharacterStaticData = CharacterStaticData {
 };
 
 pub struct WriothesleyEffect {
-    pub in_pole_star_field: bool,
+    pub in_polestar_field: bool,
     pub stellar_conduct_application_count: i32,
     pub talent2_stack: f64,
     pub common_data: CharacterCommonData,
@@ -83,7 +83,7 @@ impl<A: Attribute> ChangeAttribute<A> for WriothesleyEffect {
         }
 
         // 特殊被动「冤苦终有显明之期」：星超导反应伤害+30%（极星辉域中生效）
-        if self.in_pole_star_field {
+        if self.in_polestar_field {
             attribute.set_value_to_t(
                 AttributeType::Invisible(InvisibleAttributeType::new_reaction(
                     AttributeVariableType::ReactionEnhance,
@@ -145,9 +145,9 @@ impl WriothesleyDamageEnum {
         }
     }
 
-    pub fn get_elevative_type(&self, in_pole_star_field: bool) -> Option<ElevativeReaction> {
+    pub fn get_elevative_type(&self, in_polestar_field: bool) -> Option<ElevativeReaction> {
         use WriothesleyDamageEnum::*;
-        if !in_pole_star_field {
+        if !in_polestar_field {
             return None;
         }
         match *self {
@@ -239,9 +239,9 @@ impl CharacterTrait for Wriothesley {
         let s: WriothesleyDamageEnum = num::FromPrimitive::from_usize(s).unwrap();
         let (s1, s2, s3) = context.character_common_data.get_3_skill();
 
-        let (in_pole_star_field, stellar_conduct_application_count, talent2_stack) = match &context.character_common_data.config {
-            CharacterConfig::Wriothesley { in_pole_star_field, stellar_conduct_application_count, talent2_stack } =>
-                (*in_pole_star_field, *stellar_conduct_application_count, *talent2_stack),
+        let (in_polestar_field, stellar_conduct_application_count, talent2_stack) = match &context.character_common_data.config {
+            CharacterConfig::Wriothesley { in_polestar_field, stellar_conduct_application_count, talent2_stack } =>
+                (*in_polestar_field, *stellar_conduct_application_count, *talent2_stack),
             _ => (false, 0, 0.0),
         };
         let _ = stellar_conduct_application_count;
@@ -266,7 +266,7 @@ impl CharacterTrait for Wriothesley {
 
         // 判断当前伤害是否视为星超导伤害
         // 在极星辉域中，特殊被动将三段、五段、重击转化为星超导伤害
-        let is_stellar_conduct = s.get_elevative_type(in_pole_star_field).is_some();
+        let is_stellar_conduct = s.get_elevative_type(in_polestar_field).is_some();
 
         // 基础倍率
         let mut ratio = match s {
@@ -373,7 +373,7 @@ impl CharacterTrait for Wriothesley {
             }
         }
 
-        if let Some(elevative_type) = s.get_elevative_type(in_pole_star_field) {
+        if let Some(elevative_type) = s.get_elevative_type(in_polestar_field) {
             builder.elevative(
                 &context.attribute,
                 &context.enemy,
@@ -396,13 +396,13 @@ impl CharacterTrait for Wriothesley {
     }
 
     fn new_effect<A: Attribute>(common_data: &CharacterCommonData, config: &CharacterConfig) -> Option<Box<dyn ChangeAttribute<A>>> {
-        let (in_pole_star_field, stellar_conduct_application_count, talent2_stack) = match *config {
-            CharacterConfig::Wriothesley { in_pole_star_field, stellar_conduct_application_count, talent2_stack } =>
-                (in_pole_star_field, stellar_conduct_application_count, talent2_stack),
+        let (in_polestar_field, stellar_conduct_application_count, talent2_stack) = match *config {
+            CharacterConfig::Wriothesley { in_polestar_field, stellar_conduct_application_count, talent2_stack } =>
+                (in_polestar_field, stellar_conduct_application_count, talent2_stack),
             _ => (false, 0, 0.0),
         };
         Some(Box::new(WriothesleyEffect {
-            in_pole_star_field,
+            in_polestar_field,
             stellar_conduct_application_count,
             talent2_stack,
             common_data: common_data.clone(),

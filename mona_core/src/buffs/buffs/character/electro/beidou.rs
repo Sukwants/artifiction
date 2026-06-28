@@ -1,7 +1,7 @@
 use crate::buffs::buffs::prelude::*;
 
 pub struct BuffBeidouC6 {
-    pub in_pole_star_field: bool,
+    pub in_polestar_field: bool,
 }
 
 impl<A: Attribute> Buff<A> for BuffBeidouC6 {
@@ -15,7 +15,7 @@ impl<A: Attribute> Buff<A> for BuffBeidouC6 {
             0.15,
         );
 
-        if self.in_pole_star_field {
+        if self.in_polestar_field {
             attribute.set_value_to_t(
                 AttributeType::Invisible(InvisibleAttributeType::new_element(
                     AttributeVariableType::ResMinus,
@@ -54,12 +54,12 @@ impl BuffMeta for BuffBeidouC6 {
     ]);
 
     fn create<A: Attribute>(b: &BuffConfig) -> Box<dyn Buff<A>> {
-        let in_pole_star_field = match *b {
-            BuffConfig::BeidouC6 { in_pole_star_field } => in_pole_star_field,
+        let in_polestar_field = match *b {
+            BuffConfig::BeidouC6 { in_polestar_field } => in_polestar_field,
             _ => false,
         };
         Box::new(BuffBeidouC6 {
-            in_pole_star_field,
+            in_polestar_field,
         })
     }
 }

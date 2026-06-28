@@ -78,7 +78,7 @@ pub const BEIDOU_STATIC_DATA: CharacterStaticData = CharacterStaticData {
 };
 
 pub struct BeidouEffect {
-    pub in_pole_star_field: bool,
+    pub in_polestar_field: bool,
     pub stellar_conduct_application_count: i32,
     pub common_data: CharacterCommonData,
 }
@@ -205,9 +205,9 @@ impl CharacterTrait for Beidou {
     ]);
 
     fn change_attribute<A: Attribute>(attribute: &mut A, common_data: &CharacterCommonData, skill_config: &CharacterSkillConfig) {
-        let (in_pole_star_field, stellar_conduct_application_count) = match &common_data.config {
-            CharacterConfig::Beidou { in_pole_star_field, stellar_conduct_application_count } =>
-                (*in_pole_star_field, *stellar_conduct_application_count),
+        let (in_polestar_field, stellar_conduct_application_count) = match &common_data.config {
+            CharacterConfig::Beidou { in_polestar_field, stellar_conduct_application_count } =>
+                (*in_polestar_field, *stellar_conduct_application_count),
             _ => (false, 0),
         };
 
@@ -229,7 +229,7 @@ impl CharacterTrait for Beidou {
                 0.15,
             );
 
-            if in_pole_star_field {
+            if in_polestar_field {
                 attribute.set_value_to_s(
                     CharacterSelector::select_all(attribute),
                     AttributeType::Invisible(InvisibleAttributeType::new_element(
@@ -262,7 +262,7 @@ impl CharacterTrait for Beidou {
             }
         }
 
-        let _ = (in_pole_star_field, stellar_conduct_application_count);
+        let _ = (in_polestar_field, stellar_conduct_application_count);
     }
 
     fn damage_internal<D: DamageBuilder>(context: &DamageContext<'_, D::AttributeType>, s: usize, config: &CharacterSkillConfig, fumo: Option<Element>) -> D::Result {
@@ -312,13 +312,13 @@ impl CharacterTrait for Beidou {
     }
 
     fn new_effect<A: Attribute>(common_data: &CharacterCommonData, config: &CharacterConfig) -> Option<Box<dyn ChangeAttribute<A>>> {
-        let (in_pole_star_field, stellar_conduct_application_count) = match *config {
-            CharacterConfig::Beidou { in_pole_star_field, stellar_conduct_application_count } =>
-                (in_pole_star_field, stellar_conduct_application_count),
+        let (in_polestar_field, stellar_conduct_application_count) = match *config {
+            CharacterConfig::Beidou { in_polestar_field, stellar_conduct_application_count } =>
+                (in_polestar_field, stellar_conduct_application_count),
             _ => (false, 0),
         };
         Some(Box::new(BeidouEffect {
-            in_pole_star_field,
+            in_polestar_field,
             stellar_conduct_application_count,
             common_data: common_data.clone(),
         }))

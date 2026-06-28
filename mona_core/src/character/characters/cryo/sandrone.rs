@@ -118,7 +118,7 @@ pub const SANDRONE_STATIC_DATA: CharacterStaticData = CharacterStaticData {
 };
 
 pub struct SandroneEffect {
-    pub in_pole_star_field: bool,
+    pub in_polestar_field: bool,
     pub stellar_conduct_application_count: i32,
     pub common_data: CharacterCommonData,
 }
@@ -316,9 +316,9 @@ impl CharacterTrait for Sandrone {
     ]);
 
     fn change_attribute<A: Attribute>(attribute: &mut A, common_data: &CharacterCommonData, skill_config: &CharacterSkillConfig) {
-        let (in_pole_star_field, stellar_conduct_application_count) = match &common_data.config {
-            CharacterConfig::Sandrone { in_pole_star_field, stellar_conduct_application_count, .. } =>
-                (*in_pole_star_field, *stellar_conduct_application_count),
+        let (in_polestar_field, stellar_conduct_application_count) = match &common_data.config {
+            CharacterConfig::Sandrone { in_polestar_field, stellar_conduct_application_count, .. } =>
+                (*in_polestar_field, *stellar_conduct_application_count),
             _ => (false, 0),
         };
 
@@ -328,16 +328,16 @@ impl CharacterTrait for Sandrone {
             _ => (0.0, 0, 0),
         };
 
-        let _ = (attribute, in_pole_star_field, decoding_power, stellar_conduct_application_count, refined_tactics_stacks, c2_beam_stack);
+        let _ = (attribute, in_polestar_field, decoding_power, stellar_conduct_application_count, refined_tactics_stacks, c2_beam_stack);
     }
 
     fn damage_internal<D: DamageBuilder>(context: &DamageContext<'_, D::AttributeType>, s: usize, config: &CharacterSkillConfig, fumo: Option<Element>) -> D::Result {
         let s: SandroneDamageEnum = num::FromPrimitive::from_usize(s).unwrap();
         let (s1, s2, s3) = context.character_common_data.get_3_skill();
 
-        let (in_pole_star_field, stellar_conduct_application_count) = match &context.character_common_data.config {
-            CharacterConfig::Sandrone { in_pole_star_field, stellar_conduct_application_count, .. } =>
-                (*in_pole_star_field, *stellar_conduct_application_count),
+        let (in_polestar_field, stellar_conduct_application_count) = match &context.character_common_data.config {
+            CharacterConfig::Sandrone { in_polestar_field, stellar_conduct_application_count, .. } =>
+                (*in_polestar_field, *stellar_conduct_application_count),
             _ => (false, 0),
         };
 
@@ -360,9 +360,9 @@ impl CharacterTrait for Sandrone {
             return builder.none();
         }
 
-        // 当前技能是否由 in_pole_star_field 决定为星超导伤害（C4 始终为星超导）
+        // 当前技能是否由 in_polestar_field 决定为星超导伤害（C4 始终为星超导）
         let is_stellar_conduct = matches!(s, C4)
-            || (in_pole_star_field && matches!(s, ZB | E2 | Q_RAY | C6B | C6B_TOTAL));
+            || (in_polestar_field && matches!(s, ZB | E2 | Q_RAY | C6B | C6B_TOTAL));
 
         let ratio = match s {
             A1 => SANDRONE_SKILL.a_dmg1[s1],
@@ -453,13 +453,13 @@ impl CharacterTrait for Sandrone {
     }
 
     fn new_effect<A: Attribute>(common_data: &CharacterCommonData, config: &CharacterConfig) -> Option<Box<dyn ChangeAttribute<A>>> {
-        let (in_pole_star_field, stellar_conduct_application_count) = match *config {
-            CharacterConfig::Sandrone { in_pole_star_field, stellar_conduct_application_count, .. } =>
-                (in_pole_star_field, stellar_conduct_application_count),
+        let (in_polestar_field, stellar_conduct_application_count) = match *config {
+            CharacterConfig::Sandrone { in_polestar_field, stellar_conduct_application_count, .. } =>
+                (in_polestar_field, stellar_conduct_application_count),
             _ => (false, 0),
         };
         Some(Box::new(SandroneEffect {
-            in_pole_star_field,
+            in_polestar_field,
             stellar_conduct_application_count,
             common_data: common_data.clone(),
         }))

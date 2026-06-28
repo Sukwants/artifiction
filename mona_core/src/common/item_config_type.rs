@@ -284,6 +284,6 @@ impl ItemConfig {
         return ItemConfig { name: "stellar_conduct_application_count", title: locale!(zh_cn: "星超导附着次数", en: "Stellar Conduct Application Count"), config: ItemConfigType::GlobalLinkInt { min: 0, max: 12, default, global_link: GlobalLinkConfig { key: "stellar_conduct_application_count", priority, team_shared: true } } };
     }
     pub const fn IN_POLESTAR_FIELD(default: bool, priority: usize) -> ItemConfig {
-        return ItemConfig { name: "in_pole_star_field", title: locale!(zh_cn: "处于极星辉域中", en: "In Pole Star Field"), config: ItemConfigType::GlobalLinkBool { default, global_link: GlobalLinkConfig { key: "in_pole_star_field", priority, team_shared: true } } };
+        return ItemConfig { name: "in_polestar_field", title: locale!(zh_cn: "处于极星辉域中", en: "In Pole Star Field"), config: ItemConfigType::GlobalLinkBool { default, global_link: GlobalLinkConfig { key: "in_polestar_field", priority, team_shared: true } } };
     }
 }
