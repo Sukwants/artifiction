@@ -15,3 +15,5 @@
 有关 target function 文件的书写方法，请参见 `mona_docs/src/target_function/index.md`。
 
 有关 buff 文件的书写方法，请参见 `mona_docs/src/buff/index.md`。
+
+有关代码审查的相关说明，请参见 `mona_docs/src/review/index.md`。

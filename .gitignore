@@ -3,6 +3,7 @@ node_modules
 /dist
 
 prompt
+tmp
 
 # local env files
 .env.local
