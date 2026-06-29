@@ -278,16 +278,14 @@ impl CharacterTrait for YumemizukiMizuki {
             }
     
             // 天赋3·廓然梦生：队伍中附近角色的元素精通提升，提升值相当于梦见月瑞希自己的元素精通的10%
-            if common_data.has_talent2 {
-                attribute.add_edge_s1to1(
-                    CharacterSelector::select_self(attribute),
-                    AttributeType::Panel(AttributeName::ElementalMastery),
-                    AttributeType::Panel(AttributeName::ElementalMastery),
-                    Arc::new(move |em: f64, _| em * YUMEMIZUKI_MIZUKI_SKILL.p3_em_share),
-                    "梦见月瑞希天赋3",
-                    EdgePriority::Common,
-                );
-            }
+            attribute.add_edge_s1to1(
+                CharacterSelector::select_self(attribute),
+                AttributeType::Panel(AttributeName::ElementalMastery),
+                AttributeType::Panel(AttributeName::ElementalMastery),
+                Arc::new(move |em: f64, _| em * YUMEMIZUKI_MIZUKI_SKILL.p3_em_share),
+                "梦见月瑞希天赋3",
+                EdgePriority::Common,
+            );
     
             // C2: 缠忆君影梦相见 — 附近敌人的火/水/冰/雷/风元素抗性降低20%
             if common_data.constellation >= 2 {
@@ -396,7 +394,7 @@ impl CharacterTrait for YumemizukiMizuki {
         builder.add_atk_ratio("技能倍率", rate);
 
         // 天赋3·廓然梦生：扩散触发后下一次周期性风伤提升1000%精通
-        if s == E2 && in_dreamdrifter && p3_boost_active && context.character_common_data.has_talent2 {
+        if s == E2 && in_dreamdrifter && p3_boost_active {
             let em = context.attribute.get_em_all();
             builder.add_extra_damage("梦见月瑞希天赋3", em * YUMEMIZUKI_MIZUKI_SKILL.p3_dmg_em_ratio);
         }

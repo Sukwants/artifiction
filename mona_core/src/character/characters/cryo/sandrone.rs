@@ -137,18 +137,16 @@ impl<A: Attribute> ChangeAttribute<A> for SandroneEffect {
         }
 
         // P3: 星耀祝礼·唯理为光 — 基于攻击力提升星超导基础伤害
-        if self.common_data.has_talent2 {
-            attribute.add_edge_t1(
-                AttributeType::Panel(AttributeName::ATK),
-                AttributeType::Invisible(InvisibleAttributeType::new_reaction(
-                    AttributeVariableType::ElevativeBase,
-                    ReactionType::StellarConduct,
-                )),
-                Arc::new(move |atk: f64, _| (atk / 100.0 * SANDRONE_SKILL.p3_base_per_100_atk).min(SANDRONE_SKILL.p3_base_max)),
-                "桑多涅天赋3",
-                EdgePriority::Invisible,
-            );
-        }
+        attribute.add_edge_t1(
+            AttributeType::Panel(AttributeName::ATK),
+            AttributeType::Invisible(InvisibleAttributeType::new_reaction(
+                AttributeVariableType::ElevativeBase,
+                ReactionType::StellarConduct,
+            )),
+            Arc::new(move |atk: f64, _| (atk / 100.0 * SANDRONE_SKILL.p3_base_per_100_atk).min(SANDRONE_SKILL.p3_base_max)),
+            "桑多涅天赋3",
+            EdgePriority::Invisible,
+        );
 
         // C1: 鎏金未凋，夕暮已远 — 队伍星超导反应伤害+30%
         if self.common_data.constellation >= 1 {
