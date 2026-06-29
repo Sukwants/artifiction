@@ -42,7 +42,6 @@ pub enum BuffConfig {
     SucroseC6 { element: Element, is_hexerei: bool },
     QiqiP1 { in_polestar_field: bool },
     QiqiP3 { in_polestar_field: bool },
-    QiqiC2 { in_polestar_field: bool },
     QiqiC6 { qiqi_atk: f64 },
     MonaC1 { off_field: bool },
     MonaQ { c4: bool, skill3: usize, is_hexerei: bool },
