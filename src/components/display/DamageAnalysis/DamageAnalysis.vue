@@ -352,6 +352,25 @@ export default {
             return damage
         },
 
+        calc_SpreadAggravate(result) {
+            let base_damage = sum(result.atk) * sum(result.atk_ratio)
+                + sum(result.hp) * sum(result.hp_ratio)
+                + sum(result.def) * sum(result.def_ratio)
+                + sum(result.em) * sum(result.em_ratio)
+                + sum(result.base_damage)
+            
+            // 激化反应：基础伤害 + 反应基础 * (1 + 反应伤害提升)
+            base_damage = base_damage + result.reaction_base * (1 + sum(result.reaction_enhance))
+            
+            let damage = base_damage
+                * (1 + sum(result.bonus))
+                * (1 + min(sum(result.critical_rate), 1.0) * sum(result.critical_damage))
+                * this.resRatio(result)
+                * this.defMultiplier(result)
+
+            return damage
+        },
+
         calc_TransformativeDamage(result) {
             let base_damage = result.reaction_base
             
@@ -365,20 +384,22 @@ export default {
         },
 
         calc_ElevativeDamage(result) {
-            let base_damage = sum(result.atk) * sum(result.atk_ratio)
+            let skill_base = sum(result.atk) * sum(result.atk_ratio)
                 + sum(result.hp) * sum(result.hp_ratio)
                 + sum(result.def) * sum(result.def_ratio)
                 + sum(result.em) * sum(result.em_ratio)
-                + sum(result.base)
-                + result.reaction_base;
 
-            let damage = (base_damage
+            // (skill_base + reaction_base) * coeff * (1+enh) * (1+inc) + extra
+            let inner = (skill_base + result.reaction_base)
+                * result.reaction_coefficient
+                * (1 + sum(result.reaction_enhance))
                 * (1 + sum(result.elevative_base))
-                * (1 + sum(result.elevative_elevate))
-                * result.reaction_coefficient * (1 + sum(result.reaction_enhance))
-                + sum(result.reaction_extra))
+                + sum(result.reaction_extra)
+
+            let damage = inner
                 * (1 + min(sum(result.critical_rate), 1.0) * sum(result.critical_damage))
                 * this.resRatio(result)
+                * (1 + sum(result.elevative_elevate))
 
             return damage
         },
@@ -391,7 +412,7 @@ export default {
                 + sum(result.base)
 
             heal = heal
-                * (1 + sum(result.heal_bonus))
+                * (1 + sum(result.healing_bonus))
                 * (1 + sum(result.incoming_healing_bonus))
                 * (1 + min(sum(result.critical_rate), 1.0) * sum(result.critical_damage))
 
@@ -430,9 +451,9 @@ export default {
                 } else if (this.damageType == "DamageVaporize") {
                     return this.calc_Damage(this.DamageVaporize)
                 } else if (this.damageType == "DamageSpread") {
-                    return this.calc_Damage(this.DamageSpread)
+                    return this.calc_SpreadAggravate(this.DamageSpread)
                 } else if (this.damageType == "DamageAggravate") {
-                    return this.calc_Damage(this.DamageAggravate)
+                    return this.calc_SpreadAggravate(this.DamageAggravate)
                 } else if (this.damageType == "TransformativeDamage") {
                     return this.calc_TransformativeDamage(this.TransformativeDamage)
                 } else if (this.damageType == "ElevativeDamage") {
