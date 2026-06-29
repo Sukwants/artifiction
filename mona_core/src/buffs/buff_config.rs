@@ -40,6 +40,10 @@ pub enum BuffConfig {
     SucroseTalent2 { em: f64 },
     SucroseTalent3 { is_hexerei: bool },
     SucroseC6 { element: Element, is_hexerei: bool },
+    QiqiP1 { in_polestar_field: bool },
+    QiqiP3 { in_polestar_field: bool },
+    QiqiC2 { in_polestar_field: bool },
+    QiqiC6 { qiqi_atk: f64 },
     MonaC1 { off_field: bool },
     MonaQ { c4: bool, skill3: usize, is_hexerei: bool },
     MonaTalent3 { hexerei_secret_rite: bool, stack: f64 },
@@ -125,9 +129,13 @@ pub enum BuffConfig {
     LinneaC1 { def: f64, has_c6: bool },
     NicoleE { level_e: usize, atk: f64 },
     NicoleGuidance { has_guidance: bool },
+    PruneP2 { atk: f64 },
     NicoleC2 { has_c2: bool, element: Element },
     NicoleC4 { atk: f64 },
     NicoleC6 { },
+    LohenP2 { has_buff: bool },
+    LohenC2 { has_buff: bool },
+    SandroneP3 { sandrone_atk: f64 },
 
     FreedomSworn { refine: usize },
     SongOfBrokenPines { refine: usize },
@@ -172,17 +180,6 @@ pub enum BuffConfig {
     NightOfTheSkysUnveiling4 { gleaming_moon_effect_count: usize },
     SilkenMoonsSerenade4 { moonsign: Moonsign, gleaming_moon_effect_count: usize },
     CelestialGift4 { hexerei_secret_rite: bool, equip_element: Element, active_element: Element },
-
-    LohenP2 { has_buff: bool },
-    LohenC2 { has_buff: bool },
-
-    QiqiP1 { in_polestar_field: bool },
-    QiqiP3 { in_polestar_field: bool },
-    QiqiC2 { in_polestar_field: bool },
-    QiqiC6 { qiqi_atk: f64 },
-
-    PruneP2 { atk: f64 },
-    PruneC6 { },
 
     NoConfig,
 }

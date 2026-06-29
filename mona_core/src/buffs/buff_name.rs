@@ -193,11 +193,11 @@ pub enum BuffName {
     LinneaC2,
     LinneaC4,
     LinneaC6,
-
-    LohenP2,
-    LohenC2,
     PruneP2,
     PruneC6,
+    LohenP2,
+    LohenC2,
+    SandroneP3,
 
     AloyTalent1,
 
