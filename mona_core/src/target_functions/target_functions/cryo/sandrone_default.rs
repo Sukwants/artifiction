@@ -124,39 +124,46 @@ impl TargetFunction for SandroneDefaultTargetFunction {
         type Ty = <Sandrone as CharacterTrait>::DamageEnumType;
 
         let constellation = character.common_data.constellation;
-        let ca_rounds = 3;
 
-        // 单轮重击伤害
-        let ca_round_dmg = {
-            let (sweep_count, beam_stacks): (usize, &[usize]) = if constellation >= 1 {
-                // 一命：4 组 (3 扫射 + 1 冷凝射线)，暴伤层数 1/2/3/3
-                (12, &[1usize, 2, 3, 3][..])
-            } else {
-                // 零命：3 组 (3 扫射 + 1 冷凝射线)，暴伤层数 1/2/3
-                (9, &[1usize, 2, 3][..])
-            };
-            let sweep_total = sweep_count as f64
-                * Sandrone::damage::<SimpleDamageBuilder>(&context_ca_sweep, Ty::ZS, &config_ca_sweep, None).normal.expectation;
-            let beam_total: f64 = beam_stacks.iter().map(|&stack| {
+        // 单组 (3 扫射 + 1 冷凝射线) 的伤害，暴伤层数由参数指定
+        let beam_stacks_to_dmg = |beam_stacks: &[usize]| -> f64 {
+            beam_stacks.iter().map(|&stack| {
                 let (ctx, config) = match stack {
                     1 => (&context_ca_beam_s1, &config_ca_beam_s1),
                     2 => (&context_ca_beam_s2, &config_ca_beam_s2),
                     _ => (&context_ca_beam_s3, &config_ca_beam_s3),
                 };
                 Sandrone::damage::<SimpleDamageBuilder>(ctx, Ty::ZB, config, None).normal.expectation
-            }).sum();
-            sweep_total + beam_total
+            }).sum::<f64>()
+        };
+
+        // n 组重击的总伤害：n×3 扫射 + n 冷凝射线（暴伤层数 1,2,3,3...）
+        let ca_round = |n_groups: usize| -> f64 {
+            let sweeps = n_groups * 3;
+            let sweep_total = sweeps as f64
+                * Sandrone::damage::<SimpleDamageBuilder>(&context_ca_sweep, Ty::ZS, &config_ca_sweep, None).normal.expectation;
+            let beam_stacks: Vec<usize> = (1..=n_groups).map(|i| i.min(3)).collect();
+            sweep_total + beam_stacks_to_dmg(&beam_stacks)
         };
 
         // 单次 E 伤害（棱晶弹第一发 + 第二发）
-        let e_dmg_total = Sandrone::damage::<SimpleDamageBuilder>(&context_e, Ty::E1, &config_e, None).normal.expectation
-            + Sandrone::damage::<SimpleDamageBuilder>(&context_e, Ty::E2, &config_e, None).normal.expectation;
+        let e_dmg = || -> f64 {
+            Sandrone::damage::<SimpleDamageBuilder>(&context_e, Ty::E1, &config_e, None).normal.expectation
+                + Sandrone::damage::<SimpleDamageBuilder>(&context_e, Ty::E2, &config_e, None).normal.expectation
+        };
 
         // Q 伤害
-        let q_dmg_total = Sandrone::damage::<SimpleDamageBuilder>(&context_q, Ty::Q_BOMB_TOTAL, &config_q, None).normal.expectation
-            + Sandrone::damage::<SimpleDamageBuilder>(&context_q, Ty::Q_RAY, &config_q, None).normal.expectation;
+        let q_dmg = || -> f64 {
+            Sandrone::damage::<SimpleDamageBuilder>(&context_q, Ty::Q_BOMB_TOTAL, &config_q, None).normal.expectation
+                + Sandrone::damage::<SimpleDamageBuilder>(&context_q, Ty::Q_RAY, &config_q, None).normal.expectation
+        };
 
-        // 总计：三轮 (重击 + E) + 一次 Q
-        (ca_round_dmg + e_dmg_total) * ca_rounds as f64 + q_dmg_total
+        if constellation >= 1 {
+            // 一命及以上：(CA×6 + E) + (CA×3 + E) + Q
+            ca_round(6) + e_dmg() + ca_round(3) + e_dmg() + q_dmg()
+        } else {
+            // 零命：三轮 (CA×3 + E) + Q
+            (ca_round(3) + e_dmg()) * 3.0 + q_dmg()
+        }
     }
 }
