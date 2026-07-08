@@ -84,5 +84,8 @@ pub enum WeaponBaseATKFamily {
 `mona_core/src/weapon/weapons/swords/lightbearing_moonshard.rs`
 `mona_core/src/weapon/weapons/claymores/gest_of_the_mighty_wolf.rs`
 `mona_core/src/weapon/weapons/bows/golden_frostbound_oath.rs`
+`mona_core/src/weapon/weapons/catalysts/angelos_heptades.rs`
+`mona_core/src/weapon/weapons/polearms/disaster_and_remorse.rs`
+`mona_core/src/weapon/weapons/claymores/a_teaspoon_of_transcendence.rs`
 
 如果你是 AI，请仔细阅读以上示例与文档，严格按照以上说明，并尽量贴合示例的形式进行编写。

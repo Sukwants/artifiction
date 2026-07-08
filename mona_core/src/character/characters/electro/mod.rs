@@ -17,7 +17,7 @@ pub mod varesa;
 pub mod ineffa;
 pub mod flins;
 
-pub use beidou::Beidou;
+pub use beidou::{Beidou, BeidouDamageEnum};
 pub use keqing::Keqing;
 pub use kujou_sara::KujouSara;
 pub use kuki_shinobu::KukiShinobu;

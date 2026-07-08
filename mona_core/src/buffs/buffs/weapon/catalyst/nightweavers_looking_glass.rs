@@ -1,11 +1,5 @@
-use crate::attribute::*;
-use crate::buffs::{Buff, BuffConfig};
-use crate::buffs::buff::BuffMeta;
-use crate::buffs::buff_meta::{BuffFrom, BuffGenre, BuffImage, BuffMetaData};
-use crate::buffs::buff_name::BuffName;
-use crate::common::item_config_type::ItemConfig;
+use crate::buffs::buffs::prelude::*;
 use crate::enemies::Enemy;
-use crate::weapon::WeaponName;
 
 pub struct BuffNightweaversLookingGlass {
     pub refine: usize,
@@ -18,7 +12,7 @@ impl<A: Attribute> Buff<A> for BuffNightweaversLookingGlass {
         attribute.set_value_by(AttributeName::EnhanceBloom, "纺夜天镜「千年的祷咏歌」", 0.9 + 0.3 * refine);
         attribute.set_value_by(AttributeName::EnhanceHyperbloom, "纺夜天镜「千年的祷咏歌」", 0.6 + 0.2 * refine);
         attribute.set_value_by(AttributeName::EnhanceBurgeon, "纺夜天镜「千年的祷咏歌」", 0.6 + 0.2 * refine);
-        attribute.set_value_by(AttributeName::EnhanceLunarBloom, "纺夜天镜「千年的祷咏歌」", 0.3 + 0.1 * refine);
+        attribute.set_value_by_t(AttributeType::Invisible(InvisibleAttributeType::new_reaction(AttributeVariableType::ReactionEnhance, ReactionType::LunarBloom)), "纺夜天镜「千年的祷咏歌」", 0.3 + 0.1 * refine);
     }
 }
 

@@ -101,7 +101,7 @@ impl<A: Attribute> ChangeAttribute<A> for NeferEffect {
         attribute.add_edge_s1to1(
             CharacterSelector::select_all(attribute),
             AttributeType::Panel(AttributeName::ElementalMastery),
-            AttributeType::Invisible(InvisibleAttributeType::new_reaction(AttributeVariableType::MoonglareBase, ReactionType::LunarBloom)),
+            AttributeType::Invisible(InvisibleAttributeType::new_reaction(AttributeVariableType::ElevativeBase, ReactionType::LunarBloom)),
             Arc::new(move |em: f64, _| (em * 0.000175).min(0.14) ),
             "奈芙尔天赋3",
             EdgePriority::Invisible,
@@ -109,7 +109,7 @@ impl<A: Attribute> ChangeAttribute<A> for NeferEffect {
 
         if self.has_c6 && self.moonsign.is_ascendant() {
             attribute.set_value_by_t(AttributeType::Invisible(InvisibleAttributeType::new(
-                AttributeVariableType::MoonglareElevate,
+                AttributeVariableType::ElevativeElevate,
                 None,
                 None,
                 Some(ReactionType::LunarBloom),
@@ -146,11 +146,11 @@ impl NeferDamageEnum {
         Element::Dendro
     }
 
-    pub fn get_lunar_type(&self) -> MoonglareReaction {
+    pub fn get_elevative_type(&self) -> Option<ElevativeReaction> {
         use NeferDamageEnum::*;
         match *self {
-            ES1 | ES2 | ES3 | C61 | C62 => MoonglareReaction::LunarBloom,
-            _ => MoonglareReaction::None,
+            ES1 | ES2 | ES3 | C61 | C62 => Some(ElevativeReaction::LunarBloom),
+            _ => None,
         }
     }
 
@@ -163,7 +163,7 @@ impl NeferDamageEnum {
             X2 | X3 => SkillType::PlungingAttackOnGround,
             E | E1 | E2 => SkillType::ElementalSkill,
             Q1 | Q2 => SkillType::ElementalBurst,
-            ES1 | ES2 | ES3 | C61 | C62 => SkillType::Moonglare,
+            ES1 | ES2 | ES3 | C61 | C62 => SkillType::Elevative,
         }
     }
 }
@@ -273,7 +273,7 @@ impl CharacterTrait for Nefer {
             }
         }
 
-        if s.get_skill_type() == SkillType::Moonglare {
+        if s.get_skill_type() == SkillType::Elevative {
             let ratio = (match s {
                 ES1 => NEFER_SKILL.e_dmgs1[s2],
                 ES2 => NEFER_SKILL.e_dmgs2[s2],
@@ -287,11 +287,11 @@ impl CharacterTrait for Nefer {
 
             builder.add_em_ratio("技能倍率", ratio);
 
-            builder.moonglare(
+            builder.elevative(
                 &context.attribute,
                 &context.enemy,
                 s.get_element(),
-                s.get_lunar_type(),
+                s.get_elevative_type().unwrap(),
                 s.get_skill_type(),
                 context.character_common_data.level,
                 fumo,

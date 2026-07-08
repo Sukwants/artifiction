@@ -1,6 +1,6 @@
 use std::{collections::HashMap, hash::Hash};
 use serde::{Serialize, Deserialize};
-use crate::common::{DamageResult, Element, MoonglareReaction, ReactionType, TransformativeType};
+use crate::common::{DamageResult, Element, ElevativeReaction, ReactionType, TransformativeType};
 use crate::damage::damage_result::DamageBuilderResult;
 
 #[derive(Debug, Serialize, Deserialize)]
@@ -49,9 +49,9 @@ pub struct TransformativeDamageAnalysis {
 }
 
 #[derive(Debug, Serialize, Deserialize)]
-pub struct MoonglareDamageAnalysis {
+pub struct ElevativeDamageAnalysis {
     pub element: Element,
-    pub lunar_type: MoonglareReaction,
+    pub elevative_type: ElevativeReaction,
     
     pub atk: HashMap<String, f64>,
     pub atk_ratio: HashMap<String, f64>,
@@ -69,8 +69,8 @@ pub struct MoonglareDamageAnalysis {
     pub critical_rate: HashMap<String, f64>,
     pub critical_damage: HashMap<String, f64>,
     pub res_minus: HashMap<String, f64>,
-    pub moonglare_base: HashMap<String, f64>,
-    pub moonglare_elevate: HashMap<String, f64>,
+    pub elevative_base: HashMap<String, f64>,
+    pub elevative_elevate: HashMap<String, f64>,
 
     pub result: DamageResult,
 }
@@ -142,7 +142,7 @@ pub struct DamageAnalysisWithPossibleReaction {
 pub enum EventAnalysis {
     Damage(DamageAnalysisWithPossibleReaction),
     TransformativeDamage(TransformativeDamageAnalysis),
-    MoonglareDamage(MoonglareDamageAnalysis),
+    ElevativeDamage(ElevativeDamageAnalysis),
     Heal(HealAnalysis),
     Shield(ShieldAnalysis),
     Number(NumberAnalysis),
@@ -154,7 +154,7 @@ impl DamageBuilderResult for EventAnalysis {
         match self {
             EventAnalysis::Damage(d) => d.normal.result,
             EventAnalysis::TransformativeDamage(d) => d.result,
-            EventAnalysis::MoonglareDamage(d) => d.result,
+            EventAnalysis::ElevativeDamage(d) => d.result,
             EventAnalysis::Heal(d) => d.result,
             EventAnalysis::Shield(d) => d.result,
             EventAnalysis::Number(d) => d.result,
@@ -181,7 +181,7 @@ pub struct TransformativeDamageAnalysisForAll {
 }
 
 #[derive(Debug, Serialize, Deserialize)]
-pub struct MoonglareDamageAnalysisForAll {
+pub struct ElevativeDamageAnalysisForAll {
     pub lunar_charged_reaction: EventAnalysis,
     pub lunar_crystallize_reaction: EventAnalysis,
 }

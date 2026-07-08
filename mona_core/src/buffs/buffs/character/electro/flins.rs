@@ -1,12 +1,4 @@
-use crate::attribute::*;
-use crate::buffs::{Buff, BuffConfig};
-use crate::buffs::buff::BuffMeta;
-use crate::buffs::buff_meta::{BuffFrom, BuffGenre, BuffImage, BuffMetaData};
-use crate::buffs::buff_name::BuffName;
-use crate::character::CharacterName;
-use crate::common::i18n::locale;
-use crate::common::item_config_type::{ItemConfig, ItemConfigType};
-use crate::common::{Moonsign, ReactionType};
+use crate::buffs::buffs::prelude::*;
 
 pub struct BuffFlinsP3 {
     pub atk: f64,
@@ -14,7 +6,7 @@ pub struct BuffFlinsP3 {
 
 impl<A: Attribute> Buff<A> for BuffFlinsP3 {
     fn change_attribute(&self, attribute: &mut A) {
-        attribute.set_value_by(AttributeName::IncreaseLunarCharged, "菲林斯「月兆祝赐·旧世潜藏」", (self.atk * 0.00007).min(0.14));
+        attribute.set_value_by_t(AttributeType::Invisible(InvisibleAttributeType::new_reaction(AttributeVariableType::ElevativeBase, ReactionType::LunarCharged)), "菲林斯「月兆祝赐·旧世潜藏」", (self.atk * 0.00007).min(0.14));
     }
 }
 
@@ -67,7 +59,7 @@ impl<A: Attribute> Buff<A> for BuffFlinsC6 {
 
         if self.moonsign.is_ascendant() {
             attribute.set_value_by_t(AttributeType::Invisible(InvisibleAttributeType::new(
-                AttributeVariableType::MoonglareElevate,
+                AttributeVariableType::ElevativeElevate,
                 None,
                 None,
                 Some(ReactionType::LunarCharged),

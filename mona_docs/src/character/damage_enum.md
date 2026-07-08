@@ -108,38 +108,39 @@ impl CharacterTrait for Durin {
 
 对于一个造成多次相同倍率伤害的技能，应拆分为单次伤害和总伤害两个技能。
 
+一般情况下，两个分开书写但不会同时出现、且紧密关联的技能（如一个技能伤害在某些情况下替换另一个技能伤害），应当使用同一个 DamageEnum，并根据角色配置、技能配置在 `damage_internal` 中进行判断，返回不同的伤害倍率。
+
 对于 `DamageEnum`，需要实现 `get_element` 和 `get_skill_type` 等接口。  
 `get_element` 接口返回技能的元素类型，如为护盾返回护盾元素类型，如为治疗一般返回 `Element::Physical`。
 `get_skill_type` 接口返回技能的技能类型，一般根据通过普通攻击、重击、下落攻击、元素战技、元素爆发触发的技能类型即为对应类型，与该技能描述所在部分无必然关系，如元素战技描述中存在通过普通攻击触发的技能，则该技能类型应为 `SkillType::NormalAttack`。非当前角色操作触发的技能，如协同攻击，一般根据初始触发的技能类型进行判断。若存在“视为元素战技伤害”等描述，应严格按照该描述进行判断。  
 若明确某个技能不存在元素类型或技能类型，也不应被查询元素类型或技能类型时，可以返回 `panic!()`，应用于如治疗量、纯数值等不存在明确元素类型、技能类型的情况。
 
-请注意，任何技能触发的月曜反应伤害（月感电、月绽放、月结晶）的技能类型都必须是 `SkillType::Moonglare`。
+请注意，任何技能触发的擢升反应伤害（月感电、月绽放、月结晶、星超导）的技能类型都必须是 `SkillType::Elevative`。
 
 特别的，如果该角色存在伤害元素类型与配置相关的情况（如染色伤害），则 `get_element` 接口的实现需要新增参数、进行判断并返回相应元素类型。
 
-特别的，如果该角色会触发月曜反应伤害，则需要额外实现 `get_lunar_type` 接口，示例如下：
+特别的，如果该角色会触发擢升反应伤害，则需要额外实现 `get_elevative_type` 接口，示例如下：
 
 ```rust
-pub fn get_lunar_type(&self) -> MoonglareReaction {
+pub fn get_elevative_type(&self) -> Option<ElevativeReaction> {
     use LaumaDamageEnum::*;
     match *self {
-        EHold2 | C6E | C6A => MoonglareReaction::LunarBloom,
-        _ => MoonglareReaction::None,
+        EHold2 | C6E | C6A => Some(ElevativeReaction::LunarBloom),
+        _ => None,
     }
 }
 ```
 
-其中，`MoonglareReaction` 定义位于 `mona_core/src/common/reaction_type.rs`，定义如下：
+其中，`ElevativeReaction` 定义位于 `mona_core/src/common/reaction_type.rs`，定义如下：
 
 ```rust
 mona::common::reaction_type
-pub enum MoonglareReaction {
+pub enum ElevativeReaction {
     LunarChargedReaction,       // 月感电
     LunarCharged,               // 广义月感电
     LunarBloom,
     LunarCrystallizeReaction,   // 月结晶
     LunarCrystallize,           // 广义月结晶
-    None,
 }
 ```
 

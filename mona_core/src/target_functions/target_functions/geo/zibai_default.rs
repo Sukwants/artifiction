@@ -105,7 +105,7 @@ impl TargetFunction for ZibaiDefaultTargetFunction {
             Zibai::damage::<SimpleDamageBuilder>(&context, Ty::Q1, &config, None).normal.expectation
             + Zibai::damage::<SimpleDamageBuilder>(&context, Ty::Q2, &config, None).normal.expectation;
 
-        let dmg_lunar_crystallize = Zibai::moonglare_damage::<SimpleDamageBuilder>(&context, MoonglareReaction::LunarCrystallizeReaction).normal.expectation;
+        let dmg_lunar_crystallize = Zibai::elevative_damage::<SimpleDamageBuilder>(&context, ElevativeReaction::LunarCrystallizeReaction).normal.expectation;
 
         dmg_ea * 4.0
         + dmg_e * if moonsign.is_ascendant() { 4.0 } else { 2.0 } + if character.common_data.constellation >= 1 { dmg_e1 } else { 0.0 }

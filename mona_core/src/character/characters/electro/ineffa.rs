@@ -111,7 +111,7 @@ impl<A: Attribute> ChangeAttribute<A> for IneffaEffect {
         attribute.add_edge_s1to1(
             CharacterSelector::select_all(attribute),
             AttributeType::Panel(AttributeName::ATK),
-            AttributeType::Invisible(InvisibleAttributeType::new_reaction(AttributeVariableType::MoonglareBase, ReactionType::LunarCharged)),
+            AttributeType::Invisible(InvisibleAttributeType::new_reaction(AttributeVariableType::ElevativeBase, ReactionType::LunarCharged)),
             Arc::new(move |atk, _| (atk * 0.00007).min(0.14)),
             "伊涅芙天赋3",
             EdgePriority::Invisible
@@ -160,12 +160,12 @@ impl IneffaDamageEnum {
         }
     }
 
-    pub fn get_lunar_type(&self) -> MoonglareReaction {
+    pub fn get_elevative_type(&self) -> Option<ElevativeReaction> {
         use IneffaDamageEnum::*;
         match *self {
-            LunarCharged => MoonglareReaction::LunarChargedReaction,
-            P1 | C2 | C6 => MoonglareReaction::LunarCharged,
-            _ => MoonglareReaction::None,
+            LunarCharged => Some(ElevativeReaction::LunarChargedReaction),
+            P1 | C2 | C6 => Some(ElevativeReaction::LunarCharged),
+            _ => None,
         }
     }
 
@@ -178,7 +178,7 @@ impl IneffaDamageEnum {
             X2 | X3 => SkillType::PlungingAttackOnGround,
             E | EContinued | EShield => SkillType::ElementalSkill,
             Q => SkillType::ElementalBurst,
-            P1 | C2 | C6 | LunarCharged => SkillType::Moonglare,
+            P1 | C2 | C6 | LunarCharged => SkillType::Elevative,
         }
     }
 }
@@ -264,11 +264,11 @@ impl CharacterTrait for Ineffa {
 
             builder.add_atk_ratio("技能倍率", ratio);
 
-            builder.moonglare(
+            builder.elevative(
                 &context.attribute,
                 &context.enemy,
                 s.get_element(),
-                s.get_lunar_type(),
+                s.get_elevative_type().unwrap(),
                 s.get_skill_type(),
                 context.character_common_data.level,
                 fumo,

@@ -1,19 +1,29 @@
-use crate::artifacts::artifact_trait::{ArtifactMetaData, ArtifactTrait};
-use crate::artifacts::ArtifactSetName;
-use crate::artifacts::effect_config::ArtifactEffectConfig;
-use super::super::effect::ArtifactEffect;
-use crate::attribute::*;
-use crate::character::character_common_data::CharacterCommonData;
+use crate::artifacts::effects::prelude::*;
 
-pub struct ViridescentVenererEffect;
+pub struct ViridescentVenererEffect {
+    element: ConfigElements8Multi,
+}
 
 impl<T: Attribute> ArtifactEffect<T> for ViridescentVenererEffect {
     fn effect2(&self, attribute: &mut T) {
-        attribute.set_value_by(AttributeName::BonusAnemo, "翠绿之影2", 0.15);
+        attribute.set_value_to(AttributeName::BonusAnemo, "翠绿之影2", 0.15);
     }
 
     fn effect4(&self, attribute: &mut T) {
-        attribute.set_value_by(AttributeName::EnhanceSwirlBase, "翠绿之影4", 0.6);
+        attribute.set_value_to(AttributeName::EnhanceSwirlBase, "翠绿之影4", 0.6);
+
+        if self.element.pyro {
+            attribute.set_value_to_s(CharacterSelector::select_all(attribute), AttributeType::Invisible(InvisibleAttributeType::new_element(AttributeVariableType::ResMinus, Element::Pyro)), "翠绿之影4", 0.4);
+        }
+        if self.element.hydro {
+            attribute.set_value_to_s(CharacterSelector::select_all(attribute), AttributeType::Invisible(InvisibleAttributeType::new_element(AttributeVariableType::ResMinus, Element::Hydro)), "翠绿之影4", 0.4);
+        }
+        if self.element.electro {
+            attribute.set_value_to_s(CharacterSelector::select_all(attribute), AttributeType::Invisible(InvisibleAttributeType::new_element(AttributeVariableType::ResMinus, Element::Electro)), "翠绿之影4", 0.4);
+        }
+        if self.element.cryo {
+            attribute.set_value_to_s(CharacterSelector::select_all(attribute), AttributeType::Invisible(InvisibleAttributeType::new_element(AttributeVariableType::ResMinus, Element::Cryo)), "翠绿之影4", 0.4);
+        }
     }
 }
 
@@ -21,7 +31,9 @@ pub struct ViridescentVenerer;
 
 impl ArtifactTrait for ViridescentVenerer {
     fn create_effect<A: Attribute>(_config: &ArtifactEffectConfig, _character_common_data: &CharacterCommonData) -> Box<dyn ArtifactEffect<A>> {
-        Box::new(ViridescentVenererEffect)
+        Box::new(ViridescentVenererEffect {
+            element: _config.config_viridescent_venerer.element,
+        })
     }
 
     #[cfg(not(target_family = "wasm"))]
@@ -66,4 +78,28 @@ impl ArtifactTrait for ViridescentVenerer {
         effect5: None,
         internal_id: 15002,
     };
+
+    #[cfg(not(target_family = "wasm"))]
+    const CONFIG4: Option<&'static [ItemConfig]> = Some(&[
+        ItemConfig {
+            name: "element",
+            title: crate::common::i18n::locale!(
+                zh_cn: "扩散元素",
+                en: "Swirl Element",
+            ),
+            config: ItemConfigType::ElementMulti {
+                elements: &[Element::Cryo, Element::Pyro, Element::Hydro, Element::Electro],
+                default: ConfigElements8Multi {
+                    pyro: false,
+                    hydro: false,
+                    anemo: false,
+                    electro: false,
+                    dendro: false,
+                    cryo: false,
+                    geo: false,
+                    physical: false,
+                }
+            }
+        }
+    ]);
 }

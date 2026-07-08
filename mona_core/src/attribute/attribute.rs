@@ -370,13 +370,19 @@ pub trait AttributeCommon<T: Attribute> {
 
     fn add_atk_percentage(&mut self, key: &str, value: f64);
 
+    fn add_atk_percentage_s(&mut self, character_selector: CharacterSelector, key: &str, value: f64);
+
     fn add_atk_percentage_base(&mut self, key: &str, value: f64);
 
     fn add_def_percentage(&mut self, key: &str, value: f64);
 
+    fn add_def_percentage_s(&mut self, character_selector: CharacterSelector, key: &str, value: f64);
+
     fn add_def_percentage_base(&mut self, key: &str, value: f64);
 
     fn add_hp_percentage(&mut self, key: &str, value: f64);
+
+    fn add_hp_percentage_s(&mut self, character_selector: CharacterSelector, key: &str, value: f64);
 
     fn add_hp_percentage_base(&mut self, key: &str, value: f64);
 
@@ -738,6 +744,17 @@ impl<T: Attribute> AttributeCommon<T> for T {
         );
     }
 
+    fn add_atk_percentage_s(&mut self, selector: CharacterSelector, key: &str, value: f64) {
+        self.add_edge_s1ton(
+            selector,
+            AttributeType::Panel(AttributeName::ATKBase),
+            AttributeType::Panel(AttributeName::ATKPercentage),
+            Arc::new(move |x, _| x * value),
+            key,
+            EdgePriority::Base,
+        );
+    }
+
     fn add_atk_percentage_base(&mut self, key: &str, value: f64) {
         self.add_edge_n1(
             AttributeName::ATKBase,
@@ -758,6 +775,17 @@ impl<T: Attribute> AttributeCommon<T> for T {
         );
     }
 
+    fn add_def_percentage_s(&mut self, character_selector: CharacterSelector, key: &str, value: f64) {
+        self.add_edge_s1ton(
+            character_selector,
+            AttributeType::Panel(AttributeName::DEFBase),
+            AttributeType::Panel(AttributeName::DEFPercentage),
+            Arc::new(move |x, _| x * value),
+            key,
+            EdgePriority::Base,
+        );
+    }
+
     fn add_def_percentage_base(&mut self, key: &str, value: f64) {
         self.add_edge_n1(
             AttributeName::DEFBase,
@@ -772,6 +800,17 @@ impl<T: Attribute> AttributeCommon<T> for T {
         self.add_edge_n1(
             AttributeName::HPBase,
             AttributeName::HPPercentage,
+            Arc::new(move |x, _| x * value),
+            key,
+            EdgePriority::Base,
+        );
+    }
+
+    fn add_hp_percentage_s(&mut self, character_selector: CharacterSelector, key: &str, value: f64) {
+        self.add_edge_s1ton(
+            character_selector,
+            AttributeType::Panel(AttributeName::HPBase),
+            AttributeType::Panel(AttributeName::HPPercentage),
             Arc::new(move |x, _| x * value),
             key,
             EdgePriority::Base,

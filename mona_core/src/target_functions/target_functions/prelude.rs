@@ -8,7 +8,7 @@ pub use crate::character::skill_config::CharacterSkillConfig;
 pub use crate::character::{Character, CharacterName};
 pub(crate) use crate::common::i18n::locale;
 pub use crate::common::item_config_type::{ItemConfig, ItemConfigType, GlobalLinkConfig};
-pub use crate::common::{Element, MoonglareReaction, Moonsign, SkillType, WeaponType, ReactionType, StatName};
+pub use crate::common::{Element, ElevativeReaction, Moonsign, SkillType, WeaponType, ReactionType, StatName};
 pub use crate::damage::{DamageContext, SimpleDamageBuilder};
 pub use crate::enemies::Enemy;
 pub use crate::target_functions::*;

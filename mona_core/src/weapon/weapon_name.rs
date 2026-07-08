@@ -118,6 +118,8 @@ pub enum WeaponName {
     Verdict,
     FangOfTheMountainKing,
     AThousandBlazingSuns,
+    GestOfTheMightyWolf,
+    ATeaspoonOfTranscendence,
 
     // polearm
     // 1 star
@@ -165,7 +167,6 @@ pub enum WeaponName {
     SymphonistOfScents,
     FracturedHalo,
     BloodsoakedRuins,
-    GestOfTheMightyWolf,
     DisasterAndRemorse,
 
     // catalyst

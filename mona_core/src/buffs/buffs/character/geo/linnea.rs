@@ -104,7 +104,7 @@ impl<A: Attribute> Buff<A> for BuffLinneaP3 {
     fn change_attribute(&self, attribute: &mut A) {
         attribute.set_value_by_t(
             AttributeType::Invisible(InvisibleAttributeType::new_reaction(
-                AttributeVariableType::MoonglareBase, ReactionType::LunarCrystallize
+                AttributeVariableType::ElevativeBase, ReactionType::LunarCrystallize
             )),
             "莉奈娅天赋3",
             (self.def / 100.0 * 0.007).min(0.14),
@@ -306,7 +306,7 @@ impl<A: Attribute> Buff<A> for BuffLinneaC6 {
     fn change_attribute(&self, attribute: &mut A) {
         attribute.set_value_by_t(
             AttributeType::Invisible(InvisibleAttributeType::new_reaction(
-                AttributeVariableType::MoonglareElevate,ReactionType::LunarCrystallize
+                AttributeVariableType::ElevativeElevate,ReactionType::LunarCrystallize
             )),
             "莉奈娅命座6",
             0.25

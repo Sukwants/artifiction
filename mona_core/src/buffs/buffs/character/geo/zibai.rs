@@ -8,7 +8,10 @@ impl<A: Attribute> Buff<A> for BuffZibaiP3 {
     fn change_attribute(&self, attribute: &mut A) {
         attribute.set_value_by_s(
             CharacterSelector::select_all(attribute),
-            AttributeType::Invisible(InvisibleAttributeType::new_any(AttributeVariableType::MoonglareBase)),
+            AttributeType::Invisible(InvisibleAttributeType::new_reaction(
+                AttributeVariableType::ElevativeBase,
+                ReactionType::LunarCrystallize,
+            )),
             "兹白天赋3",
             (self.def / 100.0 * 0.007).min(0.14),
         );

@@ -1,4 +1,5 @@
 use serde::{Serialize, Deserialize};
+use crate::attribute::*;
 use crate::common::Element;
 use crate::damage::level_coefficient::{LEVEL_MULTIPLIER, CRYSTALLIZE_BASE};
 
@@ -60,34 +61,56 @@ impl TransformativeType {
 }
 
 #[derive(Debug, Serialize, Deserialize, Hash, Eq, PartialEq, Copy, Clone)]
-pub enum MoonglareReaction {
+pub enum ElevativeReaction {
     LunarChargedReaction,       // 月感电
     LunarCharged,               // 广义月感电
     LunarBloom,
     LunarCrystallizeReaction,   // 月结晶
     LunarCrystallize,           // 广义月结晶
-    None,
+    StellarConductCryo,         // 视为星超导反应伤害的冰元素伤害
+    StellarConductElectro,      // 视为星超导反应伤害的雷元素伤害
 }
 
-impl MoonglareReaction {
+impl ElevativeReaction {
     pub fn get_element(&self) -> Option<Element> {
         match *self {
-            MoonglareReaction::LunarChargedReaction | MoonglareReaction::LunarCharged => Some(Element::Electro),
-            MoonglareReaction::LunarBloom => Some(Element::Dendro),
-            MoonglareReaction::LunarCrystallizeReaction | MoonglareReaction::LunarCrystallize => Some(Element::Geo),
+            ElevativeReaction::LunarChargedReaction | ElevativeReaction::LunarCharged => Some(Element::Electro),
+            ElevativeReaction::LunarBloom => Some(Element::Dendro),
+            ElevativeReaction::LunarCrystallizeReaction | ElevativeReaction::LunarCrystallize => Some(Element::Geo),
             _ => None
+        }
+    }
+
+    pub fn get_reaction_base(&self, character_level: usize) -> f64 {
+        match *self {
+            ElevativeReaction::LunarChargedReaction | ElevativeReaction::LunarCrystallizeReaction => LEVEL_MULTIPLIER[character_level - 1],
+            _ => 0.0,
         }
     }
 
     pub fn get_reaction_coefficient(&self) -> f64 {
         match *self {
-            MoonglareReaction::LunarChargedReaction => 1.8,
-            MoonglareReaction::LunarCharged => 3.0,
-            MoonglareReaction::LunarBloom => 1.0,
-            MoonglareReaction::LunarCrystallizeReaction => 0.96,
-            MoonglareReaction::LunarCrystallize => 1.6,
-            _ => panic!()
+            ElevativeReaction::LunarChargedReaction => 1.8,
+            ElevativeReaction::LunarCharged => 3.0,
+            ElevativeReaction::LunarBloom => 1.0,
+            ElevativeReaction::LunarCrystallizeReaction => 0.96,
+            ElevativeReaction::LunarCrystallize => 1.6,
+            ElevativeReaction::StellarConductCryo => 1.0,
+            ElevativeReaction::StellarConductElectro => 1.0,
         }
+    }
+
+    pub const STELLAR_CONDUCT_EXTRA_COEFFICIENT: [f64; 13] = [0.0, 0.45, 0.5, 0.54, 0.6, 0.64, 0.71, 0.75, 0.79, 0.85, 0.89, 0.95, 1.0];
+    pub fn apply_stellar_conduct_extra_coefficient<A: Attribute>(attribute: &mut A, application_count: usize) {
+        let coefficient = ElevativeReaction::STELLAR_CONDUCT_EXTRA_COEFFICIENT[application_count];
+        attribute.set_value_to_t(
+            AttributeType::Invisible(InvisibleAttributeType::new_reaction(
+                AttributeVariableType::ElevativeCoefficient,
+                ReactionType::StellarConduct,
+            )),
+            "星超导附着次数",
+            coefficient,
+        );
     }
 }
 
@@ -113,9 +136,18 @@ pub enum ReactionType {
     LunarCharged,
     LunarBloom,
     LunarCrystallize,
+    StellarConduct,
 }
 
 impl ReactionType {
+    pub fn get_lunar_reaction_list() -> Vec<ReactionType> {
+        vec![
+            ReactionType::LunarCharged,
+            ReactionType::LunarBloom,
+            ReactionType::LunarCrystallize,
+        ]
+    }
+    
     pub fn get_reaction_from_transformative_type(transformative_type: TransformativeType) -> ReactionType {
         match transformative_type {
             TransformativeType::SwirlCryo => ReactionType::CryoSwirl,
@@ -133,12 +165,12 @@ impl ReactionType {
             TransformativeType::Crystallize => ReactionType::Crystallize,
         }
     }
-    pub fn get_reaction_from_lunar_type(lunar_type: MoonglareReaction) -> Option<ReactionType> {
-        match lunar_type {
-            MoonglareReaction::LunarChargedReaction | MoonglareReaction::LunarCharged => Some(ReactionType::LunarCharged),
-            MoonglareReaction::LunarBloom => Some(ReactionType::LunarBloom),
-            MoonglareReaction::LunarCrystallizeReaction | MoonglareReaction::LunarCrystallize => Some(ReactionType::LunarCrystallize),
-            MoonglareReaction::None => None,
+    pub fn get_reaction_from_elevative_type(elevative_type: ElevativeReaction) -> ReactionType {
+        match elevative_type {
+            ElevativeReaction::LunarChargedReaction | ElevativeReaction::LunarCharged => ReactionType::LunarCharged,
+            ElevativeReaction::LunarBloom => ReactionType::LunarBloom,
+            ElevativeReaction::LunarCrystallizeReaction | ElevativeReaction::LunarCrystallize => ReactionType::LunarCrystallize,
+            ElevativeReaction::StellarConductCryo | ElevativeReaction::StellarConductElectro => ReactionType::StellarConduct,
         }
     }
 }

@@ -31,6 +31,8 @@ pub trait AttributeResult: GetCharacterMethod {
 
     fn get_result(&self, name: AttributeName) -> Self::ResultType;
 
+    fn get_value_t(&self, ty: AttributeType) -> f64;
+
     fn get_result_t(&self, ty: AttributeType) -> Self::ResultType;
 
     fn get_result_merge(&self, names: &[AttributeName]) -> Self::ResultType;
@@ -188,6 +190,11 @@ impl<ResultTy: AttributeGraphResult> AttributeResult for AttributeResultWithChar
     fn get_result(&self, name: AttributeName) -> Self::ResultType {
         self.result
             .get_attribute(AttributeNode::new_panel(self.character_id, name))
+    }
+
+    fn get_value_t(&self, ty: AttributeType) -> f64 {
+        self.result
+            .get_attribute_value(AttributeNode::new(self.character_id, ty))
     }
 
     fn get_result_t(&self, ty: AttributeType) -> Self::ResultType {

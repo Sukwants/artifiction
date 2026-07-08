@@ -4,6 +4,7 @@ use crate::attribute::*;
 use crate::character::{Character, CharacterName};
 use crate::character::character_common_data::CharacterCommonData;
 use crate::character::characters::Beidou;
+use crate::character::characters::BeidouDamageEnum;
 use crate::character::prelude::CharacterTrait;
 use crate::character::skill_config::CharacterSkillConfig;
 use crate::common::item_config_type::ItemConfig;
@@ -100,8 +101,7 @@ impl TargetFunction for BeidouDefaultTargetFunction {
             enemy
         };
 
-        type S = <Beidou as CharacterTrait>::DamageEnumType;
-        let damage_e = Beidou::damage::<SimpleDamageBuilder>(&context, S::E3, &CharacterSkillConfig::NoConfig, None);
+        let damage_e = Beidou::damage::<SimpleDamageBuilder>(&context, BeidouDamageEnum::E3, &CharacterSkillConfig::Beidou { under_q: true, perfect_counter: true }, None);
 
         const Z: f64 = 0.8;
         const T: f64 = 1.6;

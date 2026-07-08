@@ -43,7 +43,7 @@ pub enum TargetFunctionConfig {
     XianglingDefault { recharge_demand: f64, melt_rate: f64, vaporize_rate: f64, overload_rate: f64 },
     XingqiuDefault { recharge_demand: f64 },
     XinyanDefault { recharge_demand: f64, damage_demand: f64 },
-    YaeMikoDefault { recharge_requirement: f64, combo: usize, aggravate_rate: f64, hyperbloom_rate: f64 },
+    YaeMikoDefault { recharge_requirement: f64, combo: usize, aggravate_rate: f64, hyperbloom_rate: f64, p3_trigger_rate: f64 },
     YelanDefault { recharge_demand: f64, vaporize_rate: f64 },
     YoimiyaDefault { vaporize_rate: f64, melt_rate: f64 },
     YunjinDefault { recharge_demand: f64 },
@@ -62,6 +62,7 @@ pub enum TargetFunctionConfig {
     DehyaDefault { melt_rate: f64, vaporize_rate: f64, e_count: usize },
     MikaDefault { recharge_demand: f64, crit_demand: f64 },
     WriothesleyDefault { punch_ratio: f64, melt_rate:f64 },
+    WriothesleyStellarConduct {},
     MualaniDefault { vaporize_rate: f64 },
     IneffaDefault { lunar_charged_coefficient: f64 },
     LaumaDefault { bloom_count: usize, hyperbloom_count: usize, burgeon_count: usize },
@@ -74,5 +75,6 @@ pub enum TargetFunctionConfig {
     NicoleDefault { recharge_demand: f64 },
     PruneDefault { recharge_demand: f64 },
     LohenDefault {},
+    SandroneDefault {},
     NoConfig,
 }

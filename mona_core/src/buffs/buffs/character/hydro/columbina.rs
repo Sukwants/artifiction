@@ -71,15 +71,17 @@ pub struct BuffColumbinaP3 {
 
 impl<A: Attribute> Buff<A> for BuffColumbinaP3 {
     fn change_attribute(&self, attribute: &mut A) {
-        attribute.set_value_by_s(
-            CharacterSelector::select_all(attribute),
-            AttributeType::Invisible(InvisibleAttributeType::new(
-                    AttributeVariableType::MoonglareBase,
-                    None, None, None
-                )),
-            "哥伦比娅天赋3",
-            (self.hp / 1000.0 * 0.002).min(0.07)
-        );
+        for reaction in ReactionType::get_lunar_reaction_list() {
+            attribute.set_value_by_s(
+                CharacterSelector::select_all(attribute),
+                AttributeType::Invisible(InvisibleAttributeType::new_reaction(
+                        AttributeVariableType::ElevativeBase,
+                        reaction,
+                    )),
+                "哥伦比娅天赋3",
+                (self.hp / 1000.0 * 0.002).min(0.07)
+            );
+        }
     }
 }
 
@@ -324,15 +326,17 @@ impl<A: Attribute> Buff<A> for BuffColumbinaC {
         if self.constellation >= 5 { val += 0.015; }
         if self.constellation >= 6 { val += 0.07; }
 
-        attribute.set_value_by_s(
-            CharacterSelector::select_all(attribute),
-            AttributeType::Invisible(InvisibleAttributeType::new(
-                AttributeVariableType::MoonglareElevate,
-                None, None, None
-            )),
-            "哥伦比娅命座",
-            val
-        );
+        for reaction in ReactionType::get_lunar_reaction_list() {
+            attribute.set_value_by_s(
+                CharacterSelector::select_all(attribute),
+                AttributeType::Invisible(InvisibleAttributeType::new_reaction(
+                    AttributeVariableType::ElevativeElevate,
+                    reaction,
+                )),
+                "哥伦比娅命座",
+                val
+            );
+        }
     }
 }
 

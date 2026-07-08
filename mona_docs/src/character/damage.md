@@ -75,13 +75,14 @@ impl CharacterTrait for Durin {
 首先需要处理角色配置与角色技能配置，然后将与具体技能相关的配置（如“灵驹飞踏第二段攻击造成的伤害提升”）应用进 `builder`，再根据具体技能获得技能倍率，最后调用 `builder` 中的方法完成计算。
 
 - 对于普通伤害，需要调用 `builder.damage` 方法。
-- 对于月曜反应伤害，需要调用 `builder.moonglare` 方法。
+- 对于擢升反应伤害（包含月曜反应伤害、星超导反应伤害），需要调用 `builder.elevative` 方法。
 - 对于治疗量，需要调用 `builder.heal` 方法。
 - 对于护盾量，需要调用 `builder.shield` 方法。
 - 对于纯数值（如“基础伤害提升数值”），需要调用 `builder.number` 方法。
 - 对于当前配置下不会触发的伤害、治疗或护盾，调用 `builder.none` 方法。
 
 原则上角色伤害计算部分不应出现 `builder.transformative` 方法。
+
 ### 条件伤害处理
 
 某些伤害仅在特定条件下才能触发（如需要元素转化存在、需要解锁特定天赋或命座），应在计算倍率之前检查条件，不满足时返回 `builder.none()`：

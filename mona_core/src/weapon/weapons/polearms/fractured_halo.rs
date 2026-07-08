@@ -1,15 +1,4 @@
-use crate::attribute::*;
-use crate::character::character_common_data::CharacterCommonData;
-use crate::common::i18n::locale;
-use crate::common::item_config_type::{ItemConfig, ItemConfigType};
-use crate::common::WeaponType;
-use crate::weapon::weapon_base_atk::WeaponBaseATKFamily;
-use crate::weapon::weapon_common_data::WeaponCommonData;
-use crate::weapon::weapon_effect::WeaponEffect;
-use crate::weapon::weapon_static_data::WeaponStaticData;
-use crate::weapon::weapon_sub_stat::WeaponSubStatFamily;
-use crate::weapon::{WeaponConfig, WeaponName};
-use crate::weapon::weapon_trait::WeaponTrait;
+use crate::weapon::weapons::prelude::*;
 
 pub struct FracturedHaloEffect {
     electrifying_edict: bool
@@ -33,7 +22,15 @@ impl<T: Attribute> WeaponEffect<T> for FracturedHaloEffect {
         let refine = data.refine as f64;
         attribute.add_atk_percentage("支离轮光被动", refine * 0.06 + 0.18);
         if self.electrifying_edict {
-            attribute.set_value_by(AttributeName::EnhanceLunarCharged, "支离轮光被动", refine * 0.1 + 0.3);
+            attribute.set_value_by_s(
+                CharacterSelector::select_all(attribute),
+                AttributeType::Invisible(InvisibleAttributeType::new_reaction(
+                    AttributeVariableType::ReactionEnhance,
+                    ReactionType::LunarCharged,
+                )),
+                "支离轮光被动",
+                refine * 0.1 + 0.3,
+            );
         }
     }
 }

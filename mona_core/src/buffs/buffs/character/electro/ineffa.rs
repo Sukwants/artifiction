@@ -1,11 +1,4 @@
-use crate::attribute::*;
-use crate::buffs::{Buff, BuffConfig};
-use crate::buffs::buff::BuffMeta;
-use crate::buffs::buff_meta::{BuffFrom, BuffGenre, BuffImage, BuffMetaData};
-use crate::buffs::buff_name::BuffName;
-use crate::character::CharacterName;
-use crate::common::i18n::locale;
-use crate::common::item_config_type::{ItemConfig, ItemConfigType};
+use crate::buffs::buffs::prelude::*;
 
 pub struct BuffIneffa {
     pub atk: f64,
@@ -20,10 +13,10 @@ impl<A: Attribute> Buff<A> for BuffIneffa {
             attribute.set_value_by(AttributeName::ElementalMastery, "伊涅芙「全相重构协议」", self.atk * 0.06);
         }
 
-        attribute.set_value_by(AttributeName::IncreaseLunarCharged, "伊涅芙「月兆祝赐·象拟中继」", (self.atk * 0.00007).min(0.14));
+        attribute.set_value_by_t(AttributeType::Invisible(InvisibleAttributeType::new_reaction(AttributeVariableType::ElevativeBase, ReactionType::LunarCharged)), "伊涅芙「月兆祝赐·象拟中继」", (self.atk * 0.00007).min(0.14));
 
         if self.has_c1 {
-            attribute.set_value_by(AttributeName::EnhanceLunarCharged, "伊涅芙「载流复合」", (self.atk * 0.00025).min(0.5));
+            attribute.set_value_by_t(AttributeType::Invisible(InvisibleAttributeType::new_reaction(AttributeVariableType::ReactionEnhance, ReactionType::LunarCharged)), "伊涅芙「载流复合」", (self.atk * 0.00025).min(0.5));
         }
     }
 }

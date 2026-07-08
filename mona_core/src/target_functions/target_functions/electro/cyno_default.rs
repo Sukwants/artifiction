@@ -158,56 +158,58 @@ impl TargetFunctionMetaTrait for CynoDefaultTargetFunction {
 
 impl TargetFunction for CynoDefaultTargetFunction {
     fn get_target_function_opt_config(&self) -> TargetFunctionOptConfig {
-        unimplemented!()
+        // unimplemented!()
         // let normal_rate = (1.0 - self.aggravate_rate).max(0.0);
         // let em_weight = if normal_rate > 0.8 { 0.0 } else { 1.0 };
-        // TargetFunctionOptConfig {
-        //     atk_fixed: 0.1,
-        //     atk_percentage: 1.0,
-        //     hp_fixed: 0.0,
-        //     hp_percentage: 0.0,
-        //     def_fixed: 0.0,
-        //     def_percentage: 0.0,
-        //     recharge: 0.0,
-        //     elemental_mastery: em_weight,
-        //     critical: 1.0,
-        //     critical_damage: 1.0,
-        //     healing_bonus: 0.0,
-        //     bonus_electro: 0.0,
-        //     bonus_pyro: 2.0,
-        //     bonus_hydro: 0.0,
-        //     bonus_anemo: 0.0,
-        //     bonus_cryo: 0.0,
-        //     bonus_geo: 0.0,
-        //     bonus_dendro: 0.0,
-        //     bonus_physical: 0.0,
-        //     sand_main_stats: vec![
-        //         StatName::ATKPercentage,
-        //         StatName::ElementalMastery,
-        //     ],
-        //     goblet_main_stats: vec![
-        //         StatName::ElectroBonus,
-        //         StatName::ATKPercentage,
-        //         StatName::ElementalMastery,
-        //     ],
-        //     head_main_stats: vec![
-        //         StatName::CriticalRate,
-        //         StatName::CriticalDamage,
-        //         StatName::ATKPercentage,
-        //     ],
-        //     set_names: Some(vec![
-        //         ArtifactSetName::GildedDreams,
-        //         ArtifactSetName::ThunderingFury,
-        //         ArtifactSetName::GladiatorsFinale,
-        //         ArtifactSetName::Thundersoother,
-        //         ArtifactSetName::ShimenawasReminiscence,
-        //         ArtifactSetName::EchoesOfAnOffering,
-        //     ]),
-        //     very_critical_set_names: None,
-        //     normal_threshold: TargetFunctionOptConfig::DEFAULT_NORMAL_THRESHOLD,
-        //     critical_threshold: TargetFunctionOptConfig::DEFAULT_CRITICAL_THRESHOLD,
-        //     very_critical_threshold: TargetFunctionOptConfig::DEFAULT_VERY_CRITICAL_THRESHOLD
-        // }
+        TargetFunctionOptConfig {
+            atk_fixed: 0.2,
+            atk_percentage: 0.8,
+            hp_fixed: 0.0,
+            hp_percentage: 0.0,
+            def_fixed: 0.0,
+            def_percentage: 0.0,
+            recharge: 0.0,
+            elemental_mastery: 1.0,
+            critical: 1.0,
+            critical_damage: 1.0,
+            healing_bonus: 0.0,
+            bonus_electro: 1.0,
+            bonus_pyro: 0.0,
+            bonus_hydro: 0.0,
+            bonus_anemo: 0.0,
+            bonus_cryo: 0.0,
+            bonus_geo: 0.0,
+            bonus_dendro: 0.0,
+            bonus_physical: 0.0,
+            sand_main_stats: vec![
+                StatName::ATKPercentage,
+                StatName::ElementalMastery,
+            ],
+            goblet_main_stats: vec![
+                StatName::ElectroBonus,
+                StatName::ATKPercentage,
+                StatName::ElementalMastery,
+            ],
+            head_main_stats: vec![
+                StatName::CriticalRate,
+                StatName::CriticalDamage,
+                StatName::ATKPercentage,
+            ],
+            set_names: Some(vec![
+                ArtifactSetName::ThunderingFury,
+                ArtifactSetName::GladiatorsFinale,
+                ArtifactSetName::Thundersoother,
+                ArtifactSetName::ShimenawasReminiscence,
+                ArtifactSetName::EchoesOfAnOffering,
+            ]),
+            very_critical_set_names: Some(vec![
+                ArtifactSetName::GildedDreams,
+                ArtifactSetName::DisenchantmentInDeepShadow,
+            ]),
+            normal_threshold: TargetFunctionOptConfig::DEFAULT_NORMAL_THRESHOLD,
+            critical_threshold: TargetFunctionOptConfig::DEFAULT_CRITICAL_THRESHOLD,
+            very_critical_threshold: TargetFunctionOptConfig::DEFAULT_VERY_CRITICAL_THRESHOLD
+        }
     }
 
     fn get_default_artifact_config(&self, _team_config: &TeamQuantization) -> ArtifactEffectConfig {
@@ -228,11 +230,12 @@ impl TargetFunction for CynoDefaultTargetFunction {
         };
         type S = <Cyno as CharacterTrait>::DamageEnumType;
         let config = CharacterSkillConfig::Cyno { under_judication: true };
-        let dmg_normal1: SimpleDamageResult = Cyno::damage::<SimpleDamageBuilder>(&context, S::QNormal1, &config, None);
-        let dmg_normal2 = Cyno::damage::<SimpleDamageBuilder>(&context, S::QNormal2, &config, None);
-        let dmg_normal3 = Cyno::damage::<SimpleDamageBuilder>(&context, S::QNormal3, &config, None);
-        let dmg_normal4 = Cyno::damage::<SimpleDamageBuilder>(&context, S::QNormal4, &config, None);
-        let dmg_normal5 = Cyno::damage::<SimpleDamageBuilder>(&context, S::QNormal5, &config, None);
+        let dmg_normal1: SimpleDamageResult = Cyno::damage::<SimpleDamageBuilder>(&context, S::Q1, &config, None);
+        let dmg_normal2 = Cyno::damage::<SimpleDamageBuilder>(&context, S::Q2, &config, None);
+        let dmg_normal3 = Cyno::damage::<SimpleDamageBuilder>(&context, S::Q3, &config, None);
+        let dmg_normal41 = Cyno::damage::<SimpleDamageBuilder>(&context, S::Q41, &config, None);
+        let dmg_normal42 = Cyno::damage::<SimpleDamageBuilder>(&context, S::Q42, &config, None);
+        let dmg_normal5 = Cyno::damage::<SimpleDamageBuilder>(&context, S::Q5, &config, None);
         let dmg_e2 = Cyno::damage::<SimpleDamageBuilder>(&context, S::E2, &config, None);
         let dmg_e3 = Cyno::damage::<SimpleDamageBuilder>(&context, S::E3, &config, None);
         let config_tf = CharacterSkillConfig::Cyno { under_judication: false };
@@ -259,16 +262,16 @@ impl TargetFunction for CynoDefaultTargetFunction {
         let normal1_normal = dmg_normal1.normal.expectation;
         let normal2_normal = dmg_normal2.normal.expectation;
         let normal3_normal = dmg_normal3.normal.expectation;
-        let normal4_normal = dmg_normal4.normal.expectation;
+        let normal4_normal = dmg_normal41.normal.expectation + dmg_normal42.normal.expectation;
         let normal5_normal = dmg_normal5.normal.expectation;
         let e2_normal = dmg_e2.normal.expectation;
         let e3_normal = dmg_e3.normal.expectation;
         let e2_noqte_normal = dmg_e2_noqte.normal.expectation;
 
-        let normal1_agg = dmg_normal1.aggravate.unwrap().expectation;
-        let e2_agg = dmg_e2.aggravate.unwrap().expectation;
-        let e2_noqte_agg = dmg_e2_noqte.aggravate.unwrap().expectation;
-        let e3_agg = dmg_e3.aggravate.unwrap().expectation;
+        let normal1_agg = dmg_normal1.aggravate.unwrap_or(dmg_normal1.normal).expectation;
+        let e2_agg = dmg_e2.aggravate.unwrap_or(dmg_e2.normal).expectation;
+        let e2_noqte_agg = dmg_e2_noqte.aggravate.unwrap_or(dmg_e2_noqte.normal).expectation;
+        let e3_agg = dmg_e3.aggravate.unwrap_or(dmg_e3.normal).expectation;
 
         let agg_bonus_normal = normal1_agg - normal1_normal;
         let agg_bonus_e2 = e2_agg - e2_normal;

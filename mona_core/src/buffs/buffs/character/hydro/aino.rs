@@ -1,12 +1,4 @@
-use crate::attribute::*;
-use crate::buffs::{Buff, BuffConfig};
-use crate::buffs::buff::BuffMeta;
-use crate::buffs::buff_meta::{BuffFrom, BuffGenre, BuffImage, BuffMetaData};
-use crate::buffs::buff_name::BuffName;
-use crate::character::CharacterName;
-use crate::common::i18n::locale;
-use crate::common::item_config_type::{ItemConfig, ItemConfigType};
-use crate::common::Moonsign;
+use crate::buffs::buffs::prelude::*;
 
 pub struct BuffAinoC1 {
 }
@@ -57,8 +49,8 @@ impl<A: Attribute> Buff<A> for BuffAinoC6 {
 
         attribute.set_value_by(AttributeName::EnhanceElectroCharged, "爱诺「天才之为构造之责任」", val);
         attribute.set_value_by(AttributeName::EnhanceBloom, "爱诺「天才之为构造之责任」", val);
-        attribute.set_value_by(AttributeName::EnhanceLunarCharged, "爱诺「天才之为构造之责任」", val);
-        attribute.set_value_by(AttributeName::EnhanceLunarBloom, "爱诺「天才之为构造之责任」", val);
+        attribute.set_value_by_t(AttributeType::Invisible(InvisibleAttributeType::new_reaction(AttributeVariableType::ReactionEnhance, ReactionType::LunarCharged)), "爱诺「天才之为构造之责任」", val);
+        attribute.set_value_by_t(AttributeType::Invisible(InvisibleAttributeType::new_reaction(AttributeVariableType::ReactionEnhance, ReactionType::LunarBloom)), "爱诺「天才之为构造之责任」", val);
     }
 }
 

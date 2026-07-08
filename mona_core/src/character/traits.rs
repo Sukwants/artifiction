@@ -5,7 +5,7 @@ use crate::character::character_common_data::CharacterCommonData;
 use crate::character::team_status::CharacterTag;
 use crate::character::{CharacterConfig, CharacterStaticData};
 use crate::character::skill_config::CharacterSkillConfig;
-use crate::common::{ChangeAttribute, MoonglareReaction, TransformativeType, SkillType};
+use crate::common::{ChangeAttribute, ElevativeReaction, TransformativeType, SkillType};
 use crate::common::item_config_type::ItemConfig;
 use crate::damage::damage_builder::DamageBuilder;
 use crate::damage::DamageContext;
@@ -61,14 +61,14 @@ pub trait CharacterTrait {
         builder.transformative(context.attribute, context.enemy, transformative_type, context.character_common_data.level)
     }
 
-    fn moonglare_damage<D: DamageBuilder>(context: &DamageContext<'_, D::AttributeType>, lunar_type: MoonglareReaction) -> D::Result {
+    fn elevative_damage<D: DamageBuilder>(context: &DamageContext<'_, D::AttributeType>, elevative_type: ElevativeReaction) -> D::Result {
         let builder = D::new();
-        builder.moonglare(
+        builder.elevative(
             context.attribute,
             context.enemy,
-            lunar_type.get_element().unwrap(),
-            lunar_type,
-            SkillType::Moonglare,
+            elevative_type.get_element().unwrap(),
+            elevative_type,
+            SkillType::Elevative,
             context.character_common_data.level,
             None,
         )

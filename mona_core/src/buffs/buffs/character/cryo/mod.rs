@@ -1,7 +1,7 @@
 pub use aloy::BuffAloyTalent1;
 pub use chongyun::BuffChongyunTalent2;
 pub use citlali::{BuffCitlaliC1, BuffCitlaliC2, BuffCitlaliC6, BuffCitlaliTalent1};
-pub use diona::BuffDionaC6G50;
+pub use diona::BuffDionaC6;
 pub use escoffier::{BuffEscoffierC1, BuffEscoffierC2, BuffEscoffierTalent2};
 pub use eula::BuffEulaE;
 pub use ganyu::{BuffGanyuC1, BuffGanyuTalent2};
@@ -10,6 +10,9 @@ pub use mika::BuffMika;
 pub use rosaria::{BuffRosariaC6, BuffRosariaTalent2};
 pub use shenhe::{BuffShenheE, BuffShenheQ, BuffShenheTalent1, BuffShenheTalent2};
 pub use layla::BuffLaylaC4;
+pub use lohen::{BuffLohenP2, BuffLohenC2};
+pub use sandrone::BuffSandroneP3;
+pub use qiqi::{BuffQiqiP1, BuffQiqiP3, BuffQiqiC6};
 
 pub mod aloy;
 pub mod chongyun;
@@ -22,7 +25,7 @@ pub mod kamisato_ayaka;
 pub mod mika;
 pub mod rosaria;
 pub mod shenhe;
-pub use lohen::{BuffLohenP2, BuffLohenC2};
-
 pub mod layla;
 pub mod lohen;
+pub mod sandrone;
+pub mod qiqi;

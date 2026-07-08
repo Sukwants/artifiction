@@ -1,15 +1,4 @@
-use crate::attribute::*;
-use crate::character::character_common_data::CharacterCommonData;
-use crate::common::i18n::locale;
-use crate::common::item_config_type::{ItemConfig, ItemConfigType};
-use crate::common::WeaponType;
-use crate::weapon::weapon_common_data::WeaponCommonData;
-use crate::weapon::weapon_effect::WeaponEffect;
-use crate::weapon::weapon_static_data::WeaponStaticData;
-use crate::weapon::weapon_trait::WeaponTrait;
-use crate::weapon::{WeaponConfig, WeaponName};
-use crate::weapon::weapon_base_atk::WeaponBaseATKFamily;
-use crate::weapon::weapon_sub_stat::WeaponSubStatFamily;
+use crate::weapon::weapons::prelude::*;
 
 pub struct AthameArtisEffect {
     pub hexerei_secret_rite: bool,
@@ -20,12 +9,21 @@ impl<A: Attribute> WeaponEffect<A> for AthameArtisEffect {
     fn apply(&self, data: &WeaponCommonData, attribute: &mut A) {
         let refine = data.refine as f64;
 
-        attribute.set_value_by(AttributeName::CriticalDamageElementalBurst, "黑蚀被动", 0.12 + 0.04 * refine);
+        attribute.set_value_to_t(
+            AttributeType::Invisible(InvisibleAttributeType::new_skill(AttributeVariableType::CriticalDamage, SkillType::ElementalBurst)),
+            "黑蚀被动", 0.12 + 0.04 * refine
+        );
 
         let rate = if self.hexerei_secret_rite { 1.75 } else { 1.0 };
 
         if self.effect {
-            attribute.add_atk_percentage("黑蚀「白昼之刃」", (0.15 + 0.05 * refine) * rate);
+            attribute.add_atk_percentage("黑蚀被动", (0.15 + 0.05 * refine) * rate);
+            
+            attribute.add_atk_percentage_s(
+                CharacterSelector::select_all_onfield_except_self(attribute),
+                "黑蚀被动",
+                (0.12 + 0.04 * refine) * rate
+            );
         }
     }
 }

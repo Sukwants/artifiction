@@ -1,18 +1,21 @@
-use crate::attribute::*;
-use crate::buffs::{Buff, BuffConfig};
-use crate::buffs::buff::BuffMeta;
-use crate::buffs::buff_meta::{BuffFrom, BuffGenre, BuffImage, BuffMetaData};
-use crate::buffs::buff_name::BuffName;
-use crate::common::item_config_type::{ItemConfig, ItemConfigType};
-use crate::enemies::Enemy;
+use crate::buffs::buffs::prelude::*;
 
 pub struct BuffMoonsignPyro {
-    pub atk: f64
+    pub atk: f64,
+    pub global: bool,
 }
 
 impl<A: Attribute> Buff<A> for BuffMoonsignPyro {
     fn change_attribute(&self, attribute: &mut A) {
-        attribute.set_value_by(AttributeName::EnhanceMoonglare, "月荫-火", (self.atk / 100.0 * 0.009).min(0.36));
+        let value = (self.atk / 100.0 * 0.009).min(0.36);
+        for reaction in ReactionType::get_lunar_reaction_list() {
+            let ty = AttributeType::Invisible(InvisibleAttributeType::new_reaction(AttributeVariableType::ReactionEnhance, reaction));
+            if self.global {
+                attribute.set_value_to_s(CharacterSelector::select_all(attribute), ty, "月荫-火", value);
+            } else {
+                attribute.set_value_to_t(ty, "月荫-火", value);
+            }
+        }
     }
 }
 
@@ -42,28 +45,45 @@ impl BuffMeta for BuffMoonsignPyro {
                 en: "ATK",
             ),
             config: ItemConfigType::FloatInput { default: 0.0 }
+        },
+        ItemConfig {
+            name: "global",
+            title: crate::common::i18n::locale!(
+                zh_cn: "全局生效",
+                en: "Global",
+            ),
+            config: ItemConfigType::Bool { default: false }
         }
     ]);
 
     fn create<A: Attribute>(b: &BuffConfig) -> Box<dyn Buff<A>> {
-        let atk = match *b {
-            BuffConfig::MoonsignPyro { atk } => atk,
-            _ => 0.0
+        let (atk, global) = match *b {
+            BuffConfig::MoonsignPyro { atk, global } => (atk, global),
+            _ => (0.0, false)
         };
 
         Box::new(BuffMoonsignPyro {
-            atk
+            atk, global
         })
     }
 }
 
 pub struct BuffMoonsignHydro {
-    pub hp: f64
+    pub hp: f64,
+    pub global: bool,
 }
 
 impl<A: Attribute> Buff<A> for BuffMoonsignHydro {
     fn change_attribute(&self, attribute: &mut A) {
-        attribute.set_value_by(AttributeName::EnhanceMoonglare, "月荫-水", (self.hp / 1000.0 * 0.006).min(0.36));
+        let value = (self.hp / 1000.0 * 0.006).min(0.36);
+        for reaction in ReactionType::get_lunar_reaction_list() {
+            let ty = AttributeType::Invisible(InvisibleAttributeType::new_reaction(AttributeVariableType::ReactionEnhance, reaction));
+            if self.global {
+                attribute.set_value_to_s(CharacterSelector::select_all(attribute), ty, "月荫-水", value);
+            } else {
+                attribute.set_value_to_t(ty, "月荫-水", value);
+            }
+        }
     }
 }
 
@@ -93,28 +113,45 @@ impl BuffMeta for BuffMoonsignHydro {
                 en: "HP",
             ),
             config: ItemConfigType::FloatInput { default: 0.0 }
+        },
+        ItemConfig {
+            name: "global",
+            title: crate::common::i18n::locale!(
+                zh_cn: "全局生效",
+                en: "Global",
+            ),
+            config: ItemConfigType::Bool { default: false }
         }
     ]);
 
     fn create<A: Attribute>(b: &BuffConfig) -> Box<dyn Buff<A>> {
-        let hp = match *b {
-            BuffConfig::MoonsignHydro { hp } => hp,
-            _ => 0.0
+        let (hp, global) = match *b {
+            BuffConfig::MoonsignHydro { hp, global } => (hp, global),
+            _ => (0.0, false)
         };
 
         Box::new(BuffMoonsignHydro {
-            hp
+            hp, global
         })
     }
 }
 
 pub struct BuffMoonsignAnemo {
-    pub em: f64
+    pub em: f64,
+    pub global: bool,
 }
 
 impl<A: Attribute> Buff<A> for BuffMoonsignAnemo {
     fn change_attribute(&self, attribute: &mut A) {
-        attribute.set_value_by(AttributeName::EnhanceMoonglare, "月荫-风", (self.em / 100.0 * 0.0225).min(0.36));
+        let value = (self.em / 100.0 * 0.0225).min(0.36);
+        for reaction in ReactionType::get_lunar_reaction_list() {
+            let ty = AttributeType::Invisible(InvisibleAttributeType::new_reaction(AttributeVariableType::ReactionEnhance, reaction));
+            if self.global {
+                attribute.set_value_to_s(CharacterSelector::select_all(attribute), ty, "月荫-风", value);
+            } else {
+                attribute.set_value_to_t(ty, "月荫-风", value);
+            }
+        }
     }
 }
 
@@ -144,28 +181,45 @@ impl BuffMeta for BuffMoonsignAnemo {
                 en: "Elemental Mastery",
             ),
             config: ItemConfigType::FloatInput { default: 0.0 }
+        },
+        ItemConfig {
+            name: "global",
+            title: crate::common::i18n::locale!(
+                zh_cn: "全局生效",
+                en: "Global",
+            ),
+            config: ItemConfigType::Bool { default: false }
         }
     ]);
 
     fn create<A: Attribute>(b: &BuffConfig) -> Box<dyn Buff<A>> {
-        let em = match *b {
-            BuffConfig::MoonsignAnemo { em } => em,
-            _ => 0.0
+        let (em, global) = match *b {
+            BuffConfig::MoonsignAnemo { em, global } => (em, global),
+            _ => (0.0, false)
         };
 
         Box::new(BuffMoonsignAnemo {
-            em
+            em, global
         })
     }
 }
 
 pub struct BuffMoonsignElectro {
-    pub atk: f64
+    pub atk: f64,
+    pub global: bool,
 }
 
 impl<A: Attribute> Buff<A> for BuffMoonsignElectro {
     fn change_attribute(&self, attribute: &mut A) {
-        attribute.set_value_by(AttributeName::EnhanceMoonglare, "月荫-雷", (self.atk / 100.0 * 0.009).min(0.36));
+        let value = (self.atk / 100.0 * 0.009).min(0.36);
+        for reaction in ReactionType::get_lunar_reaction_list() {
+            let ty = AttributeType::Invisible(InvisibleAttributeType::new_reaction(AttributeVariableType::ReactionEnhance, reaction));
+            if self.global {
+                attribute.set_value_to_s(CharacterSelector::select_all(attribute), ty, "月荫-雷", value);
+            } else {
+                attribute.set_value_to_t(ty, "月荫-雷", value);
+            }
+        }
     }
 }
 
@@ -195,28 +249,45 @@ impl BuffMeta for BuffMoonsignElectro {
                 en: "ATK",
             ),
             config: ItemConfigType::FloatInput { default: 0.0 }
+        },
+        ItemConfig {
+            name: "global",
+            title: crate::common::i18n::locale!(
+                zh_cn: "全局生效",
+                en: "Global",
+            ),
+            config: ItemConfigType::Bool { default: false }
         }
     ]);
 
     fn create<A: Attribute>(b: &BuffConfig) -> Box<dyn Buff<A>> {
-        let atk = match *b {
-            BuffConfig::MoonsignElectro { atk } => atk,
-            _ => 0.0
+        let (atk, global) = match *b {
+            BuffConfig::MoonsignElectro { atk, global } => (atk, global),
+            _ => (0.0, false)
         };
 
         Box::new(BuffMoonsignElectro {
-            atk
+            atk, global
         })
     }
 }
 
 pub struct BuffMoonsignDendro {
-    pub em: f64
+    pub em: f64,
+    pub global: bool,
 }
 
 impl<A: Attribute> Buff<A> for BuffMoonsignDendro {
     fn change_attribute(&self, attribute: &mut A) {
-        attribute.set_value_by(AttributeName::EnhanceMoonglare, "月荫-草", (self.em / 100.0 * 0.0225).min(0.36));
+        let value = (self.em / 100.0 * 0.0225).min(0.36);
+        for reaction in ReactionType::get_lunar_reaction_list() {
+            let ty = AttributeType::Invisible(InvisibleAttributeType::new_reaction(AttributeVariableType::ReactionEnhance, reaction));
+            if self.global {
+                attribute.set_value_to_s(CharacterSelector::select_all(attribute), ty, "月荫-草", value);
+            } else {
+                attribute.set_value_to_t(ty, "月荫-草", value);
+            }
+        }
     }
 }
 
@@ -246,28 +317,45 @@ impl BuffMeta for BuffMoonsignDendro {
                 en: "Elemental Mastery",
             ),
             config: ItemConfigType::FloatInput { default: 0.0 }
+        },
+        ItemConfig {
+            name: "global",
+            title: crate::common::i18n::locale!(
+                zh_cn: "全局生效",
+                en: "Global",
+            ),
+            config: ItemConfigType::Bool { default: false }
         }
     ]);
 
     fn create<A: Attribute>(b: &BuffConfig) -> Box<dyn Buff<A>> {
-        let em = match *b {
-            BuffConfig::MoonsignDendro { em } => em,
-            _ => 0.0
+        let (em, global) = match *b {
+            BuffConfig::MoonsignDendro { em, global } => (em, global),
+            _ => (0.0, false)
         };
 
         Box::new(BuffMoonsignDendro {
-            em
+            em, global
         })
     }
 }
 
 pub struct BuffMoonsignCryo {
-    pub atk: f64
+    pub atk: f64,
+    pub global: bool,
 }
 
 impl<A: Attribute> Buff<A> for BuffMoonsignCryo {
     fn change_attribute(&self, attribute: &mut A) {
-        attribute.set_value_by(AttributeName::EnhanceMoonglare, "月荫-冰", (self.atk / 100.0 * 0.009).min(0.36));
+        let value = (self.atk / 100.0 * 0.009).min(0.36);
+        for reaction in ReactionType::get_lunar_reaction_list() {
+            let ty = AttributeType::Invisible(InvisibleAttributeType::new_reaction(AttributeVariableType::ReactionEnhance, reaction));
+            if self.global {
+                attribute.set_value_to_s(CharacterSelector::select_all(attribute), ty, "月荫-冰", value);
+            } else {
+                attribute.set_value_to_t(ty, "月荫-冰", value);
+            }
+        }
     }
 }
 
@@ -297,28 +385,45 @@ impl BuffMeta for BuffMoonsignCryo {
                 en: "ATK",
             ),
             config: ItemConfigType::FloatInput { default: 0.0 }
+        },
+        ItemConfig {
+            name: "global",
+            title: crate::common::i18n::locale!(
+                zh_cn: "全局生效",
+                en: "Global",
+            ),
+            config: ItemConfigType::Bool { default: false }
         }
     ]);
 
     fn create<A: Attribute>(b: &BuffConfig) -> Box<dyn Buff<A>> {
-        let atk = match *b {
-            BuffConfig::MoonsignCryo { atk } => atk,
-            _ => 0.0
+        let (atk, global) = match *b {
+            BuffConfig::MoonsignCryo { atk, global } => (atk, global),
+            _ => (0.0, false)
         };
 
         Box::new(BuffMoonsignCryo {
-            atk
+            atk, global
         })
     }
 }
 
 pub struct BuffMoonsignGeo {
-    pub def: f64
+    pub def: f64,
+    pub global: bool,
 }
 
 impl<A: Attribute> Buff<A> for BuffMoonsignGeo {
     fn change_attribute(&self, attribute: &mut A) {
-        attribute.set_value_by(AttributeName::EnhanceMoonglare, "月荫-岩", (self.def / 100.0 * 0.01).min(0.36));
+        let value = (self.def / 100.0 * 0.01).min(0.36);
+        for reaction in ReactionType::get_lunar_reaction_list() {
+            let ty = AttributeType::Invisible(InvisibleAttributeType::new_reaction(AttributeVariableType::ReactionEnhance, reaction));
+            if self.global {
+                attribute.set_value_to_s(CharacterSelector::select_all(attribute), ty, "月荫-岩", value);
+            } else {
+                attribute.set_value_to_t(ty, "月荫-岩", value);
+            }
+        }
     }
 }
 
@@ -348,17 +453,25 @@ impl BuffMeta for BuffMoonsignGeo {
                 en: "DEF",
             ),
             config: ItemConfigType::FloatInput { default: 0.0 }
+        },
+        ItemConfig {
+            name: "global",
+            title: crate::common::i18n::locale!(
+                zh_cn: "全局生效",
+                en: "Global",
+            ),
+            config: ItemConfigType::Bool { default: false }
         }
     ]);
 
     fn create<A: Attribute>(b: &BuffConfig) -> Box<dyn Buff<A>> {
-        let def = match *b {
-            BuffConfig::MoonsignGeo { def } => def,
-            _ => 0.0
+        let (def, global) = match *b {
+            BuffConfig::MoonsignGeo { def, global } => (def, global),
+            _ => (0.0, false)
         };
 
         Box::new(BuffMoonsignGeo {
-            def
+            def, global
         })
     }
 }

@@ -74,6 +74,7 @@ pub enum WeaponConfig {
     FlameforgedInsight { reaction: bool },
     MasterKey { reaction: bool, moonsign: Moonsign },
     GestOfTheMightyWolf { stack: f64, hexerei_secret_rite: bool },
+    ATeaspoonOfTranscendence { stack: f64 },
 
     // Polearm
     EngulfingLightning { rate: f64 },

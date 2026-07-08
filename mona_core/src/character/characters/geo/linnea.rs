@@ -118,7 +118,7 @@ impl<A: Attribute> ChangeAttribute<A> for LinneaEffect {
         attribute.add_edge_s1to1(
             CharacterSelector::select_all(attribute),
             AttributeType::Panel(AttributeName::DEF),
-            AttributeType::Invisible(InvisibleAttributeType::new_reaction(AttributeVariableType::MoonglareBase, ReactionType::LunarCrystallize)),
+            AttributeType::Invisible(InvisibleAttributeType::new_reaction(AttributeVariableType::ElevativeBase, ReactionType::LunarCrystallize)),
             Arc::new(|def: f64, _| (def / 100.0 * 0.007).min(0.14) ),
             "莉奈娅天赋3",
             EdgePriority::Invisible,
@@ -161,7 +161,7 @@ impl<A: Attribute> ChangeAttribute<A> for LinneaEffect {
             attribute.set_value_by_s(
                 CharacterSelector::select_all(attribute),
                 AttributeType::Invisible(InvisibleAttributeType::new_reaction(
-                    AttributeVariableType::MoonglareElevate,
+                    AttributeVariableType::ElevativeElevate,
                     ReactionType::LunarCrystallize,
                 )),
                 "莉奈娅命座6",
@@ -197,11 +197,11 @@ impl LinneaDamageEnum {
         }
     }
 
-    pub fn get_lunar_type(&self) -> MoonglareReaction {
+    pub fn get_elevative_type(&self) -> Option<ElevativeReaction> {
         use LinneaDamageEnum::*;
         match *self {
-            E2 | E3 => MoonglareReaction::LunarCrystallize,
-            _ => MoonglareReaction::None,
+            E2 | E3 => Some(ElevativeReaction::LunarCrystallize),
+            _ => None,
         }
     }
 
@@ -214,7 +214,7 @@ impl LinneaDamageEnum {
             X2 | X3 => SkillType::PlungingAttackOnGround,
             E1 => SkillType::ElementalSkill,
             Q | QC => SkillType::ElementalBurst,
-            E2 | E3 => SkillType::Moonglare,
+            E2 | E3 => SkillType::Elevative,
         }
     }
 }
@@ -371,12 +371,12 @@ impl CharacterTrait for Linnea {
                 _ => unreachable!(),
             }
     
-            if s.get_lunar_type() != MoonglareReaction::None {
-                builder.moonglare(
+            if let Some(elevative_type) = s.get_elevative_type() {
+                builder.elevative(
                     &context.attribute,
                     &context.enemy,
                     s.get_element(),
-                    s.get_lunar_type(),
+                    elevative_type,
                     s.get_skill_type(),
                     context.character_common_data.level,
                     fumo,

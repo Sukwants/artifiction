@@ -13,7 +13,7 @@ impl Reaction {
         em * 5.0 / (em + 1200.0)
     }
 
-    pub fn moonglare(em: f64) -> f64 {
+    pub fn elevative(em: f64) -> f64 {
         em * 6.0 / (em + 2000.0)
     }
 }

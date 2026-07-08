@@ -98,8 +98,9 @@ pub enum AttributeVariableType {
 
     ReactionExtra, // 反应额外提升
 
-    MoonglareBase, // 月曜反应基础提升
-    MoonglareElevate, // 月曜反应擢升
+    ElevativeCoefficient, // 擢升反应倍率提升
+    ElevativeBase, // 擢升反应基础提升
+    ElevativeElevate, // 擢升反应擢升
 
     HealingBonus, // 治疗加成
     IncomingHealingBonus, // 受治疗加成
@@ -126,14 +127,16 @@ pub enum AttributeVariableType {
 - “某种反应可以造成暴击，暴击率为”指 `CriticalRate` 部分。
 - “某种反应可以造成暴击，暴击伤害为”指 `CriticalDamage` 部分。
 
-对于月曜反应（月感电、月绽放、月结晶）伤害：
+对于擢升反应（月感电、月绽放、月结晶、星超导）伤害：
 
 - “按照一定百分比，提升特定反应的伤害”指 `ReactionEnhance` 部分。
 - “基于特定数值，提升特定反应的伤害”指 `ReactionExtra` 部分。
 - “按照一定百分比，提升某种伤害的暴击率”指 `CriticalRate` 部分。请注意，若描述为“按照一定百分比，提升角色的暴击率”等不指示特定伤害类型的描述，则应指 `AttributeName::CriticalBase` 的面板属性。
 - “按照一定百分比，提升某种伤害的暴击伤害”指 `CriticalDamage` 部分。请注意，若描述为“按照一定百分比，提升角色的暴击伤害”等不指示特定伤害类型的描述，则应指 `AttributeName::CriticalDamageBase` 的面板属性。
-- “按照一定百分比，提升队伍中角色造成的特定反应的基础伤害”指 `MoonglareBase` 部分。
-- “造成的特定反应伤害擢升一定百分比”指 `MoonglareElevate` 部分。
+- “按照一定百分比，提升队伍中角色造成的特定反应的基础伤害”指 `ElevativeBase` 部分。
+- “造成的特定反应伤害擢升一定百分比”指 `ElevativeElevate` 部分。
+- 特别的，对于作用于所有月曜反应（包含月感电、月绽放、月结晶）的效果，应当使用 `ReactionType::get_elevative_reaction()` 来获取所有月曜反应的列表，以保证良好的可扩展性。
+- 特别的，星超导伤害的基础倍率与月曜反应不同，由冰、雷元素附着次数决定，因此对于任何会触发星超导伤害的角色，需要通过角色配置来获取当前附着次数，附着次数达到 $0 \sim 12$ 次时的额外基础倍率从 `ElevativeReaction::STELLAR_CONDUCT_EXTRA_COEFFICIENT` 数组中获取，该额外基础倍率应当通过 `ElevativeCoefficient` 部分进行加成，且 `ElevativeCoefficient` 仅会受到上述描述的加成效果影响，其他加成效果不应影响该部分，该增益命名为“星超导附着次数”。
 
 对于治疗效果：
 
@@ -151,7 +154,7 @@ pub enum AttributeVariableType {
 - “降低敌人的某种元素抗性”、“降低敌人所有元素抗性与物理抗性”指 `ResMinus` 部分。
 - “降低敌人的防御力”指 `DefMinus` 部分。
 
-`InvisibleAttributeType` 中的 `element`、`skill`、`reaction` 字段用来指示当前非面板属性作用的特定元素、技能或反应类型，如没有指示则为 `None`，具体类型如下：
+`InvisibleAttributeType` 中的 `element`、`skill`、`reaction` 字段用来指示当前非面板属性作用的特定元素、技能或反应类型，如没有指示则为 `None`，将会匹配任意值，具体类型如下：
 
 ```rust
 mona::common::element
@@ -177,11 +180,11 @@ pub enum SkillType {
     PlungingAttackOnGround,     // 下落攻击坠地冲击
     ElementalSkill,             // 元素战技
     ElementalBurst,             // 元素爆发
-    Moonglare,                  // 月曜反应
+    Elevative,                  // 擢升反应
 }
 ```
 
-请注意，任何技能触发的月曜反应伤害（月感电、月绽放、月结晶）的技能类型都必须是 `SkillType::Moonglare`。
+请注意，任何技能触发的擢升反应伤害（月感电、月绽放、月结晶、星超导）的技能类型都必须是 `SkillType::Elevative`。
 
 ```rust
 mona::common::reaction_type
@@ -401,11 +404,14 @@ Attribute 对外提供的接口有：
 - `fn add_edge_s1ton(&mut self, character_selector: CharacterSelector, from: AttributeType, to: AttributeType, func: EdgeFunction, key: &str, priority: EdgePriority)`：添加从被 `character_selector` 选择的角色属性 `from` 到该角色属性 `to` 的属性边，函数关系为 `func`，优先级为 `priority`。
 - `fn add_edge_s2ton(&mut self, character_selector: CharacterSelector, from1: AttributeType, from2: AttributeType, to: AttributeType, func: EdgeFunction, key: &str, priority: EdgePriority)`：添加从被 `character_selector` 选择的角色属性 `from1` 和 `from2` 到该角色属性 `to` 的属性边，函数关系为 `func`，优先级为 `priority`。
 - `fn add_atk_percentage(&mut self, key: &str, value: f64)`：将当前角色的攻击力提升 `value` 百分比。
+- `fn add_atk_percentage_s(&mut self, character_selector: CharacterSelector, key: &str, value: f64)`：将 `character_selector` 选择的角色的攻击力提升 `value` 百分比。
 - `fn add_def_percentage(&mut self, key: &str, value: f64)`：将当前角色的防御力提升 `value` 百分比。
+- `fn add_def_percentage_s(&mut self, character_selector: CharacterSelector, key: &str, value: f64)`：将 `character_selector` 选择的角色的防御力提升 `value` 百分比。
 - `fn add_hp_percentage(&mut self, key: &str, value: f64)`：将当前角色的生命值上限提升 `value` 百分比。
+- `fn add_hp_percentage_s(&mut self, character_selector: CharacterSelector, key: &str, value: f64)`：将 `character_selector` 选择的角色的生命值上限提升 `value` 百分比。
 - `fn add_elemental_bonus(&mut self, key: &str, value: f64)`：将当前角色的所有元素伤害加成的面板属性提升 `value` 百分比。
 
-请注意，由于默认情况下同一来源的增益无法叠加，因此除非明确可以叠加的增益，其余均建议使用 `set_value_to` 等而非 `set_value_by` 等接口来实现，以避免错误叠加与重复计算。
+请注意，由于默认情况下同一来源的增益无法叠加（包括同名武器的同名效果、同名圣遗物的同名效果），因此除非明确可以叠加的增益（如“多件同名武器产生的此效果可以叠加”），其余均建议使用 `set_value_to`、`set_value_to_t`、`set_value_to_s` 等而非 `set_value_by`、`set_value_by_t`、`set_value_by_s` 等接口来实现，以避免错误叠加与重复计算。
 
 以下为历史接口，不应使用：
 
@@ -426,11 +432,37 @@ Attribute 对外提供的接口有：
 
 ### 注意事项
 
-对于攻击力、防御力、生命值上限，共有四个有关属性：`ATKBase`、`ATKFixed`、`ATKPercentage`、`ATK`（防御力和生命值上限同理）。其中 `ATKBase` 指基础攻击力，除非明确提升基础攻击力，否则不得修改该属性；`ATKFixed` 指攻击力固定数值部分提升；`ATKPercentage` 指攻击力百分比部分提升，但使用方法不是直接将提升百分比加到该属性上，而是需要通过从 `ATKBase` 到 `ATKPercentage` 的相应比例的属性边来实现；`ATK` 是 `ATKBase`、`ATKFixed`、`ATKPercentage` 三者的实时和，基于攻击力的加成应当从 `ATK` 引出属性边来实现，不允许有指向 `ATK` 的属性边。
+#### 攻击力 / 防御力 / 生命值上限
 
-`add_atk_percentage` 方法仅对当前角色生效。若需要为其他角色（如场上角色）添加攻击力百分比加成，应使用 `add_edge_s1ton` 配合对应的 `CharacterSelector`，在选中角色的 `ATKBase` 和 `ATKPercentage` 之间建边：
+> 本条极易出错，请在实现前后仔细确认。
+
+对于攻击力、防御力、生命值上限，共有四个有关属性：`ATKBase`、`ATKFixed`、`ATKPercentage`、`ATK`（防御力和生命值上限同理）。其中 `ATKBase` 指基础攻击力，除非明确提升基础攻击力，否则不得修改该属性；`ATKFixed` 指攻击力固定数值部分提升；`ATKPercentage` 指攻击力百分比部分提升，但使用方法不是直接将提升百分比加到该属性上，而是需要通过从 `ATKBase` 到 `ATKPercentage` 的相应比例的属性边来实现或者通过封装的便捷方法；`ATK` 是 `ATKBase`、`ATKFixed`、`ATKPercentage` 三者的实时和，基于攻击力的加成应当从 `ATK` 引出属性边来实现，不允许有指向 `ATK` 的属性边。
+
+具体的：
+
+| 属性 | 含义 | 如何修改 |
+|------|------|---------|
+| `ATKBase` | 基础攻击力 | 除非明确说"提升基础攻击力"，否则**不得修改** |
+| `ATKFixed` | 攻击力固定数值 | 可直接 `set_value_to` 或 `set_value_by` |
+| `ATKPercentage` | 攻击力百分比 | **不可直接 `set_value_to` 或 `set_value_by`**，推荐使用 `add_atk_percentage` 或 `add_atk_percentage_s` 等方法，或者通过 `ATKBase -> ATKPercentage` 的属性边实现 |
+| `ATK` | 最终攻击力 | 不允许有指向 `ATK` 的属性边，所有攻击力加成应按照固定数值或百分比应用到 `ATKFixed` 或 `ATKPercentage`。基于攻击力的加成应从 `ATK` 引出边 |
+
+防御力（`DEF`）和生命值上限（`HP`）同理。
+
+**常见错误 vs 正确做法：**
 
 ```rust
+// 错误：直接给 ATKPercentage / HPPercentage 设值
+attribute.set_value_to(AttributeName::ATKPercentage, "key", 0.25);
+attribute.set_value_to_t(AttributeType::Panel(AttributeName::HPPercentage), "key", 0.25);
+attribute.set_value_by_s(selector, AttributeType::Panel(AttributeName::ATKPercentage), "key", 0.25);
+
+// 正确：对当前角色，使用便捷方法
+attribute.add_atk_percentage("key", 0.25);
+attribute.add_hp_percentage("key", 0.25);
+attribute.add_def_percentage("key", 0.25);
+
+// 正确：对其他角色（场上/全队等），使用 add_edge_s1ton
 attribute.add_edge_s1ton(
     CharacterSelector::select_onfield(attribute),
     AttributeType::Panel(AttributeName::ATKBase),
@@ -439,11 +471,51 @@ attribute.add_edge_s1ton(
     "效果名称",
     EdgePriority::Base,
 );
+
+// 正确：对其他角色（场上/全队等），使用便捷方法
+attribute.add_atk_percentage_s(CharacterSelector::select_onfield(attribute), "效果名称", 0.3);
+attribute.add_def_percentage_s(CharacterSelector::select_onfield(attribute), "效果名称", 0.3);
+attribute.add_hp_percentage_s(CharacterSelector::select_onfield(attribute), "效果名称", 0.3);
 ```
 
-防御力与生命值上限同理。
+> `add_atk_percentage` 仅对当前角色生效。为其他角色添加时，必须用 `add_edge_s1ton`（在**被选中角色自身**的 Base → Percentage 间建边），**不可**用 `add_edge_s1to1`（那会从当前角色建边）。
 
-特别的，对于施加在敌人身上的减抗、减防效果，应当总是应用到所有人，即角色选择器应总是为 `CharacterSelector::select_all(attribute)`，以保证所有伤害都受到该效果的影响。
+#### 减抗 / 减防
+
+对于施加在敌人身上的减抗（`ResMinus`）、减防（`DefMinus`）效果，应**总是**使用 `CharacterSelector::select_all(attribute)`，以保证所有伤害都受到该效果的影响：
+
+```rust
+// 正确
+attribute.set_value_to_s(
+    CharacterSelector::select_all(attribute),
+    AttributeType::Invisible(InvisibleAttributeType::new_element(AttributeVariableType::ResMinus, Element::Geo)),
+    "效果名称",
+    value,
+);
+```
+
+#### 天赋编号
+
+请特别注意，在给固有天赋（无法升级的天赋，即排除普通攻击、元素战技、元素爆发后的天赋）编号时排除生活天赋，一般情况下一个角色至多只有三个战斗天赋。生活天赋即与战斗无关的天赋（部分角色生活天赋与战斗有一定关系，但仍然可以区分，针对生活天赋给出的增益来源命名为“天赋4”），如：
+
+> 阿蕾奇诺：唯厄月可知晓：  
+> 在战斗状态下，阿蕾奇诺获得40%火元素伤害加成，并且仅能通过厄月将升恢复生命值。  
+
+> 丝柯克：诸武相授：  
+> 队伍中所有角色的元素类型均为水元素或冰元素，并且至少有一名水元素角色、一名冰元素角色时，队伍中自己的角色的元素战技等级提高1级。  
+
+> 杜林：地涌的回音：  
+> 在蒙德执行时长为20小时的探索派遣任务时，获得的奖励增加25%。  
+
+> 哥伦比娅：月的守望：  
+> 处于挪德卡莱或霜月区域时，队伍中自己的角色倒下时，哥伦比娅将复苏该角色，并为其恢复生命值，恢复值基于哥伦比娅的好感等级，该效果每100秒至多触发一次。该效果在秘境、征讨领域、深境螺旋中无效。  
+> 此外，对受到月矩力影响的部分小动物，哥伦比娅似乎有着特殊的亲和力…  
+
+> 法尔伽：归风的凯歌：  
+> 队伍中每有一名蒙德角色，通过长按施放的元素战技烈风终坠的冷却时间就会缩短5%。  
+> 该效果在秘境、征讨领域、深境螺旋中无效。  
+
+对于天赋的编号中，Pi 等价于“天赋i”，与原始 `passive` 编号无决定性关系，处理时先按原始 `passive` 编号排序后，按上面的规则排除生活天赋，再按顺序编号。
 
 ### 调用示例
 
@@ -506,7 +578,7 @@ attribute.set_value_to_s(
 attribute.add_edge_s1to1(
     CharacterSelector::select_all(attribute),
     AttributeType::Panel(AttributeName::ElementalMastery),
-    AttributeType::Invisible(InvisibleAttributeType::new_reaction(AttributeVariableType::MoonglareBase, ReactionType::LunarBloom)),
+    AttributeType::Invisible(InvisibleAttributeType::new_reaction(AttributeVariableType::ElevativeBase, ReactionType::LunarBloom)),
     Arc::new(move |em: f64, _| (em * 0.000175).min(0.14) ),
     "菈乌玛天赋3",
     EdgePriority::Invisible,

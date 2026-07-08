@@ -64,19 +64,19 @@ impl TargetFunction for WriothesleyDefaultTargetFunction {
         type S = <Wriothesley as CharacterTrait>::DamageEnumType;
         let dmg_normal = Wriothesley::damage::<SimpleDamageBuilder>(
             &context,
-            S::Normal1,
-            &CharacterSkillConfig::Wriothesley {under_chilling_penalty: true},
+            S::A1,
+            &CharacterSkillConfig::Wriothesley {under_chilling_penalty: true, gracious_rebuke: true},
             None
         );
         let dmg_charged2 = Wriothesley::damage::<SimpleDamageBuilder>(
             &context,
-            S::ChargedTalent1,
-            &CharacterSkillConfig::Wriothesley {under_chilling_penalty: true},
+            S::Z,
+            &CharacterSkillConfig::Wriothesley {under_chilling_penalty: true, gracious_rebuke: true},
             None
         );
 
-        let dmg_normal_mean = self.melt_rate * dmg_normal.melt.unwrap().expectation + (1.0-self.melt_rate) * dmg_normal.normal.expectation;
-        let dmg_charged2_mean = self.melt_rate * dmg_charged2.melt.unwrap().expectation + (1.0-self.melt_rate)*dmg_charged2.normal.expectation;
+        let dmg_normal_mean = self.melt_rate * dmg_normal.melt.unwrap_or(dmg_normal.normal).expectation + (1.0-self.melt_rate) * dmg_normal.normal.expectation;
+        let dmg_charged2_mean = self.melt_rate * dmg_charged2.melt.unwrap_or(dmg_charged2.normal).expectation + (1.0-self.melt_rate)*dmg_charged2.normal.expectation;
         
         dmg_normal_mean * 6.3886 + self.punch_ratio*dmg_charged2_mean
     }

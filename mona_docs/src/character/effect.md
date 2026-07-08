@@ -149,4 +149,4 @@ impl CharacterTrait for Durin {
 
 `new_effect` 函数用于将用户输入的配置项转换为 Effect 结构体，每一个配置项都应添加到 `mona::character::character_config::CharacterConfig` 中，并在 `new_effect` 函数中进行匹配解析。
 
-请额外注意，天赋 1 和天赋 2 需要通过 `has_talent1` 和 `has_talent2` 来判断是否生效，命座需要通过 `common_data.constellation` 来判断是否生效。
+请额外注意，天赋 1 和天赋 2 需要通过 `has_talent1` 和 `has_talent2` 来判断是否生效，天赋 3 或生活天赋则总是生效，不需要判断，命座需要通过 `common_data.constellation` 来判断是否生效。

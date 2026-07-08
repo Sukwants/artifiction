@@ -1,15 +1,31 @@
-use crate::attribute::*;
-use crate::buffs::{Buff, BuffConfig};
-use crate::buffs::buff::BuffMeta;
-use crate::buffs::buff_meta::{BuffFrom, BuffGenre, BuffImage, BuffMetaData};
-use crate::buffs::buff_name::BuffName;
-use crate::character::CharacterName;
+use crate::buffs::buffs::prelude::*;
 
-pub struct BuffBeidouC6;
+pub struct BuffBeidouC6 {
+    pub in_polestar_field: bool,
+}
 
 impl<A: Attribute> Buff<A> for BuffBeidouC6 {
     fn change_attribute(&self, attribute: &mut A) {
-        attribute.set_value_by(AttributeName::ResMinusElectro, "BUFF：北斗命座「北斗祓幽孽」", 0.15);
+        attribute.set_value_to_t(
+            AttributeType::Invisible(InvisibleAttributeType::new_element(
+                AttributeVariableType::ResMinus,
+                Element::Electro,
+            )),
+            "北斗命座6",
+            0.15,
+        );
+
+        if self.in_polestar_field {
+            attribute.set_value_to_t(
+                AttributeType::Invisible(InvisibleAttributeType::new_element(
+                    AttributeVariableType::ResMinus,
+                    Element::Cryo,
+                )),
+                "北斗命座6",
+                0.15,
+            );
+            attribute.set_value_to(AttributeName::ElementalMastery, "北斗命座6", 200.0);
+        }
     }
 }
 
@@ -17,20 +33,33 @@ impl BuffMeta for BuffBeidouC6 {
     #[cfg(not(target_family = "wasm"))]
     const META_DATA: BuffMetaData = BuffMetaData {
         name: BuffName::BeidouC6,
-        name_locale: crate::common::i18n::locale!(
+        name_locale: locale!(
             zh_cn: "北斗-「北斗祓幽孽」",
             en: "Beidou-「Bane of Evil」",
         ),
         image: BuffImage::Avatar(CharacterName::Beidou),
         genre: BuffGenre::Character,
-        description: Some(crate::common::i18n::locale!(
-            zh_cn: "北斗命座6：斫雷持续期间，周围敌人的雷元素抗性降低15%。",
-            en: "Beidou C6: 斫雷持续期间，周围敌人的雷元素抗性降低15%。",
+        description: Some(locale!(
+            zh_cn: "北斗命座6：斫雷持续期间，周围敌人的雷元素抗性降低15%。\
+                <br>辉映·星超导：斫雷持续期间，附近敌人的冰元素抗性还会降低15%，且当前场上角色元素精通提升200点。",
+            en: "Beidou C6: During Stormbreaker, opponents' Electro RES is decreased by 15%.\
+                <br>Glimmering Stellar-Conduct: During Stormbreaker, opponents' Cryo RES will also be decreased by 15%, and the current active character gains 200 Elemental Mastery.",
         )),
         from: BuffFrom::Character(CharacterName::Beidou),
     };
 
-    fn create<A: Attribute>(_b: &BuffConfig) -> Box<dyn Buff<A>> {
-        Box::new(BuffBeidouC6)
+    #[cfg(not(target_family = "wasm"))]
+    const CONFIG: Option<&'static [ItemConfig]> = Some(&[
+        ItemConfig::IN_POLESTAR_FIELD(false, ItemConfig::PRIORITY_BUFF),
+    ]);
+
+    fn create<A: Attribute>(b: &BuffConfig) -> Box<dyn Buff<A>> {
+        let in_polestar_field = match *b {
+            BuffConfig::BeidouC6 { in_polestar_field } => in_polestar_field,
+            _ => false,
+        };
+        Box::new(BuffBeidouC6 {
+            in_polestar_field,
+        })
     }
 }

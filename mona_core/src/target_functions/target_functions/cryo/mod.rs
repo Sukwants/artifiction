@@ -14,8 +14,10 @@ pub mod skirk_default;
 pub mod mika_default;
 pub mod freminet_default;
 pub mod wriothesley_default;
+pub mod wriothesley_stellar_conduct;
 pub mod citlali_default;
 pub mod lohen_default;
+pub mod sandrone_default;
 
 pub use aloy_default::AloyDefaultTargetFunction;
 pub use chongyun_default::ChongyunDefaultTargetFunction;
@@ -33,5 +35,7 @@ pub use skirk_default::SkirkDefaultTargetFunction;
 pub use mika_default::MikaDefaultTargetFunction;
 pub use freminet_default::FreminetDefaultTargetFunction;
 pub use wriothesley_default::WriothesleyDefaultTargetFunction;
+pub use wriothesley_stellar_conduct::WriothesleyStellarConductTargetFunction;
 pub use citlali_default::CitlaliDefaultTargetFunction;
 pub use lohen_default::LohenDefaultTargetFunction;
+pub use sandrone_default::SandroneDefaultTargetFunction;

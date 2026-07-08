@@ -66,81 +66,8 @@ pub struct SucroseEffect {
 }
 
 impl<A: Attribute> ChangeAttribute<A> for SucroseEffect {
-    fn change_attribute(&self, attribute: &mut A) {
-        if self.common_data.has_talent1 {
-            if self.elements.cryo {
-                attribute.set_value_by_s(CharacterSelector::select_element(attribute, Element::Cryo),
-                    AttributeType::Panel(AttributeName::ElementalMastery), "砂糖天赋1", 50.0);
-            }
-            if self.elements.pyro {
-                attribute.set_value_by_s(CharacterSelector::select_element(attribute, Element::Pyro),
-                    AttributeType::Panel(AttributeName::ElementalMastery), "砂糖天赋1", 50.0);
-            }
-            if self.elements.hydro {
-                attribute.set_value_by_s(CharacterSelector::select_element(attribute, Element::Hydro),
-                    AttributeType::Panel(AttributeName::ElementalMastery), "砂糖天赋1", 50.0);
-            }
-            if self.elements.electro {
-                attribute.set_value_by_s(CharacterSelector::select_element(attribute, Element::Electro),
-                    AttributeType::Panel(AttributeName::ElementalMastery), "砂糖天赋1", 50.0);
-            }
-        }
-
-        if self.common_data.has_talent2 {
-            attribute.add_edge_s1to1(
-                CharacterSelector::select_all_except_self(attribute),
-                AttributeType::Panel(AttributeName::ElementalMastery),
-                AttributeType::Panel(AttributeName::ElementalMastery),
-                Arc::new(|em, _| em * 0.20),
-                "砂糖天赋2",
-                EdgePriority::Common,
-            );
-        }
-
-        if self.common_data.constellation >= 6 {
-            if self.elements.cryo {
-                attribute.set_value_by_s(CharacterSelector::select_all(attribute),
-                    AttributeType::Panel(AttributeName::BonusCryo), "砂糖命座6", 0.2);
-                attribute.set_value_by_s(CharacterSelector::select_by_tag(attribute, CharacterTag::Hexerei),
-                    AttributeType::Panel(AttributeName::BonusCryo), "砂糖命座6", 0.0857142);
-            }
-            if self.elements.pyro {
-                attribute.set_value_by_s(CharacterSelector::select_all(attribute),
-                    AttributeType::Panel(AttributeName::BonusPyro), "砂糖命座6", 0.2);
-                attribute.set_value_by_s(CharacterSelector::select_by_tag(attribute, CharacterTag::Hexerei),
-                    AttributeType::Panel(AttributeName::BonusPyro), "砂糖命座6", 0.0857142);
-            }
-            if self.elements.hydro {
-                attribute.set_value_by_s(CharacterSelector::select_all(attribute),
-                    AttributeType::Panel(AttributeName::BonusHydro), "砂糖命座6", 0.2);
-                attribute.set_value_by_s(CharacterSelector::select_by_tag(attribute, CharacterTag::Hexerei),
-                    AttributeType::Panel(AttributeName::BonusHydro), "砂糖命座6", 0.0857142);
-            }
-            if self.elements.electro {
-                attribute.set_value_by_s(CharacterSelector::select_all(attribute),
-                    AttributeType::Panel(AttributeName::BonusElectro), "砂糖命座6", 0.2);
-                attribute.set_value_by_s(CharacterSelector::select_by_tag(attribute, CharacterTag::Hexerei),
-                    AttributeType::Panel(AttributeName::BonusElectro), "砂糖命座6", 0.0857142);
-            }
-        }
-
-        if self.hexerei_secret_rite {
-            for skill in vec![SkillType::NormalAttack, SkillType::ChargedAttack, SkillType::PlungingAttackInAction, SkillType::PlungingAttackOnGround, SkillType::ElementalSkill, SkillType::ElementalBurst] {
-                attribute.set_value_by_s(
-                    CharacterSelector::select_all(attribute),
-                    AttributeType::Invisible(InvisibleAttributeType::new_skill(AttributeVariableType::Bonus, skill)),
-                    "砂糖天赋3",
-                    0.0571428,
-                );
-
-                attribute.set_value_by_s(
-                    CharacterSelector::select_by_tag(attribute, CharacterTag::Hexerei),
-                    AttributeType::Invisible(InvisibleAttributeType::new_skill(AttributeVariableType::Bonus, skill)),
-                    "砂糖天赋3",
-                    0.0714285,
-                );
-            }
-        }
+    fn change_attribute(&self, _attribute: &mut A) {
+        // 天赋4效果已移至 CharacterTrait::change_attribute 以使用 CONFIG_SKILL 中的覆盖率配置
     }
 }
 
@@ -250,6 +177,156 @@ impl CharacterTrait for Sucrose {
             }
         },
     ]);
+
+    #[cfg(not(target_family = "wasm"))]
+    const CONFIG_SKILL: Option<&'static [ItemConfig]> = Some(&[
+        ItemConfig {
+            name: "talent1_coverage",
+            title: locale!(
+                zh_cn: "触媒置换术平均覆盖率",
+                en: "Catalyst Conversion Avg. Coverage",
+            ),
+            config: ItemConfigType::Float { min: 0.0, max: 1.0, default: 0.0 }
+        },
+        ItemConfig {
+            name: "talent2_coverage",
+            title: locale!(
+                zh_cn: "小小的慧风平均覆盖率",
+                en: "Mollis Favonius Avg. Coverage",
+            ),
+            config: ItemConfigType::Float { min: 0.0, max: 1.0, default: 0.0 }
+        },
+        ItemConfig {
+            name: "c6_coverage",
+            title: locale!(
+                zh_cn: "混元熵增论平均覆盖率",
+                en: "Chaotic Entropy Avg. Coverage",
+            ),
+            config: ItemConfigType::Float { min: 0.0, max: 1.0, default: 0.0 }
+        },
+        ItemConfig {
+            name: "small_wind_spirit_coverage",
+            title: locale!(
+                zh_cn: "小型风灵增伤平均覆盖率",
+                en: "Small Wind Spirit DMG Bonus Avg. Coverage",
+            ),
+            config: ItemConfigType::Float { min: 0.0, max: 1.0, default: 0.0 }
+        },
+        ItemConfig {
+            name: "large_wind_spirit_coverage",
+            title: locale!(
+                zh_cn: "大型风灵魔导增伤平均覆盖率",
+                en: "Large Wind Spirit Hexerei DMG Bonus Avg. Coverage",
+            ),
+            config: ItemConfigType::Float { min: 0.0, max: 1.0, default: 0.0 }
+        },
+    ]);
+
+    fn change_attribute<A: Attribute>(attribute: &mut A, common_data: &CharacterCommonData, skill_config: &CharacterSkillConfig) {
+        let (hexerei_secret_rite, elements) = match &common_data.config {
+            CharacterConfig::Sucrose { hexerei_secret_rite, elements } => (*hexerei_secret_rite, *elements),
+            _ => (false, ConfigElements8Multi::default()),
+        };
+
+        let (talent1_coverage, talent2_coverage, c6_coverage, small_wind_spirit_coverage, large_wind_spirit_coverage) = match *skill_config {
+            CharacterSkillConfig::Sucrose { talent1_coverage, talent2_coverage, c6_coverage, small_wind_spirit_coverage, large_wind_spirit_coverage } =>
+                (talent1_coverage, talent2_coverage, c6_coverage, small_wind_spirit_coverage, large_wind_spirit_coverage),
+            _ => (0.0, 0.0, 0.0, 0.0, 0.0),
+        };
+
+        // 天赋1：触媒置换术
+        // 砂糖触发扩散反应时，使队伍中所有对应元素类型的角色（不包括砂糖自己）元素精通提升50，持续8秒。
+        // 覆盖率：扩散反应触发后 buff 持续时间的占比
+        if common_data.has_talent1 {
+            let em_bonus = 50.0 * talent1_coverage;
+            if elements.cryo {
+                attribute.set_value_by_s(CharacterSelector::select_element(attribute, Element::Cryo),
+                    AttributeType::Panel(AttributeName::ElementalMastery), "砂糖天赋1", em_bonus);
+            }
+            if elements.pyro {
+                attribute.set_value_by_s(CharacterSelector::select_element(attribute, Element::Pyro),
+                    AttributeType::Panel(AttributeName::ElementalMastery), "砂糖天赋1", em_bonus);
+            }
+            if elements.hydro {
+                attribute.set_value_by_s(CharacterSelector::select_element(attribute, Element::Hydro),
+                    AttributeType::Panel(AttributeName::ElementalMastery), "砂糖天赋1", em_bonus);
+            }
+            if elements.electro {
+                attribute.set_value_by_s(CharacterSelector::select_element(attribute, Element::Electro),
+                    AttributeType::Panel(AttributeName::ElementalMastery), "砂糖天赋1", em_bonus);
+            }
+        }
+
+        // 天赋2：小小的慧风
+        // 风灵作成·陆叁零捌或禁·风灵作成·柒伍同构贰型命中敌人时，基于砂糖元素精通的20%，为队伍中所有角色（不包括砂糖自己）提供元素精通加成，持续8秒。
+        // 覆盖率：E/Q 命中后 buff 持续时间的占比
+        if common_data.has_talent2 {
+            let t2c = talent2_coverage;
+            attribute.add_edge_s1to1(
+                CharacterSelector::select_all_except_self(attribute),
+                AttributeType::Panel(AttributeName::ElementalMastery),
+                AttributeType::Panel(AttributeName::ElementalMastery),
+                Arc::new(move |em, _| em * 0.20 * t2c),
+                "砂糖天赋2",
+                EdgePriority::Common,
+            );
+        }
+
+        // 命座6：混元熵增论
+        // 禁·风灵作成·柒伍同构贰型如果发生了元素转化，则使队伍中所有角色在技能持续时间内获得20%的对应元素伤害加成。
+        // 覆盖率：Q 元素转化后 buff 持续时间的占比
+        if common_data.constellation >= 6 {
+            let bonus = 0.2 * c6_coverage;
+            let hexerei_bonus = 0.0857142 * c6_coverage;
+            if elements.cryo {
+                attribute.set_value_by_s(CharacterSelector::select_all(attribute),
+                    AttributeType::Panel(AttributeName::BonusCryo), "砂糖命座6", bonus);
+                attribute.set_value_by_s(CharacterSelector::select_by_tag(attribute, CharacterTag::Hexerei),
+                    AttributeType::Panel(AttributeName::BonusCryo), "砂糖命座6", hexerei_bonus);
+            }
+            if elements.pyro {
+                attribute.set_value_by_s(CharacterSelector::select_all(attribute),
+                    AttributeType::Panel(AttributeName::BonusPyro), "砂糖命座6", bonus);
+                attribute.set_value_by_s(CharacterSelector::select_by_tag(attribute, CharacterTag::Hexerei),
+                    AttributeType::Panel(AttributeName::BonusPyro), "砂糖命座6", hexerei_bonus);
+            }
+            if elements.hydro {
+                attribute.set_value_by_s(CharacterSelector::select_all(attribute),
+                    AttributeType::Panel(AttributeName::BonusHydro), "砂糖命座6", bonus);
+                attribute.set_value_by_s(CharacterSelector::select_by_tag(attribute, CharacterTag::Hexerei),
+                    AttributeType::Panel(AttributeName::BonusHydro), "砂糖命座6", hexerei_bonus);
+            }
+            if elements.electro {
+                attribute.set_value_by_s(CharacterSelector::select_all(attribute),
+                    AttributeType::Panel(AttributeName::BonusElectro), "砂糖命座6", bonus);
+                attribute.set_value_by_s(CharacterSelector::select_by_tag(attribute, CharacterTag::Hexerei),
+                    AttributeType::Panel(AttributeName::BonusElectro), "砂糖命座6", hexerei_bonus);
+            }
+        }
+
+        // 天赋4：魔导·秘仪（魔女的前夜礼·七循之理）
+        // · 召唤小型风灵后的15秒内，队伍中附近的角色的所有伤害提升5.71428%
+        // · 召唤大型风灵后的20秒内，队伍中附近的魔导角色的所有伤害额外提升7.14285%
+        if hexerei_secret_rite {
+            let small_bonus = 0.0571428 * small_wind_spirit_coverage;
+            let large_bonus = 0.0714285 * large_wind_spirit_coverage;
+            for skill in vec![SkillType::NormalAttack, SkillType::ChargedAttack, SkillType::PlungingAttackInAction, SkillType::PlungingAttackOnGround, SkillType::ElementalSkill, SkillType::ElementalBurst] {
+                attribute.set_value_by_s(
+                    CharacterSelector::select_all(attribute),
+                    AttributeType::Invisible(InvisibleAttributeType::new_skill(AttributeVariableType::Bonus, skill)),
+                    "砂糖天赋4",
+                    small_bonus,
+                );
+
+                attribute.set_value_by_s(
+                    CharacterSelector::select_by_tag(attribute, CharacterTag::Hexerei),
+                    AttributeType::Invisible(InvisibleAttributeType::new_skill(AttributeVariableType::Bonus, skill)),
+                    "砂糖天赋4",
+                    large_bonus,
+                );
+            }
+        }
+    }
 
     fn damage_internal<D: DamageBuilder>(context: &DamageContext<'_, D::AttributeType>, s: usize, config: &CharacterSkillConfig, fumo: Option<Element>) -> D::Result {
         let s: SucroseDamageEnum = num::FromPrimitive::from_usize(s).unwrap();

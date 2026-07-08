@@ -149,17 +149,19 @@ impl<A: Attribute> ChangeAttribute<A> for ColumbinaEffect {
             }
         }
 
-        attribute.add_edge_s1to1(
-            CharacterSelector::select_all(attribute),
-            AttributeType::Panel(AttributeName::HP),
-            AttributeType::Invisible(InvisibleAttributeType::new(
-                    AttributeVariableType::MoonglareBase,
-                    None, None, None
-                )),
-            Arc::new(|hp: f64, _| (hp / 1000.0 * 0.002).min(0.07) ),
-            "哥伦比娅天赋3",
-            EdgePriority::Invisible,
-        );
+        for reaction in ReactionType::get_lunar_reaction_list() {
+            attribute.add_edge_s1to1(
+                CharacterSelector::select_all(attribute),
+                AttributeType::Panel(AttributeName::HP),
+                AttributeType::Invisible(InvisibleAttributeType::new_reaction(
+                        AttributeVariableType::ElevativeBase,
+                        reaction,
+                    )),
+                Arc::new(|hp: f64, _| (hp / 1000.0 * 0.002).min(0.07) ),
+                "哥伦比娅天赋3",
+                EdgePriority::Invisible,
+            );
+        }
 
         if self.common_data.constellation >= 1 {
             let mut val = 0.0;
@@ -171,15 +173,17 @@ impl<A: Attribute> ChangeAttribute<A> for ColumbinaEffect {
             if self.common_data.constellation >= 5 { val += 0.015; }
             if self.common_data.constellation >= 6 { val += 0.07; }
 
-            attribute.set_value_by_s(
-                CharacterSelector::select_all(attribute),
-                AttributeType::Invisible(InvisibleAttributeType::new(
-                    AttributeVariableType::MoonglareElevate,
-                    None, None, None
-                )),
-                "哥伦比娅命座",
-                val
-            );
+            for reaction in ReactionType::get_lunar_reaction_list() {
+                attribute.set_value_by_s(
+                    CharacterSelector::select_all(attribute),
+                    AttributeType::Invisible(InvisibleAttributeType::new_reaction(
+                        AttributeVariableType::ElevativeElevate,
+                        reaction,
+                    )),
+                    "哥伦比娅命座",
+                    val
+                );
+            }
         }
     }
 }
@@ -210,17 +214,17 @@ impl ColumbinaDamageEnum {
         }
     }
 
-    pub fn get_lunar_type(&self, main_element: Option<Element>) -> MoonglareReaction {
+    pub fn get_elevative_type(&self, main_element: Option<Element>) -> Option<ElevativeReaction> {
         use ColumbinaDamageEnum::*;
         match *self {
-            ZM => MoonglareReaction::LunarBloom,
+            ZM => Some(ElevativeReaction::LunarBloom),
             EGI => match main_element {
-                Some(Element::Electro) => MoonglareReaction::LunarCharged,
-                Some(Element::Dendro) => MoonglareReaction::LunarBloom,
-                Some(Element::Geo) => MoonglareReaction::LunarCrystallize,
-                _ => MoonglareReaction::None,
+                Some(Element::Electro) => Some(ElevativeReaction::LunarCharged),
+                Some(Element::Dendro) => Some(ElevativeReaction::LunarBloom),
+                Some(Element::Geo) => Some(ElevativeReaction::LunarCrystallize),
+                _ => None,
             },
-            _ => MoonglareReaction::None,
+            _ => None,
         }
     }
 
@@ -233,7 +237,7 @@ impl ColumbinaDamageEnum {
             X2 | X3 => SkillType::PlungingAttackOnGround,
             E | EGC => SkillType::ElementalSkill,
             Q => SkillType::ElementalBurst,
-            ZM | EGI => SkillType::Moonglare,
+            ZM | EGI => SkillType::Elevative,
         }
     }
 }
@@ -402,7 +406,7 @@ impl CharacterTrait for Columbina {
             Q => COLUMBINA_SKILL.q_dmg[s3],
         };
 
-        if s.get_skill_type() == SkillType::Moonglare || s.get_skill_type() == SkillType::ElementalSkill || s.get_skill_type() == SkillType::ElementalBurst {
+        if s.get_skill_type() == SkillType::Elevative || s.get_skill_type() == SkillType::ElementalSkill || s.get_skill_type() == SkillType::ElementalBurst {
             builder.add_hp_ratio("技能倍率", ratio);
         } else {
             builder.add_atk_ratio("技能倍率", ratio);
@@ -424,12 +428,12 @@ impl CharacterTrait for Columbina {
         }
 
         if s == ZM || s == EGI {
-            if s.get_lunar_type(main_element) != MoonglareReaction::None {
-                builder.moonglare(
+            if let Some(elevative_type) = s.get_elevative_type(main_element) {
+                builder.elevative(
                     &context.attribute,
                     &context.enemy,
                     s.get_element(main_element),
-                    s.get_lunar_type(main_element),
+                    elevative_type,
                     s.get_skill_type(),
                     context.character_common_data.level,
                     fumo,
