@@ -1,6 +1,18 @@
 // @ts-ignore
 
 import { deepCopy } from "@/utils/common";
+import { ref } from "vue";
+
+const resolvedConfigValueMap = new WeakMap<object, any>();
+const resolvedConfigVersion = ref(0);
+
+export function getConfigItemValue(configItem: any) {
+    resolvedConfigVersion.value;
+    if (configItem && typeof configItem === "object" && resolvedConfigValueMap.has(configItem)) {
+        return resolvedConfigValueMap.get(configItem);
+    }
+    return configItem?.config;
+}
 
 export function getObjectConfig(config: any) {
     if (config === "NoConfig") {
@@ -24,7 +36,7 @@ export function getObjectConfigValue(config: any) {
     for (const i in config) {
         res[i] = {};
         for (const j in config[i]) {
-            res[i][j] = config[i][j].configValue;
+            res[i][j] = getConfigItemValue(config[i][j]);
         }
     }
     return res;
@@ -44,8 +56,8 @@ export function getObjectConfigUnlinked(config: any) {
     return res;
 }
 
-export function restoreObjectConfig(config: any, configValue: any, unlinked: any) {
-    if (config === "NoConfig" || configValue === "NoConfig" || unlinked === "NoConfig") {
+export function restoreObjectConfig(config: any, unlinked: any) {
+    if (config === "NoConfig" || unlinked === "NoConfig") {
         return "NoConfig";
     }
     const res: any = {};
@@ -54,12 +66,6 @@ export function restoreObjectConfig(config: any, configValue: any, unlinked: any
         for (const j in config[i]) {
             if (!res[i][j]) res[i][j] = {};
             res[i][j].config = config[i][j];
-        }
-    }
-    for (const i in configValue) {
-        for (const j in configValue[i]) {
-            if (!res[i][j]) res[i][j] = {};
-            res[i][j].configValue = configValue[i][j];
         }
     }
     for (const i in unlinked) {
@@ -130,12 +136,14 @@ export function useGlobalConfig() {
             if (!p.configConfig) continue;
             for (const i of p.configConfig) {
                 if (i.type == "globalLink" && p.config[i.name].unlinked !== true) {
-                    p.config[i.name].configValue = res[i.key];
+                    resolvedConfigValueMap.set(p.config[i.name], res[i.key]);
                 } else {
-                    p.config[i.name].configValue = p.config[i.name].config;
+                    resolvedConfigValueMap.set(p.config[i.name], p.config[i.name].config);
                 }
             }
         }
+
+        resolvedConfigVersion.value += 1;
     }
 
     function updateGlobalConfig(key: string, value: any) {

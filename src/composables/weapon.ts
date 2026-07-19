@@ -19,7 +19,6 @@ export function getDefaultWeaponConfig(name: string) {
         for (let config of configs) {
             defaultConfig[config.name] = {
                 config: config.default,
-                configValue: config.default,
                 unlinked: config.unlinked,
             }
         }

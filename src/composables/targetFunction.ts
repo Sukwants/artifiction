@@ -29,7 +29,6 @@ export function getDefaultTargetFunctionConfig(name: string) {
         for (let c of targetFunctionData[name].config) {
             defaultConfig[c.name] = {
                 config: c.default,
-                configValue: c.default,
                 unlinked: c.unlinked,
             }
         }

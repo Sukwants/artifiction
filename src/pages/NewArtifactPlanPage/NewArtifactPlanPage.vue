@@ -704,7 +704,7 @@ import IconEpFolder from "~icons/ep/folder"
 import IconEpLock from "~icons/ep/lock"
 import IconEpUnlock from "~icons/ep/unlock"
 import {useComputeConstraint} from "@/composables/constraint"
-import {BuffEntry, useBuff} from "@/composables/buff"
+import {BuffEntry, getDefaultBuffConfig, useBuff} from "@/composables/buff"
 import {type PresetEntry, usePresetStore} from "@/store/pinia/preset"
 import {useArtifactStore} from "@/store/pinia/artifact"
 import type {IBuff, IPreset} from "@/types/preset"
@@ -1091,11 +1091,10 @@ function usePreset(name: string) {
             const newBuff: BuffEntry = {
                 id: idGenerator.generateId(),
                 name: buff.name,
-                config: restoreObjectConfig(
-                    buff.config,
+                config: deepMerge(restoreObjectConfig(
                     buff.config,
                     buff.configUnlinked ?? {}
-                ),
+                ), getDefaultBuffConfig(buff.name)),
                 lock: buff.lock
             }
             newBuffs.push(newBuff)
@@ -1113,7 +1112,7 @@ function usePreset(name: string) {
         characterSkill1.value = c.skill1 + 1
         characterSkill2.value = c.skill2 + 1
         characterSkill3.value = c.skill3 + 1
-        characterConfig.value = deepMerge(restoreObjectConfig(c.params, c.params, c.configUnlinked ?? {}), getDefaultCharacterConfig(c.name))
+        characterConfig.value = deepMerge(restoreObjectConfig(c.params, c.configUnlinked ?? {}), getDefaultCharacterConfig(c.name))
         characterTags.value = c.tags ?? getDefaultCharacterTag(c.name)
     }
 
@@ -1123,14 +1122,14 @@ function usePreset(name: string) {
         weaponName.value = w.name
         weaponLevel.value = w.level.toString() + (w.ascend ? "+" : "-")
         weaponRefine.value = w.refine
-        weaponConfig.value = deepMerge(restoreObjectConfig(w.params, w.params, w.configUnlinked ?? {}), getDefaultWeaponConfig(w.name) )
+        weaponConfig.value = deepMerge(restoreObjectConfig(w.params, w.configUnlinked ?? {}), getDefaultWeaponConfig(w.name) )
     }
 
     // use target function
     const tf = item.targetFunction
     if (tf) {
         targetFunctionName.value = tf.name
-        targetFunctionConfig.value = deepMerge(restoreObjectConfig(tf.params, tf.params, tf.configUnlinked ?? {}), getDefaultTargetFunctionConfig(tf.name) )
+        targetFunctionConfig.value = deepMerge(restoreObjectConfig(tf.params, tf.configUnlinked ?? {}), getDefaultTargetFunctionConfig(tf.name) )
     }
 
     // is DSL?
@@ -1175,7 +1174,7 @@ function usePreset(name: string) {
     const art = item.artifactConfig
     const artUnlinked = item.artifactConfigUnlinked
     if (art) {
-        artifactConfig.value = deepMerge(restoreObjectConfig(art, art, artUnlinked ?? {}), newDefaultArtifactConfig() )
+        artifactConfig.value = deepMerge(restoreObjectConfig(art, artUnlinked ?? {}), newDefaultArtifactConfig() )
     }
 
     miscCurrentPresetName.value = name

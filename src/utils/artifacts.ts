@@ -47,7 +47,6 @@ export function newDefaultArtifactConfig(): any {
             for (let item of configAll) {
                 c[item.name] = {
                     config: deepCopy(item.default),
-                    configValue: deepCopy(item.default),
                     unlinked: deepCopy(item.unlinked)
                 }
             }

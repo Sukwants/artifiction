@@ -11,6 +11,25 @@ export interface BuffEntry {
     lock: boolean,
 }
 
+export function getDefaultBuffConfig(name: string) {
+    const data = buffData[name]
+    if (data.config.length === 0) {
+        return "NoConfig"
+    }
+
+    let defaultConfig: any = {}
+    for (let c of data.config) {
+        defaultConfig[c.name] = {
+            config: c.default,
+            unlinked: c.unlinked,
+        }
+    }
+
+    return {
+        [name]: defaultConfig
+    }
+}
+
 export function useBuff() {
     const buffs = ref<BuffEntry[]>([])
 
@@ -32,28 +51,9 @@ export function useBuff() {
     })
 
     function addBuff(name: string) {
-        const data = buffData[name]
-        let defaultConfig: any = {}
-        for (let c of data.config) {
-            defaultConfig[c.name] = {
-                config: c.default,
-                configValue: c.default,
-                unlinked: c.unlinked,
-            }
-        }
-
-        let config
-        if (data.config.length === 0) {
-            config = "NoConfig"
-        } else {
-            config = {
-                [name]: defaultConfig
-            }
-        }
-        
         buffs.value.push({
             name,
-            config: config,
+            config: getDefaultBuffConfig(name),
             id: idGenerator.generateId(),
             lock: false
         })

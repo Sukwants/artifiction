@@ -12,7 +12,7 @@
                 :modelValue="value2[config.name].config"
                 @update:modelValue="handleInput(config.name, $event)"
                 :name="config.name"
-                :globalValue="value2[config.name].configValue"
+                :globalValue="getConfigItemValue(value2[config.name])"
                 :updateGlobalConfig="updateGlobalConfig"
                 :unlinked="value2[config.name].unlinked"
                 @update:unlinked="handleUnlinked(config.name, $event)"
@@ -32,9 +32,10 @@
 </template>
 
 <script>
-import { update } from "lodash";
 import ConfigItem from "./ConfigItem"
 import {useI18n} from "@/i18n/i18n"
+import { getConfigItemValue } from "@/composables/globalConfig"
+import { deepCopy } from "@/utils/common"
 
 export default {
     name: "ItemConfig",
@@ -78,30 +79,42 @@ export default {
     methods: {
         handleInput(name, value) {
             if (this.needItemName) {
-                let obj = Object.assign({}, this.modelValue[this.itemName])
-                obj[name].config = value
+                let obj = deepCopy(this.modelValue[this.itemName])
+                obj[name] = {
+                    ...obj[name],
+                    config: value
+                }
 
                 this.$emit("update:modelValue", {
                     [this.itemName]: obj
                 })
             } else {
-                let obj = Object.assign({}, this.modelValue)
-                obj[name].config = value
+                let obj = deepCopy(this.modelValue)
+                obj[name] = {
+                    ...obj[name],
+                    config: value
+                }
                 this.$emit("update:modelValue", obj)
             }
         },
 
         handleUnlinked(name, value) {
             if (this.needItemName) {
-                let obj = Object.assign({}, this.modelValue[this.itemName])
-                obj[name].unlinked = value
+                let obj = deepCopy(this.modelValue[this.itemName])
+                obj[name] = {
+                    ...obj[name],
+                    unlinked: value
+                }
 
                 this.$emit("update:modelValue", {
                     [this.itemName]: obj
                 })
             } else {
-                let obj = Object.assign({}, this.modelValue)
-                obj[name].unlinked = value
+                let obj = deepCopy(this.modelValue)
+                obj[name] = {
+                    ...obj[name],
+                    unlinked: value
+                }
                 this.$emit("update:modelValue", obj)
             }
         }
@@ -109,7 +122,7 @@ export default {
     setup() {
         const { t, ta } = useI18n()
         return {
-            t, ta
+            t, ta, getConfigItemValue
         }
     }
 }

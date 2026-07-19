@@ -21,7 +21,6 @@ export function getDefaultCharacterConfig(name: string) {
         for (let c of configs) {
             defaultConfig[c.name] = {
                 config: c.default,
-                configValue: c.default,
                 unlinked: c.unlinked,
             }
         }
@@ -138,7 +137,6 @@ function getDefaultCharacterSkillConfig(name: string) {
         for (let c of characterData[name].configSkill) {
             defaultConfig[c.name] = {
                 config: c.default,
-                configValue: c.default,
                 unlinked: c.unlinked,
             }
         }
