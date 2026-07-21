@@ -18,7 +18,6 @@ export interface IPreset {
     name: string,
     algorithm?: PresetAlgorithm,
     artifactConfig?: any,
-    artifactConfigUnlinked?: any,
     artifactEffectMode?: ArtifactEffectMode,
     constraint?: IConstraint,
     dslSource?: string,
@@ -27,7 +26,8 @@ export interface IPreset {
     character: ICharacter,
     weapon: IWeapon,
     targetFunction: ITargetFunction,
-    buffs?: IBuff[]
+    buffs?: IBuff[],
+    globalConfigUnlinked?: Record<string, boolean>,
 }
 
 export type ArtifactEffectMode = "custom" | "auto"

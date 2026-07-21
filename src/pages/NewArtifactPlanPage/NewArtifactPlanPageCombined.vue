@@ -43,9 +43,7 @@
                 :currentCharacterId="id"
                 :currentTeamId="characterTeamIds[id]"
                 :currentOnField="characterOnField[id]"
-                :teamSharedGlobalConfig="teamSharedGlobalConfig"
                 @update:interface="val => characters[id] = val"
-                @update:configList="val => configList[id] = val"
             ></new-artifact-plan-page>
         </el-tab-pane>
     </el-tabs>
@@ -57,12 +55,17 @@ import type { TabPaneName } from 'element-plus'
 import {useI18n} from "@/i18n/i18n"
 import { characterData } from "@/assets/character";
 import { ref, computed } from 'vue';
+import { ConfigManager } from "@/composables/config.js";
 
 const { t, ta } = useI18n()
 
 let currentCharacterId = ref(1)
 let characterIds = ref([1])
 let maxCharacterId = 1
+
+const configManager = new ConfigManager()
+
+provide("configManager", configManager)
 
 const editCharacter = (
   targetName: TabPaneName | undefined,
@@ -79,7 +82,7 @@ const editCharacter = (
         const index = characterIds.value.findIndex((id) => id === targetName)
         if (index !== -1) {
             characters.value[characterIds.value[index]] = null
-            configList.value[characterIds.value[index]] = null
+            configManager.removeCharacter(characterIds.value[index])
             if (currentCharacterId.value === targetName) {
                 currentCharacterId.value = characterIds.value[index + 1] || characterIds.value[index - 1] || 0
             }
@@ -96,24 +99,10 @@ let characterOnField = ref<boolean[]>([false, true])
 
 
 const characters = ref<any[]>([])
-const configList = ref<any[]>([])
 
 const get_character_name = (id: number) => {
     return (characterData as any)[characters.value[id]?.character?.name]?.nameLocale
 }
-
-let teamSharedGlobalConfig = computed(() => {
-    let values: any = {};
-    for (let i of configList.value) {
-        if (!i) continue;
-        for (let key in i) {
-            if (!values[key]) values[key] = [];
-            values[key].push(...i[key])
-        }
-    }
-    return values
-})
-
 
 </script>
 

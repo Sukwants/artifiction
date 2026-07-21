@@ -31,11 +31,15 @@
     </div>
 </template>
 
-<script>
+<script lang="ts">
 import ConfigItem from "./ConfigItem"
 import {useI18n} from "@/i18n/i18n"
 import { getConfigItemValue } from "@/composables/globalConfig"
 import { deepCopy } from "@/utils/common"
+import { ConfigManager, ConfigAddress } from "@/composables/config"
+import { PropType } from "vue"
+
+const configManager = inject<ConfigManager>("configManager")!
 
 export default {
     name: "ItemConfig",
@@ -43,21 +47,16 @@ export default {
         ConfigItem
     },
     props: {
-        modelValue: {},
-        itemName: {},
+        modelValue: {
+            type: Object as PropType<Record<string, ConfigAddress>>,
+            required: true
+        },
         configs: {
             type: Array
-        },
-        updateGlobalConfig: {
-            type: Function,
-            required: false
         },
         bg: {
             default: "rgb(239, 246, 253)"
         },
-        needItemName: {
-            default: true,
-        }
     },
     emits: ["update:modelValue"],
     computed: {
@@ -68,11 +67,7 @@ export default {
         },
 
         value2() {
-            if (this.needItemName) {
-                return this.modelValue[this.itemName]
-            } else {
-                return this.modelValue
-            }
+            return configManager.getObjectValue(this.modelValue)
         }
     },
     

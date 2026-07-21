@@ -5,38 +5,40 @@ import type {WeaponName, WeaponType} from "@/types/weapon"
 import {weaponByType, weaponData} from "@weapon"
 import {type Ref} from "vue"
 import {useI18n} from "@/i18n/i18n";
-import { getObjectConfigValue } from "@/composables/globalConfig";
+import { ConfigMeta, ConfigAddress, ConfigManager } from "@/composables/config"
 
-export function getDefaultWeaponConfig(name: string) {
-    let res: any;
+// export function getDefaultWeaponConfig(name: string) {
+//     let res: any;
 
-    // change config
-    const hasConfig = !!weaponData[name]?.configs
-    if (hasConfig) {
-        const configs = weaponData[name].configs
+//     // change config
+//     const hasConfig = !!weaponData[name]?.configs
+//     if (hasConfig) {
+//         const configs = weaponData[name].configs
 
-        let defaultConfig: any = {}
-        for (let config of configs) {
-            defaultConfig[config.name] = {
-                config: config.default,
-                unlinked: config.unlinked,
-            }
-        }
+//         let defaultConfig: any = {}
+//         for (let config of configs) {
+//             defaultConfig[config.name] = {
+//                 config: config.default,
+//                 unlinked: config.unlinked,
+//             }
+//         }
 
-        res = {
-            [name]: defaultConfig
-        }
-    } else {
-        res = "NoConfig"
-    }
+//         res = {
+//             [name]: defaultConfig
+//         }
+//     } else {
+//         res = "NoConfig"
+//     }
 
-    return res;
-}
-export function useWeapon(weaponType: null | Ref<WeaponType>) {
+//     return res;
+// }
+export function useWeapon(weaponType: null | Ref<WeaponType>, config: ConfigManager, character_id: number) {
     const weaponName = ref(DEFAULT_WEAPON)
     const weaponLevel = ref("90")
     const weaponRefine = ref(1)
-    const weaponConfig = ref<any>(getDefaultWeaponConfig(weaponName.value))
+    const weaponConfig = ref<Record<string, Record<string, ConfigAddress>>>({
+        [weaponName.value]: config.registerObject(character_id, "weapon", weaponName.value, weaponData[weaponName.value].configs)
+    })
 
     const weaponLevelNumber = computed(() => {
         return parseInt(weaponLevel.value)
@@ -55,7 +57,7 @@ export function useWeapon(weaponType: null | Ref<WeaponType>) {
         return !!weaponData[weaponName.value].configs
     })
 
-    const weaponConfigConfig = computed(() => {
+    const weaponConfigMeta: Ref<ConfigMeta[]> = computed(() => {
         return weaponData[weaponName.value].configs
     })
 
@@ -65,7 +67,7 @@ export function useWeapon(weaponType: null | Ref<WeaponType>) {
             level: weaponLevelNumber.value,
             ascend: weaponAscend.value,
             refine: weaponRefine.value,
-            params: getObjectConfigValue(weaponConfig.value),
+            params: config.getModuleValue(weaponConfig.value),
         }
     })
 
@@ -84,7 +86,10 @@ export function useWeapon(weaponType: null | Ref<WeaponType>) {
 
     watch(() => weaponName.value, name => {
         weaponName.value = name
-        weaponConfig.value = getDefaultWeaponConfig(name)
+        config.unregisterObject(weaponConfig.value[name])
+        weaponConfig.value = {
+            [name]: config.registerObject(character_id, "weapon", name, weaponData[name].configs)
+        }
     }, {
         flush: "sync"
     })
@@ -104,7 +109,7 @@ export function useWeapon(weaponType: null | Ref<WeaponType>) {
         weaponAscend,
         weaponSplash,
         weaponNeedConfig,
-        weaponConfigConfig,
+        weaponConfigMeta,
         weaponInterface,
         weaponLocale
 

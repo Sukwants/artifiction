@@ -2,35 +2,29 @@
 import {buffData} from "@buff"
 import {RandomIDProvider} from "@/utils/idProvider"
 import type {IBuffWasm} from "@/types/preset"
-import { getObjectConfigValue } from "@/composables/globalConfig";
+import { ConfigMeta, ConfigAddress, ConfigManager } from "@/composables/config"
 
 export interface BuffEntry {
     id: number,
     name: string,
-    config: any,
+    config: Record<string, Record<string, ConfigAddress>>,
     lock: boolean,
 }
 
-export function getDefaultBuffConfig(name: string) {
-    const data = buffData[name]
-    if (data.config.length === 0) {
-        return "NoConfig"
-    }
+// export function getDefaultBuffConfig(name: string) {
+//     const data = buffData[name]
 
-    let defaultConfig: any = {}
-    for (let c of data.config) {
-        defaultConfig[c.name] = {
-            config: c.default,
-            unlinked: c.unlinked,
-        }
-    }
+//     let defaultConfig: any = {}
+//     for (let c of data.config) {
+//         defaultConfig[c.name] = structuredClone(c.default)
+//     }
 
-    return {
-        [name]: defaultConfig
-    }
-}
+//     return {
+//         [name]: defaultConfig
+//     }
+// }
 
-export function useBuff() {
+export function useBuff(config: ConfigManager, character_id: number) {
     const buffs = ref<BuffEntry[]>([])
 
     const idGenerator = new RandomIDProvider()
@@ -44,23 +38,27 @@ export function useBuff() {
         for (let buff of buffsUnlocked.value) {
             temp.push({
                 name: buff.name,
-                config: getObjectConfigValue(buff.config),
+                config: config.getModuleValue(buff.config),
             })
         }
         return temp
     })
 
     function addBuff(name: string) {
+        const id = idGenerator.generateId()
         buffs.value.push({
             name,
-            config: getDefaultBuffConfig(name),
-            id: idGenerator.generateId(),
+            config: {
+                [name]: config.registerObject(character_id, "buff", `${name}-${id}`, buffData[name].config),
+            },
+            id: id,
             lock: false
         })
     }
 
     function deleteBuff(id: number) {
         const index = buffs.value.findIndex(e => e.id === id)
+        config.unregisterObject(buffs.value[index].config[buffs.value[index].name])
         buffs.value.splice(index, 1)
     }
 

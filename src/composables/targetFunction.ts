@@ -4,7 +4,7 @@ import {targetFunctionByCharacterName, targetFunctionData} from "@targetFunction
 import {type Ref} from "vue"
 import type {CharacterName} from "@/types/character"
 import {useI18n} from "@/i18n/i18n";
-import { getObjectConfigValue } from "@/composables/globalConfig";
+import { ConfigMeta, ConfigAddress, ConfigManager } from "@/composables/config"
 
 function getDefaultTargetFunction(name: string) {
     let res: any;
@@ -19,36 +19,36 @@ function getDefaultTargetFunction(name: string) {
     return res;
 }
 
-export function getDefaultTargetFunctionConfig(name: string) {
-    let res: any;
+// export function getDefaultTargetFunctionConfig(name: string) {
+//     let res: any;
 
-    const hasConfig = targetFunctionData[name].config.length > 0
+//     const hasConfig = targetFunctionData[name].config.length > 0
 
-    if (hasConfig) {
-        let defaultConfig: any = {}
-        for (let c of targetFunctionData[name].config) {
-            defaultConfig[c.name] = {
-                config: c.default,
-                unlinked: c.unlinked,
-            }
-        }
-        res = {
-            [name]: defaultConfig
-        }
-    } else {
-        res = "NoConfig"
-    }
+//     if (hasConfig) {
+//         let defaultConfig: any = {}
+//         for (let c of targetFunctionData[name].config) {
+//             defaultConfig[c.name] = {
+//                 config: c.default,
+//                 unlinked: c.unlinked,
+//             }
+//         }
+//         res = {
+//             [name]: defaultConfig
+//         }
+//     } else {
+//         res = "NoConfig"
+//     }
 
-    return res;
-}
+//     return res;
+// }
 
-export function useTargetFunction(characterName: Ref<CharacterName>) {
+export function useTargetFunction(characterName: Ref<CharacterName>, config: ConfigManager, character_id: number) {
     const targetFunctionName = ref<TargetFunctionName>(getDefaultTargetFunction(characterName.value))
-    const targetFunctionConfig = ref<any>("NoConfig")
+    const targetFunctionConfig = ref<Record<string, Record<string, ConfigAddress>>>({
+        [targetFunctionName.value]: config.registerObject(character_id, "target_function", targetFunctionName.value, targetFunctionData[targetFunctionName.value].config)
+    })
     const targetFunctionUseDSL = ref(false)
     const targetFunctionDSLSource = ref("")
-
-    targetFunctionConfig.value = getDefaultTargetFunctionConfig(getDefaultTargetFunction(characterName.value))
 
     const { t, ta } = useI18n()
 
@@ -66,7 +66,7 @@ export function useTargetFunction(characterName: Ref<CharacterName>) {
         return temp && temp.length > 0
     })
 
-    const targetFunctionConfigConfig = computed(() => {
+    const targetFunctionConfigMeta: Ref<ConfigMeta[]> = computed(() => {
         return targetFunctionData[targetFunctionName.value].config
     })
 
@@ -74,7 +74,7 @@ export function useTargetFunction(characterName: Ref<CharacterName>) {
         const use_dsl = targetFunctionUseDSL.value
         return {
             name: targetFunctionName.value,
-            params: getObjectConfigValue(targetFunctionConfig.value),
+            params: config.getModuleValue(targetFunctionConfig.value),
             use_dsl,
             dsl_source: use_dsl ? targetFunctionDSLSource.value : ""
         }
@@ -88,7 +88,10 @@ export function useTargetFunction(characterName: Ref<CharacterName>) {
 
     watch(() => targetFunctionName.value, name => {
         targetFunctionName.value = name
-        targetFunctionConfig.value = getDefaultTargetFunctionConfig(name)
+        config.unregisterObject(targetFunctionConfig.value[name])
+        targetFunctionConfig.value = {
+            [name]: config.registerObject(character_id, "target_function", name, targetFunctionData[name].config)
+        }
     }, {
         flush: "sync"
     })
@@ -101,7 +104,7 @@ export function useTargetFunction(characterName: Ref<CharacterName>) {
         targetFunctionBadge,
         targetFunctionDescription,
         targetFunctionNeedConfig,
-        targetFunctionConfigConfig,
+        targetFunctionConfigMeta,
         targetFunctionInterface
     }
 }

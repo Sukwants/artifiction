@@ -4,16 +4,23 @@ import type {ArtifactSetName, IArtifact, IArtifactWasm} from "@/types/artifact"
 import {artifactsData} from "@artifact"
 import {convertArtifact, convertArtifactName} from "@/utils/converter"
 import {toSnakeCase} from "@/utils/common"
-import {getArtifactAllConfigsByName, newDefaultArtifactConfig} from "@/utils/artifacts"
+import { default_artifact_config } from "@/utils/artifacts"
 import {useI18n} from "@/i18n/i18n"
-import { getObjectConfigValue } from "./globalConfig"
+import { ConfigMeta, ConfigAddress, ConfigManager } from "@/composables/config"
 
-export function useArtifactConfig() {
+export function useArtifactConfig(config: ConfigManager, character_id: number) {
 
-    const artifactConfig = ref<any>(newDefaultArtifactConfig())
-    const artifactConfigValue = computed(() => {
-        return getObjectConfigValue(artifactConfig.value)
-    })
+    const artifactConfig = ref<Record<string, Record<string, ConfigAddress>>>({})
+    for (const name in artifactsData) {
+        const data = artifactsData[name]
+        const name2 = data.name2
+
+        const snake = toSnakeCase(name2)
+
+        for (const num in [1, 2, 3, 4, 5]) {
+            artifactConfig.value[`config_${snake}*set${num}`] = config.registerObject(character_id, "artifact", name, data[`config${num}`])
+        }
+    }
     const showConfigArtifactDialog = ref(false)
     const artifactEffectMode = ref<"auto" | "custom">("custom")
 
@@ -23,19 +30,28 @@ export function useArtifactConfig() {
 
     return {
         artifactConfig,
-        artifactConfigValue,
         showConfigArtifactDialog,
         artifactEffectMode,
         handleClickArtifactConfig,
     }
 }
 
-export function use5Artifacts() {
+export function use5Artifacts(config: ConfigManager, character_id: number) {
     const artifactStore = useArtifactStore()
 
     const artifactIds = ref([-1, -1, -1, -1, -1])
     // artifact set 2/4 config
-    const artifactSingleConfig = ref<any>(newDefaultArtifactConfig())
+    const artifactSingleConfig = ref<Record<string, Record<string, ConfigAddress>>>({})
+    for (const name in artifactsData) {
+        const data = artifactsData[name]
+        const name2 = data.name2
+
+        const snake = toSnakeCase(name2)
+
+        for (const num in [1, 2, 3, 4, 5]) {
+            artifactSingleConfig.value[`config_${snake}*set${num}`] = {};
+        }
+    }
 
     const artifactItems = computed(() => {
         let temp: (IArtifact | null)[] = []
@@ -72,6 +88,22 @@ export function use5Artifacts() {
         return temp
     })
 
+    watch(() => artifactSetCount.value, (newVal, oldVal) => {
+        for (const name in artifactsData) {
+            for (const num in [1, 2, 3, 4, 5]) {
+                if (newVal[name] >= parseInt(num) && oldVal[name] < parseInt(num)) {
+                    const configName = `config_${toSnakeCase(artifactsData[name].name2)}*set${num}`
+                    artifactSingleConfig.value[configName] = config.registerObject(character_id, "artifact", name, artifactsData[name][`config${num}`])
+                }
+                if (newVal[name] < parseInt(num) && oldVal[name] >= parseInt(num)) {
+                    const configName = `config_${toSnakeCase(artifactsData[name].name2)}*set${num}`
+                    config.unregisterObject(artifactSingleConfig.value[configName])
+                    artifactSingleConfig.value[configName] = {}
+                }
+            }
+        }
+    })
+
     const artifactWasmFormat = computed((): IArtifactWasm[] => {
         let temp: IArtifactWasm[] = []
         for (let id of artifactIds.value) {
@@ -87,7 +119,21 @@ export function use5Artifacts() {
     })
 
     const artifactConfigForCalculator = computed(() => {
-        return getObjectConfigValue(artifactSingleConfig.value)
+        let res: Record<string, Record<string, any>> = {};
+        for (const name in artifactsData) {
+            const configName = `config_${toSnakeCase(artifactsData[name].name2)}`
+            res[configName] = {}
+            for (const num in [1, 2, 3, 4, 5]) {
+                const configNameWithNum = `config_${toSnakeCase(artifactsData[name].name2)}*set${num}`
+                for (const key in default_artifact_config[configNameWithNum]) {
+                    res[configNameWithNum][key] = default_artifact_config[configNameWithNum][key]
+                }
+                for (const key in artifactSingleConfig.value[configNameWithNum]) {
+                    res[configNameWithNum][key] = config.getConfigValue(artifactSingleConfig.value[configNameWithNum][key])
+                }
+            }
+        }
+        return res
     })
 
     const artifactCount = computed(() => {
