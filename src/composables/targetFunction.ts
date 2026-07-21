@@ -86,9 +86,10 @@ export function useTargetFunction(characterName: Ref<CharacterName>, config: Con
         flush: "sync"
     })
 
-    watch(() => targetFunctionName.value, name => {
-        targetFunctionName.value = name
-        config.unregisterObject(targetFunctionConfig.value[name])
+    watch(() => targetFunctionName.value, (name, oldName) => {
+        if (oldName && targetFunctionConfig.value[oldName]) {
+            config.unregisterObject(targetFunctionConfig.value[oldName])
+        }
         targetFunctionConfig.value = {
             [name]: config.registerObject(character_id, "target_function", name, targetFunctionData[name].config)
         }
@@ -105,6 +106,7 @@ export function useTargetFunction(characterName: Ref<CharacterName>, config: Con
         targetFunctionDescription,
         targetFunctionNeedConfig,
         targetFunctionConfigMeta,
+        targetFunctionConfigConfig: targetFunctionConfigMeta,
         targetFunctionInterface
     }
 }

@@ -95,9 +95,10 @@ export function useCharacter(config: ConfigManager, character_id: number) {
         return i
     })
 
-    watch(() => characterName.value, name => {
-        characterName.value = name
-        config.unregisterObject(characterConfig.value[characterName.value])
+    watch(() => characterName.value, (name, oldName) => {
+        if (oldName && characterConfig.value[oldName]) {
+            config.unregisterObject(characterConfig.value[oldName])
+        }
         characterConfig.value = {
             [name]: config.registerObject(character_id, "character", name, characterData[name].config)
         } 
@@ -120,6 +121,7 @@ export function useCharacter(config: ConfigManager, character_id: number) {
         characterSplash,
         characterNeedConfig,
         characterConfigMeta,
+        characterConfigConfig: characterConfigMeta,
         characterInterface,
         characterLocale,
         characterTags,
@@ -172,8 +174,10 @@ export function useCharacterSkill(characterName: Ref<CharacterName>, config: Con
         }
     })
 
-    watch(() => characterName.value, name => {
-        config.unregisterObject(characterSkillConfig.value[name])
+    watch(() => characterName.value, (name, oldName) => {
+        if (oldName && characterSkillConfig.value[oldName]) {
+            config.unregisterObject(characterSkillConfig.value[oldName])
+        }
         characterSkillConfig.value = {
             [name]: config.registerObject(character_id, "character_skill", name, characterData[name].configSkill)
         }
@@ -196,6 +200,7 @@ export function useCharacterSkill(characterName: Ref<CharacterName>, config: Con
         characterSkillIndex,
         characterNeedSkillConfig,
         characterSkillConfigMeta,
+        characterSkillConfigConfig: characterSkillConfigMeta,
         characterSkillInterface,
     }
 }

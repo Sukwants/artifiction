@@ -27,17 +27,19 @@ export function howManyUpgradeCount(value: number, tagName: ArtifactStatName, st
 
 // create new default artifact config
 export function newDefaultArtifactConfig() {
-    let configs: Record<string, Record<string, any>> = {}
+    const configs: Record<string, Record<string, any>> = {}
 
-    for (let name in artifactsData) {
+    for (const name in artifactsData) {
         const data = artifactsData[name]
         const name2 = data.name2
 
         const snake = toSnakeCase(name2)
 
-        for (let num in [1, 2, 3, 4, 5]) {
-            for (let key in data[`config${num}`] ?? []) {
-                configs[`config_${snake}*set${num}`][key] = data[`config${num}`][key].default ?? []
+        for (const num of [1, 2, 3, 4, 5]) {
+            const configName = `config_${snake}*set${num}`
+            configs[configName] = {}
+            for (const config of data[`config${num}`] ?? []) {
+                configs[configName][config.name] = config.default ?? []
             }
         }
     }
@@ -323,7 +325,7 @@ export function statName2Locale(name: ArtifactStatName): string {
 
 export function getArtifactAllConfigs(item: any): any {
     let res = [];
-    for (let num in [1, 2, 3, 4, 5]) {
+    for (const num of [1, 2, 3, 4, 5]) {
         const config = item[`config${num}`] ?? []
         res.push(config)
     }
@@ -338,7 +340,7 @@ export function getArtifactAllConfigsByName(name: ArtifactSetName): any {
 /// merge configs into a legit config
 /// note: there may be circumstances where a merging config is not complete (e.g. lacking some config2 fields)
 export function mergeArtifactConfig(config: any): any {
-    const defaultConfig = default_artifact_config
+    const defaultConfig = deepCopy(default_artifact_config)
     for (const key in config) {
         if (key in defaultConfig) {
             for (const configKey in config[key]) {

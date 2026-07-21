@@ -19,8 +19,7 @@
 
                 <div class="pf-config">
                     <item-config
-                        v-model="potentialFunctionConfig"
-                        :item-name="potentialFunctionName"
+                        :model-value="potentialFunctionConfig[potentialFunctionName]"
                         :configs="pfConfigConfigs"
                     ></item-config>
                 </div>
@@ -93,6 +92,7 @@
 <!--                    ></artifact-display-by-id>-->
                     <artifact-display
                         v-for="result in artifactsToBeDisplayed"
+                        :key="result[0].id"
                         :item="result[0]"
                         :extra="result[1].toFixed(2)"
                         :show-back="true"
@@ -118,7 +118,6 @@
 
 <script setup lang="ts">
 import {potentialFunctionData} from "@potentialFunction"
-import {getPotentialFunctionDefaultConfig} from "@util/potentialFunction"
 import {getArtifactsWasm} from "@/utils/artifacts"
 import {wasmComputeArtifactPotential} from "@wasm"
 import {deviceIsPC} from "@/utils/device"
@@ -135,8 +134,11 @@ import {useArtifactStore} from "@/store/pinia/artifact"
 // import "element-plus/es/components/message/style/css"
 import IconEpCpu from "~icons/ep/cpu"
 import {useI18n} from "@/i18n/i18n"
+import {ConfigAddress, ConfigManager} from "@/composables/config"
 
 const { t } = useI18n()
+const configManager = new ConfigManager()
+provide("configManager", configManager)
 
 
 const artifactStore = useArtifactStore()
@@ -174,7 +176,28 @@ const pfConfigConfigs = computed(() => {
 })
 
 // potential function config
-const potentialFunctionConfig = ref(getPotentialFunctionDefaultConfig("ArtifactEff"))
+const potentialFunctionConfig = ref<Record<string, Record<string, ConfigAddress>>>({
+    [potentialFunctionName.value]: configManager.registerObject(
+        1,
+        "potential_function",
+        potentialFunctionName.value,
+        potentialFunctionData[potentialFunctionName.value].config
+    )
+})
+
+watch(() => potentialFunctionName.value, (name, oldName) => {
+    if (oldName && potentialFunctionConfig.value[oldName]) {
+        configManager.unregisterObject(potentialFunctionConfig.value[oldName])
+    }
+    potentialFunctionConfig.value = {
+        [name]: configManager.registerObject(
+            1,
+            "potential_function",
+            name,
+            potentialFunctionData[name].config
+        )
+    }
+})
 
 // results
 const results = ref<[number, number][]>([])     // [id, score][]
@@ -241,7 +264,7 @@ const resultsToBeDisplay = computed((): [number, number][] => {
 })
 
 const artifactsToBeDisplayed = computed((): [IArtifact, number][] => {
-    const r = <[IArtifact, number][]>[]
+    const r: [IArtifact, number][] = []
     for (let item of resultsToBeDisplay.value) {
         const [artifactId, score] = item
         const a = artifactStore.artifacts.value.get(artifactId)
@@ -256,7 +279,7 @@ const artifactsToBeDisplayed = computed((): [IArtifact, number][] => {
 const potentialFunctionInterface = computed(() => {
     return {
         name: potentialFunctionName.value,
-        config: potentialFunctionConfig.value
+        config: configManager.getModuleValue(potentialFunctionConfig.value)
     }
 })
 

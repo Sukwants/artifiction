@@ -84,9 +84,10 @@ export function useWeapon(weaponType: null | Ref<WeaponType>, config: ConfigMana
         })
     }
 
-    watch(() => weaponName.value, name => {
-        weaponName.value = name
-        config.unregisterObject(weaponConfig.value[name])
+    watch(() => weaponName.value, (name, oldName) => {
+        if (oldName && weaponConfig.value[oldName]) {
+            config.unregisterObject(weaponConfig.value[oldName])
+        }
         weaponConfig.value = {
             [name]: config.registerObject(character_id, "weapon", name, weaponData[name].configs)
         }

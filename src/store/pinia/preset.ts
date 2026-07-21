@@ -2,7 +2,7 @@ import {upgradePresetItem} from "@/utils/preset"
 import {computed, reactive, type Ref, ref, watch} from "vue"
 import {type IPreset} from "@/types/preset"
 
-const VERSION = 3
+const VERSION = 4
 
 function loadPresetOrDefault(payload: any) {
     if (!payload) {
@@ -90,4 +90,36 @@ export function watchContent() {
 
 export const usePresetStore = () => {
     return s
+}
+
+export function upgradePresetToNewVersion(preset: PresetEntry | any): PresetEntry | undefined {
+    if (preset.version === 4) {
+        return preset;
+    }
+    if (preset.version <= 3) {
+        const item = preset.item as any;
+        
+        let res: IPreset = {
+            name: item.name,
+            algorithm: item.algorithm,
+            artifactConfig: item.artifactConfig,
+            artifactEffectMode: item.artifactEffectMode,
+            constraint: item.constraint,
+            dslSource: item.dslSource,
+            useDSL: item.useDSL,
+            filter: item.filter,
+            character: item.character,
+            weapon: item.weapon,
+            targetFunction: item.targetFunction,
+            buffs: item.buffs,
+            globalConfigUnlinked: {},   // 不管了，不要了
+        }
+
+        return {
+            name: preset.name,
+            item: res,
+            version: 4
+        }
+    }
+    return undefined;
 }

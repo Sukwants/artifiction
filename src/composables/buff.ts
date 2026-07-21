@@ -2,7 +2,7 @@
 import {buffData} from "@buff"
 import {RandomIDProvider} from "@/utils/idProvider"
 import type {IBuffWasm} from "@/types/preset"
-import { ConfigMeta, ConfigAddress, ConfigManager } from "@/composables/config"
+import { ConfigAddress, ConfigManager } from "@/composables/config"
 
 export interface BuffEntry {
     id: number,

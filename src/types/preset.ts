@@ -6,13 +6,12 @@ import type {ArtifactStatName} from "@/types/artifact"
 export interface IBuff {
     name: string,
     config: any,
-    configUnlinked: any,
     lock: boolean,
 }
 
 export type IBuffWithID = IBuff & { id: number }
 
-export type IBuffWasm = Omit<Omit<IBuff, "lock">, "configUnlinked">;
+export type IBuffWasm = Omit<IBuff, "lock">;
 
 export interface IPreset {
     name: string,
@@ -26,7 +25,7 @@ export interface IPreset {
     character: ICharacter,
     weapon: IWeapon,
     targetFunction: ITargetFunction,
-    buffs?: IBuff[],
+    buffs?: Record<number, IBuff>,
     globalConfigUnlinked?: Record<string, boolean>,
 }
 

@@ -10,6 +10,7 @@ export type GlobalLinkMeta = {
 export type ConfigMeta = {
     type: string,
     name: string,
+    title: any,
     default: any,
     global_link?: GlobalLinkMeta,
     [key: string]: unknown,
@@ -32,22 +33,22 @@ export class ConfigAddress {
         return `${this.character_id}#${this.module_name}:${this.object_name}:${this.config_name}`;
     }
 
-    from_str(s: string): ConfigAddress {
-        const [character_id_str, rest] = s.split('#');
-        const [module_name, object_name, config_name] = rest.split(':');
+    static fromString(s: string): ConfigAddress {
+        const [character_id_str, rest] = s.split("#");
+        const [module_name, object_name, config_name] = rest.split(":");
         return new ConfigAddress(parseInt(character_id_str), module_name, object_name, config_name);
     }
 
     str_without_character(): string {
         return `${this.module_name}:${this.object_name}:${this.config_name}`;
     }
-};
+}
 
 export class ConfigManager {
     private version = ref(0); // 配置版本号，每次配置更新时自增，用于触发组件更新
     private values: Map<string, any> = new Map(); // 配置项值
     private global_link_metas: Map<string, GlobalLinkMeta> = new Map(); // 配置项的全局链接信息
-    private global_key_lists: Map<string, Set<ConfigAddress>> = new Map(); // 全局链接键对应的配置项地址集合
+    private global_key_lists: Map<string, Set<string>> = new Map(); // 全局链接键对应的配置项地址集合
 
     registerObject(character_id: number, module_name: string, object_name: string, config_metas: ConfigMeta[] | undefined): Record<string, ConfigAddress> {
         // 将对象注册到配置系统中，返回配置项地址的映射
@@ -57,19 +58,21 @@ export class ConfigManager {
         ++this.version.value;
         config_metas = structuredClone(config_metas);
 
-        let config_addresses: Record<string, ConfigAddress> = {};
+        const config_addresses: Record<string, ConfigAddress> = {};
 
-        for (let config of config_metas) {
+        for (const config of config_metas) {
             config_addresses[config.name] = new ConfigAddress(character_id, module_name, object_name, config.name);
+            const addressKey = config_addresses[config.name].str();
 
-            this.values.set(config_addresses[config.name].str(), config.default);
+            this.values.set(addressKey, config.default);
 
-            if (config.global_link) {
-                this.global_link_metas.set(config_addresses[config.name].str(), config.global_link);
-                if (!this.global_key_lists.has(config.global_link.key)) {
-                    this.global_key_lists.set(config.global_link.key, new Set());
+            const globalLinkMeta = config.global_link;
+            if (globalLinkMeta) {
+                this.global_link_metas.set(addressKey, globalLinkMeta);
+                if (!this.global_key_lists.has(globalLinkMeta.key)) {
+                    this.global_key_lists.set(globalLinkMeta.key, new Set());
                 }
-                this.global_key_lists.get(config.global_link.key)?.add(config_addresses[config.name]);
+                this.global_key_lists.get(globalLinkMeta.key)?.add(addressKey);
             }
         }
         return config_addresses;
@@ -80,14 +83,15 @@ export class ConfigManager {
 
         ++this.version.value;
 
-        for (let config_name in config_addresses) {
-            this.values.delete(config_addresses[config_name].str());
+        for (const config_name in config_addresses) {
+            const addressKey = config_addresses[config_name].str();
+            this.values.delete(addressKey);
 
-            if (this.global_link_metas.has(config_addresses[config_name].str())) {
-                this.global_key_lists.get(this.global_link_metas.get(config_addresses[config_name].str())!.key)?.delete(config_addresses[config_name]);
+            if (this.global_link_metas.has(addressKey)) {
+                this.global_key_lists.get(this.global_link_metas.get(addressKey)!.key)?.delete(addressKey);
             }
 
-            this.global_link_metas.delete(config_addresses[config_name].str());
+            this.global_link_metas.delete(addressKey);
         }
     }
 
@@ -103,19 +107,20 @@ export class ConfigManager {
         if (!addresses) return [];
 
         let max_priority = -Infinity;
-        let active_addresses: ConfigAddress[] = [];
-        for (const address of addresses) {
-            const info = this.global_link_metas.get(address.str())!;
+        let active_addresses: string[] = [];
+        for (const addressKey of addresses) {
+            const address = ConfigAddress.fromString(addressKey);
+            const info = this.global_link_metas.get(addressKey)!;
             if (!info || info.unlinked) continue;
             if ((address.character_id == current_address.character_id || info.team_shared) && info.priority >= max_priority) {
                 if (info.priority > max_priority) {
                     max_priority = info.priority;
                     active_addresses = [];
                 }
-                active_addresses.push(address);
+                active_addresses.push(addressKey);
             }
         }
-        return structuredClone(active_addresses);
+        return active_addresses.map(address => ConfigAddress.fromString(address));
     }
 
     getConfigValue(config_address: ConfigAddress): any {
@@ -149,15 +154,15 @@ export class ConfigManager {
     }
     
     getObjectValue(config_addresses: Record<string, ConfigAddress>): Record<string, any> {
-        let res: Record<string, any> = {};
-        for (let config_name in config_addresses) {
+        const res: Record<string, any> = {};
+        for (const config_name in config_addresses) {
             res[config_name] = this.getConfigValue(config_addresses[config_name]);
         }
         return structuredClone(res);
     }
 
     updateObjectValue(config_addresses: Record<string, ConfigAddress>, values: Record<string, any>): void {
-        for (let config_name in config_addresses) {
+        for (const config_name in config_addresses) {
             if (config_name in values) {
                 this.updateConfigValue(config_addresses[config_name], values[config_name]);
             }
@@ -165,15 +170,15 @@ export class ConfigManager {
     }
 
     getModuleValue(config_addresses: Record<string, Record<string, ConfigAddress>>): Record<string, Record<string, any>> {
-        let res: Record<string, Record<string, any>> = {};
-        for (let object_name in config_addresses) {
+        const res: Record<string, Record<string, any>> = {};
+        for (const object_name in config_addresses) {
             res[object_name] = this.getObjectValue(config_addresses[object_name]);
         }
         return structuredClone(res);
     }
 
     updateModuleValue(config_addresses: Record<string, Record<string, ConfigAddress>>, values: Record<string, Record<string, any>>): void {
-        for (let object_name in config_addresses) {
+        for (const object_name in config_addresses) {
             if (object_name in values) {
                 this.updateObjectValue(config_addresses[object_name], values[object_name]);
             }
@@ -201,10 +206,11 @@ export class ConfigManager {
 
         void this.version.value;
         
-        let res: Record<string, boolean> = {};
-        for (let [address, info] of this.global_link_metas) {
-            if (ConfigAddress.prototype.from_str(address).character_id == character_id && info.unlinked) {
-                res[ConfigAddress.prototype.from_str(address).str_without_character()] = info.unlinked;
+        const res: Record<string, boolean> = {};
+        for (const [address, info] of this.global_link_metas) {
+            const configAddress = ConfigAddress.fromString(address);
+            if (configAddress.character_id == character_id && info.unlinked) {
+                res[configAddress.str_without_character()] = info.unlinked;
             }
         }
         return structuredClone(res);
@@ -215,9 +221,10 @@ export class ConfigManager {
         ++this.version.value;
         statuses = structuredClone(statuses);
 
-        for (let [address, info] of this.global_link_metas) {
-            if (ConfigAddress.prototype.from_str(address).character_id == character_id) {
-                info.unlinked = statuses[ConfigAddress.prototype.from_str(address).str_without_character()] || false;
+        for (const [address, info] of this.global_link_metas) {
+            const configAddress = ConfigAddress.fromString(address);
+            if (configAddress.character_id == character_id) {
+                info.unlinked = statuses[configAddress.str_without_character()] || false;
             }
         }
     }
@@ -226,14 +233,14 @@ export class ConfigManager {
 
         ++this.version.value;
 
-        for (let address of Array.from(this.values.keys())) {
-            if (ConfigAddress.prototype.from_str(address).character_id == character_id) {
+        for (const address of Array.from(this.values.keys())) {
+            if (ConfigAddress.fromString(address).character_id == character_id) {
                 this.values.delete(address);
                 if (this.global_link_metas.has(address)) {
-                    this.global_key_lists.get(this.global_link_metas.get(address)!.key)?.delete(ConfigAddress.prototype.from_str(address));
+                    this.global_key_lists.get(this.global_link_metas.get(address)!.key)?.delete(address);
                 }
                 this.global_link_metas.delete(address);
             }
         }
     }
-};
+}

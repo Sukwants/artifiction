@@ -55,7 +55,7 @@ import type { TabPaneName } from 'element-plus'
 import {useI18n} from "@/i18n/i18n"
 import { characterData } from "@/assets/character";
 import { ref, computed } from 'vue';
-import { ConfigManager } from "@/composables/config.js";
+import { ConfigManager } from "@/composables/config";
 
 const { t, ta } = useI18n()
 
