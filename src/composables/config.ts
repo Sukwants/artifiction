@@ -161,7 +161,9 @@ export class ConfigManager {
         return structuredClone(res);
     }
 
-    updateObjectValue(config_addresses: Record<string, ConfigAddress>, values: Record<string, any>): void {
+    updateObjectValue(config_addresses: Record<string, ConfigAddress>, values: Record<string, any> | null | undefined): void {
+        if (!values) return;
+
         for (const config_name in config_addresses) {
             if (config_name in values) {
                 this.updateConfigValue(config_addresses[config_name], values[config_name]);
@@ -177,7 +179,9 @@ export class ConfigManager {
         return structuredClone(res);
     }
 
-    updateModuleValue(config_addresses: Record<string, Record<string, ConfigAddress>>, values: Record<string, Record<string, any>>): void {
+    updateModuleValue(config_addresses: Record<string, Record<string, ConfigAddress>>, values: Record<string, Record<string, any>> | null | undefined): void {
+        if (!values) return;
+
         for (const object_name in config_addresses) {
             if (object_name in values) {
                 this.updateObjectValue(config_addresses[object_name], values[object_name]);

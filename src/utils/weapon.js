@@ -14,23 +14,23 @@ export function getWeaponDefaultConfigWasmInterface(name) {
             [name]: defaultConfigs
         }
     } else {
-        return "NoConfig"
+        return null
     }
 }
 
 export function upgradeWeaponConfig(name, oldConfig) {
     if (!name) {
-        return "NoConfig"
+        return null
     }
 
     const data = weaponData[name]
     if (!data) {
-        return "NoConfig"
+        return null
     }
 
     const configs = data.configs ?? []
     if (configs.length === 0) {
-        return "NoConfig"
+        return null
     }
 
     if (Object.prototype.hasOwnProperty.call(oldConfig, name)) {

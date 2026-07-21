@@ -37,11 +37,14 @@ function f() {
         presets.value = loadPresetOrDefault(payload)
     }
 
-    function addOrOverwrite(name: string, item: IPreset) {
-        presets.value[name] = {
-            name,
-            item,
-            version: VERSION
+    function addOrOverwrite(name: string, item: IPreset, version: number) {
+        const preset = upgradePresetToNewVersion({
+            name: name,
+            item: item,
+            version: version
+        })
+        if (preset) {
+            presets.value[name] = preset
         }
     }
 
@@ -98,6 +101,11 @@ export function upgradePresetToNewVersion(preset: PresetEntry | any): PresetEntr
     }
     if (preset.version <= 3) {
         const item = preset.item as any;
+
+        function removeConfigUnlinked(obj: any) {
+            const {configUnlinked, ...rest} = obj;
+            return rest;
+        }
         
         let res: IPreset = {
             name: item.name,
@@ -108,12 +116,22 @@ export function upgradePresetToNewVersion(preset: PresetEntry | any): PresetEntr
             dslSource: item.dslSource,
             useDSL: item.useDSL,
             filter: item.filter,
-            character: item.character,
-            weapon: item.weapon,
-            targetFunction: item.targetFunction,
-            buffs: item.buffs,
+            character: removeConfigUnlinked(item.character),
+            weapon: removeConfigUnlinked(item.weapon),
+            targetFunction: removeConfigUnlinked(item.targetFunction),
+            buffs: item.buffs.map((buff: any) => removeConfigUnlinked(buff)),
             globalConfigUnlinked: {},   // 不管了，不要了
         }
+
+        if (res.character.params == "NoConfig") res.character.params = {};
+        if (res.weapon.params == "NoConfig") res.weapon.params = {};
+        if (res.targetFunction.params == "NoConfig") res.targetFunction.params = {};
+        if (res.buffs) {
+            for (const id in res.buffs) {
+                if (res.buffs[id].config == "NoConfig") res.buffs[id].config = {};
+            }
+        }
+        if (res.artifactConfig == "NoConfig") res.artifactConfig = {};
 
         return {
             name: preset.name,

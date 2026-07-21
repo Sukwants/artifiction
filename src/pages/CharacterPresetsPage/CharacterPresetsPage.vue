@@ -138,7 +138,7 @@ async function handleImport() {
         })
     } else {
         for (let entry of obj) {
-            presetStore.addOrOverwrite(entry.name, entry.item)
+            presetStore.addOrOverwrite(entry.name, entry.item, entry.version)
         }
 
         showImportDialog.value = false
