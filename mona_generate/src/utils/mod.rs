@@ -180,9 +180,11 @@ pub fn config_to_json(config: &ItemConfig) -> String {
         },
         ItemConfigType::GlobalLinkFloat { min, max, default, global_link } => {
             json!({
-                "type": "floatInput",
+                "type": "float",
                 "title": title_index,
                 "name": name,
+                "min": min,
+                "max": max,
                 "default": default,
                 "global_link": {
                     "key": global_link.key,
