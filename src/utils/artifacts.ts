@@ -35,11 +35,11 @@ export function newDefaultArtifactConfig() {
 
         const snake = toSnakeCase(name2)
 
+        const configName = `config_${snake}`
+        configs[configName] = {}
         for (const num of [1, 2, 3, 4, 5]) {
-            const configName = `config_${snake}*set${num}`
-            configs[configName] = {}
-            for (const config of data[`config${num}`] ?? []) {
-                configs[configName][config.name] = config.default ?? []
+            for (const meta of data[`config${num}`] ?? []) {
+                configs[configName][meta.name] = meta.default ?? []
             }
         }
     }
@@ -47,6 +47,53 @@ export function newDefaultArtifactConfig() {
     return configs
 }
 export const default_artifact_config = newDefaultArtifactConfig()
+
+export function convertArtifactConfigForWasm(config: Record<string, Record<string, any>>): Record<string, Record<string, any>> {
+    const res: Record<string, Record<string, any>> = {}
+
+    for (const name in artifactsData) {
+        const data = artifactsData[name]
+        const name2 = data.name2
+
+        const snake = toSnakeCase(name2)
+
+        const config_name = `config_${snake}`
+        const setConfig: Record<string, any> = {}
+        for (const num of [1, 2, 3, 4, 5]) {
+            const config_name_with_count = `config_${snake}*set${num}`
+            for (const meta of data[`config${num}`] ?? []) {
+                if (meta.name in (config[config_name_with_count] ?? {})) {
+                    setConfig[meta.name] = config[config_name_with_count][meta.name]
+                }
+            }
+        }
+        if (Object.keys(setConfig).length > 0) {
+            res[config_name] = setConfig
+        }
+    }
+
+    return res
+}
+export function convertArtifactConfigFromWasm(config: Record<string, Record<string, any>>): Record<string, Record<string, any>> {
+    const res: Record<string, Record<string, any>> = {}
+
+    for (const name in artifactsData) {
+        const data = artifactsData[name]
+        const name2 = data.name2
+
+        const snake = toSnakeCase(name2)
+
+        for (const num of [1, 2, 3, 4, 5]) {
+            const config_name_with_count = `config_${snake}*set${num}`
+            res[config_name_with_count] = {}
+            for (const meta of data[`config${num}`] ?? []) {
+                res[config_name_with_count][meta.name] = config[`config_${snake}`]?.[meta.name] ?? meta.default
+            }
+        }
+    }
+
+    return res
+}
 
 // toggle artifact omit/not omit
 export function toggleArtifact(id: number) {
@@ -181,7 +228,7 @@ export function importMonaJson(rawObj: any, removeNonExisting: boolean, backupIm
            if (artifacts !== undefined) {
                kumiStore.addKumi(1, equipName, artifacts)
            }
-        }   
+        }
     }
     if (importKumi && parseInt(rawObj.version) >= 2) {
         const kumi = rawObj.kumi ?? []
@@ -350,6 +397,5 @@ export function mergeArtifactConfig(config: any): any {
             }
         }
     }
-    console.log(defaultConfig)
     return defaultConfig
 }

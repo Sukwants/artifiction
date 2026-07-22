@@ -1,5 +1,6 @@
 use std::collections::{BinaryHeap, HashMap};
 use std::cmp::{PartialOrd, Eq, PartialEq, Ord, Ordering, Reverse};
+use std::print;
 
 use mona::common::CharacterFullInfo;
 use wasm_bindgen::prelude::*;
@@ -39,10 +40,11 @@ impl OptimizeSingleWasm {
         let active_character = CharacterFullInfo::get_character(&characters, input.active_character_id);
 
         let target_function: Box<dyn TargetFunction> = if input.target_function.use_dsl {
-            Box::new(TargetFunctionDSL::new(&input.target_function.dsl_source.unwrap()))
+            Box::new(TargetFunctionDSL::new(input.target_function.dsl_source.as_ref().unwrap()))
         } else {
             input.target_function.to_target_function(&active_character.character, &active_character.weapon)
         };
+        let artifact_config = input.artifact_config.clone().unwrap().to_config();
         let constraint = input.constraint.unwrap_or(Default::default());
 
         let filtered_artifacts = input.filter.as_ref().map(|x| x.filter_artifact(&artifacts_ref));
@@ -55,7 +57,7 @@ impl OptimizeSingleWasm {
 
         let result = algorithm.optimize(
             &artifacts,
-            Some(active_character.artifact_config.clone()),
+            Some(artifact_config),
             &active_character.character,
             &active_character.weapon,
             &target_function,

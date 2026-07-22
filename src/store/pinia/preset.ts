@@ -37,7 +37,7 @@ function f() {
         presets.value = loadPresetOrDefault(payload)
     }
 
-    function addOrOverwrite(name: string, item: IPreset, version: number) {
+    function addOrOverwrite(name: string, item: IPreset, version: number = VERSION) {
         const preset = upgradePresetToNewVersion({
             name: name,
             item: item,

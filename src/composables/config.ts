@@ -123,12 +123,12 @@ export class ConfigManager {
         return active_addresses.map(address => ConfigAddress.fromString(address));
     }
 
-    getConfigValue(config_address: ConfigAddress): any {
+    getConfigValue(config_address: ConfigAddress, unlink: boolean = false): any {
         // 获取配置项的值，如果该配置项被全局链接覆写，则返回优先级最高的任意配置项的值
 
         void this.version.value;
 
-        if (this.global_link_metas.has(config_address.str()) && !this.global_link_metas.get(config_address.str())!.unlinked) {
+        if (!unlink && this.global_link_metas.has(config_address.str()) && !this.global_link_metas.get(config_address.str())!.unlinked) {
             const active_addresses = this.getActiveAddresses(config_address);
             if (active_addresses.length > 0) {
                 return this.values.get(active_addresses[0].str());
@@ -137,13 +137,13 @@ export class ConfigManager {
         return structuredClone(this.values.get(config_address.str()));
     }
 
-    updateConfigValue(config_address: ConfigAddress, value: any): void {
+    updateConfigValue(config_address: ConfigAddress, value: any, unlink: boolean = false): void {
         // 更新配置项的值，如果该配置项被全局链接覆写，则更新优先级最高的所有配置项的值
 
         ++this.version.value;
         value = structuredClone(value);
 
-        if (this.global_link_metas.has(config_address.str()) && !this.global_link_metas.get(config_address.str())!.unlinked) {
+        if (!unlink && this.global_link_metas.has(config_address.str()) && !this.global_link_metas.get(config_address.str())!.unlinked) {
             const active_addresses = this.getActiveAddresses(config_address);
             for (const address of active_addresses) {
                 this.values.set(address.str(), value);
@@ -153,38 +153,38 @@ export class ConfigManager {
         }
     }
     
-    getObjectValue(config_addresses: Record<string, ConfigAddress>): Record<string, any> {
+    getObjectValue(config_addresses: Record<string, ConfigAddress>, unlink: boolean = false): Record<string, any> {
         const res: Record<string, any> = {};
         for (const config_name in config_addresses) {
-            res[config_name] = this.getConfigValue(config_addresses[config_name]);
+            res[config_name] = this.getConfigValue(config_addresses[config_name], unlink);
         }
         return structuredClone(res);
     }
 
-    updateObjectValue(config_addresses: Record<string, ConfigAddress>, values: Record<string, any> | null | undefined): void {
+    updateObjectValue(config_addresses: Record<string, ConfigAddress>, values: Record<string, any> | null | undefined, unlink: boolean = false): void {
         if (!values) return;
 
         for (const config_name in config_addresses) {
             if (config_name in values) {
-                this.updateConfigValue(config_addresses[config_name], values[config_name]);
+                this.updateConfigValue(config_addresses[config_name], values[config_name], unlink);
             }
         }
     }
 
-    getModuleValue(config_addresses: Record<string, Record<string, ConfigAddress>>): Record<string, Record<string, any>> {
+    getModuleValue(config_addresses: Record<string, Record<string, ConfigAddress>>, unlink: boolean = false): Record<string, Record<string, any>> {
         const res: Record<string, Record<string, any>> = {};
         for (const object_name in config_addresses) {
-            res[object_name] = this.getObjectValue(config_addresses[object_name]);
+            res[object_name] = this.getObjectValue(config_addresses[object_name], unlink);
         }
         return structuredClone(res);
     }
 
-    updateModuleValue(config_addresses: Record<string, Record<string, ConfigAddress>>, values: Record<string, Record<string, any>> | null | undefined): void {
+    updateModuleValue(config_addresses: Record<string, Record<string, ConfigAddress>>, values: Record<string, Record<string, any>> | null | undefined, unlink: boolean = false): void {
         if (!values) return;
 
         for (const object_name in config_addresses) {
             if (object_name in values) {
-                this.updateObjectValue(config_addresses[object_name], values[object_name]);
+                this.updateObjectValue(config_addresses[object_name], values[object_name], unlink);
             }
         }
     }

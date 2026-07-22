@@ -693,11 +693,11 @@ import {useComputeConstraint} from "@/composables/constraint"
 import {BuffEntry, useBuff} from "@/composables/buff"
 import {type PresetEntry, usePresetStore, upgradePresetToNewVersion} from "@/store/pinia/preset"
 import {useArtifactStore} from "@/store/pinia/artifact"
-import type {IPreset} from "@/types/preset"
+import type {IBuff, IPreset} from "@/types/preset"
 import {RandomIDProvider} from "@/utils/idProvider"
 import {use5Artifacts, useArtifactConfig} from "@/composables/artifact"
 import {positions} from "@/constants/artifact"
-import {positionToIndex} from "@/utils/artifacts"
+import {convertArtifactConfigForWasm, convertArtifactConfigFromWasm, positionToIndex} from "@/utils/artifacts"
 import {useMona} from "@/wasm/mona"
 import {useKumiStore} from "@/store/pinia/kumi"
 import SimpleLoading from "@/components/loading/SimpleLoading.vue"
@@ -1006,24 +1006,24 @@ function handleClickSaveOptimizeConfig() {
 
 function getPresetItem() {
     let characterToBeSaved = deepCopy(characterInterface.value)
-    characterToBeSaved.params = configManager.getModuleValue(characterConfig.value)
+    characterToBeSaved.params = configManager.getModuleValue(characterConfig.value, true)
 
     let weaponToBeSaved = deepCopy(weaponInterface.value)
-    weaponToBeSaved.params = configManager.getModuleValue(weaponConfig.value)
+    weaponToBeSaved.params = configManager.getModuleValue(weaponConfig.value, true)
 
     let targetFunctionToBeSaved = deepCopy(targetFunctionInterface.value)
-    targetFunctionToBeSaved.params = configManager.getModuleValue(targetFunctionConfig.value)
+    targetFunctionToBeSaved.params = configManager.getModuleValue(targetFunctionConfig.value, true)
 
     let buffsToBeSaved: Record<string, IBuff> = {}
     for (let buff of buffs.value) {
         buffsToBeSaved[buff.id] = {
             name: buff.name,
-            config: configManager.getModuleValue(buff.config),
+            config: configManager.getModuleValue(buff.config, true),
             lock: buff.lock
         }
     }
 
-    let artifactConfigToBeSaved = configManager.getModuleValue(artifactConfig.value)
+    let artifactConfigToBeSaved = convertArtifactConfigForWasm(configManager.getModuleValue(artifactConfig.value, true))
 
     const globalConfigUnlinked = configManager.getAllUnlinkedStatus(props.currentCharacterId)
 
@@ -1083,7 +1083,7 @@ function usePreset(name: string) {
                 },
                 lock: buff.lock
             }
-            configManager.updateModuleValue(newBuff.config, buff.config)
+            configManager.updateModuleValue(newBuff.config, buff.config, true)
             newBuffs.push(newBuff)
         }
         buffs.value = newBuffs
@@ -1100,7 +1100,7 @@ function usePreset(name: string) {
         characterSkill2.value = c.skill2 + 1
         characterSkill3.value = c.skill3 + 1
         characterTags.value = c.tags ?? getDefaultCharacterTag(c.name)
-        configManager.updateModuleValue(characterConfig.value, c.params)
+        configManager.updateModuleValue(characterConfig.value, c.params, true)
     }
 
     // use weapon
@@ -1109,14 +1109,14 @@ function usePreset(name: string) {
         weaponName.value = w.name
         weaponLevel.value = w.level.toString() + (w.ascend ? "+" : "-")
         weaponRefine.value = w.refine
-        configManager.updateModuleValue(weaponConfig.value, w.params)
+        configManager.updateModuleValue(weaponConfig.value, w.params, true)
     }
 
     // use target function
     const tf = item.targetFunction
     if (tf) {
         targetFunctionName.value = tf.name
-        configManager.updateModuleValue(targetFunctionConfig.value, tf.params)
+        configManager.updateModuleValue(targetFunctionConfig.value, tf.params, true)
     }
 
     // is DSL?
@@ -1160,7 +1160,7 @@ function usePreset(name: string) {
     // use artifact config
     const art = item.artifactConfig
     if (art) {
-        configManager.updateModuleValue(artifactConfig.value, art)
+        configManager.updateModuleValue(artifactConfig.value, convertArtifactConfigFromWasm(art), true)
     }
 
     if (item.globalConfigUnlinked) {
@@ -1493,7 +1493,7 @@ function handleUseNthOptimizationResult(n: number) {
 function getOptimizeArtifactWasmInterface() {
     let artifact_config: any = null
     if (artifactEffectMode.value === "custom") {
-        artifact_config = configManager.getModuleValue(artifactConfig.value)
+        artifact_config = convertArtifactConfigForWasm(configManager.getModuleValue(artifactConfig.value))
     }
 
     const i = {

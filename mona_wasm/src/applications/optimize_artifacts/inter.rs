@@ -74,6 +74,7 @@ pub struct OptimizeArtifactInterface {
 
     pub active_character_id: usize,
     pub target_function: TargetFunctionInterface,
+    pub artifact_config: Option<ArtifactConfigInterface>,
     pub constraint: Option<ConstraintConfig>,
     pub filter: Option<ArtifactFilterConfig>,
     #[serde(default)]
