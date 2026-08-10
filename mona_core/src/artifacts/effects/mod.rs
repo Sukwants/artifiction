@@ -68,6 +68,8 @@ pub use aubade_of_morningstar_and_moon::AubadeOfMorningstarAndMoon;
 pub use a_day_carved_from_rising_winds::ADayCarvedFromRisingWinds;
 pub use celestial_gift::CelestialGift;
 pub use disenchantment_in_deep_shadow::DisenchantmentInDeepShadow;
+pub use scarlet_proof::ScarletProof;
+pub use heart_of_the_furnace::HeartOfTheFurnace;
 
 pub mod empty;
 pub mod adventurer;
@@ -131,6 +133,8 @@ pub mod aubade_of_morningstar_and_moon;
 pub mod a_day_carved_from_rising_winds;
 pub mod celestial_gift;
 pub mod disenchantment_in_deep_shadow;
+pub mod scarlet_proof;
+pub mod heart_of_the_furnace;
 
 pub fn get_effect<T: Attribute>(name: ArtifactSetName, config: &ArtifactEffectConfig, character: &Character<T>) -> Box<dyn ArtifactEffect<T>> {
     name.create_effect(config, &character.common_data)
