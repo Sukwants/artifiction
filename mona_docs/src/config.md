@@ -91,6 +91,12 @@ pub enum ItemConfigType {
         default: i32,
         global_link: GlobalLinkConfig,
     },
+    GlobalLinkOption2 {
+        options_zh: &'static str,
+        options_en: &'static str,
+        default: usize,
+        global_link: GlobalLinkConfig,
+    },
     GlobalLinkMoonsign3 {
         default: Moonsign,
         global_link: GlobalLinkConfig,
@@ -131,6 +137,8 @@ pub struct GlobalLinkConfig {
 
 其中 `key` 字段表示全局联动的键值，唯一标识一个全局联动配置。`priority` 字段该配置项在全局联动中的优先级，数值越大优先级越高。`team_shared` 字段表示该配置项的值是否在整个队伍中联动。
 
+`GlobalLinkOption2`：带全局联动的双语言单选配置项，选项内容包含中英文两种语言，默认值为选项下标（从 0 开始），其输入方式与 `Option2` 一致，仅额外包含全局联动配置项 `global_link`。
+
 `priority` 字段有如下可选优先级：
 - `ItemConfig::PRIORITY_DEFAULT`：默认优先级，数值为 0。
 - `ItemConfig::PRIORITY_CHARACTERSKILL`：角色技能配置应使用该优先级，数值为 1。
@@ -144,6 +152,7 @@ pub struct GlobalLinkConfig {
 - `ItemConfig::MOONSIGN_GLOBAL`：月兆配置项。在与月兆相关的角色、武器、圣遗物、buff 等配置中需要出现该配置项，需要传入相应的默认值和优先级。
 - `ItemConfig::HEXEREI_SECRET_RITE_GLOBAL`：魔导配置项。在与魔导相关的角色、武器、圣遗物、buff 等配置中需要出现该配置项，需要传入相应的默认值和优先级。
 - `ItemConfig::STELLAR_CONDUCT_APPLICATION_COUNT`： 星超导附着次数配置项。在与星超导相关的角色中需要出现该配置项，需要传入相应的默认值和优先级。请注意，该配置项的值应当决定星超导反应伤害的额外基础倍率，附着次数达到 $0 \sim 12$ 次时的额外基础倍率从 `ElevativeReaction::STELLAR_CONDUCT_EXTRA_COEFFICIENT` 数组中获取，该额外基础倍率应当通过 `ElevativeCoefficient` 部分进行加成。
-- `ItemConfig::IN_POLESTAR_FIELD`：极星辉域配置项。在与星超导相关的角色中需要出现该配置项，需要传入相应的默认值和优先级。
+- `ItemConfig::STELLAR_GLIMMER_STATE`：辉映·星烁状态配置项（三选项：无/辉映·星超导/辉映·星扩散，对应 0/1/2）。在与星反应（星超导、星扩散）相关的角色中需要出现该配置项，需要传入相应的默认值和优先级。
+- （配置位置待定）星扩散风涡系数：用于决定星扩散反应冰伤额外基础倍率的配置项。风涡系数达到 $0 \sim 6$ 时的额外基础倍率从 `ElevativeReaction::STELLAR_SWIRL_CRYO_EXTRA_COEFFICIENT` 数组中获取，该额外基础倍率应当通过 `ElevativeCoefficient` 部分进行加成，增益命名为“星扩散风涡系数”。目前该配置的存放位置尚未确定，待确定后再添加相应的 `ItemConfig` 与角色配置。
 
 此外，`ItemConfig` 中已给出的配置项均可自行在合适的位置使用。

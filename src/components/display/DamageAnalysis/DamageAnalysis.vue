@@ -510,6 +510,10 @@ export default {
                 "LunarCrystallize": "月结晶伤害",
                 "StellarConductCryo": "星超导伤害",
                 "StellarConductElectro": "星超导伤害",
+                "StellarSwirlReactionAnemo": "星扩散反应风伤",
+                "StellarSwirlReactionCryo": "星扩散反应冰伤",
+                "StellarSwirlAnemo": "星扩散伤害（风）",
+                "StellarSwirlCryo": "星扩散伤害（冰）",
             }
             return map[elevative_type]
         },

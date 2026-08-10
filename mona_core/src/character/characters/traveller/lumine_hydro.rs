@@ -7,7 +7,7 @@ use crate::character::traits::{CharacterSkillMap, CharacterSkillMapItem, Charact
 use crate::character::macros::{damage_enum, skill_map};
 use crate::common::{ChangeAttribute, Element, ElevativeReaction, Moonsign, SkillType, WeaponType};
 use crate::common::i18n::{locale, hit_n_dmg, plunging_dmg, charged_dmg};
-use crate::common::item_config_type::{ItemConfig, ItemConfigType};
+use crate::common::item_config_type::{ItemConfig, ItemConfigType, ConfigElements8Multi};
 use crate::damage::damage_builder::DamageBuilder;
 use crate::damage::DamageContext;
 use crate::target_functions::TargetFunction;
@@ -32,6 +32,10 @@ pub struct LumineHydroSkillType {
     pub e_dmg_ad: [f64; 15], // Suffusion DMG Bonus
 
     pub q_dmg: [f64; 15],
+
+    pub p3_bonus: f64,     // 天赋3：重击·水狱每段伤害提升（150%攻击力）
+    pub p3_hp_bonus: f64,  // 天赋3：生命≥50%时额外每段提升（100%攻击力）
+    pub p3_heal_ratio: f64, // 天赋3：生命<50%时命中恢复（25%生命上限）
 }
 
 pub const LUMINEHYDRO_SKILL: LumineHydroSkillType = LumineHydroSkillType {
@@ -55,6 +59,10 @@ pub const LUMINEHYDRO_SKILL: LumineHydroSkillType = LumineHydroSkillType {
 
     // Elemental Burst: Rising Waters
     q_dmg: [1.018664, 1.095064, 1.171464, 1.27333, 1.34973, 1.42613, 1.527996, 1.629862, 1.731729, 1.833595, 1.935462, 2.037328, 2.164661, 2.291994, 2.419327],
+
+    p3_bonus: 1.5,
+    p3_hp_bonus: 1.0,
+    p3_heal_ratio: 0.25,
 };
 
 pub const LUMINEHYDRO_STATIC_DATA: CharacterStaticData = CharacterStaticData {
@@ -86,10 +94,34 @@ pub const LUMINEHYDRO_STATIC_DATA: CharacterStaticData = CharacterStaticData {
 };
 
 pub struct LumineHydroEffect {
+    pub elements: ConfigElements8Multi,
+    pub common_data: CharacterCommonData,
 }
 
 impl<A: Attribute> ChangeAttribute<A> for LumineHydroEffect {
     fn change_attribute(&self, attribute: &mut A) {
+        // 天赋3：异邦的澄水 — 每种共鸣过的元素提供额外的强化效果
+        if self.elements.anemo {
+            attribute.set_value_by(AttributeName::CriticalBase, "旅行者天赋3", 0.10);
+        }
+        if self.elements.geo {
+            attribute.add_def_percentage("旅行者天赋3", 0.20);
+        }
+        if self.elements.electro {
+            attribute.set_value_by(AttributeName::Recharge, "旅行者天赋3", 0.20);
+        }
+        if self.elements.dendro {
+            attribute.set_value_by(AttributeName::ElementalMastery, "旅行者天赋3", 60.0);
+        }
+        if self.elements.hydro {
+            attribute.add_hp_percentage("旅行者天赋3", 0.20);
+        }
+        if self.elements.pyro {
+            attribute.add_atk_percentage("旅行者天赋3", 0.20);
+        }
+        if self.elements.cryo {
+            attribute.set_value_by(AttributeName::CriticalDamageBase, "旅行者天赋3", 0.20);
+        }
     }
 }
 
@@ -109,13 +141,17 @@ damage_enum!(
     ED
     EST
     Q
+    P3A       // 重击·水狱一段（天赋3）
+    P3B       // 重击·水狱二段（天赋3）
+    P3T       // 重击·水狱总伤害（天赋3）
+    P3_HEAL   // 重击·水狱治疗（生命<50%时，天赋3）
 );
 
 impl LumineHydroDamageEnum {
     pub fn get_element(&self) -> Element {
         use LumineHydroDamageEnum::*;
         match *self {
-            E | ED | EST | Q => Element::Hydro,
+            E | ED | EST | Q | P3A | P3B | P3T => Element::Hydro,
             _ => Element::Physical,
         }
     }
@@ -124,7 +160,7 @@ impl LumineHydroDamageEnum {
         use LumineHydroDamageEnum::*;
         match *self {
             A1 | A2 | A3 | A4 | A5 => SkillType::NormalAttack,
-            Z1 | Z2 => SkillType::ChargedAttack,
+            Z1 | Z2 | P3A | P3B | P3T | P3_HEAL => SkillType::ChargedAttack,
             X1 => SkillType::PlungingAttackInAction,
             X2 | X3 => SkillType::PlungingAttackOnGround,
             E | ED | EST => SkillType::ElementalSkill,
@@ -156,6 +192,10 @@ impl CharacterTrait for LumineHydro {
             X1 plunging_dmg!(1)
             X2 plunging_dmg!(2)
             X3 plunging_dmg!(3)
+            P3A locale!(zh_cn: "重击·水狱一段", en: "Charged Attack: Water Prison (1st Segment)")
+            P3B locale!(zh_cn: "重击·水狱二段", en: "Charged Attack: Water Prison (2nd Segment)")
+            P3T locale!(zh_cn: "重击·水狱总伤害", en: "Charged Attack: Water Prison (Total)")
+            P3_HEAL locale!(zh_cn: "重击·水狱治疗（生命<50%）", en: "Charged Attack: Water Prison Healing (HP<50%)")
         ),
         skill2: skill_map!(
             LumineHydroDamageEnum
@@ -171,6 +211,26 @@ impl CharacterTrait for LumineHydro {
 
     #[cfg(not(target_family = "wasm"))]
     const CONFIG_DATA: Option<&'static [ItemConfig]> = Some(&[
+        ItemConfig {
+            name: "elements",
+            title: locale!(
+                zh_cn: "共鸣过的元素（天赋3额外强化效果）",
+                en: "Resonated Elements (Talent 3 Additional Buff Effects)"
+            ),
+            config: ItemConfigType::ElementMulti {
+                elements: &[Element::Pyro, Element::Hydro, Element::Anemo, Element::Electro, Element::Dendro, Element::Cryo, Element::Geo],
+                default: ConfigElements8Multi {
+                    pyro: true,
+                    hydro: true,
+                    anemo: true,
+                    electro: true,
+                    dendro: true,
+                    cryo: true,
+                    geo: true,
+                    physical: false,
+                }
+            }
+        },
     ]);
 
     #[cfg(not(target_family = "wasm"))]
@@ -205,6 +265,18 @@ impl CharacterTrait for LumineHydro {
         use LumineHydroDamageEnum::*;
         let mut builder = D::new();
 
+        // 重击·水狱治疗：仅生命<50%时命中恢复25%生命上限
+        if s == P3_HEAL {
+            if hp_above_half {
+                return builder.none();
+            }
+            builder.add_hp_ratio("重击·水狱治疗", LUMINEHYDRO_SKILL.p3_heal_ratio);
+            return builder.heal(&context.attribute);
+        }
+
+        // 重击·水狱：生命≥50%时额外每段提升100%攻击力
+        let p3_hp_extra = if hp_above_half { LUMINEHYDRO_SKILL.p3_hp_bonus } else { 0.0 };
+
         if s == ED {
             if hp_above_half {
                 builder.add_hp_ratio("充盈伤害额外倍率", LUMINEHYDRO_SKILL.e_dmg_ad[s2]);
@@ -233,6 +305,9 @@ impl CharacterTrait for LumineHydro {
             ED => LUMINEHYDRO_SKILL.e_dmg_d[s2],
             EST => LUMINEHYDRO_SKILL.e_dmg_st[s2],
             Q => LUMINEHYDRO_SKILL.q_dmg[s3],
+            P3A => LUMINEHYDRO_SKILL.z_dmg1[s1] + LUMINEHYDRO_SKILL.p3_bonus + p3_hp_extra,
+            P3B => LUMINEHYDRO_SKILL.z_dmg2[s1] + LUMINEHYDRO_SKILL.p3_bonus + p3_hp_extra,
+            P3T => LUMINEHYDRO_SKILL.z_dmg1[s1] + LUMINEHYDRO_SKILL.z_dmg2[s1] + 2.0 * (LUMINEHYDRO_SKILL.p3_bonus + p3_hp_extra),
             _ => 0.0
         };
 
@@ -249,7 +324,13 @@ impl CharacterTrait for LumineHydro {
     }
 
     fn new_effect<A: Attribute>(common_data: &CharacterCommonData, config: &CharacterConfig) -> Option<Box<dyn ChangeAttribute<A>>> {
+        let elements = match *config {
+            CharacterConfig::LumineHydro { elements, .. } => elements,
+            _ => ConfigElements8Multi::default(),
+        };
         Some(Box::new(LumineHydroEffect {
+            elements,
+            common_data: common_data.clone(),
         }))
     }
 

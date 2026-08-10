@@ -7,7 +7,7 @@ use crate::character::traits::{CharacterSkillMap, CharacterSkillMapItem, Charact
 use crate::character::macros::{damage_enum, skill_map};
 use crate::common::{ChangeAttribute, Element, ElevativeReaction, Moonsign, SkillType, WeaponType};
 use crate::common::i18n::{locale, hit_n_dmg, plunging_dmg, charged_dmg};
-use crate::common::item_config_type::{ItemConfig, ItemConfigType};
+use crate::common::item_config_type::{ItemConfig, ItemConfigType, ConfigElements8Multi};
 use crate::damage::damage_builder::DamageBuilder;
 use crate::damage::DamageContext;
 use crate::target_functions::TargetFunction;
@@ -30,6 +30,9 @@ pub struct AetherDendroSkillType {
 
     pub q_dmgc: [f64; 15], // Lea Lotus Lamp Attack DMG
     pub q_dmge: [f64; 15], // Explosion DMG
+
+    pub p3_bonus: f64,       // 天赋3：重击·草惠每段伤害提升（80%攻击力）
+    pub p3_lotus_bonus: f64, // 天赋3：蔓草莲台爆炸伤害（120%攻击力）
 }
 
 pub const AETHERDENDRO_SKILL: AetherDendroSkillType = AetherDendroSkillType {
@@ -51,6 +54,9 @@ pub const AETHERDENDRO_SKILL: AetherDendroSkillType = AetherDendroSkillType {
     // Elemental Burst: Surgent Manifestation
     q_dmgc: [0.8016, 0.86172, 0.92184, 1.002, 1.06212, 1.12224, 1.2024, 1.28256, 1.36272, 1.44288, 1.52304, 1.6032, 1.7034, 1.8036, 1.9038],
     q_dmge: [4.008, 4.3086, 4.6092, 5.01, 5.3106, 5.6112, 6.012, 6.4128, 6.8136, 7.2144, 7.6152, 8.016, 8.517, 9.018, 9.519],
+
+    p3_bonus: 0.8,
+    p3_lotus_bonus: 1.2,
 };
 
 pub const AETHERDENDRO_STATIC_DATA: CharacterStaticData = CharacterStaticData {
@@ -82,10 +88,34 @@ pub const AETHERDENDRO_STATIC_DATA: CharacterStaticData = CharacterStaticData {
 };
 
 pub struct AetherDendroEffect {
+    pub elements: ConfigElements8Multi,
+    pub common_data: CharacterCommonData,
 }
 
 impl<A: Attribute> ChangeAttribute<A> for AetherDendroEffect {
     fn change_attribute(&self, attribute: &mut A) {
+        // 天赋3：异邦的蕙草 — 每种共鸣过的元素提供额外的强化效果
+        if self.elements.anemo {
+            attribute.set_value_by(AttributeName::CriticalBase, "旅行者天赋3", 0.10);
+        }
+        if self.elements.geo {
+            attribute.add_def_percentage("旅行者天赋3", 0.20);
+        }
+        if self.elements.electro {
+            attribute.set_value_by(AttributeName::Recharge, "旅行者天赋3", 0.20);
+        }
+        if self.elements.dendro {
+            attribute.set_value_by(AttributeName::ElementalMastery, "旅行者天赋3", 60.0);
+        }
+        if self.elements.hydro {
+            attribute.add_hp_percentage("旅行者天赋3", 0.20);
+        }
+        if self.elements.pyro {
+            attribute.add_atk_percentage("旅行者天赋3", 0.20);
+        }
+        if self.elements.cryo {
+            attribute.set_value_by(AttributeName::CriticalDamageBase, "旅行者天赋3", 0.20);
+        }
     }
 }
 
@@ -104,13 +134,18 @@ damage_enum!(
     E
     QC
     QE
+    P3A     // 重击·草惠一段（天赋3）
+    P3B     // 重击·草惠二段（天赋3）
+    P3T     // 重击·草惠总伤害（天赋3）
+    P3L1    // 蔓草莲台爆炸1（天赋3）
+    P3L2    // 蔓草莲台爆炸2（天赋3）
 );
 
 impl AetherDendroDamageEnum {
     pub fn get_element(&self) -> Element {
         use AetherDendroDamageEnum::*;
         match *self {
-            E | QC | QE => Element::Dendro,
+            E | QC | QE | P3A | P3B | P3T | P3L1 | P3L2 => Element::Dendro,
             _ => Element::Physical,
         }
     }
@@ -119,7 +154,7 @@ impl AetherDendroDamageEnum {
         use AetherDendroDamageEnum::*;
         match *self {
             A1 | A2 | A3 | A4 | A5 => SkillType::NormalAttack,
-            Z1 | Z2 => SkillType::ChargedAttack,
+            Z1 | Z2 | P3A | P3B | P3T | P3L1 | P3L2 => SkillType::ChargedAttack,
             X1 => SkillType::PlungingAttackInAction,
             X2 | X3 => SkillType::PlungingAttackOnGround,
             E => SkillType::ElementalSkill,
@@ -151,6 +186,11 @@ impl CharacterTrait for AetherDendro {
             X1 plunging_dmg!(1)
             X2 plunging_dmg!(2)
             X3 plunging_dmg!(3)
+            P3A locale!(zh_cn: "重击·草惠一段", en: "Charged Attack: Verdant Grace (1st Segment)")
+            P3B locale!(zh_cn: "重击·草惠二段", en: "Charged Attack: Verdant Grace (2nd Segment)")
+            P3T locale!(zh_cn: "重击·草惠总伤害", en: "Charged Attack: Verdant Grace (Total)")
+            P3L1 locale!(zh_cn: "蔓草莲台爆炸1", en: "Vine Lotus Platform Explosion 1")
+            P3L2 locale!(zh_cn: "蔓草莲台爆炸2", en: "Vine Lotus Platform Explosion 2")
         ),
         skill2: skill_map!(
             AetherDendroDamageEnum
@@ -165,6 +205,26 @@ impl CharacterTrait for AetherDendro {
 
     #[cfg(not(target_family = "wasm"))]
     const CONFIG_DATA: Option<&'static [ItemConfig]> = Some(&[
+        ItemConfig {
+            name: "elements",
+            title: locale!(
+                zh_cn: "共鸣过的元素（天赋3额外强化效果）",
+                en: "Resonated Elements (Talent 3 Additional Buff Effects)"
+            ),
+            config: ItemConfigType::ElementMulti {
+                elements: &[Element::Pyro, Element::Hydro, Element::Anemo, Element::Electro, Element::Dendro, Element::Cryo, Element::Geo],
+                default: ConfigElements8Multi {
+                    pyro: true,
+                    hydro: true,
+                    anemo: true,
+                    electro: true,
+                    dendro: true,
+                    cryo: true,
+                    geo: true,
+                    physical: false,
+                }
+            }
+        },
     ]);
 
     #[cfg(not(target_family = "wasm"))]
@@ -228,6 +288,10 @@ impl CharacterTrait for AetherDendro {
             E => AETHERDENDRO_SKILL.e_dmg[s2],
             QC => AETHERDENDRO_SKILL.q_dmgc[s3],
             QE => AETHERDENDRO_SKILL.q_dmge[s3],
+            P3A => AETHERDENDRO_SKILL.z_dmg1[s1] + AETHERDENDRO_SKILL.p3_bonus,
+            P3B => AETHERDENDRO_SKILL.z_dmg2[s1] + AETHERDENDRO_SKILL.p3_bonus,
+            P3T => AETHERDENDRO_SKILL.z_dmg1[s1] + AETHERDENDRO_SKILL.z_dmg2[s1] + 2.0 * AETHERDENDRO_SKILL.p3_bonus,
+            P3L1 | P3L2 => AETHERDENDRO_SKILL.p3_lotus_bonus,
             _ => 0.0
         };
 
@@ -244,7 +308,13 @@ impl CharacterTrait for AetherDendro {
     }
 
     fn new_effect<A: Attribute>(common_data: &CharacterCommonData, config: &CharacterConfig) -> Option<Box<dyn ChangeAttribute<A>>> {
+        let elements = match *config {
+            CharacterConfig::AetherDendro { elements } => elements,
+            _ => ConfigElements8Multi::default(),
+        };
         Some(Box::new(AetherDendroEffect {
+            elements,
+            common_data: common_data.clone(),
         }))
     }
 

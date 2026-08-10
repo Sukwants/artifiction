@@ -10,6 +10,8 @@ pub mod aether_hydro;
 pub mod lumine_hydro;
 pub mod aether_pyro;
 pub mod lumine_pyro;
+pub mod aether_cryo;
+pub mod lumine_cryo;
 
 pub use aether_anemo::AetherAnemo;
 pub use lumine_anemo::LumineAnemo;
@@ -23,3 +25,5 @@ pub use aether_hydro::AetherHydro;
 pub use lumine_hydro::LumineHydro;
 pub use aether_pyro::AetherPyro;
 pub use lumine_pyro::LuminePyro;
+pub use aether_cryo::AetherCryo;
+pub use lumine_cryo::LumineCryo;

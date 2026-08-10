@@ -225,6 +225,12 @@ pub enum ItemConfigType {
         default: i32,
         global_link: GlobalLinkConfig,
     },
+    GlobalLinkOption2 {
+        options_zh: &'static str,
+        options_en: &'static str,
+        default: usize,
+        global_link: GlobalLinkConfig,
+    },
     GlobalLinkMoonsign3 {
         default: Moonsign,
         global_link: GlobalLinkConfig,
@@ -283,7 +289,8 @@ impl ItemConfig {
     pub const fn STELLAR_CONDUCT_APPLICATION_COUNT(default: i32, priority: usize) -> ItemConfig {
         return ItemConfig { name: "stellar_conduct_application_count", title: locale!(zh_cn: "星超导附着次数", en: "Stellar Conduct Application Count"), config: ItemConfigType::GlobalLinkInt { min: 0, max: 12, default, global_link: GlobalLinkConfig { key: "stellar_conduct_application_count", priority, team_shared: true } } };
     }
-    pub const fn IN_POLESTAR_FIELD(default: bool, priority: usize) -> ItemConfig {
-        return ItemConfig { name: "in_polestar_field", title: locale!(zh_cn: "处于极星辉域中", en: "In Pole Star Field"), config: ItemConfigType::GlobalLinkBool { default, global_link: GlobalLinkConfig { key: "in_polestar_field", priority, team_shared: true } } };
+    // 辉映·星烁状态：0=无，1=辉映·星超导，2=辉映·星扩散
+    pub const fn STELLAR_GLIMMER_STATE(default: usize, priority: usize) -> ItemConfig {
+        return ItemConfig { name: "stellar_glimmer_state", title: locale!(zh_cn: "辉映·星烁状态", en: "Radiance: Stellar Glimmer State"), config: ItemConfigType::GlobalLinkOption2 { options_zh: "无,辉映·星超导,辉映·星扩散", options_en: "None,Stellar-Conduct,Stellar Swirl", default, global_link: GlobalLinkConfig { key: "stellar_glimmer_state", priority, team_shared: true } } };
     }
 }

@@ -303,6 +303,10 @@ export default {
         lunar_crystallize: "月结晶伤害",
         stellar_conduct_cryo: "星超导伤害",
         stellar_conduct_electro: "星超导伤害",
+        stellar_swirl_reaction_anemo: "星扩散（风）",
+        stellar_swirl_reaction_cryo: "星扩散（冰）",
+        stellar_swirl_anemo: "星扩散伤害",
+        stellar_swirl_cryo: "星扩散伤害",
     },
     res: {
         Pyro: "火抗",

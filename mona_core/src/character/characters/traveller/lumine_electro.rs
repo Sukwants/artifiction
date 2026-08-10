@@ -7,7 +7,7 @@ use crate::character::traits::{CharacterSkillMap, CharacterSkillMapItem, Charact
 use crate::character::macros::{damage_enum, skill_map};
 use crate::common::{ChangeAttribute, Element, ElevativeReaction, Moonsign, SkillType, WeaponType};
 use crate::common::i18n::{locale, hit_n_dmg, plunging_dmg, charged_dmg};
-use crate::common::item_config_type::{ItemConfig, ItemConfigType};
+use crate::common::item_config_type::{ItemConfig, ItemConfigType, ConfigElements8Multi};
 use crate::damage::damage_builder::DamageBuilder;
 use crate::damage::DamageContext;
 use crate::target_functions::TargetFunction;
@@ -30,6 +30,9 @@ pub struct LumineElectroSkillType {
 
     pub q_dmg: [f64; 15],
     pub q_dmgt: [f64; 15], // Falling Thunder DMG
+
+    pub p3_bonus: f64,           // 天赋3：重击·雷岚每段伤害提升（100%攻击力）
+    pub p3_lightning_bonus: f64, // 天赋3：重击·雷岚落雷伤害（200%攻击力）
 }
 
 pub const LUMINEELECTRO_SKILL: LumineElectroSkillType = LumineElectroSkillType {
@@ -51,6 +54,9 @@ pub const LUMINEELECTRO_SKILL: LumineElectroSkillType = LumineElectroSkillType {
     // Elemental Burst: Bellowing Thunder
     q_dmg: [1.144, 1.2298, 1.3156, 1.43, 1.5158, 1.6016, 1.716, 1.8304, 1.9448, 2.0592, 2.1736, 2.288, 2.431, 2.574, 2.717],
     q_dmgt: [0.328, 0.3526, 0.3772, 0.41, 0.4346, 0.4592, 0.492, 0.5248, 0.5576, 0.5904, 0.6232, 0.656, 0.697, 0.738, 0.779],
+
+    p3_bonus: 1.0,
+    p3_lightning_bonus: 2.0,
 };
 
 pub const LUMINEELECTRO_STATIC_DATA: CharacterStaticData = CharacterStaticData {
@@ -82,13 +88,38 @@ pub const LUMINEELECTRO_STATIC_DATA: CharacterStaticData = CharacterStaticData {
 };
 
 pub struct LumineElectroEffect {
+    pub elements: ConfigElements8Multi,
     pub has_p2: bool,
     pub has_c2: bool,
     pub abundance_amulet_count: usize,
+    pub common_data: CharacterCommonData,
 }
 
 impl<A: Attribute> ChangeAttribute<A> for LumineElectroEffect {
     fn change_attribute(&self, attribute: &mut A) {
+        // 天赋3：异邦的远雷 — 每种共鸣过的元素提供额外的强化效果
+        if self.elements.anemo {
+            attribute.set_value_by(AttributeName::CriticalBase, "旅行者天赋3", 0.10);
+        }
+        if self.elements.geo {
+            attribute.add_def_percentage("旅行者天赋3", 0.20);
+        }
+        if self.elements.electro {
+            attribute.set_value_by(AttributeName::Recharge, "旅行者天赋3", 0.20);
+        }
+        if self.elements.dendro {
+            attribute.set_value_by(AttributeName::ElementalMastery, "旅行者天赋3", 60.0);
+        }
+        if self.elements.hydro {
+            attribute.add_hp_percentage("旅行者天赋3", 0.20);
+        }
+        if self.elements.pyro {
+            attribute.add_atk_percentage("旅行者天赋3", 0.20);
+        }
+        if self.elements.cryo {
+            attribute.set_value_by(AttributeName::CriticalDamageBase, "旅行者天赋3", 0.20);
+        }
+
         if self.has_c2 {
             attribute.set_value_by(AttributeName::ResMinusElectro, "二命：震怒的苍雷", 0.15);
         }
@@ -127,13 +158,17 @@ damage_enum!(
     Q
     QT
     QC6
+    P3A    // 重击·雷岚一段（天赋3）
+    P3B    // 重击·雷岚二段（天赋3）
+    P3T    // 重击·雷岚总伤害（天赋3）
+    P3L    // 重击·雷岚落雷（天赋3）
 );
 
 impl LumineElectroDamageEnum {
     pub fn get_element(&self) -> Element {
         use LumineElectroDamageEnum::*;
         match *self {
-            E | Q | QT | QC6 => Element::Electro,
+            E | Q | QT | QC6 | P3A | P3B | P3T | P3L => Element::Electro,
             _ => Element::Physical,
         }
     }
@@ -142,7 +177,7 @@ impl LumineElectroDamageEnum {
         use LumineElectroDamageEnum::*;
         match *self {
             A1 | A2 | A3 | A4 | A5 => SkillType::NormalAttack,
-            Z1 | Z2 => SkillType::ChargedAttack,
+            Z1 | Z2 | P3A | P3B | P3T | P3L => SkillType::ChargedAttack,
             X1 => SkillType::PlungingAttackInAction,
             X2 | X3 => SkillType::PlungingAttackOnGround,
             E => SkillType::ElementalSkill,
@@ -174,6 +209,10 @@ impl CharacterTrait for LumineElectro {
             X1 plunging_dmg!(1)
             X2 plunging_dmg!(2)
             X3 plunging_dmg!(3)
+            P3A locale!(zh_cn: "重击·雷岚一段", en: "Charged Attack: Thunderstorm (1st Segment)")
+            P3B locale!(zh_cn: "重击·雷岚二段", en: "Charged Attack: Thunderstorm (2nd Segment)")
+            P3T locale!(zh_cn: "重击·雷岚总伤害", en: "Charged Attack: Thunderstorm (Total)")
+            P3L locale!(zh_cn: "重击·雷岚落雷", en: "Charged Attack: Thunderstorm Lightning Strike")
         ),
         skill2: skill_map!(
             LumineElectroDamageEnum
@@ -189,6 +228,26 @@ impl CharacterTrait for LumineElectro {
 
     #[cfg(not(target_family = "wasm"))]
     const CONFIG_DATA: Option<&'static [ItemConfig]> = Some(&[
+        ItemConfig {
+            name: "elements",
+            title: locale!(
+                zh_cn: "共鸣过的元素（天赋3额外强化效果）",
+                en: "Resonated Elements (Talent 3 Additional Buff Effects)"
+            ),
+            config: ItemConfigType::ElementMulti {
+                elements: &[Element::Pyro, Element::Hydro, Element::Anemo, Element::Electro, Element::Dendro, Element::Cryo, Element::Geo],
+                default: ConfigElements8Multi {
+                    pyro: true,
+                    hydro: true,
+                    anemo: true,
+                    electro: true,
+                    dendro: true,
+                    cryo: true,
+                    geo: true,
+                    physical: false,
+                }
+            }
+        },
         ItemConfig {
             name: "abundance_amulet_count",
             title: locale!(
@@ -225,6 +284,10 @@ impl CharacterTrait for LumineElectro {
             Q => LUMINEELECTRO_SKILL.q_dmg[s3],
             QT => LUMINEELECTRO_SKILL.q_dmgt[s3],
             QC6 => LUMINEELECTRO_SKILL.q_dmgt[s3] * 2.0,
+            P3A => LUMINEELECTRO_SKILL.z_dmg1[s1] + LUMINEELECTRO_SKILL.p3_bonus,
+            P3B => LUMINEELECTRO_SKILL.z_dmg2[s1] + LUMINEELECTRO_SKILL.p3_bonus,
+            P3T => LUMINEELECTRO_SKILL.z_dmg1[s1] + LUMINEELECTRO_SKILL.z_dmg2[s1] + 2.0 * LUMINEELECTRO_SKILL.p3_bonus,
+            P3L => LUMINEELECTRO_SKILL.p3_lightning_bonus,
             _ => 0.0
         };
 
@@ -241,13 +304,16 @@ impl CharacterTrait for LumineElectro {
     }
 
     fn new_effect<A: Attribute>(common_data: &CharacterCommonData, config: &CharacterConfig) -> Option<Box<dyn ChangeAttribute<A>>> {
+        let (elements, abundance_amulet_count) = match config {
+            CharacterConfig::LumineElectro { elements, abundance_amulet_count } => (*elements, *abundance_amulet_count),
+            _ => (ConfigElements8Multi::default(), 0),
+        };
         Some(Box::new(LumineElectroEffect {
+            elements,
             has_p2: common_data.has_talent2,
             has_c2: common_data.constellation >= 2,
-            abundance_amulet_count: match config {
-                CharacterConfig::LumineElectro { abundance_amulet_count } => *abundance_amulet_count,
-                _ => 0
-            },
+            abundance_amulet_count,
+            common_data: common_data.clone(),
         }))
     }
 

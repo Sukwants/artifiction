@@ -7,7 +7,7 @@ use crate::character::traits::{CharacterSkillMap, CharacterSkillMapItem, Charact
 use crate::character::macros::{damage_enum, skill_map};
 use crate::common::{ChangeAttribute, Element, ElevativeReaction, Moonsign, SkillType, WeaponType};
 use crate::common::i18n::{locale, hit_n_dmg, plunging_dmg, charged_dmg};
-use crate::common::item_config_type::{ItemConfig, ItemConfigType};
+use crate::common::item_config_type::{ItemConfig, ItemConfigType, ConfigElements8Multi};
 use crate::damage::damage_builder::DamageBuilder;
 use crate::damage::DamageContext;
 use crate::target_functions::TargetFunction;
@@ -36,6 +36,9 @@ pub struct AetherAnemoSkillType {
     pub q_dmga: [f64; 15], // Additional Elemental DMG
 
     pub p2_dmg: f64,
+
+    pub p3_bonus: f64,      // 天赋3：重击·风旋每段伤害提升（60%攻击力）
+    pub p3_wind_bonus: f64, // 天赋3：每层「晨风之刃」对应元素剑风伤害（50%攻击力）
 }
 
 pub const AETHERANEMO_SKILL: AetherAnemoSkillType = AetherAnemoSkillType {
@@ -63,6 +66,9 @@ pub const AETHERANEMO_SKILL: AetherAnemoSkillType = AetherAnemoSkillType {
     q_dmga: [0.248, 0.2666, 0.2852, 0.31, 0.3286, 0.3472, 0.372, 0.3968, 0.4216, 0.4464, 0.4712, 0.496, 0.527, 0.558, 0.589],
 
     p2_dmg: 0.6,
+
+    p3_bonus: 0.6,
+    p3_wind_bonus: 0.5,
 };
 
 pub const AETHERANEMO_STATIC_DATA: CharacterStaticData = CharacterStaticData {
@@ -94,12 +100,37 @@ pub const AETHERANEMO_STATIC_DATA: CharacterStaticData = CharacterStaticData {
 };
 
 pub struct AetherAnemoEffect {
+    pub elements: ConfigElements8Multi,
     pub has_c2: bool,
     pub has_c6: bool,
+    pub common_data: CharacterCommonData,
 }
 
 impl<A: Attribute> ChangeAttribute<A> for AetherAnemoEffect {
     fn change_attribute(&self, attribute: &mut A) {
+        // 天赋3：异邦的烈风 — 每种共鸣过的元素提供额外的强化效果
+        if self.elements.anemo {
+            attribute.set_value_by(AttributeName::CriticalBase, "旅行者天赋3", 0.10);
+        }
+        if self.elements.geo {
+            attribute.add_def_percentage("旅行者天赋3", 0.20);
+        }
+        if self.elements.electro {
+            attribute.set_value_by(AttributeName::Recharge, "旅行者天赋3", 0.20);
+        }
+        if self.elements.dendro {
+            attribute.set_value_by(AttributeName::ElementalMastery, "旅行者天赋3", 60.0);
+        }
+        if self.elements.hydro {
+            attribute.add_hp_percentage("旅行者天赋3", 0.20);
+        }
+        if self.elements.pyro {
+            attribute.add_atk_percentage("旅行者天赋3", 0.20);
+        }
+        if self.elements.cryo {
+            attribute.set_value_by(AttributeName::CriticalDamageBase, "旅行者天赋3", 0.20);
+        }
+
         if self.has_c2 {
             attribute.set_value_by(AttributeName::Recharge, "二命：革新的旋风", 0.16);
         }
@@ -133,14 +164,25 @@ damage_enum!(
     Q
     QA
     P2
+    P3A           // 重击·风旋一段（天赋3）
+    P3B           // 重击·风旋二段（天赋3）
+    P3T           // 重击·风旋总伤害（天赋3）
+    P3W_Pyro      // 重击·风旋火元素剑风（天赋3）
+    P3W_Hydro     // 重击·风旋水元素剑风（天赋3）
+    P3W_Cryo      // 重击·风旋冰元素剑风（天赋3）
+    P3W_Electro   // 重击·风旋雷元素剑风（天赋3）
 );
 
 impl AetherAnemoDamageEnum {
     pub fn get_element(&self, elemental_absorption: Element) -> Element {
         use AetherAnemoDamageEnum::*;
         match *self {
-            EC1 | EC2 | ES1 | ES2 | Q | P2 => Element::Anemo,
+            EC1 | EC2 | ES1 | ES2 | Q | P2 | P3A | P3B | P3T => Element::Anemo,
             EC1A | EC2A | ES1A | ES2A | QA => elemental_absorption,
+            P3W_Pyro => Element::Pyro,
+            P3W_Hydro => Element::Hydro,
+            P3W_Cryo => Element::Cryo,
+            P3W_Electro => Element::Electro,
             _ => Element::Physical,
         }
     }
@@ -149,7 +191,7 @@ impl AetherAnemoDamageEnum {
         use AetherAnemoDamageEnum::*;
         match *self {
             A1 | A2 | A3 | A4 | A5 | P2 => SkillType::NormalAttack,
-            Z1 | Z2 => SkillType::ChargedAttack,
+            Z1 | Z2 | P3A | P3B | P3T | P3W_Pyro | P3W_Hydro | P3W_Cryo | P3W_Electro => SkillType::ChargedAttack,
             X1 => SkillType::PlungingAttackInAction,
             X2 | X3 => SkillType::PlungingAttackOnGround,
             EC1 | EC2 | ES1 | ES2 | EC1A | EC2A | ES1A | ES2A => SkillType::ElementalSkill,
@@ -182,6 +224,13 @@ impl CharacterTrait for AetherAnemo {
             X2 plunging_dmg!(2)
             X3 plunging_dmg!(3)
             P2 locale!(zh_cn: "裂空之风", en: "Slitting Wind")
+            P3A locale!(zh_cn: "重击·风旋一段", en: "Charged Attack: Wind Cyclone (1st Segment)")
+            P3B locale!(zh_cn: "重击·风旋二段", en: "Charged Attack: Wind Cyclone (2nd Segment)")
+            P3T locale!(zh_cn: "重击·风旋总伤害", en: "Charged Attack: Wind Cyclone (Total)")
+            P3W_Pyro locale!(zh_cn: "重击·风旋火元素剑风", en: "Charged Attack: Wind Cyclone Pyro Blade Wind")
+            P3W_Hydro locale!(zh_cn: "重击·风旋水元素剑风", en: "Charged Attack: Wind Cyclone Hydro Blade Wind")
+            P3W_Cryo locale!(zh_cn: "重击·风旋冰元素剑风", en: "Charged Attack: Wind Cyclone Cryo Blade Wind")
+            P3W_Electro locale!(zh_cn: "重击·风旋雷元素剑风", en: "Charged Attack: Wind Cyclone Electro Blade Wind")
         ),
         skill2: skill_map!(
             AetherAnemoDamageEnum
@@ -203,10 +252,50 @@ impl CharacterTrait for AetherAnemo {
 
     #[cfg(not(target_family = "wasm"))]
     const CONFIG_DATA: Option<&'static [ItemConfig]> = Some(&[
+        ItemConfig {
+            name: "elements",
+            title: locale!(
+                zh_cn: "共鸣过的元素（天赋3额外强化效果）",
+                en: "Resonated Elements (Talent 3 Additional Buff Effects)"
+            ),
+            config: ItemConfigType::ElementMulti {
+                elements: &[Element::Pyro, Element::Hydro, Element::Anemo, Element::Electro, Element::Dendro, Element::Cryo, Element::Geo],
+                default: ConfigElements8Multi {
+                    pyro: true,
+                    hydro: true,
+                    anemo: true,
+                    electro: true,
+                    dendro: true,
+                    cryo: true,
+                    geo: true,
+                    physical: false,
+                }
+            }
+        },
     ]);
 
     #[cfg(not(target_family = "wasm"))]
     const CONFIG_SKILL: Option<&'static [ItemConfig]> = Some(&[
+        ItemConfig {
+            name: "wind_elements",
+            title: locale!(
+                zh_cn: "重击·风旋消耗的「晨风之刃」元素类型",
+                en: "Charged Attack: Wind Cyclone Consumed Blade Wind Element Types"
+            ),
+            config: ItemConfigType::ElementMulti {
+                elements: &[Element::Pyro, Element::Hydro, Element::Cryo, Element::Electro],
+                default: ConfigElements8Multi {
+                    pyro: true,
+                    hydro: true,
+                    anemo: false,
+                    electro: true,
+                    dendro: false,
+                    cryo: true,
+                    geo: false,
+                    physical: false,
+                }
+            }
+        },
         ItemConfig {
             name: "elemental_absorption",
             title: locale!(zh_cn: "元素吸收类型", en: "Elemental Absorption Type"),
@@ -218,13 +307,22 @@ impl CharacterTrait for AetherAnemo {
         let s: AetherAnemoDamageEnum = num::FromPrimitive::from_usize(s).unwrap();
         let (s1, s2, s3) = context.character_common_data.get_3_skill();
 
-        let elemental_absorption = match *config {
-            CharacterSkillConfig::AetherAnemo { elemental_absorption } => elemental_absorption,
-            _ => Element::Cryo,
+        let (wind_elements, elemental_absorption) = match *config {
+            CharacterSkillConfig::AetherAnemo { elemental_absorption, wind_elements } => (wind_elements, elemental_absorption),
+            _ => (ConfigElements8Multi::default(), Element::Cryo),
         };
 
         use AetherAnemoDamageEnum::*;
         let mut builder = D::new();
+
+        // 剑风仅由实际消耗的元素类型产生：未选中的元素类型不产生对应剑风
+        if (s == P3W_Pyro && !wind_elements.pyro)
+            || (s == P3W_Hydro && !wind_elements.hydro)
+            || (s == P3W_Cryo && !wind_elements.cryo)
+            || (s == P3W_Electro && !wind_elements.electro)
+        {
+            return builder.none();
+        }
 
         if context.character_common_data.constellation >= 6 && s.get_element(elemental_absorption) != Element::Anemo {
             builder.add_extra_res_minus("六命：革新的旋风", 0.2);
@@ -252,6 +350,10 @@ impl CharacterTrait for AetherAnemo {
             Q => AETHERANEMO_SKILL.q_dmg[s3],
             QA => AETHERANEMO_SKILL.q_dmga[s3],
             P2 => AETHERANEMO_SKILL.p2_dmg,
+            P3A => AETHERANEMO_SKILL.z_dmg1[s1] + AETHERANEMO_SKILL.p3_bonus,
+            P3B => AETHERANEMO_SKILL.z_dmg2[s1] + AETHERANEMO_SKILL.p3_bonus,
+            P3T => AETHERANEMO_SKILL.z_dmg1[s1] + AETHERANEMO_SKILL.z_dmg2[s1] + 2.0 * AETHERANEMO_SKILL.p3_bonus,
+            P3W_Pyro | P3W_Hydro | P3W_Cryo | P3W_Electro => AETHERANEMO_SKILL.p3_wind_bonus,
             _ => 0.0
         };
 
@@ -268,9 +370,15 @@ impl CharacterTrait for AetherAnemo {
     }
 
     fn new_effect<A: Attribute>(common_data: &CharacterCommonData, config: &CharacterConfig) -> Option<Box<dyn ChangeAttribute<A>>> {
+        let elements = match *config {
+            CharacterConfig::AetherAnemo { elements } => elements,
+            _ => ConfigElements8Multi::default(),
+        };
         Some(Box::new(AetherAnemoEffect {
+            elements,
             has_c2: common_data.constellation >= 2,
             has_c6: common_data.constellation >= 6,
+            common_data: common_data.clone(),
         }))
     }
 

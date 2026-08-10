@@ -115,7 +115,7 @@ impl CharacterTrait for Durin {
 `get_skill_type` 接口返回技能的技能类型，一般根据通过普通攻击、重击、下落攻击、元素战技、元素爆发触发的技能类型即为对应类型，与该技能描述所在部分无必然关系，如元素战技描述中存在通过普通攻击触发的技能，则该技能类型应为 `SkillType::NormalAttack`。非当前角色操作触发的技能，如协同攻击，一般根据初始触发的技能类型进行判断。若存在“视为元素战技伤害”等描述，应严格按照该描述进行判断。  
 若明确某个技能不存在元素类型或技能类型，也不应被查询元素类型或技能类型时，可以返回 `panic!()`，应用于如治疗量、纯数值等不存在明确元素类型、技能类型的情况。
 
-请注意，任何技能触发的擢升反应伤害（月感电、月绽放、月结晶、星超导）的技能类型都必须是 `SkillType::Elevative`。
+请注意，任何技能触发的擢升反应伤害（月感电、月绽放、月结晶、星超导、星扩散）的技能类型都必须是 `SkillType::Elevative`。
 
 特别的，如果该角色存在伤害元素类型与配置相关的情况（如染色伤害），则 `get_element` 接口的实现需要新增参数、进行判断并返回相应元素类型。
 
@@ -141,10 +141,18 @@ pub enum ElevativeReaction {
     LunarBloom,
     LunarCrystallizeReaction,   // 月结晶
     LunarCrystallize,           // 广义月结晶
+    StellarConductCryo,         // 视为星超导反应伤害的冰元素伤害
+    StellarConductElectro,      // 视为星超导反应伤害的雷元素伤害
+    StellarSwirlReactionAnemo,  // 星扩散反应风伤
+    StellarSwirlReactionCryo,   // 星扩散反应冰伤
+    StellarSwirlAnemo,          // 视为星扩散伤害的风元素伤害
+    StellarSwirlCryo,           // 视为星扩散伤害的冰元素伤害
 }
 ```
 
 其中 `LunarCharged`、`LunarBloom`、`LunarCrystallize` 分别为通过角色技能触发的月感电、月绽放、月结晶伤害，`LunarChargedReaction`、`LunarCrystallizeReaction` 分别为通过元素反应触发的月感电、月结晶伤害。在 `DamageEnum` 中，原则上不允许出现效果为 `LunarChargedReaction`、`LunarCrystallizeReaction` 的技能。
+
+特别的，对于星扩散，`StellarSwirlReactionAnemo`、`StellarSwirlReactionCryo` 分别为通过元素反应触发的星扩散反应风伤、星扩散反应冰伤，`StellarSwirlAnemo`、`StellarSwirlCryo` 分别为视为星扩散伤害的风元素伤害、冰元素伤害。在 `DamageEnum` 中，原则上不允许出现效果为 `StellarSwirlReactionAnemo`、`StellarSwirlReactionCryo` 的技能（星扩散反应风伤/冰伤通过元素反应触发，应当通过 `builder.elevative` 直接计算，具体可参照月感电的写法）。
 
 `CharacterTrait` 的实现中，前几个变量仿照上例即可。`DEFAULT_TAGS` 根据当前角色是否为月兆或魔导角色进行设置。`SKILL_MAP` 为所有需要对用户展示的技能以及相应名称，按照技能描述填写名称即可，对于部分天赋或命座中的技能，可通过“命座2伤害”等形式进行命名。
 

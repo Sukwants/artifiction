@@ -78,7 +78,7 @@ pub const BEIDOU_STATIC_DATA: CharacterStaticData = CharacterStaticData {
 };
 
 pub struct BeidouEffect {
-    pub in_polestar_field: bool,
+    pub stellar_glimmer_state: usize,
     pub common_data: CharacterCommonData,
 }
 
@@ -169,7 +169,7 @@ impl CharacterTrait for Beidou {
 
     #[cfg(not(target_family = "wasm"))]
     const CONFIG_DATA: Option<&'static [ItemConfig]> = Some(&[
-        ItemConfig::IN_POLESTAR_FIELD(false, ItemConfig::PRIORITY_CHARACTER),
+        ItemConfig::STELLAR_GLIMMER_STATE(0, ItemConfig::PRIORITY_CHARACTER),
     ]);
 
     #[cfg(not(target_family = "wasm"))]
@@ -193,9 +193,9 @@ impl CharacterTrait for Beidou {
     ]);
 
     fn change_attribute<A: Attribute>(attribute: &mut A, common_data: &CharacterCommonData, skill_config: &CharacterSkillConfig) {
-        let in_polestar_field = match &common_data.config {
-            CharacterConfig::Beidou { in_polestar_field } => *in_polestar_field,
-            _ => false,
+        let stellar_glimmer_state = match &common_data.config {
+            CharacterConfig::Beidou { stellar_glimmer_state } => *stellar_glimmer_state,
+            _ => 0,
         };
 
         let (under_q, perfect_counter) = match *skill_config {
@@ -216,7 +216,7 @@ impl CharacterTrait for Beidou {
                 0.15,
             );
 
-            if in_polestar_field {
+            if stellar_glimmer_state == 1 {
                 attribute.set_value_to_s(
                     CharacterSelector::select_all(attribute),
                     AttributeType::Invisible(InvisibleAttributeType::new_element(
@@ -297,12 +297,12 @@ impl CharacterTrait for Beidou {
     }
 
     fn new_effect<A: Attribute>(common_data: &CharacterCommonData, config: &CharacterConfig) -> Option<Box<dyn ChangeAttribute<A>>> {
-        let in_polestar_field = match *config {
-            CharacterConfig::Beidou { in_polestar_field } => in_polestar_field,
-            _ => false,
+        let stellar_glimmer_state = match *config {
+            CharacterConfig::Beidou { stellar_glimmer_state } => stellar_glimmer_state,
+            _ => 0,
         };
         Some(Box::new(BeidouEffect {
-            in_polestar_field,
+            stellar_glimmer_state,
             common_data: common_data.clone(),
         }))
     }

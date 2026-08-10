@@ -240,6 +240,8 @@ impl CalculatorInterface {
         let result = ElevativeDamageAnalysisForAll {
             lunar_charged_reaction: get_damage(ElevativeReaction::LunarChargedReaction),
             lunar_crystallize_reaction: get_damage(ElevativeReaction::LunarCrystallizeReaction),
+            stellar_swirl_reaction_anemo: get_damage(ElevativeReaction::StellarSwirlReactionAnemo),
+            stellar_swirl_reaction_cryo: get_damage(ElevativeReaction::StellarSwirlReactionCryo),
         };
 
         result

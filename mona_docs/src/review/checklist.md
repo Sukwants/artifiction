@@ -35,9 +35,9 @@
 - [ ] **`get_element` 实现**：普通攻击一般为 `Physical` 或对应元素，元素战技/爆发为对应元素，治疗一般为 `Physical`，护盾返回护盾元素类型。检查元素类型是否正确。
 - [ ] **`get_element` 与染色**：若角色存在染色伤害，`get_element` 是否需要传入参数进行判断？检查是否正确实现。
 - [ ] **`get_skill_type` 实现**：技能类型应基于实际触发方式而非描述所在位置。协同攻击一般基于初始触发类型；"视为元素战技伤害"应严格按描述判断。检查技能类型是否正确。
-- [ ] **擢升反应技能类型**：任何技能触发的擢升反应伤害（月感电/月绽放/月结晶/星超导）技能类型必须是 `SkillType::Elevative`。检查是否遗漏。
+- [ ] **擢升反应技能类型**：任何技能触发的擢升反应伤害（月感电/月绽放/月结晶/星超导/星扩散）技能类型必须是 `SkillType::Elevative`。检查是否遗漏。
 - [ ] **`get_elevative_type` 实现**：若角色触发擢升反应伤害，是否实现了此方法？检查返回值是否正确。
-- [ ] **`ElevativeReaction` 类型**：在 `DamageEnum` 中不允许出现 `LunarChargedReaction` 或 `LunarCrystallizeReaction`（这两种通过元素反应触发）。检查是否正确使用 `LunarCharged`/`LunarBloom`/`LunarCrystallize`。
+- [ ] **`ElevativeReaction` 类型**：在 `DamageEnum` 中不允许出现 `LunarChargedReaction` 或 `LunarCrystallizeReaction`（这两种通过元素反应触发），也不允许出现 `StellarSwirlReactionAnemo` 或 `StellarSwirlReactionCryo`（星扩散反应风伤/冰伤通过元素反应触发）。检查是否正确使用 `LunarCharged`/`LunarBloom`/`LunarCrystallize`/`StellarSwirlAnemo`/`StellarSwirlCryo`。
 - [ ] **命座伤害拆分**：当同一命座伤害可能由不同技能触发时，是否拆分为多个 DamageEnum 变体（如 C4E/C4Q）并分别归入对应 skill_map？检查是否正确拆分。
 - [ ] **`DEFAULT_TAGS`**：月兆角色需要 `CharacterTag::Moonsign`，魔导角色需要 `CharacterTag::Hexerei`。检查标签设置是否正确。
 - [ ] **`SKILL_MAP`**：所有需要对用户展示的技能是否都在 `skill_map!` 中注册？检查名称是否准确、中英文是否齐全。
@@ -198,7 +198,7 @@
 - [ ] **非面板属性声明**：是否正确使用 `InvisibleAttributeType::new_*` 方法声明非面板属性？检查 `attribute_variable_type`/`element`/`skill`/`reaction` 参数是否正确。
 - [ ] **一般伤害叙述对应**："基于特定数值提升伤害"→`BaseDamage`；"按百分比提升伤害"→`Bonus`；"提升反应伤害/加成系数"→`ReactionEnhance`；"提升暴击率"→`CriticalRate`；"提升暴击伤害"→`CriticalDamage`；"无视防御力"→`DefPenetration`。检查对应关系是否正确。
 - [ ] **聚变反应叙述对应**："提升反应伤害"→`ReactionEnhance`；"基于数值提升反应伤害"→`ReactionExtra`；反应暴击率→`CriticalRate`；反应暴击伤害→`CriticalDamage`。检查对应关系是否正确。
-- [ ] **擢升反应叙述对应**：特别注意"提升反应基础伤害"→`ElevativeBase`；"反应擢升"→`ElevativeElevate`；星超导附着次数→`ElevativeCoefficient`。检查对应关系是否正确。
+- [ ] **擢升反应叙述对应**：特别注意"提升反应基础伤害"→`ElevativeBase`；"反应擢升"→`ElevativeElevate`；星超导附着次数→`ElevativeCoefficient`；星扩散风涡系数→`ElevativeCoefficient`。检查对应关系是否正确。
 - [ ] **治疗效果叙述对应**："治疗加成提升"→`HealingBonus`；"受治疗加成提升"→`IncomingHealingBonus`；治疗暴击率→`HealingCriticalRate`；治疗暴击伤害→`HealingCriticalDamage`。
 - [ ] **护盾效果叙述对应**："护盾强效提升"→`ShieldStrength`。
 - [ ] **敌人效果叙述对应**："降低抗性"→`ResMinus`；"降低防御力"→`DefMinus`。
@@ -274,7 +274,7 @@
   - `PRIORITY_BUFF` (4)：buff 配置
   - `PRIORITY_WEAPON` (5)：武器配置
   - `PRIORITY_CHARACTER` (6)：角色配置
-- [ ] **预设全局联动**：月兆配置（`MOONSIGN_GLOBAL`）、魔导配置（`HEXEREI_SECRET_RITE_GLOBAL`）、星超导附着次数（`STELLAR_CONDUCT_APPLICATION_COUNT`）、极星辉域（`IN_POLESTAR_FIELD`）是否在相关位置正确使用？
+- [ ] **预设全局联动**：月兆配置（`MOONSIGN_GLOBAL`）、魔导配置（`HEXEREI_SECRET_RITE_GLOBAL`）、星超导附着次数（`STELLAR_CONDUCT_APPLICATION_COUNT`）、辉映·星烁状态（`STELLAR_GLIMMER_STATE`）是否在相关位置正确使用？星扩散风涡系数配置位置待定，待确定后检查是否在相关位置正确使用。
 
 ### 7.3 配置解析
 

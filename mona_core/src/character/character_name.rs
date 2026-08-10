@@ -155,4 +155,8 @@ pub enum CharacterName {
     Nicole,
     Lohen,
     Sandrone,
+    AetherCryo,
+    LumineCryo,
+    Alyosha,
+    Odette,
 }

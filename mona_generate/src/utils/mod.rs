@@ -210,6 +210,24 @@ pub fn config_to_json(config: &ItemConfig) -> String {
                 }
             })
         },
+        ItemConfigType::GlobalLinkOption2 { options_zh, options_en, default, global_link } => {
+            let temp_zh: Vec<&str> = options_zh.split(",").collect();
+            let temp_en: Vec<&str> = options_en.split(",").collect();
+            json!({
+                "type": "option2",
+                "title": title_index,
+                "name": name,
+                "default": default,
+                "options_zh": temp_zh,
+                "options_en": temp_en,
+                "global_link": {
+                    "key": global_link.key,
+                    "priority": global_link.priority,
+                    "unlinked": false,
+                    "team_shared": global_link.team_shared
+                }
+            })
+        },
         ItemConfigType::GlobalLinkMoonsign3 { default, global_link } => {
             json!({
                 "type": "moonsign3",
