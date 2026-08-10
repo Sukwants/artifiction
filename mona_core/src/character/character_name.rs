@@ -160,3 +160,27 @@ pub enum CharacterName {
     Alyosha,
     Odette,
 }
+
+impl CharacterName {
+    /// 判断当前角色是否为旅行者（空/荧，包含全部元素形态）。
+    /// 旅行者相关的武器等效果可通过该方法统一判断。
+    pub fn is_traveler(&self) -> bool {
+        matches!(
+            *self,
+            CharacterName::AetherAnemo
+                | CharacterName::LumineAnemo
+                | CharacterName::AetherGeo
+                | CharacterName::LumineGeo
+                | CharacterName::AetherElectro
+                | CharacterName::LumineElectro
+                | CharacterName::AetherDendro
+                | CharacterName::LumineDendro
+                | CharacterName::AetherHydro
+                | CharacterName::LumineHydro
+                | CharacterName::AetherPyro
+                | CharacterName::LuminePyro
+                | CharacterName::AetherCryo
+                | CharacterName::LumineCryo
+        )
+    }
+}

@@ -53,6 +53,8 @@ pub enum WeaponName {
     CalamityOfEshu,
     SerenitysCall,
     MoonweaversDawn,
+    HereticsMoltenBlade,
+    Emberwell,
     // 5 star
     AquilaFavonia,
     SkywardBlade,
@@ -70,6 +72,8 @@ pub enum WeaponName {
     Azurelight,
     AthameArtis,
     LightbearingMoonshard,
+    ExaiphanesBlade,
+    WhitelakeFrostfeather,
 
     // claymore
     // 1 star
@@ -108,6 +112,8 @@ pub enum WeaponName {
     EarthShaker,
     FlameforgedInsight,
     MasterKey,
+    ForgedByTheGoldenMelody,
+    BladeOfAtonement,
     // 5 star
     SkywardPride,
     WolfsGravestone,
@@ -154,6 +160,8 @@ pub enum WeaponName {
     TamayurateiNoOhanashi,
     ProspectorsShovel,
     SacrificersStaff,
+    Frostbreath,
+    SongOfTheVigil,
     // 5 star
     PrimordialJadeWingedSpear,
     SkywardSpine,
@@ -206,6 +214,8 @@ pub enum WeaponName {
     BlackmarrowLantern,
     EtherlightSpindlelute,
     DawningFrost,
+    ClashOfKings,
+    EchoesOfTheHeart,
     // 5 star
     SkywardAtlas,
     LostPrayerToTheSacredWinds,
@@ -267,6 +277,8 @@ pub enum WeaponName {
     SequenceOfSolitude,
     SnareHook,
     RainbowSerpentsRainBow,
+    JadeVista,
+    CovenantOfFrostAndSnow,
     // 5 star
     SkywardHarp,
     AmosBow,

@@ -50,6 +50,10 @@ pub use serenitys_call::SerenitysCall;
 pub use moonweavers_dawn::MoonweaversDawn;
 pub use athame_artis::AthameArtis;
 pub use lightbearing_moonshard::LightbearingMoonshard;
+pub use emberwell::Emberwell;
+pub use exaiphanes_blade::ExaiphanesBlade;
+pub use heretics_molten_blade::HereticsMoltenBlade;
+pub use whitelake_frostfeather::WhitelakeFrostfeather;
 
 pub mod mistsplitter_reforged;
 pub mod aquila_favonia;
@@ -103,3 +107,7 @@ pub mod serenitys_call;
 pub mod moonweavers_dawn;
 pub mod athame_artis;
 pub mod lightbearing_moonshard;
+pub mod emberwell;
+pub mod exaiphanes_blade;
+pub mod heretics_molten_blade;
+pub mod whitelake_frostfeather;
