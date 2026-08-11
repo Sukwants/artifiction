@@ -119,7 +119,7 @@ export function upgradePresetToNewVersion(preset: PresetEntry | any): PresetEntr
             character: removeConfigUnlinked(item.character),
             weapon: removeConfigUnlinked(item.weapon),
             targetFunction: removeConfigUnlinked(item.targetFunction),
-            buffs: item.buffs.map((buff: any) => removeConfigUnlinked(buff)),
+            buffs: (item.buffs ?? []).map((buff: any) => removeConfigUnlinked(buff)),
             globalConfigUnlinked: {},   // 不管了，不要了
         }
 
