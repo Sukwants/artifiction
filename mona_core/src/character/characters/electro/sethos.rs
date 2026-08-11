@@ -109,7 +109,7 @@ impl CharacterTrait for Sethos {
         ),
         element: Element::Electro,
         hp: [821, 2108, 2721, 4076, 4512, 5189, 5770, 6448, 6884, 7561, 7996, 8674, 9110, 9787, 10464],
-        atk: [19, 49, 63, 95, 105, 121, 134, 150, 160, 176, 186, 201, 212, 227, 285],
+        atk: [19, 49, 63, 95, 105, 120, 134, 150, 160, 176, 186, 201, 212, 227, 285],
         def: [47, 121, 156, 233, 258, 297, 330, 369, 394, 432, 457, 496, 521, 560, 598],
         sub_stat: CharacterSubStatFamily::ElementalMastery96,
         weapon_type: WeaponType::Bow,

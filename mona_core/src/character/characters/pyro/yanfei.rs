@@ -57,7 +57,7 @@ pub const YANFEI_STATIC_DATA: CharacterStaticData = CharacterStaticData {
     name: CharacterName::Yanfei,
     internal_name: "Feiyan",
     element: Element::Pyro,
-    hp: [784, 2014, 2160, 3895, 4311, 4959, 5514, 6161, 6578, 7225, 7641, 8289, 8705, 9352, 9999],
+    hp: [784, 2014, 2600, 3895, 4311, 4959, 5514, 6161, 6578, 7225, 7641, 8289, 8705, 9352, 9999],
     atk: [20, 52, 67, 100, 111, 127, 141, 158, 169, 185, 196, 213, 223, 240, 301],
     def: [49, 126, 163, 244, 271, 311, 346, 387, 413, 453, 480, 520, 546, 587, 628],
     sub_stat: CharacterSubStatFamily::Bonus240(StatName::PyroBonus),

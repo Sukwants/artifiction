@@ -189,7 +189,7 @@ impl CharacterTrait for Cyno {
         internal_name: "Cyno",
         element: Element::Electro,
         hp: [972, 2522, 3356, 5022, 5614, 6459, 7249, 8103, 8695, 9557, 10149, 11020, 11613, 12491, 13379],
-        atk: [25, 64, 85, 128, 143, 165, 185, 206, 221, 243, 258, 281, 296, 318, 390],
+        atk: [25, 64, 85, 128, 143, 164, 185, 206, 221, 243, 258, 281, 296, 318, 390],
         def: [67, 174, 231, 345, 386, 444, 499, 557, 598, 657, 698, 758, 799, 859, 920],
         sub_stat: CharacterSubStatFamily::CriticalDamage384,
         weapon_type: WeaponType::Polearm,
