@@ -100,6 +100,7 @@ pub enum BuffConfig {
     YumemizukiMizukiC1 { em: f64 },
     YumemizukiMizukiC2 { em: f64 },
     YumemizukiMizukiP3 { em: f64 },
+    YumemizukiMizukiC6 {},
     IansanQ { nightsoul_point: usize, atk: f64, level_q: usize },
     Ifa { re_count: usize },
     EscoffierTalent2 { hydro_cryo_count: usize },

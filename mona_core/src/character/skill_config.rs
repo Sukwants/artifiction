@@ -72,7 +72,7 @@ pub enum CharacterSkillConfig {
     Xilonen { nightsoul: bool },
     Chasca { element_count: usize, c6_rate: f64 },
     Mavuika { after_q: bool },
-    YumemizukiMizuki { in_dreamdrifter: bool, p3_boost_active: bool },
+    YumemizukiMizuki { in_dreamdrifter: bool, p4_boost_active: bool, c1_awaiting_active: bool },
     Skirk { cunning_stacks: i32, seven_phase_mode: bool, havoc_extinction: bool, death_crossing_stacks: i32, void_rift_count: i32 },
     Nefer { veil_of_falsehood: usize, shadow_dance: bool },
     Jahoda { elemental_absorption: Element, activated_p2: bool },

@@ -152,6 +152,7 @@ pub enum BuffName {
     YumemizukiMizukiP3,
     YumemizukiMizukiC1,
     YumemizukiMizukiC2,
+    YumemizukiMizukiC6,
     IansanQ,
     IansanC2,
     IansanC6,
