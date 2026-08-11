@@ -1,23 +1,16 @@
-import {artifactEff, artifactTags} from "@/constants/artifact"
+import { artifactEff, artifactTags } from "@/constants/artifact"
 // @ts-ignore
 import objectHash from "object-hash"
-import {artifactsData} from "@/assets/artifacts"
-import { toSnakeCase, deepCopy } from "@/utils/common"
+import { artifactsData } from "@/assets/artifacts"
+import { toSnakeCase, deepCopy, deepMerge } from "@/utils/common"
 import { wasmGetArtifactsRankByCharacter } from "@/wasm"
-import {convertArtifact, convertArtifactStatNameBack} from "@/utils/converter"
-import type {
-    ArtifactPosition,
-    ArtifactSetName, ArtifactStatName,
-    ArtifactSubStatName,
-    IArtifact,
-    IArtifactContentOnly
-} from "@/types/artifact"
+import { convertArtifact, convertArtifactStatNameBack } from "@/utils/converter"
+import type { ArtifactPosition, ArtifactSetName, ArtifactStatName, ArtifactSubStatName, IArtifact, IArtifactContentOnly } from "@/types/artifact"
 import { useArtifactStore } from "@/store/pinia/artifact"
 import { hash, hashExceptValue } from "@/utils/artifactHash"
 import { positions } from "@/constants/artifact"
-import {useI18n} from "@/i18n/i18n";
-import {useKumiStore} from "@/store/pinia/kumi";
-import { getObjectConfig } from "@/composables/globalConfig"
+import { useI18n } from "@/i18n/i18n";
+import { useKumiStore } from "@/store/pinia/kumi";
 
 
 const artifactStore = useArtifactStore()
@@ -33,32 +26,73 @@ export function howManyUpgradeCount(value: number, tagName: ArtifactStatName, st
 
 
 // create new default artifact config
-export function newDefaultArtifactConfig(): any {
-    let configs: any = {}
+export function newDefaultArtifactConfig() {
+    const configs: Record<string, Record<string, any>> = {}
 
-    for (let name in artifactsData) {
+    for (const name in artifactsData) {
         const data = artifactsData[name]
         const name2 = data.name2
-        const config4 = data.config4 ?? []
-        const config2 = data.config2 ?? []
-        const configAll = config2.concat(config4)
-        if (configAll.length > 0) {
-            let c: any = {}
-            for (let item of configAll) {
-                c[item.name] = {
-                    config: deepCopy(item.default),
-                    configValue: deepCopy(item.default),
-                    unlinked: deepCopy(item.unlinked)
-                }
-            }
 
-            const snake = toSnakeCase(name2)
-            const configName = "config_" + snake
-            configs[configName] = c
+        const snake = toSnakeCase(name2)
+
+        const configName = `config_${snake}`
+        configs[configName] = {}
+        for (const num of [1, 2, 3, 4, 5]) {
+            for (const meta of data[`config${num}`] ?? []) {
+                configs[configName][meta.name] = meta.default ?? []
+            }
         }
     }
 
     return configs
+}
+export const default_artifact_config = newDefaultArtifactConfig()
+
+export function convertArtifactConfigForWasm(config: Record<string, Record<string, any>>): Record<string, Record<string, any>> {
+    const res: Record<string, Record<string, any>> = {}
+
+    for (const name in artifactsData) {
+        const data = artifactsData[name]
+        const name2 = data.name2
+
+        const snake = toSnakeCase(name2)
+
+        const config_name = `config_${snake}`
+        const setConfig: Record<string, any> = {}
+        for (const num of [1, 2, 3, 4, 5]) {
+            const config_name_with_count = `config_${snake}*set${num}`
+            for (const meta of data[`config${num}`] ?? []) {
+                if (meta.name in (config[config_name_with_count] ?? {})) {
+                    setConfig[meta.name] = config[config_name_with_count][meta.name]
+                }
+            }
+        }
+        if (Object.keys(setConfig).length > 0) {
+            res[config_name] = setConfig
+        }
+    }
+
+    return res
+}
+export function convertArtifactConfigFromWasm(config: Record<string, Record<string, any>>): Record<string, Record<string, any>> {
+    const res: Record<string, Record<string, any>> = {}
+
+    for (const name in artifactsData) {
+        const data = artifactsData[name]
+        const name2 = data.name2
+
+        const snake = toSnakeCase(name2)
+
+        for (const num of [1, 2, 3, 4, 5]) {
+            const config_name_with_count = `config_${snake}*set${num}`
+            res[config_name_with_count] = {}
+            for (const meta of data[`config${num}`] ?? []) {
+                res[config_name_with_count][meta.name] = config[`config_${snake}`]?.[meta.name] ?? meta.default
+            }
+        }
+    }
+
+    return res
 }
 
 // toggle artifact omit/not omit
@@ -194,7 +228,7 @@ export function importMonaJson(rawObj: any, removeNonExisting: boolean, backupIm
            if (artifacts !== undefined) {
                kumiStore.addKumi(1, equipName, artifacts)
            }
-        }   
+        }
     }
     if (importKumi && parseInt(rawObj.version) >= 2) {
         const kumi = rawObj.kumi ?? []
@@ -236,34 +270,7 @@ export function getArtifactThumbnail(name: ArtifactSetName): string {
 // if new config key also exists in old config, use old value
 // otherwise, use default value
 export function upgradeArtifactConfig(oldConfig: any) {
-    if (!oldConfig) {
-        return getObjectConfig(newDefaultArtifactConfig())
-    }
-
-    let newConfig: any = {}
-
-    for (let name in artifactsData) {
-        const data = artifactsData[name]
-        const name2 = data.name2
-        const snake = toSnakeCase(name2)
-        const configName = "config_" + snake
-
-        if (Object.prototype.hasOwnProperty.call(oldConfig, configName)) {
-            newConfig[configName] = deepCopy(oldConfig[configName])
-        } else {
-            const config4 = data.config4 ?? []
-            if (config4.length > 0) {
-                let c: any = {}
-                for (let item of config4) {
-                    c[item.name] = item.default
-                }
-
-                newConfig[configName] = c
-            }
-        }
-    }
-
-    return newConfig
+    return deepMerge(default_artifact_config, oldConfig)
 }
 
 // get all artifacts(including omitted) using wasm format
@@ -364,9 +371,12 @@ export function statName2Locale(name: ArtifactStatName): string {
 }
 
 export function getArtifactAllConfigs(item: any): any {
-    const config2 = item.config2 ?? []
-    const config4 = item.config4 ?? []
-    return config2.concat(config4)
+    let res = [];
+    for (const num of [1, 2, 3, 4, 5]) {
+        const config = item[`config${num}`] ?? []
+        res.push(config)
+    }
+    return res
 }
 
 /// Get artifacts configs (config2/config4) for current artifact name
@@ -377,7 +387,7 @@ export function getArtifactAllConfigsByName(name: ArtifactSetName): any {
 /// merge configs into a legit config
 /// note: there may be circumstances where a merging config is not complete (e.g. lacking some config2 fields)
 export function mergeArtifactConfig(config: any): any {
-    const defaultConfig = newDefaultArtifactConfig()
+    const defaultConfig = deepCopy(default_artifact_config)
     for (const key in config) {
         if (key in defaultConfig) {
             for (const configKey in config[key]) {
@@ -387,6 +397,5 @@ export function mergeArtifactConfig(config: any): any {
             }
         }
     }
-    console.log(defaultConfig)
     return defaultConfig
 }

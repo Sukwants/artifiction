@@ -80,10 +80,10 @@ impl TargetFunction for YaeMikoDefaultTargetFunction {
         let solved_e_p3 = attr_e_p3.solve();
         let ctx_e_p3 = DamageContext { character_common_data: &character.common_data, attribute: &solved_e_p3, enemy };
 
-        // 从角色配置读取极星辉域状态
-        let in_polestar_field = match &character.common_data.config {
-            CharacterConfig::YaeMiko { in_polestar_field, .. } => *in_polestar_field,
-            _ => false,
+        // 从角色配置读取辉映·星烁状态
+        let stellar_glimmer_state = match &character.common_data.config {
+            CharacterConfig::YaeMiko { stellar_glimmer_state, .. } => *stellar_glimmer_state,
+            _ => StellarGlimmerState::None,
         };
 
         type S = <YaeMiko as CharacterTrait>::DamageEnumType;
@@ -138,9 +138,9 @@ impl TargetFunction for YaeMikoDefaultTargetFunction {
             _ => NAN
         };
 
-        // 天赋3星超导额外伤害 (仅极星辉域下生效, 从角色配置读取)
+        // 天赋3星超导额外伤害 (仅辉映·星超导状态下生效, 从角色配置读取)
         let mut dmg_sum_p3_sc = 0.0;
-        if in_polestar_field {
+        if stellar_glimmer_state.is_stellar_conduct() {
             let dmg_p3_sc = YaeMiko::damage::<SimpleDamageBuilder>(&ctx_e_p3, S::P3_SC, &config_e_p3, None);
             dmg_sum_p3_sc = dmg_p3_sc.normal.expectation * p3_count;
         }

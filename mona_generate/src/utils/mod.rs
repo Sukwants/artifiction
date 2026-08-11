@@ -166,65 +166,93 @@ pub fn config_to_json(config: &ItemConfig) -> String {
         },
         ItemConfigType::GlobalLinkBool { default, global_link } => {
             json!({
-                "type": "globalLink",
+                "type": "bool",
+                "title": title_index,
                 "name": name,
-                "key": global_link.key,
                 "default": default,
-                "priority": global_link.priority,
-                "unlinked": false,
-                "team_shared": global_link.team_shared,
-                "config": {
-                    "type": "bool",
-                    "title": title_index,
+                "global_link": {
+                    "key": global_link.key,
+                    "priority": global_link.priority,
+                    "unlinked": false,
+                    "team_shared": global_link.team_shared
                 }
             })
         },
         ItemConfigType::GlobalLinkFloat { min, max, default, global_link } => {
             json!({
-                "type": "globalLink",
+                "type": "float",
+                "title": title_index,
                 "name": name,
-                "key": global_link.key,
+                "min": min,
+                "max": max,
                 "default": default,
-                "priority": global_link.priority,
-                "unlinked": false,
-                "team_shared": global_link.team_shared,
-                "config": {
-                    "type": "float",
-                    "title": title_index,
-                    "min": min,
-                    "max": max
+                "global_link": {
+                    "key": global_link.key,
+                    "priority": global_link.priority,
+                    "unlinked": false,
+                    "team_shared": global_link.team_shared
                 }
             })
         },
         ItemConfigType::GlobalLinkInt { min, max, default, global_link } => {
             json!({
-                "type": "globalLink",
+                "type": "int",
+                "title": title_index,
                 "name": name,
-                "key": global_link.key,
+                "min": min,
+                "max": max,
                 "default": default,
-                "priority": global_link.priority,
-                "unlinked": false,
-                "team_shared": global_link.team_shared,
-                "config": {
-                    "type": "int",
-                    "title": title_index,
-                    "min": min,
-                    "max": max
+                "global_link": {
+                    "key": global_link.key,
+                    "priority": global_link.priority,
+                    "unlinked": false,
+                    "team_shared": global_link.team_shared
+                }
+            })
+        },
+        ItemConfigType::GlobalLinkOption2 { options_zh, options_en, default, global_link } => {
+            let temp_zh: Vec<&str> = options_zh.split(",").collect();
+            let temp_en: Vec<&str> = options_en.split(",").collect();
+            json!({
+                "type": "option2",
+                "title": title_index,
+                "name": name,
+                "default": default,
+                "options_zh": temp_zh,
+                "options_en": temp_en,
+                "global_link": {
+                    "key": global_link.key,
+                    "priority": global_link.priority,
+                    "unlinked": false,
+                    "team_shared": global_link.team_shared
                 }
             })
         },
         ItemConfigType::GlobalLinkMoonsign3 { default, global_link } => {
             json!({
-                "type": "globalLink",
+                "type": "moonsign3",
+                "title": title_index,
                 "name": name,
-                "key": global_link.key,
                 "default": default,
-                "priority": global_link.priority,
-                "unlinked": false,
-                "team_shared": global_link.team_shared,
-                "config": {
-                    "type": "moonsign3",
-                    "title": title_index,
+                "global_link": {
+                    "key": global_link.key,
+                    "priority": global_link.priority,
+                    "unlinked": false,
+                    "team_shared": global_link.team_shared
+                }
+            })
+        },
+        ItemConfigType::GlobalLinkStellarGlimmer3 { default, global_link } => {
+            json!({
+                "type": "stellar_glimmer_state",
+                "title": title_index,
+                "name": name,
+                "default": default,
+                "global_link": {
+                    "key": global_link.key,
+                    "priority": global_link.priority,
+                    "unlinked": false,
+                    "team_shared": global_link.team_shared
                 }
             })
         },

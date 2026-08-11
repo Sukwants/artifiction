@@ -63,7 +63,7 @@ pub const GANYU_STATIC_DATA: CharacterStaticData = CharacterStaticData {
     internal_name: "Ganyu",
     element: Element::Cryo,
     hp: [763, 1978, 2632, 3939, 4403, 5066, 5686, 6355, 6820, 7495, 7960, 8643, 9108, 9797, 10493],
-    atk: [26, 68, 90, 135, 151, 173, 194, 217, 233, 256, 272, 295, 311, 335, 411],
+    atk: [26, 68, 90, 135, 151, 173, 194, 217, 233, 256, 272, 295, 311, 335, 410],
     def: [49, 127, 169, 253, 283, 326, 366, 409, 439, 482, 512, 556, 586, 630, 675],
     sub_stat: CharacterSubStatFamily::CriticalDamage384,
     weapon_type: WeaponType::Bow,

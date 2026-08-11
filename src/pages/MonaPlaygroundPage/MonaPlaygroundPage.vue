@@ -76,8 +76,7 @@
 
                     <div class="character-extra-config" v-if="characterNeedConfig">
                         <item-config
-                            v-model="characterConfig"
-                            :item-name="characterName"
+                            :model-value="characterConfig[characterName]"
                             :configs="characterConfigConfig"
                         ></item-config>
                     </div>
@@ -116,8 +115,7 @@
 
                     <div class="weapon-extra-config" v-if="weaponNeedConfig">
                         <item-config
-                            v-model="weaponConfig"
-                            :item-name="weaponName"
+                            :model-value="weaponConfig[weaponName]"
                             :configs="weaponConfigConfig"
                         ></item-config>
                     </div>
@@ -142,7 +140,6 @@
                         v-for="buff in buffs"
                         :key="buff.id"
                         :buff="buff"
-                        v-model:buffConfig="buff.config"
                         @delete="deleteBuff(buff.id)"
                         @toggle="toggleBuff(buff.id)"
                     ></buff-item>
@@ -213,7 +210,7 @@
                 </div>
 
                 <div class="output mona-scroll-hidden">
-                    <p v-for="output in outputs" class="output-row">{{ output }}</p>
+                    <p v-for="(output, index) in outputs" :key="index" class="output-row">{{ output }}</p>
                 </div>
             </div>
         </el-col>
@@ -247,7 +244,10 @@ import IconFa6SolidBan from "~icons/fa6-solid/ban"
 import IconFa6SolidPlay from "~icons/fa6-solid/play"
 import {positions} from "@/constants/artifact"
 import {useMona} from "@/wasm/mona"
+import {ConfigManager} from "@/composables/config"
 
+const configManager = new ConfigManager()
+provide("configManager", configManager)
 
 //////////////////////////////////////////////////////////////////////////
 // character
@@ -262,10 +262,9 @@ const {
     characterWeaponType,
     characterInterface,
     characterSplash,
-    characterAscend,
     characterConfigConfig,
     characterNeedConfig
-} = useCharacter()
+} = useCharacter(configManager, 1)
 
 
 //////////////////////////////////////////////////////////////////////////
@@ -274,9 +273,8 @@ const {
     weaponName, weaponLevel, weaponRefine, weaponConfig,
     weaponNeedConfig,
     weaponConfigConfig,
-    weaponAscend,
     weaponInterface,
-} = useWeapon(characterWeaponType)
+} = useWeapon(characterWeaponType, configManager, 1)
 
 
 //////////////////////////////////////////////////////////////////////////
@@ -287,7 +285,7 @@ const {
     addBuff,
     deleteBuff,
     toggleBuff
-} = useBuff()
+} = useBuff(configManager, 1)
 const showSelectBuffDialog = ref(false)
 
 function handleSelectBuff(name: string) {
@@ -304,17 +302,13 @@ function handleClickAddBuff() {
 // artifacts
 const {
     artifactIds,
-    artifactSingleConfig,
     artifactConfigForCalculator,
     artifactWasmFormat,
-    artifactNeedConfig4,
-    artifactConfig4Configs,
     artifactItems,
 
     removeArtifact,
     toggleArtifact,
-    setArtifact,
-} = use5Artifacts()
+} = use5Artifacts(configManager, 1)
 const showSelectArtifactDialog = ref(false)
 const selectArtifactSlot = ref<ArtifactPosition>("flower")
 

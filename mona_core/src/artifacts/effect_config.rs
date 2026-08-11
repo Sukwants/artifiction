@@ -244,6 +244,18 @@ pub struct ConfigCelestialGift {
 #[derive(Debug, Clone, Default)]
 pub struct ConfigDisenchantmentInDeepShadow {}
 
+#[derive(Serialize, Deserialize)]
+#[derive(Debug, Clone, Default)]
+pub struct ConfigScarletProof {
+    pub set4_rate: f64,
+}
+
+#[derive(Serialize, Deserialize)]
+#[derive(Debug, Clone, Default)]
+pub struct ConfigHeartOfTheFurnace {
+    pub set4_rate: f64,
+}
+
 #[derive(Default, Debug, Clone)]
 #[derive(Serialize, Deserialize)]
 pub struct ArtifactEffectConfig {
@@ -288,6 +300,8 @@ pub struct ArtifactEffectConfig {
     pub config_aubade_of_morningstar_and_moon: ConfigAubadeOfMorningstarAndMoon,
     pub config_a_day_carved_from_rising_winds: ConfigADayCarvedFromRisingWinds,
     pub config_celestial_gift: ConfigCelestialGift,
+    pub config_scarlet_proof: ConfigScarletProof,
+    pub config_heart_of_the_furnace: ConfigHeartOfTheFurnace,
 }
 
 #[derive(Serialize, Deserialize)]
@@ -334,6 +348,8 @@ pub struct ArtifactConfigInterface {
     pub config_aubade_of_morningstar_and_moon: Option<ConfigAubadeOfMorningstarAndMoon>,
     pub config_a_day_carved_from_rising_winds: Option<ConfigADayCarvedFromRisingWinds>,
     pub config_celestial_gift: Option<ConfigCelestialGift>,
+    pub config_scarlet_proof: Option<ConfigScarletProof>,
+    pub config_heart_of_the_furnace: Option<ConfigHeartOfTheFurnace>,
 }
 
 impl ArtifactConfigInterface {
@@ -380,6 +396,8 @@ impl ArtifactConfigInterface {
             config_aubade_of_morningstar_and_moon: self.config_aubade_of_morningstar_and_moon.unwrap_or_default(),
             config_a_day_carved_from_rising_winds: self.config_a_day_carved_from_rising_winds.unwrap_or_default(),
             config_celestial_gift: self.config_celestial_gift.unwrap_or_default(),
+            config_scarlet_proof: self.config_scarlet_proof.unwrap_or_default(),
+            config_heart_of_the_furnace: self.config_heart_of_the_furnace.unwrap_or_default(),
         }
     }
 }
@@ -522,6 +540,16 @@ impl ArtifactEffectConfigBuilder {
 
     pub fn celestial_gift(&mut self, hexerei_secret_rite: bool) -> &mut Self {
         self.config.config_celestial_gift.hexerei_secret_rite = hexerei_secret_rite;
+        self
+    }
+
+    pub fn scarlet_proof(&mut self, set4_rate: f64) -> &mut Self {
+        self.config.config_scarlet_proof.set4_rate = set4_rate;
+        self
+    }
+
+    pub fn heart_of_the_furnace(&mut self, set4_rate: f64) -> &mut Self {
+        self.config.config_heart_of_the_furnace.set4_rate = set4_rate;
         self
     }
 }

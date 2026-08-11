@@ -1,48 +1,44 @@
 const DEFAULT_CHARACTER = "Sandrone";
 
-import type {WeaponType} from "@/types/weapon"
+import type { WeaponType } from "@/types/weapon"
 // @ts-ignore
 import { characterData } from "@character"
-import {type Ref} from "vue"
-import type {CharacterName} from "@/types/character"
-import {useI18n} from "@/i18n/i18n"
-import { getObjectConfigValue } from "@/composables/globalConfig";
+import { type Ref } from "vue"
+import type { CharacterName } from "@/types/character"
+import { useI18n } from "@/i18n/i18n"
+import { ConfigMeta, ConfigAddress, ConfigManager } from "@/composables/config"
 
-export function getDefaultCharacterConfig(name: string) {
-    let res: any;
+// export function getDefaultCharacterConfig(name: string) {
+//     let res: any = {};
 
-    const hasConfigData = characterData[name].config.length > 0;
+//     const hasConfigData = characterData[name].config.length > 0;
 
-    // change config
-    if (hasConfigData) {
-        const configs = characterData[name].config
+//     // change config
+//     if (hasConfigData) {
+//         const configs = characterData[name].config
 
-        let defaultConfig: any = {}
-        for (let c of configs) {
-            defaultConfig[c.name] = {
-                config: c.default,
-                configValue: c.default,
-                unlinked: c.unlinked,
-            }
-        }
-        res = {
-            [name]: defaultConfig
-        }
-    } else {
-        res = "NoConfig"
-    }
+//         let defaultConfig: any = {}
+//         for (let c of configs) {
+//             defaultConfig[c.name] = structuredClone(c.default)
+//         }
+//         res = {
+//             [name]: defaultConfig
+//         }
+//     }
 
-    return res;
-}
+//     return res;
+// }
 
 export function getDefaultCharacterTag(name: string) {
     return characterData[name].defaultTags || []
 }
 
-export function useCharacter() {
+export function useCharacter(config: ConfigManager, character_id: number) {
     const characterName = ref(DEFAULT_CHARACTER)
     const characterLevel = ref("90")
-    const characterConfig = ref<any>(getDefaultCharacterConfig(characterName.value))
+    const characterConfig = ref<Record<string, Record<string, ConfigAddress>>>({
+        [characterName.value]: config.registerObject(character_id, "character", characterName.value, characterData[characterName.value].config)
+    })
     const characterSkill1 = ref(8)
     const characterSkill2 = ref(8)
     const characterSkill3 = ref(8)
@@ -74,7 +70,7 @@ export function useCharacter() {
         return temp && temp.length > 0
     })
 
-    const characterConfigConfig = computed(() => {
+    const characterConfigMeta: Ref<ConfigMeta[]> = computed(() => {
         return characterData[characterName.value].config
     })
 
@@ -93,15 +89,19 @@ export function useCharacter() {
             skill1: characterSkill1.value - 1,
             skill2: characterSkill2.value - 1,
             skill3: characterSkill3.value - 1,
-            params: getObjectConfigValue(characterConfig.value),
+            params: config.getModuleValue(characterConfig.value),
             tags: characterTags.value,
         }
         return i
     })
 
-    watch(() => characterName.value, name => {
-        characterName.value = name
-        characterConfig.value = getDefaultCharacterConfig(name)
+    watch(() => characterName.value, (name, oldName) => {
+        if (oldName && characterConfig.value[oldName]) {
+            config.unregisterObject(characterConfig.value[oldName])
+        }
+        characterConfig.value = {
+            [name]: config.registerObject(character_id, "character", name, characterData[name].config)
+        } 
         characterTags.value = getDefaultCharacterTag(name)
     }, {
         flush: "sync"
@@ -120,40 +120,42 @@ export function useCharacter() {
         characterAscend,
         characterSplash,
         characterNeedConfig,
-        characterConfigConfig,
+        characterConfigMeta,
+        characterConfigConfig: characterConfigMeta,
         characterInterface,
         characterLocale,
         characterTags,
     }
 }
 
-function getDefaultCharacterSkillConfig(name: string) {
-    let res: any;
+// function getDefaultCharacterSkillConfig(name: string) {
+//     let res: any;
 
-    const hasConfigSkill = characterData[name].configSkill.length > 0
+//     const hasConfigSkill = characterData[name].configSkill.length > 0
 
-    // change skill config
-    if (hasConfigSkill) {
-        let defaultConfig: any = {}
-        for (let c of characterData[name].configSkill) {
-            defaultConfig[c.name] = {
-                config: c.default,
-                configValue: c.default,
-                unlinked: c.unlinked,
-            }
-        }
-        res = {
-            [name]: defaultConfig
-        }
-    } else {
-        res = "NoConfig"
-    }
+//     // change skill config
+//     if (hasConfigSkill) {
+//         let defaultConfig: any = {}
+//         for (let c of characterData[name].configSkill) {
+//             defaultConfig[c.name] = {
+//                 config: c.default,
+//                 unlinked: c.unlinked,
+//             }
+//         }
+//         res = {
+//             [name]: defaultConfig
+//         }
+//     } else {
+//         res = "NoConfig"
+//     }
 
-    return res;
-}
+//     return res;
+// }
 
-export function useCharacterSkill(characterName: Ref<CharacterName>) {
-    const characterSkillConfig = ref<any>(getDefaultCharacterSkillConfig(characterName.value))
+export function useCharacterSkill(characterName: Ref<CharacterName>, config: ConfigManager, character_id: number) {
+    const characterSkillConfig = ref<Record<string, Record<string, ConfigAddress>>>({
+        [characterName.value]: config.registerObject(character_id, "character_skill", characterName.value, characterData[characterName.value].configSkill)
+    })
     const characterSkillIndex = ref(0)
 
     const characterNeedSkillConfig = computed((): boolean => {
@@ -161,19 +163,24 @@ export function useCharacterSkill(characterName: Ref<CharacterName>) {
         return temp && temp.length > 0
     })
 
-    const characterSkillConfigConfig = computed(() => {
+    const characterSkillConfigMeta = computed(() => {
         return characterData[characterName.value].configSkill
     })
 
     const characterSkillInterface = computed(() => {
         return {
             index: characterSkillIndex.value,
-            config: getObjectConfigValue(characterSkillConfig.value)
+            config: config.getModuleValue(characterSkillConfig.value)
         }
     })
 
-    watch(() => characterName.value, name => {
-        characterSkillConfig.value = getDefaultCharacterSkillConfig(name)
+    watch(() => characterName.value, (name, oldName) => {
+        if (oldName && characterSkillConfig.value[oldName]) {
+            config.unregisterObject(characterSkillConfig.value[oldName])
+        }
+        characterSkillConfig.value = {
+            [name]: config.registerObject(character_id, "character_skill", name, characterData[name].configSkill)
+        }
         // change skill index
         characterSkillIndex.value = 0
     }, {
@@ -192,7 +199,8 @@ export function useCharacterSkill(characterName: Ref<CharacterName>) {
         characterSkillConfig,
         characterSkillIndex,
         characterNeedSkillConfig,
-        characterSkillConfigConfig,
+        characterSkillConfigMeta,
+        characterSkillConfigConfig: characterSkillConfigMeta,
         characterSkillInterface,
     }
 }

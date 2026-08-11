@@ -8,7 +8,6 @@ export interface ICharacter {
     skill3: number,
     tags: string[],
     params: any,
-    configUnlinked: any,
 }
 
 export type CharacterName = string

@@ -7,6 +7,7 @@ pub use crate::damage::damage_result::DamageResult;
 pub use entry_type::EntryType;
 pub use reaction_type::{ReactionType, TransformativeType, ElevativeReaction};
 pub use moonsign::Moonsign;
+pub use stellar_glimmer_state::StellarGlimmerState;
 pub use character_full_info::CharacterFullInfo;
 
 pub mod stat;
@@ -16,6 +17,7 @@ pub mod change_attribute;
 pub mod skill_type;
 pub mod entry_type;
 pub mod moonsign;
+pub mod stellar_glimmer_state;
 pub mod max_trait;
 pub mod reaction_type;
 pub mod item_config_type;

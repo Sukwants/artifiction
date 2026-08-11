@@ -10,7 +10,7 @@ pub(crate) use crate::common::i18n::{charged_dmg, hit_n_dmg, locale, plunging_dm
 pub use crate::common::item_config_type::ConfigElements8Multi;
 pub use crate::common::item_config_type::{ItemConfig, ItemConfigType};
 pub use crate::common::StatName;
-pub use crate::common::{ChangeAttribute, Element, ElevativeReaction, Moonsign, ReactionType, SkillType, WeaponType,};
+pub use crate::common::{ChangeAttribute, Element, ElevativeReaction, Moonsign, ReactionType, SkillType, StellarGlimmerState, WeaponType,};
 pub use crate::damage::damage_builder::DamageBuilder;
 pub use crate::damage::DamageContext;
 pub use crate::target_functions::TargetFunction;

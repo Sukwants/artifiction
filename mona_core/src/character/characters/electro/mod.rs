@@ -1,3 +1,4 @@
+pub mod alyosha;
 pub mod beidou;
 pub mod keqing;
 pub mod kujou_sara;
@@ -17,6 +18,7 @@ pub mod varesa;
 pub mod ineffa;
 pub mod flins;
 
+pub use alyosha::Alyosha;
 pub use beidou::{Beidou, BeidouDamageEnum};
 pub use keqing::Keqing;
 pub use kujou_sara::KujouSara;

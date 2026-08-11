@@ -2,17 +2,17 @@ import { targetFunctionData } from "@targetFunction"
 
 export function upgradeTargetFunctionConfig(name, oldConfig) {
     if (!name) {
-        return "NoConfig"
+        return null
     }
 
     const data = targetFunctionData[name]
     if (!data) {
-        return "NoConfig"
+        return null
     }
 
     const configs = data.config ?? []
     if (configs.length === 0) {
-        return "NoConfig"
+        return null
     }
 
     if (Object.prototype.hasOwnProperty.call(oldConfig, name)) {

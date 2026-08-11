@@ -1,5 +1,6 @@
 use serde::{Deserialize, Serialize};
 use crate::common::{Element, Moonsign};
+use crate::common::item_config_type::ConfigElements8Multi;
 
 fn default_true() -> bool {
     true
@@ -11,8 +12,10 @@ fn default_false() -> bool {
 
 #[derive(Serialize, Deserialize, Debug, Clone)]
 pub enum CharacterSkillConfig {
-    AetherAnemo { elemental_absorption: Element },
-    LumineAnemo { elemental_absorption: Element },
+    AetherAnemo { elemental_absorption: Element, wind_elements: ConfigElements8Multi },
+    LumineAnemo { elemental_absorption: Element, wind_elements: ConfigElements8Multi },
+    AetherGeo { shield_buff: bool },
+    LumineGeo { shield_buff: bool },
     AetherDendro { overflowing_lotuslight_count: usize },
     LumineDendro { overflowing_lotuslight_count: usize },
     AetherHydro { hp_above_half: bool, consumed_hp_times: usize },
@@ -69,7 +72,7 @@ pub enum CharacterSkillConfig {
     Xilonen { nightsoul: bool },
     Chasca { element_count: usize, c6_rate: f64 },
     Mavuika { after_q: bool },
-    YumemizukiMizuki { in_dreamdrifter: bool, p3_boost_active: bool },
+    YumemizukiMizuki { in_dreamdrifter: bool, p4_boost_active: bool, c1_awaiting_active: bool },
     Skirk { cunning_stacks: i32, seven_phase_mode: bool, havoc_extinction: bool, death_crossing_stacks: i32, void_rift_count: i32 },
     Nefer { veil_of_falsehood: usize, shadow_dance: bool },
     Jahoda { elemental_absorption: Element, activated_p2: bool },
@@ -83,5 +86,9 @@ pub enum CharacterSkillConfig {
     Nicole { on_field_over_3s: bool },
     Lohen { in_masterstroke: bool, evilsbane_blade: bool },
     Sandrone { decoding_power: f64, refined_tactics_stacks: usize, c2_beam_stack: usize },
+    AetherCryo { frostglow_stacks: usize, frostpierce_star_on_field: bool, #[serde(default = "default_true")] c2_ice_crystal_hit: bool, #[serde(default = "default_false")] c2_stellar_triggered: bool },
+    LumineCryo { frostglow_stacks: usize, frostpierce_star_on_field: bool, #[serde(default = "default_true")] c2_ice_crystal_hit: bool, #[serde(default = "default_false")] c2_stellar_triggered: bool },
+    Alyosha { e_hold: bool, hunters_precision_stacks: usize },
+    Odette { activated_coda: bool, has_dance_double: bool, snow_swans_dream_active: bool },
     NoConfig,
 }

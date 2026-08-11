@@ -18,6 +18,9 @@ pub mod wriothesley_stellar_conduct;
 pub mod citlali_default;
 pub mod lohen_default;
 pub mod sandrone_default;
+pub mod odette_default;
+pub mod aether_cryo_default;
+pub mod lumine_cryo_default;
 
 pub use aloy_default::AloyDefaultTargetFunction;
 pub use chongyun_default::ChongyunDefaultTargetFunction;
@@ -39,3 +42,6 @@ pub use wriothesley_stellar_conduct::WriothesleyStellarConductTargetFunction;
 pub use citlali_default::CitlaliDefaultTargetFunction;
 pub use lohen_default::LohenDefaultTargetFunction;
 pub use sandrone_default::SandroneDefaultTargetFunction;
+pub use odette_default::OdetteDefaultTargetFunction;
+pub use aether_cryo_default::AetherCryoDefaultTargetFunction;
+pub use lumine_cryo_default::LumineCryoDefaultTargetFunction;

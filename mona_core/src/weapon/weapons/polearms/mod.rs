@@ -39,6 +39,8 @@ pub use prospectors_shovel::ProspectorsShovel;
 pub use bloodsoaked_ruins::BloodsoakedRuins;
 pub use sacrificers_staff::SacrificersStaff;
 pub use disaster_and_remorse::DisasterAndRemorse;
+pub use frostbreath::Frostbreath;
+pub use song_of_the_vigil::SongOfTheVigil;
 
 pub mod engulfing_lightning;
 pub mod skyward_spine;
@@ -81,3 +83,5 @@ pub mod prospectors_shovel;
 pub mod bloodsoaked_ruins;
 pub mod sacrificers_staff;
 pub mod disaster_and_remorse;
+pub mod frostbreath;
+pub mod song_of_the_vigil;

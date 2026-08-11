@@ -54,7 +54,7 @@ pub const BEIDOU_STATIC_DATA: CharacterStaticData = CharacterStaticData {
     internal_name: "Beidou",
     element: Element::Electro,
     hp: [1094, 2811, 3628, 5435, 6015, 6919, 7694, 8597, 9178, 10081, 10662, 11565, 12146, 13050, 13953],
-    atk: [19, 48, 63, 94, 104, 119, 133, 148, 158, 174, 184, 200, 210, 225, 282],
+    atk: [19, 48, 63, 94, 104, 119, 133, 148, 158, 174, 184, 200, 210, 225, 283],
     def: [54, 140, 180, 270, 299, 344, 382, 427, 456, 501, 530, 575, 603, 648, 693],
     sub_stat: CharacterSubStatFamily::Bonus240(StatName::ElectroBonus),
     weapon_type: WeaponType::Claymore,
@@ -78,7 +78,7 @@ pub const BEIDOU_STATIC_DATA: CharacterStaticData = CharacterStaticData {
 };
 
 pub struct BeidouEffect {
-    pub in_polestar_field: bool,
+    pub stellar_glimmer_state: StellarGlimmerState,
     pub common_data: CharacterCommonData,
 }
 
@@ -169,7 +169,7 @@ impl CharacterTrait for Beidou {
 
     #[cfg(not(target_family = "wasm"))]
     const CONFIG_DATA: Option<&'static [ItemConfig]> = Some(&[
-        ItemConfig::IN_POLESTAR_FIELD(false, ItemConfig::PRIORITY_CHARACTER),
+        ItemConfig::STELLAR_GLIMMER_STATE(StellarGlimmerState::None, ItemConfig::PRIORITY_CHARACTER),
     ]);
 
     #[cfg(not(target_family = "wasm"))]
@@ -193,9 +193,9 @@ impl CharacterTrait for Beidou {
     ]);
 
     fn change_attribute<A: Attribute>(attribute: &mut A, common_data: &CharacterCommonData, skill_config: &CharacterSkillConfig) {
-        let in_polestar_field = match &common_data.config {
-            CharacterConfig::Beidou { in_polestar_field } => *in_polestar_field,
-            _ => false,
+        let stellar_glimmer_state = match &common_data.config {
+            CharacterConfig::Beidou { stellar_glimmer_state } => *stellar_glimmer_state,
+            _ => StellarGlimmerState::None,
         };
 
         let (under_q, perfect_counter) = match *skill_config {
@@ -216,7 +216,7 @@ impl CharacterTrait for Beidou {
                 0.15,
             );
 
-            if in_polestar_field {
+            if stellar_glimmer_state.is_stellar_conduct() {
                 attribute.set_value_to_s(
                     CharacterSelector::select_all(attribute),
                     AttributeType::Invisible(InvisibleAttributeType::new_element(
@@ -297,12 +297,12 @@ impl CharacterTrait for Beidou {
     }
 
     fn new_effect<A: Attribute>(common_data: &CharacterCommonData, config: &CharacterConfig) -> Option<Box<dyn ChangeAttribute<A>>> {
-        let in_polestar_field = match *config {
-            CharacterConfig::Beidou { in_polestar_field } => in_polestar_field,
-            _ => false,
+        let stellar_glimmer_state = match *config {
+            CharacterConfig::Beidou { stellar_glimmer_state } => stellar_glimmer_state,
+            _ => StellarGlimmerState::None,
         };
         Some(Box::new(BeidouEffect {
-            in_polestar_field,
+            stellar_glimmer_state,
             common_data: common_data.clone(),
         }))
     }

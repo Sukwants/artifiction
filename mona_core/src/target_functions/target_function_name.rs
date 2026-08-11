@@ -133,4 +133,8 @@ pub enum TargetFunctionName {
     PruneDefault,
     LohenDefault,
     SandroneDefault,
+    OdetteDefault,
+    AetherCryoDefault,
+    LumineCryoDefault,
+    AlyoshaDefault,
 }

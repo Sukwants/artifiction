@@ -14,6 +14,7 @@ pub mod sethos_default;
 pub mod varesa_default;
 pub mod ineffa_default;
 pub mod flins_default;
+pub mod alyosha_default;
 
 pub use beidou_default::BeidouDefaultTargetFunction;
 pub use fischl_default::FischlDefaultTargetFunction;
@@ -31,3 +32,4 @@ pub use sethos_default::SethosDefaultTargetFunction;
 pub use varesa_default::VaresaDefaultTargetFunction;
 pub use ineffa_default::IneffaDefaultTargetFunction;
 pub use flins_default::FlinsDefaultTargetFunction;
+pub use alyosha_default::AlyoshaDefaultTargetFunction;

@@ -70,7 +70,7 @@ pub const DIONA_STATIC_DATA: CharacterStaticData = CharacterStaticData {
     internal_name: "Diona",
     element: Element::Cryo,
     hp: [802, 2061, 2661, 3985, 4411, 5074, 5642, 6305, 6731, 7393, 7818, 8481, 8907, 9570, 10232],
-    atk: [18, 46, 59, 88, 98, 113, 125, 140, 149, 164, 174, 188, 198, 212, 266],
+    atk: [18, 46, 59, 88, 98, 113, 125, 140, 149, 164, 174, 188, 198, 212, 267],
     def: [50, 129, 167, 250, 277, 318, 354, 396, 422, 464, 491, 532, 559, 601, 642],
     sub_stat: CharacterSubStatFamily::Bonus240(StatName::CryoBonus),
     weapon_type: WeaponType::Bow,
@@ -94,7 +94,7 @@ pub const DIONA_STATIC_DATA: CharacterStaticData = CharacterStaticData {
 };
 
 pub struct DionaEffect {
-    pub in_polestar_field: bool,
+    pub stellar_glimmer_state: StellarGlimmerState,
     pub common_data: CharacterCommonData,
 }
 
@@ -120,8 +120,8 @@ impl<A: Attribute> ChangeAttribute<A> for DionaEffect {
                 DIONA_SKILL.c6_hp_bonus,
             );
 
-            // 辉映·星超导：处于极星辉域中时，超导、星超导反应伤害提升40%
-            if self.in_polestar_field {
+            // 辉映·星超导：处于辉映·星超导状态时，超导、星超导反应伤害提升40%
+            if self.stellar_glimmer_state.is_stellar_conduct() {
                 attribute.set_value_to_t(
                     AttributeType::Invisible(InvisibleAttributeType::new_reaction(
                         AttributeVariableType::ReactionEnhance,
@@ -234,7 +234,7 @@ impl CharacterTrait for Diona {
 
     #[cfg(not(target_family = "wasm"))]
     const CONFIG_DATA: Option<&'static [ItemConfig]> = Some(&[
-        ItemConfig::IN_POLESTAR_FIELD(false, ItemConfig::PRIORITY_CHARACTER),
+        ItemConfig::STELLAR_GLIMMER_STATE(StellarGlimmerState::None, ItemConfig::PRIORITY_CHARACTER),
     ]);
 
     #[cfg(not(target_family = "wasm"))]
@@ -356,12 +356,12 @@ impl CharacterTrait for Diona {
     }
 
     fn new_effect<A: Attribute>(common_data: &CharacterCommonData, config: &CharacterConfig) -> Option<Box<dyn ChangeAttribute<A>>> {
-        let in_polestar_field = match *config {
-            CharacterConfig::Diona { in_polestar_field } => in_polestar_field,
-            _ => false,
+        let stellar_glimmer_state = match *config {
+            CharacterConfig::Diona { stellar_glimmer_state } => stellar_glimmer_state,
+            _ => StellarGlimmerState::None,
         };
         Some(Box::new(DionaEffect {
-            in_polestar_field,
+            stellar_glimmer_state,
             common_data: common_data.clone(),
         }))
     }

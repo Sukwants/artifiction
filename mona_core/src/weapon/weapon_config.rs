@@ -43,6 +43,10 @@ pub enum WeaponConfig {
     MoonweaversDawn { energy: usize },
     AthameArtis { hexerei_secret_rite: bool, effect: bool },
     LightbearingMoonshard { rate: f64 },
+    Emberwell { element_reaction: bool, stellar_reaction: bool },
+    ExaiphanesBlade { resonated_elements: usize },
+    HereticsMoltenBlade { rate: f64 },
+    WhitelakeFrostfeather { stack: f64, full_rate: f64 },
 
     // claymore
     WolfsGravestone { rate: f64 },
@@ -75,6 +79,8 @@ pub enum WeaponConfig {
     MasterKey { reaction: bool, moonsign: Moonsign },
     GestOfTheMightyWolf { stack: f64, hexerei_secret_rite: bool },
     ATeaspoonOfTranscendence { stack: f64 },
+    BladeOfAtonement { element_reaction: bool, stellar_reaction: bool },
+    ForgedByTheGoldenMelody { rate1: f64, rate2: f64, rate3: f64 },
 
     // Polearm
     EngulfingLightning { rate: f64 },
@@ -104,6 +110,8 @@ pub enum WeaponConfig {
     BloodsoakedRuins { rate: f64, requiem_of_ruin: bool },
     SacrificersStaff { stack: f64 },
     DisasterAndRemorse { rate1: f64, rate2: f64, hexerei_secret_rite: bool },
+    Frostbreath { reaction: bool },
+    SongOfTheVigil { stellar_reaction: bool },
 
     // Catalyst
     LostPrayerToTheSacredWinds { stack: f64 },
@@ -142,6 +150,8 @@ pub enum WeaponConfig {
     DawningFrost { rate1: f64, rate2: f64 },
     NocturnesCurtainCall { effect: bool },
     AngelosHeptades { hexerei_secret_rite: bool },
+    ClashOfKings { rate: f64 },
+    EchoesOfTheHeart { element_reaction: bool, stellar_reaction: bool },
 
     // Bow
     PolarStar { stack: usize },
@@ -178,6 +188,8 @@ pub enum WeaponConfig {
     RainbowSerpentsRainBow { rate: f64 },
     TheDaybreakChronicles { rate1: f64, rate2: f64, rate3: f64 },
     GoldenFrostboundOath { rate1: f64, rate2: f64 },
+    CovenantOfFrostAndSnow { rate: f64 },
+    JadeVista { same_count: usize, diff_count: usize },
 }
 
 impl Default for WeaponConfig {

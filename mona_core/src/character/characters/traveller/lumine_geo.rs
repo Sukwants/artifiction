@@ -5,9 +5,10 @@ use crate::character::{CharacterConfig, CharacterName, CharacterStaticData};
 use crate::character::skill_config::CharacterSkillConfig;
 use crate::character::traits::{CharacterSkillMap, CharacterSkillMapItem, CharacterTrait};
 use crate::character::macros::{damage_enum, skill_map};
+use crate::character::team_status::CharacterSelector;
 use crate::common::{ChangeAttribute, Element, ElevativeReaction, Moonsign, SkillType, WeaponType};
 use crate::common::i18n::{locale, hit_n_dmg, plunging_dmg, charged_dmg};
-use crate::common::item_config_type::{ItemConfig, ItemConfigType};
+use crate::common::item_config_type::{ItemConfig, ItemConfigType, ConfigElements8Multi};
 use crate::damage::damage_builder::DamageBuilder;
 use crate::damage::DamageContext;
 use crate::target_functions::TargetFunction;
@@ -31,6 +32,8 @@ pub struct LumineGeoSkillType {
     pub q_dmg: [f64; 15],
 
     pub p2_dmg: f64,
+
+    pub p3_bonus: f64, // 天赋3：重击·岩坠每段伤害提升（120%攻击力）
 }
 
 pub const LUMINEGEO_SKILL: LumineGeoSkillType = LumineGeoSkillType {
@@ -53,14 +56,16 @@ pub const LUMINEGEO_SKILL: LumineGeoSkillType = LumineGeoSkillType {
     q_dmg: [1.48, 1.591, 1.702, 1.85, 1.961, 2.072, 2.22, 2.368, 2.516, 2.664, 2.812, 2.96, 3.145, 3.33, 3.515],
 
     p2_dmg: 0.6,
+
+    p3_bonus: 1.2,
 };
 
 pub const LUMINEGEO_STATIC_DATA: CharacterStaticData = CharacterStaticData {
     name: CharacterName::LumineGeo,
     internal_name: "LumineGeo",
     element: Element::Geo,
-    hp: [912, 2342, 3024, 4529, 5031, 5766, 6411, 7164, 7648, 8401, 8885, 9638, 10122, 10875, 11627],
-    atk: [18, 46, 59, 88, 98, 113, 125, 140, 149, 164, 174, 188, 198, 212, 266],
+    hp: [912, 2342, 3024, 4529, 5013, 5766, 6411, 7164, 7648, 8401, 8885, 9638, 10122, 10875, 11627],
+    atk: [18, 46, 59, 88, 98, 113, 125, 140, 149, 164, 174, 188, 198, 212, 267],
     def: [57, 147, 190, 284, 315, 362, 402, 450, 480, 527, 558, 605, 635, 683, 730],
     sub_stat: CharacterSubStatFamily::ATK240,
     weapon_type: WeaponType::Sword,
@@ -84,10 +89,34 @@ pub const LUMINEGEO_STATIC_DATA: CharacterStaticData = CharacterStaticData {
 };
 
 pub struct LumineGeoEffect {
+    pub elements: ConfigElements8Multi,
+    pub common_data: CharacterCommonData,
 }
 
 impl<A: Attribute> ChangeAttribute<A> for LumineGeoEffect {
     fn change_attribute(&self, attribute: &mut A) {
+        // 天赋3：异邦的坚岩 — 每种共鸣过的元素提供额外的强化效果
+        if self.elements.anemo {
+            attribute.set_value_by(AttributeName::CriticalBase, "旅行者天赋3", 0.10);
+        }
+        if self.elements.geo {
+            attribute.add_def_percentage("旅行者天赋3", 0.20);
+        }
+        if self.elements.electro {
+            attribute.set_value_by(AttributeName::Recharge, "旅行者天赋3", 0.20);
+        }
+        if self.elements.dendro {
+            attribute.set_value_by(AttributeName::ElementalMastery, "旅行者天赋3", 60.0);
+        }
+        if self.elements.hydro {
+            attribute.add_hp_percentage("旅行者天赋3", 0.20);
+        }
+        if self.elements.pyro {
+            attribute.add_atk_percentage("旅行者天赋3", 0.20);
+        }
+        if self.elements.cryo {
+            attribute.set_value_by(AttributeName::CriticalDamageBase, "旅行者天赋3", 0.20);
+        }
     }
 }
 
@@ -106,13 +135,16 @@ damage_enum!(
     E
     Q
     P2
+    P3A    // 重击·岩坠一段（天赋3）
+    P3B    // 重击·岩坠二段（天赋3）
+    P3T    // 重击·岩坠总伤害（天赋3）
 );
 
 impl LumineGeoDamageEnum {
     pub fn get_element(&self) -> Element {
         use LumineGeoDamageEnum::*;
         match *self {
-            E | Q | P2 => Element::Geo,
+            E | Q | P2 | P3A | P3B | P3T => Element::Geo,
             _ => Element::Physical,
         }
     }
@@ -121,7 +153,7 @@ impl LumineGeoDamageEnum {
         use LumineGeoDamageEnum::*;
         match *self {
             A1 | A2 | A3 | A4 | A5 | P2 => SkillType::NormalAttack,
-            Z1 | Z2 => SkillType::ChargedAttack,
+            Z1 | Z2 | P3A | P3B | P3T => SkillType::ChargedAttack,
             X1 => SkillType::PlungingAttackInAction,
             X2 | X3 => SkillType::PlungingAttackOnGround,
             E => SkillType::ElementalSkill,
@@ -154,6 +186,9 @@ impl CharacterTrait for LumineGeo {
             X2 plunging_dmg!(2)
             X3 plunging_dmg!(3)
             P2 locale!(zh_cn: "裂空之风", en: "Slitting Wind")
+            P3A locale!(zh_cn: "重击·岩坠一段", en: "Charged Attack: Rockfall (1st Segment)")
+            P3B locale!(zh_cn: "重击·岩坠二段", en: "Charged Attack: Rockfall (2nd Segment)")
+            P3T locale!(zh_cn: "重击·岩坠总伤害", en: "Charged Attack: Rockfall (Total)")
         ),
         skill2: skill_map!(
             LumineGeoDamageEnum
@@ -167,15 +202,63 @@ impl CharacterTrait for LumineGeo {
 
     #[cfg(not(target_family = "wasm"))]
     const CONFIG_DATA: Option<&'static [ItemConfig]> = Some(&[
+        ItemConfig {
+            name: "elements",
+            title: locale!(
+                zh_cn: "共鸣过的元素（天赋3额外强化效果）",
+                en: "Resonated Elements (Talent 3 Additional Buff Effects)"
+            ),
+            config: ItemConfigType::ElementMulti {
+                elements: &[Element::Pyro, Element::Hydro, Element::Anemo, Element::Electro, Element::Dendro, Element::Cryo, Element::Geo],
+                default: ConfigElements8Multi {
+                    pyro: true,
+                    hydro: true,
+                    anemo: true,
+                    electro: true,
+                    dendro: true,
+                    cryo: true,
+                    geo: true,
+                    physical: false,
+                }
+            }
+        },
     ]);
 
     #[cfg(not(target_family = "wasm"))]
     const CONFIG_SKILL: Option<&'static [ItemConfig]> = Some(&[
+        ItemConfig {
+            name: "shield_buff",
+            title: locale!(
+                zh_cn: "重击·岩坠命中后队伍护盾强效提升（15秒，20%）",
+                en: "Charged Attack: Rockfall Shield Strength Buff (15s, 20%)"
+            ),
+            config: ItemConfigType::Bool { default: true }
+        },
     ]);
+
+    fn change_attribute<A: Attribute>(attribute: &mut A, common_data: &CharacterCommonData, skill_config: &CharacterSkillConfig) {
+        let _ = common_data;
+        let shield_buff = match *skill_config {
+            CharacterSkillConfig::LumineGeo { shield_buff } => shield_buff,
+            _ => false,
+        };
+
+        // 重击·岩坠命中后15秒内，队伍中附近的角色护盾强效提升20%
+        if shield_buff {
+            attribute.set_value_by_s(
+                CharacterSelector::select_all(attribute),
+                AttributeType::Panel(AttributeName::ShieldStrength),
+                "旅行者天赋3",
+                0.2,
+            );
+        }
+    }
 
     fn damage_internal<D: DamageBuilder>(context: &DamageContext<'_, D::AttributeType>, s: usize, config: &CharacterSkillConfig, fumo: Option<Element>) -> D::Result {
         let s: LumineGeoDamageEnum = num::FromPrimitive::from_usize(s).unwrap();
         let (s1, s2, s3) = context.character_common_data.get_3_skill();
+
+        let _ = config;
 
         use LumineGeoDamageEnum::*;
         let mut builder = D::new();
@@ -194,6 +277,9 @@ impl CharacterTrait for LumineGeo {
             E => LUMINEGEO_SKILL.e_dmg[s2],
             Q => LUMINEGEO_SKILL.q_dmg[s3],
             P2 => LUMINEGEO_SKILL.p2_dmg,
+            P3A => LUMINEGEO_SKILL.z_dmg1[s1] + LUMINEGEO_SKILL.p3_bonus,
+            P3B => LUMINEGEO_SKILL.z_dmg2[s1] + LUMINEGEO_SKILL.p3_bonus,
+            P3T => LUMINEGEO_SKILL.z_dmg1[s1] + LUMINEGEO_SKILL.z_dmg2[s1] + 2.0 * LUMINEGEO_SKILL.p3_bonus,
             _ => 0.0
         };
 
@@ -210,7 +296,13 @@ impl CharacterTrait for LumineGeo {
     }
 
     fn new_effect<A: Attribute>(common_data: &CharacterCommonData, config: &CharacterConfig) -> Option<Box<dyn ChangeAttribute<A>>> {
+        let elements = match *config {
+            CharacterConfig::LumineGeo { elements } => elements,
+            _ => ConfigElements8Multi::default(),
+        };
         Some(Box::new(LumineGeoEffect {
+            elements,
+            common_data: common_data.clone(),
         }))
     }
 

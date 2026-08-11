@@ -84,6 +84,8 @@ pub enum ArtifactSetName {
     ADayCarvedFromRisingWinds,
     CelestialGift,
     DisenchantmentInDeepShadow,
+    ScarletProof,
+    HeartOfTheFurnace,
 }
 
 impl ArtifactSetName {

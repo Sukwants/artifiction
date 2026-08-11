@@ -3,12 +3,12 @@ import { potentialFunctionData } from "@potentialFunction"
 export function getPotentialFunctionDefaultConfig(name) {
     const item = potentialFunctionData[name]
     if (!item) {
-        return "NoConfig"
+        return null
     }
 
     let configConfigs = item.config ?? []
     if (configConfigs.length === 0) {
-        return "NoConfig"
+        return null
     }
 
     let defaultConfigs = {}

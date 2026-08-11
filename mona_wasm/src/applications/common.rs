@@ -1,24 +1,49 @@
-use serde::{Serialize, Deserialize};
-use mona::artifacts::{Artifact, ArtifactList, ArtifactSlotName};
 use mona::artifacts::effect_config::ArtifactEffectConfig;
+use mona::artifacts::{Artifact, ArtifactList, ArtifactSlotName};
 use mona::attribute::{Attribute, SimpleAttribute};
 use mona::buffs::buff_name::BuffName;
 use mona::buffs::{Buff, BuffConfig};
-use mona::character::{Character, CharacterConfig, CharacterName};
 use mona::character::skill_config::CharacterSkillConfig;
 use mona::character::team_status::{CharacterStatus, CharacterTag, CharacterTags};
-use mona::common::{StatName, CharacterFullInfo};
+use mona::character::{Character, CharacterConfig, CharacterName};
+use mona::common::{CharacterFullInfo, StatName};
 use mona::enemies::Enemy;
 use mona::potential_function::potential_function::PotentialFunction;
 use mona::potential_function::potential_function_config::PotentialFunctionConfig;
 use mona::potential_function::potential_function_name::PotentialFunctionName;
-use mona::target_functions::{TargetFunction, TargetFunctionConfig, TargetFunctionName, TargetFunctionUtils};
+use mona::target_functions::{
+    TargetFunction, TargetFunctionConfig, TargetFunctionName, TargetFunctionUtils,
+};
 use mona::weapon::{Weapon, WeaponConfig, WeaponName};
+use serde::de::{DeserializeOwned, Error as DeError};
+use serde::{Deserialize, Deserializer, Serialize};
+
+fn empty_object_as_none<'de, D, T>(deserializer: D) -> Result<Option<T>, D::Error>
+where
+    D: Deserializer<'de>,
+    T: DeserializeOwned,
+{
+    let value = Option::<serde_json::Value>::deserialize(deserializer)?;
+    match value {
+        None | Some(serde_json::Value::Null) => Ok(None),
+        Some(serde_json::Value::Object(map)) if map.is_empty() => Ok(None),
+        Some(serde_json::Value::Object(map))
+            if map.len() == 1
+                && map
+                    .values()
+                    .any(|value| value.as_object().is_some_and(|object| object.is_empty())) =>
+        {
+            Ok(None)
+        }
+        Some(value) => T::deserialize(value).map(Some).map_err(DeError::custom),
+    }
+}
 
 #[derive(Serialize, Deserialize)]
 pub struct SkillInterface {
     pub index: usize,
-    pub config: CharacterSkillConfig
+    #[serde(default, deserialize_with = "empty_object_as_none")]
+    pub config: Option<CharacterSkillConfig>,
 }
 
 #[derive(Serialize, Deserialize)]
@@ -30,7 +55,8 @@ pub struct CharacterInterface {
     pub skill1: usize,
     pub skill2: usize,
     pub skill3: usize,
-    pub params: CharacterConfig,
+    #[serde(default, deserialize_with = "empty_object_as_none")]
+    pub params: Option<CharacterConfig>,
     pub tags: Vec<CharacterTag>,
 }
 
@@ -40,6 +66,9 @@ fn default_false() -> bool {
 
 impl CharacterInterface {
     pub fn to_character<T: Attribute>(&self, on_field: bool) -> Character<T> {
+        let no_config = CharacterConfig::NoConfig;
+        let params = self.params.as_ref().unwrap_or(&no_config);
+
         Character::new(
             self.name,
             self.level,
@@ -48,7 +77,7 @@ impl CharacterInterface {
             self.skill1,
             self.skill2,
             self.skill3,
-            &self.params,
+            params,
             &self.tags.iter().cloned().collect(),
             on_field,
         )
@@ -61,18 +90,22 @@ pub struct WeaponInterface {
     pub level: i32,
     pub ascend: bool,
     pub refine: i32,
-    pub params: WeaponConfig,
+    #[serde(default, deserialize_with = "empty_object_as_none")]
+    pub params: Option<WeaponConfig>,
 }
 
 impl WeaponInterface {
     pub fn to_weapon<T: Attribute>(&self, character: &Character<T>) -> Weapon<T> {
+        let no_config = WeaponConfig::NoConfig;
+        let params = self.params.as_ref().unwrap_or(&no_config);
+
         Weapon::new(
             self.name,
             self.level,
             self.ascend,
             self.refine,
-            &self.params,
-            character
+            params,
+            character,
         )
     }
 }
@@ -80,32 +113,39 @@ impl WeaponInterface {
 #[derive(Serialize, Deserialize)]
 pub struct TargetFunctionInterface {
     pub name: TargetFunctionName,
-    pub params: TargetFunctionConfig,
+    #[serde(default, deserialize_with = "empty_object_as_none")]
+    pub params: Option<TargetFunctionConfig>,
     #[serde(default = "default_false")]
     pub use_dsl: bool,
     pub dsl_source: Option<String>,
 }
 
 impl TargetFunctionInterface {
-    pub fn to_target_function(&self, character: &Character<SimpleAttribute>, weapon: &Weapon<SimpleAttribute>) -> Box<dyn TargetFunction> {
-        TargetFunctionUtils::new_target_function(
-            self.name,
-            character,
-            weapon,
-            &self.params
-        )
+    pub fn to_target_function(
+        &self,
+        character: &Character<SimpleAttribute>,
+        weapon: &Weapon<SimpleAttribute>,
+    ) -> Box<dyn TargetFunction> {
+        let no_config = TargetFunctionConfig::NoConfig;
+        let params = self.params.as_ref().unwrap_or(&no_config);
+
+        TargetFunctionUtils::new_target_function(self.name, character, weapon, params)
     }
 }
 
 #[derive(Serialize, Deserialize)]
 pub struct BuffInterface {
     pub name: BuffName,
-    pub config: BuffConfig,
+    #[serde(default, deserialize_with = "empty_object_as_none")]
+    pub config: Option<BuffConfig>,
 }
 
 impl BuffInterface {
     pub fn to_buff<A: Attribute>(&self) -> Box<dyn Buff<A>> {
-        self.name.create(&self.config)
+        let no_config = BuffConfig::NoConfig;
+        let config = self.config.as_ref().unwrap_or(&no_config);
+
+        self.name.create(config)
     }
 }
 
@@ -119,7 +159,7 @@ pub struct EnemyInterface {
     pub geo_res: f64,
     pub anemo_res: f64,
     pub dendro_res: f64,
-    pub physical_res: f64
+    pub physical_res: f64,
 }
 
 impl EnemyInterface {
@@ -133,7 +173,7 @@ impl EnemyInterface {
             anemo_res: self.anemo_res,
             geo_res: self.geo_res,
             dendro_res: self.dendro_res,
-            physical_res: self.physical_res
+            physical_res: self.physical_res,
         }
     }
 }
@@ -153,36 +193,30 @@ impl ArtifactFilterConfig {
         for artifact in artifacts.iter() {
             match artifact.slot {
                 Flower | Feather => results.push(artifact),
-                Sand => {
-                    match self.sand_main_stat {
-                        None => results.push(artifact),
-                        Some(ref li) => {
-                            if li.contains(&artifact.main_stat.0) || li.len() == 0 {
-                                results.push(artifact);
-                            }
+                Sand => match self.sand_main_stat {
+                    None => results.push(artifact),
+                    Some(ref li) => {
+                        if li.contains(&artifact.main_stat.0) || li.len() == 0 {
+                            results.push(artifact);
                         }
                     }
                 },
-                Goblet => {
-                    match self.goblet_main_stat {
-                        None => results.push(artifact),
-                        Some(ref li) => {
-                            if li.contains(&artifact.main_stat.0) || li.len() == 0 {
-                                results.push(artifact);
-                            }
+                Goblet => match self.goblet_main_stat {
+                    None => results.push(artifact),
+                    Some(ref li) => {
+                        if li.contains(&artifact.main_stat.0) || li.len() == 0 {
+                            results.push(artifact);
                         }
                     }
                 },
-                Head => {
-                    match self.head_main_stat {
-                        None => results.push(artifact),
-                        Some(ref li) => {
-                            if li.contains(&artifact.main_stat.0) || li.len() == 0 {
-                                results.push(artifact);
-                            }
+                Head => match self.head_main_stat {
+                    None => results.push(artifact),
+                    Some(ref li) => {
+                        if li.contains(&artifact.main_stat.0) || li.len() == 0 {
+                            results.push(artifact);
                         }
                     }
-                }
+                },
             }
         }
 
@@ -193,6 +227,7 @@ impl ArtifactFilterConfig {
 #[derive(Serialize, Deserialize)]
 pub struct PotentialFunctionInterface {
     pub name: PotentialFunctionName,
+    #[serde(default, deserialize_with = "empty_object_as_none")]
     pub config: Option<PotentialFunctionConfig>,
 }
 
@@ -221,8 +256,9 @@ pub struct CharacterFullInterface {
 pub type CharactersInterface = Vec<Option<CharacterFullInterface>>;
 
 impl CharacterFullInterface {
-    pub fn get_characters<'a, A: Attribute>(input: &'a Vec<Option<CharacterFullInterface>>) -> Vec<CharacterFullInfo<'a, A>> {
-
+    pub fn get_characters<'a, A: Attribute>(
+        input: &'a Vec<Option<CharacterFullInterface>>,
+    ) -> Vec<CharacterFullInfo<'a, A>> {
         let mut characters: Vec<CharacterFullInfo<A>> = Vec::new();
 
         for c in input.iter() {
@@ -234,10 +270,21 @@ impl CharacterFullInterface {
                     artifacts: c.artifacts.iter().collect(),
                     artifact_config: match &c.artifact_config {
                         Some(x) => x.clone(),
-                        None => Default::default()
+                        None => Default::default(),
                     },
-                    skill_config: if let Some(skill) = &c.skill { skill.config.clone() } else { CharacterSkillConfig::NoConfig },
-                    skill_index: if let Some(skill) = &c.skill { skill.index } else { usize::MAX },
+                    skill_config: if let Some(skill) = &c.skill {
+                        skill
+                            .config
+                            .clone()
+                            .unwrap_or(CharacterSkillConfig::NoConfig)
+                    } else {
+                        CharacterSkillConfig::NoConfig
+                    },
+                    skill_index: if let Some(skill) = &c.skill {
+                        skill.index
+                    } else {
+                        usize::MAX
+                    },
                     character_status: CharacterStatus::new(
                         c.character_id,
                         c.team_id,

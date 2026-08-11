@@ -53,7 +53,7 @@ pub const ESCOFFIER_STATIC_DATA: CharacterStaticData = CharacterStaticData {
     element: Element::Cryo,
     hp: [1039, 2695, 3586, 5366, 5999, 6902, 7747, 8659, 9292, 10213, 10846, 11777, 12410, 13348, 14297],
     atk: [27, 70, 93, 139, 156, 179, 201, 225, 241, 265, 282, 306, 322, 347, 425],
-    def: [57, 148, 197, 294, 329, 378, 425, 475, 509, 560, 595, 646, 680, 732, 784],
+    def: [57, 148, 197, 294, 329, 378, 425, 475, 509, 560, 594, 646, 680, 732, 784],
     sub_stat: CharacterSubStatFamily::CriticalRate192,
     weapon_type: WeaponType::Polearm,
     star: 5,

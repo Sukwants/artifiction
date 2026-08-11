@@ -58,7 +58,7 @@ pub const LAUMA_STATIC_DATA: CharacterStaticData = CharacterStaticData {
     internal_name: "Lauma",
     element: Element::Dendro,
     hp: [829, 2151, 2863, 4283, 4789, 5509, 6183, 6911, 7416, 8151, 8657, 9400, 9905, 10654, 11411],
-    atk: [20, 51, 69, 103, 115, 132, 148, 165, 177, 195, 207, 225, 237, 255, 313],
+    atk: [20, 51, 69, 103, 115, 132, 148, 165, 177, 195, 207, 225, 237, 255, 312],
     def: [52, 135, 180, 269, 301, 346, 388, 434, 465, 512, 543, 590, 622, 669, 716],
     sub_stat: CharacterSubStatFamily::ElementalMastery115,
     weapon_type: WeaponType::Catalyst,

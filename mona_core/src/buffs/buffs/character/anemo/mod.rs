@@ -5,7 +5,7 @@ pub use shikanoin_heizou::BuffShikanoinHeizouTalent2;
 pub use sucrose::{BuffSucroseC6, BuffSucroseTalent1, BuffSucroseTalent2, BuffSucroseTalent3};
 pub use venti::{BuffVentiP3, BuffVentiC2, BuffVentiC4, BuffVentiC6};
 pub use xianyun::{BuffXianyunTalent1, BuffXianyunTalent2};
-pub use yumemizuki_mizuki::{BuffYumemizukiMizukiC1, BuffYumemizukiMizukiC2, BuffYumemizukiMizukiP3};
+pub use yumemizuki_mizuki::{BuffYumemizukiMizukiC1, BuffYumemizukiMizukiC2, BuffYumemizukiMizukiP3, BuffYumemizukiMizukiC6};
 pub use lynette::BuffLynetteP1;
 pub use lanyan::BuffLanyanC4;
 pub use ifa::BuffIfa;

@@ -76,5 +76,9 @@ pub enum TargetFunctionConfig {
     PruneDefault { recharge_demand: f64 },
     LohenDefault {},
     SandroneDefault {},
+    OdetteDefault {},
+    AetherCryoDefault {},
+    LumineCryoDefault {},
+    AlyoshaDefault { recharge_demand: f64 },
     NoConfig,
 }

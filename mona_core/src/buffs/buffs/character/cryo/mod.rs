@@ -13,6 +13,9 @@ pub use layla::BuffLaylaC4;
 pub use lohen::{BuffLohenP2, BuffLohenC2};
 pub use sandrone::BuffSandroneP3;
 pub use qiqi::{BuffQiqiP1, BuffQiqiP3, BuffQiqiC6};
+pub use odette::{BuffOdetteP1, BuffOdetteP3, BuffOdetteC2, BuffOdetteC4, BuffOdetteC6};
+pub use aether_cryo::{BuffAetherCryoP3, BuffAetherCryoC6};
+pub use lumine_cryo::{BuffLumineCryoP3, BuffLumineCryoC6};
 
 pub mod aloy;
 pub mod chongyun;
@@ -29,3 +32,6 @@ pub mod layla;
 pub mod lohen;
 pub mod sandrone;
 pub mod qiqi;
+pub mod odette;
+pub mod aether_cryo;
+pub mod lumine_cryo;

@@ -184,4 +184,6 @@ pub struct TransformativeDamageAnalysisForAll {
 pub struct ElevativeDamageAnalysisForAll {
     pub lunar_charged_reaction: EventAnalysis,
     pub lunar_crystallize_reaction: EventAnalysis,
+    pub stellar_swirl_reaction_anemo: EventAnalysis,
+    pub stellar_swirl_reaction_cryo: EventAnalysis,
 }

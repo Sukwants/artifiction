@@ -143,6 +143,11 @@ export default {
         Nascent: "Nascent",
         Ascendant: "Ascendant"
     },
+    stellar_glimmer_state: {
+        None: "None",
+        StellarConduct: "Stellar Conduct",
+        StellarSwirl: "Stellar Swirl"
+    },
     accountPage: {
         title: "Accounts and Syncing",
         syncButton: "Sync with a local directory",
@@ -301,6 +306,10 @@ export default {
         lunar_crystallize: "Lunar-Crystallize DMG",
         stellar_conduct_cryo: "Stellar-Conduct DMG",
         stellar_conduct_electro: "Stellar-Conduct DMG",
+        stellar_swirl_reaction_anemo: "Stellar-Swirl Reaction Anemo DMG",
+        stellar_swirl_reaction_cryo: "Stellar-Swirl Reaction Cryo DMG",
+        stellar_swirl_anemo: "Stellar-Swirl Anemo DMG",
+        stellar_swirl_cryo: "Stellar-Swirl Cryo DMG",
     },
     res: {
         Pyro: "Pyro Res",

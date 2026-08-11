@@ -7,7 +7,7 @@ use crate::character::traits::{CharacterSkillMap, CharacterSkillMapItem, Charact
 use crate::character::macros::{damage_enum, skill_map};
 use crate::common::{ChangeAttribute, Element, ElevativeReaction, Moonsign, SkillType, WeaponType};
 use crate::common::i18n::{locale, hit_n_dmg, plunging_dmg, charged_dmg};
-use crate::common::item_config_type::{ItemConfig, ItemConfigType, GlobalLinkConfig};
+use crate::common::item_config_type::{ItemConfig, ItemConfigType, GlobalLinkConfig, ConfigElements8Multi};
 use crate::damage::damage_builder::DamageBuilder;
 use crate::damage::DamageContext;
 use crate::target_functions::TargetFunction;
@@ -33,6 +33,8 @@ pub struct AetherPyroSkillType {
     pub q_dmg: [f64; 15],
 
     pub c6_dmg: f64,
+
+    pub p3_bonus: f64, // 天赋3：重击·火噬每段伤害提升（200%攻击力）
 }
 
 pub const AETHERPYRO_SKILL: AetherPyroSkillType = AetherPyroSkillType {
@@ -57,14 +59,16 @@ pub const AETHERPYRO_SKILL: AetherPyroSkillType = AetherPyroSkillType {
     q_dmg: [4.272, 4.5924, 4.9128, 5.34, 5.6604, 5.9808, 6.408, 6.8352, 7.2624, 7.6896, 8.1168, 8.544, 9.078, 9.612, 10.146],
 
     c6_dmg: 0.96,
+
+    p3_bonus: 2.0,
 };
 
 pub const AETHERPYRO_STATIC_DATA: CharacterStaticData = CharacterStaticData {
     name: CharacterName::AetherPyro,
     internal_name: "AetherPyro",
     element: Element::Pyro,
-    hp: [912, 2342, 3024, 4529, 5031, 5766, 6411, 7164, 7648, 8401, 8885, 9638, 10122, 10875, 11627],
-    atk: [18, 46, 59, 88, 98, 113, 125, 140, 149, 164, 174, 188, 198, 212, 266],
+    hp: [912, 2342, 3024, 4529, 5013, 5766, 6411, 7164, 7648, 8401, 8885, 9638, 10122, 10875, 11627],
+    atk: [18, 46, 59, 88, 98, 113, 125, 140, 149, 164, 174, 188, 198, 212, 267],
     def: [57, 147, 190, 284, 315, 362, 402, 450, 480, 527, 558, 605, 635, 683, 730],
     sub_stat: CharacterSubStatFamily::ATK240,
     weapon_type: WeaponType::Sword,
@@ -88,10 +92,34 @@ pub const AETHERPYRO_STATIC_DATA: CharacterStaticData = CharacterStaticData {
 };
 
 pub struct AetherPyroEffect {
+    pub elements: ConfigElements8Multi,
+    pub common_data: CharacterCommonData,
 }
 
 impl<A: Attribute> ChangeAttribute<A> for AetherPyroEffect {
     fn change_attribute(&self, attribute: &mut A) {
+        // 天赋3：异邦的星火 — 每种共鸣过的元素提供额外的强化效果
+        if self.elements.anemo {
+            attribute.set_value_by(AttributeName::CriticalBase, "旅行者天赋3", 0.10);
+        }
+        if self.elements.geo {
+            attribute.add_def_percentage("旅行者天赋3", 0.20);
+        }
+        if self.elements.electro {
+            attribute.set_value_by(AttributeName::Recharge, "旅行者天赋3", 0.20);
+        }
+        if self.elements.dendro {
+            attribute.set_value_by(AttributeName::ElementalMastery, "旅行者天赋3", 60.0);
+        }
+        if self.elements.hydro {
+            attribute.add_hp_percentage("旅行者天赋3", 0.20);
+        }
+        if self.elements.pyro {
+            attribute.add_atk_percentage("旅行者天赋3", 0.20);
+        }
+        if self.elements.cryo {
+            attribute.set_value_by(AttributeName::CriticalDamageBase, "旅行者天赋3", 0.20);
+        }
     }
 }
 
@@ -112,13 +140,16 @@ damage_enum!(
     E2
     Q
     C6
+    P3A    // 重击·火噬一段（天赋3）
+    P3B    // 重击·火噬二段（天赋3）
+    P3T    // 重击·火噬总伤害（天赋3）
 );
 
 impl AetherPyroDamageEnum {
     pub fn get_element(&self, fumo: bool) -> Element {
         use AetherPyroDamageEnum::*;
         match *self {
-            E1 | EH | E2 | Q | C6 => Element::Pyro,
+            E1 | EH | E2 | Q | C6 | P3A | P3B | P3T => Element::Pyro,
             A1 | A2 | A3 | A4 | A5 | Z1 | Z2 | X1 | X2 | X3 => if fumo { Element::Pyro } else { Element::Physical },
             _ => Element::Physical,
         }
@@ -128,7 +159,7 @@ impl AetherPyroDamageEnum {
         use AetherPyroDamageEnum::*;
         match *self {
             A1 | A2 | A3 | A4 | A5 | C6 => SkillType::NormalAttack,
-            Z1 | Z2 => SkillType::ChargedAttack,
+            Z1 | Z2 | P3A | P3B | P3T => SkillType::ChargedAttack,
             X1 => SkillType::PlungingAttackInAction,
             X2 | X3 => SkillType::PlungingAttackOnGround,
             E1 | EH | E2 => SkillType::ElementalSkill,
@@ -160,6 +191,9 @@ impl CharacterTrait for AetherPyro {
             X1 plunging_dmg!(1)
             X2 plunging_dmg!(2)
             X3 plunging_dmg!(3)
+            P3A locale!(zh_cn: "重击·火噬一段", en: "Charged Attack: Pyrovore (1st Segment)")
+            P3B locale!(zh_cn: "重击·火噬二段", en: "Charged Attack: Pyrovore (2nd Segment)")
+            P3T locale!(zh_cn: "重击·火噬总伤害", en: "Charged Attack: Pyrovore (Total)")
         ),
         skill2: skill_map!(
             AetherPyroDamageEnum
@@ -175,6 +209,26 @@ impl CharacterTrait for AetherPyro {
 
     #[cfg(not(target_family = "wasm"))]
     const CONFIG_DATA: Option<&'static [ItemConfig]> = Some(&[
+        ItemConfig {
+            name: "elements",
+            title: locale!(
+                zh_cn: "共鸣过的元素（天赋3额外强化效果）",
+                en: "Resonated Elements (Talent 3 Additional Buff Effects)"
+            ),
+            config: ItemConfigType::ElementMulti {
+                elements: &[Element::Pyro, Element::Hydro, Element::Anemo, Element::Electro, Element::Dendro, Element::Cryo, Element::Geo],
+                default: ConfigElements8Multi {
+                    pyro: true,
+                    hydro: true,
+                    anemo: true,
+                    electro: true,
+                    dendro: true,
+                    cryo: true,
+                    geo: true,
+                    physical: false,
+                }
+            }
+        },
     ]);
 
     #[cfg(not(target_family = "wasm"))]
@@ -278,6 +332,9 @@ impl CharacterTrait for AetherPyro {
             E2 => AETHERPYRO_SKILL.e_dmg2[s2],
             Q => AETHERPYRO_SKILL.q_dmg[s3],
             C6 => AETHERPYRO_SKILL.c6_dmg,
+            P3A => AETHERPYRO_SKILL.z_dmg1[s1] + AETHERPYRO_SKILL.p3_bonus,
+            P3B => AETHERPYRO_SKILL.z_dmg2[s1] + AETHERPYRO_SKILL.p3_bonus,
+            P3T => AETHERPYRO_SKILL.z_dmg1[s1] + AETHERPYRO_SKILL.z_dmg2[s1] + 2.0 * AETHERPYRO_SKILL.p3_bonus,
             _ => 0.0
         };
 
@@ -294,7 +351,13 @@ impl CharacterTrait for AetherPyro {
     }
 
     fn new_effect<A: Attribute>(common_data: &CharacterCommonData, config: &CharacterConfig) -> Option<Box<dyn ChangeAttribute<A>>> {
+        let elements = match *config {
+            CharacterConfig::AetherPyro { elements, .. } => elements,
+            _ => ConfigElements8Multi::default(),
+        };
         Some(Box::new(AetherPyroEffect {
+            elements,
+            common_data: common_data.clone(),
         }))
     }
 

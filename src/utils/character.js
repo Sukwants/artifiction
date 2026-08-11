@@ -13,23 +13,23 @@ export function getCharacterDefaultConfigWasmInterface(name) {
             [name]: defaultConfigs
         }
     } else {
-        return "NoConfig"
+        return null
     }
 }
 
 export function upgradeCharacterConfig(name, oldConfig) {
     if (!name) {
-        return "NoConfig"
+        return null
     }
 
     const data = characterData[name]
     if (!data) {
-        return "NoConfig"
+        return null
     }
 
     const config = data.config ?? []
     if (config.length === 0) {
-        return "NoConfig"
+        return null
     }
 
     if (Object.hasOwnProperty.call(oldConfig, name)) {

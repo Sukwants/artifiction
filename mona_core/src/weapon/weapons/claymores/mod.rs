@@ -41,6 +41,8 @@ pub use flameforged_insight::FlameforgedInsight;
 pub use master_key::MasterKey;
 pub use gest_of_the_mighty_wolf::GestOfTheMightyWolf;
 pub use a_teaspoon_of_transcendence::ATeaspoonOfTranscendence;
+pub use blade_of_atonement::BladeOfAtonement;
+pub use forged_by_the_golden_melody::ForgedByTheGoldenMelody;
 
 pub mod wolfs_gravestone;
 pub mod skyward_pride;
@@ -85,3 +87,5 @@ pub mod flameforged_insight;
 pub mod master_key;
 pub mod gest_of_the_mighty_wolf;
 pub mod a_teaspoon_of_transcendence;
+pub mod blade_of_atonement;
+pub mod forged_by_the_golden_melody;

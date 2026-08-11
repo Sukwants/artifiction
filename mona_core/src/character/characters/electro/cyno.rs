@@ -96,7 +96,7 @@ pub const CYNO_SKILL: CynoSkillType = CynoSkillType {
 };
 
 pub struct CynoEffect {
-    pub in_polestar_field: bool,
+    pub stellar_glimmer_state: StellarGlimmerState,
     pub stellar_conduct_application_count: usize,
     pub after_q: bool,
     pub c2_stack: f64,
@@ -172,10 +172,10 @@ impl CynoDamageEnum {
         }
     }
 
-    pub fn get_elevative_type(&self, in_polestar_field: bool) -> Option<ElevativeReaction> {
+    pub fn get_elevative_type(&self, stellar_glimmer_state: StellarGlimmerState) -> Option<ElevativeReaction> {
         use CynoDamageEnum::*;
         match *self {
-            E3 | C6B if in_polestar_field => Some(ElevativeReaction::StellarConductElectro),
+            E3 | C6B if stellar_glimmer_state.is_stellar_conduct() => Some(ElevativeReaction::StellarConductElectro),
             _ => None,
         }
     }
@@ -189,7 +189,7 @@ impl CharacterTrait for Cyno {
         internal_name: "Cyno",
         element: Element::Electro,
         hp: [972, 2522, 3356, 5022, 5614, 6459, 7249, 8103, 8695, 9557, 10149, 11020, 11613, 12491, 13379],
-        atk: [25, 64, 85, 128, 143, 165, 185, 206, 221, 243, 258, 281, 296, 318, 390],
+        atk: [25, 64, 85, 128, 143, 164, 185, 206, 221, 243, 258, 281, 296, 318, 390],
         def: [67, 174, 231, 345, 386, 444, 499, 557, 598, 657, 698, 758, 799, 859, 920],
         sub_stat: CharacterSubStatFamily::CriticalDamage384,
         weapon_type: WeaponType::Polearm,
@@ -255,7 +255,7 @@ impl CharacterTrait for Cyno {
     #[cfg(not(target_family = "wasm"))]
     const CONFIG_DATA: Option<&'static [ItemConfig]> = Some(&[
         ItemConfig::STELLAR_CONDUCT_APPLICATION_COUNT(0, ItemConfig::PRIORITY_CHARACTER),
-        ItemConfig::IN_POLESTAR_FIELD(false, ItemConfig::PRIORITY_CHARACTER),
+        ItemConfig::STELLAR_GLIMMER_STATE(StellarGlimmerState::None, ItemConfig::PRIORITY_CHARACTER),
         ItemConfig {
             name: "c2_stack",
             title: locale!(
@@ -287,10 +287,10 @@ impl CharacterTrait for Cyno {
     ]);
 
     fn change_attribute<A: Attribute>(attribute: &mut A, common_data: &CharacterCommonData, skill_config: &CharacterSkillConfig) {
-        let (in_polestar_field, stellar_conduct_application_count, after_q, c2_stack) = match &common_data.config {
-            CharacterConfig::Cyno { in_polestar_field, stellar_conduct_application_count, after_q, c2_stack, .. } =>
-                (*in_polestar_field, *stellar_conduct_application_count, *after_q, *c2_stack),
-            _ => (false, 0, false, 0.0),
+        let (stellar_glimmer_state, stellar_conduct_application_count, after_q, c2_stack) = match &common_data.config {
+            CharacterConfig::Cyno { stellar_glimmer_state, stellar_conduct_application_count, after_q, c2_stack, .. } =>
+                (*stellar_glimmer_state, *stellar_conduct_application_count, *after_q, *c2_stack),
+            _ => (StellarGlimmerState::None, 0, false, 0.0),
         };
 
         let under_judication = match *skill_config {
@@ -298,17 +298,17 @@ impl CharacterTrait for Cyno {
             _ => false
         };
 
-        let _ = (attribute, in_polestar_field, stellar_conduct_application_count, after_q, c2_stack, under_judication);
+        let _ = (attribute, stellar_glimmer_state, stellar_conduct_application_count, after_q, c2_stack, under_judication);
     }
 
     fn damage_internal<D: DamageBuilder>(context: &DamageContext<'_, D::AttributeType>, s: usize, config: &CharacterSkillConfig, fumo: Option<Element>) -> D::Result {
         let s: CynoDamageEnum = num::FromPrimitive::from_usize(s).unwrap();
         let (s1, s2, s3) = context.character_common_data.get_3_skill();
 
-        let (in_polestar_field, stellar_conduct_application_count, after_q, c2_stack) = match &context.character_common_data.config {
-            CharacterConfig::Cyno { in_polestar_field, stellar_conduct_application_count, after_q, c2_stack, .. } =>
-                (*in_polestar_field, *stellar_conduct_application_count, *after_q, *c2_stack),
-            _ => (false, 0, false, 0.0),
+        let (stellar_glimmer_state, stellar_conduct_application_count, after_q, c2_stack) = match &context.character_common_data.config {
+            CharacterConfig::Cyno { stellar_glimmer_state, stellar_conduct_application_count, after_q, c2_stack, .. } =>
+                (*stellar_glimmer_state, *stellar_conduct_application_count, *after_q, *c2_stack),
+            _ => (StellarGlimmerState::None, 0, false, 0.0),
         };
 
         let _ = stellar_conduct_application_count;
@@ -330,8 +330,8 @@ impl CharacterTrait for Cyno {
             return D::new().none();
         }
 
-        // E3/C6B become Stellar-Conduct when in Polestar Field
-        let is_stellar_conduct = matches!(s, E3 | C6B) && in_polestar_field;
+        // E3/C6B become Stellar-Conduct when in Radiance: Stellar-Conduct state
+        let is_stellar_conduct = matches!(s, E3 | C6B) && stellar_glimmer_state.is_stellar_conduct();
 
         let mut builder = D::new();
 
@@ -396,7 +396,7 @@ impl CharacterTrait for Cyno {
         }
 
         // Determine if this is Stellar-Conduct (elevative) damage
-        if let Some(elevative_type) = s.get_elevative_type(in_polestar_field) {
+        if let Some(elevative_type) = s.get_elevative_type(stellar_glimmer_state) {
             builder.elevative(
                 &context.attribute,
                 &context.enemy,
@@ -419,13 +419,13 @@ impl CharacterTrait for Cyno {
     }
 
     fn new_effect<A: Attribute>(common_data: &CharacterCommonData, config: &CharacterConfig) -> Option<Box<dyn ChangeAttribute<A>>> {
-        let (in_polestar_field, stellar_conduct_application_count, after_q, c2_stack) = match *config {
-            CharacterConfig::Cyno { in_polestar_field, stellar_conduct_application_count, after_q, c2_stack, .. } =>
-                (in_polestar_field, stellar_conduct_application_count, after_q, c2_stack),
-            _ => (false, 0, false, 0.0),
+        let (stellar_glimmer_state, stellar_conduct_application_count, after_q, c2_stack) = match *config {
+            CharacterConfig::Cyno { stellar_glimmer_state, stellar_conduct_application_count, after_q, c2_stack, .. } =>
+                (stellar_glimmer_state, stellar_conduct_application_count, after_q, c2_stack),
+            _ => (StellarGlimmerState::None, 0, false, 0.0),
         };
         Some(Box::new(CynoEffect {
-            in_polestar_field,
+            stellar_glimmer_state,
             stellar_conduct_application_count,
             after_q,
             c2_stack,

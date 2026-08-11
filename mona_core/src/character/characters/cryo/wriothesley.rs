@@ -62,7 +62,7 @@ pub const WRIOTHESLEY_STATIC_DATA: CharacterStaticData = CharacterStaticData {
 };
 
 pub struct WriothesleyEffect {
-    pub in_polestar_field: bool,
+    pub stellar_glimmer_state: StellarGlimmerState,
     pub stellar_conduct_application_count: usize,
     pub talent2_stack: f64,
     pub common_data: CharacterCommonData,
@@ -82,8 +82,8 @@ impl<A: Attribute> ChangeAttribute<A> for WriothesleyEffect {
             attribute.set_value_to(AttributeName::USER1, "检偿之敕层数", self.talent2_stack);
         }
 
-        // 特殊被动「冤苦终有显明之期」：星超导反应伤害+30%（极星辉域中生效）
-        if self.in_polestar_field {
+        // 特殊被动「冤苦终有显明之期」：星超导反应伤害+30%（辉映·星超导状态中生效）
+        if self.stellar_glimmer_state.is_stellar_conduct() {
             attribute.set_value_to_t(
                 AttributeType::Invisible(InvisibleAttributeType::new_reaction(
                     AttributeVariableType::ReactionEnhance,
@@ -137,9 +137,9 @@ impl WriothesleyDamageEnum {
         }
     }
 
-    pub fn get_elevative_type(&self, in_polestar_field: bool) -> Option<ElevativeReaction> {
+    pub fn get_elevative_type(&self, stellar_glimmer_state: StellarGlimmerState) -> Option<ElevativeReaction> {
         use WriothesleyDamageEnum::*;
-        if !in_polestar_field {
+        if !stellar_glimmer_state.is_stellar_conduct() {
             return None;
         }
         match *self {
@@ -196,7 +196,7 @@ impl CharacterTrait for Wriothesley {
     #[cfg(not(target_family = "wasm"))]
     const CONFIG_DATA: Option<&'static [ItemConfig]> = Some(&[
         ItemConfig::STELLAR_CONDUCT_APPLICATION_COUNT(0, ItemConfig::PRIORITY_CHARACTER),
-        ItemConfig::IN_POLESTAR_FIELD(true, ItemConfig::PRIORITY_CHARACTER),
+        ItemConfig::STELLAR_GLIMMER_STATE(StellarGlimmerState::StellarConduct, ItemConfig::PRIORITY_CHARACTER),
         ItemConfig {
             name: "talent2_stack",
             title: locale!(
@@ -231,10 +231,10 @@ impl CharacterTrait for Wriothesley {
         let s: WriothesleyDamageEnum = num::FromPrimitive::from_usize(s).unwrap();
         let (s1, s2, s3) = context.character_common_data.get_3_skill();
 
-        let (in_polestar_field, stellar_conduct_application_count, talent2_stack) = match &context.character_common_data.config {
-            CharacterConfig::Wriothesley { in_polestar_field, stellar_conduct_application_count, talent2_stack } =>
-                (*in_polestar_field, *stellar_conduct_application_count, *talent2_stack),
-            _ => (false, 0, 0.0),
+        let (stellar_glimmer_state, stellar_conduct_application_count, talent2_stack) = match &context.character_common_data.config {
+            CharacterConfig::Wriothesley { stellar_glimmer_state, stellar_conduct_application_count, talent2_stack } =>
+                (*stellar_glimmer_state, *stellar_conduct_application_count, *talent2_stack),
+            _ => (StellarGlimmerState::None, 0, 0.0),
         };
         let _ = stellar_conduct_application_count;
 
@@ -258,7 +258,7 @@ impl CharacterTrait for Wriothesley {
 
         // 判断当前伤害是否视为星超导伤害
         // 在极星辉域中，特殊被动将三段、五段、重击转化为星超导伤害
-        let is_stellar_conduct = s.get_elevative_type(in_polestar_field).is_some();
+        let is_stellar_conduct = s.get_elevative_type(stellar_glimmer_state).is_some();
 
         // 基础倍率
         let mut ratio = match s {
@@ -365,7 +365,7 @@ impl CharacterTrait for Wriothesley {
             }
         }
 
-        if let Some(elevative_type) = s.get_elevative_type(in_polestar_field) {
+        if let Some(elevative_type) = s.get_elevative_type(stellar_glimmer_state) {
             builder.elevative(
                 &context.attribute,
                 &context.enemy,
@@ -388,13 +388,13 @@ impl CharacterTrait for Wriothesley {
     }
 
     fn new_effect<A: Attribute>(common_data: &CharacterCommonData, config: &CharacterConfig) -> Option<Box<dyn ChangeAttribute<A>>> {
-        let (in_polestar_field, stellar_conduct_application_count, talent2_stack) = match *config {
-            CharacterConfig::Wriothesley { in_polestar_field, stellar_conduct_application_count, talent2_stack } =>
-                (in_polestar_field, stellar_conduct_application_count, talent2_stack),
-            _ => (false, 0, 0.0),
+        let (stellar_glimmer_state, stellar_conduct_application_count, talent2_stack) = match *config {
+            CharacterConfig::Wriothesley { stellar_glimmer_state, stellar_conduct_application_count, talent2_stack } =>
+                (stellar_glimmer_state, stellar_conduct_application_count, talent2_stack),
+            _ => (StellarGlimmerState::None, 0, 0.0),
         };
         Some(Box::new(WriothesleyEffect {
-            in_polestar_field,
+            stellar_glimmer_state,
             stellar_conduct_application_count,
             talent2_stack,
             common_data: common_data.clone(),
