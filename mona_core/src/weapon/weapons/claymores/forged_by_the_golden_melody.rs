@@ -19,7 +19,7 @@ impl<A: Attribute> WeaponEffect<A> for ForgedByTheGoldenMelodyEffect {
             attribute.add_atk_percentage("金律铸影被动", (0.135 + 0.045 * refine) * self.rate1);
         }
         if self.rate2 > 0.0 {
-            attribute.set_value_by(AttributeName::ElementalMastery, "金律铸影被动", (90.0 + 30.0 * refine) * self.rate2);
+            attribute.set_value_to(AttributeName::ElementalMastery, "金律铸影被动", (90.0 + 30.0 * refine) * self.rate2);
         }
         if self.rate3 > 0.0 {
             attribute.set_value_to_t(AttributeType::Invisible(InvisibleAttributeType::new_reaction(

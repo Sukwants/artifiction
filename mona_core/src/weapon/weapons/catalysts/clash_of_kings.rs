@@ -13,7 +13,7 @@ impl<A: Attribute> WeaponEffect<A> for ClashOfKingsEffect {
         // 持续时间随角色循环变化，以「应用比例」配置项近似平均覆盖率。
         if self.rate > 0.0 {
             attribute.add_atk_percentage("群王局戏被动", (0.15 + 0.05 * refine) * self.rate);
-            attribute.set_value_by(AttributeName::ElementalMastery, "群王局戏被动", (75.0 + 25.0 * refine) * self.rate);
+            attribute.set_value_to(AttributeName::ElementalMastery, "群王局戏被动", (75.0 + 25.0 * refine) * self.rate);
         }
     }
 }

@@ -12,6 +12,7 @@ impl<A: Attribute> ArtifactEffect<A> for ScarletProofEffect {
 
     fn effect4(&self, attribute: &mut A) {
         // 装备者触发星扩散反应后的10秒内，暴击率提升16%，星扩散反应伤害提升40%。
+        // 该效果为限时触发型（10秒），此处以「四件套被动比例」set4_rate（0~1，默认1.0）近似覆盖率。
         attribute.set_value_to(AttributeName::CriticalBase, "血红之证4", 0.16 * self.set4_rate);
         attribute.set_value_to_t(
             AttributeType::Invisible(InvisibleAttributeType::new_reaction(

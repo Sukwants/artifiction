@@ -12,7 +12,7 @@ impl<A: Attribute> WeaponEffect<A> for EchoesOfTheHeartEffect {
 
         // 触发元素反应的12秒内，装备者的元素精通提升。
         if self.element_reaction {
-            attribute.set_value_by(AttributeName::ElementalMastery, "寸心余响被动", 45.0 + 15.0 * refine);
+            attribute.set_value_to(AttributeName::ElementalMastery, "寸心余响被动", 45.0 + 15.0 * refine);
         }
 
         // 触发星烁反应的12秒内，装备者造成的星烁反应伤害提升（星超导/星扩散）。

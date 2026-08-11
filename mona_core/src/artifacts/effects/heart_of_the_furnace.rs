@@ -12,9 +12,11 @@ impl<A: Attribute> ArtifactEffect<A> for HeartOfTheFurnaceEffect {
 
     fn effect4(&self, attribute: &mut A) {
         // 装备者触发星烁反应或造成星烁反应伤害后的12秒内，攻击力提升12%（后台也可触发）。
+        // 该效果为限时触发型（12秒），此处以「四件套被动比例」set4_rate（0~1，默认1.0）近似覆盖率。
         attribute.add_atk_percentage("炉火融炼之心4", 0.12 * self.set4_rate);
 
         // 队伍中附近的所有角色造成的星烁反应伤害提升50%，同名圣遗物套装产生的伤害加成效果无法叠加。
+        // 同样以 set4_rate 近似覆盖率。
         for reaction in [ReactionType::StellarConduct, ReactionType::StellarSwirl] {
             attribute.set_value_to_s(
                 CharacterSelector::select_all(attribute),

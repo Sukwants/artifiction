@@ -17,7 +17,7 @@ impl<A: Attribute> WeaponEffect<A> for JadeVistaEffect {
         let diff = self.diff_count.min(3 - same);
 
         if same > 0 {
-            attribute.set_value_by(AttributeName::ElementalMastery, "悬黎千钧被动", (48.0 + 16.0 * refine) * same as f64);
+            attribute.set_value_to(AttributeName::ElementalMastery, "悬黎千钧被动", (48.0 + 16.0 * refine) * same as f64);
         }
         if diff > 0 {
             attribute.add_atk_percentage("悬黎千钧被动", (0.08 + 0.04 * refine) * diff as f64);

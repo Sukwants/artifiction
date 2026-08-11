@@ -15,7 +15,7 @@ impl<A: Attribute> Buff<A> for BuffOdetteP1 {
                 AttributeVariableType::ReactionEnhance,
                 ReactionType::StellarConduct,
             )),
-            "奥黛塔天赋1",
+            "奥黛塔天赋1·队友",
             bonus,
         );
         attribute.set_value_to_t(
@@ -23,7 +23,7 @@ impl<A: Attribute> Buff<A> for BuffOdetteP1 {
                 AttributeVariableType::ReactionEnhance,
                 ReactionType::StellarSwirl,
             )),
-            "奥黛塔天赋1",
+            "奥黛塔天赋1·队友",
             bonus,
         );
     }
@@ -151,7 +151,7 @@ impl<A: Attribute> Buff<A> for BuffOdetteC2 {
     fn change_attribute(&self, attribute: &mut A) {
         // 命座2：每层「华彩」使角色攻击力提升7%（队友获得转移的华彩后生效）
         let atk_bonus = self.marvelous_splendor_other * ODETTE_SKILL.c2_atk_per_stack;
-        attribute.add_atk_percentage("奥黛塔命座2", atk_bonus);
+        attribute.add_atk_percentage("奥黛塔命座2·队友", atk_bonus);
     }
 }
 
@@ -273,7 +273,7 @@ impl<A: Attribute> Buff<A> for BuffOdetteC6 {
                 AttributeVariableType::ElevativeElevate,
                 ReactionType::StellarConduct,
             )),
-            "奥黛塔命座6",
+            "奥黛塔命座6·队友",
             ODETTE_SKILL.c6_elevate_all,
         );
         attribute.set_value_to_t(
@@ -281,7 +281,7 @@ impl<A: Attribute> Buff<A> for BuffOdetteC6 {
                 AttributeVariableType::ElevativeElevate,
                 ReactionType::StellarSwirl,
             )),
-            "奥黛塔命座6",
+            "奥黛塔命座6·队友",
             ODETTE_SKILL.c6_elevate_all,
         );
     }

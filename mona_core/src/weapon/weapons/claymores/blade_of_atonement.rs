@@ -13,7 +13,7 @@ impl<A: Attribute> WeaponEffect<A> for BladeOfAtonementEffect {
         // 触发元素反应的12秒内，装备者的元素精通提升。
         // 战斗过程中元素反应持续触发，该效果近乎常驻，故以布尔配置项表示是否触发。
         if self.element_reaction {
-            attribute.set_value_by(AttributeName::ElementalMastery, "救赎之斩被动", 48.0 + 16.0 * refine);
+            attribute.set_value_to(AttributeName::ElementalMastery, "救赎之斩被动", 48.0 + 16.0 * refine);
         }
 
         // 触发星烁反应的12秒内，装备者的攻击力提升。

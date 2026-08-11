@@ -12,7 +12,7 @@ impl<A: Attribute> WeaponEffect<A> for CovenantOfFrostAndSnowEffect {
         // 装备者施放元素战技后的12秒内，元素精通提升。
         // 持续时间随角色循环变化，以「应用比例」配置项近似平均覆盖率。
         if self.rate > 0.0 {
-            attribute.set_value_by(AttributeName::ElementalMastery, "霜雪誓约被动", (90.0 + 30.0 * refine) * self.rate);
+            attribute.set_value_to(AttributeName::ElementalMastery, "霜雪誓约被动", (90.0 + 30.0 * refine) * self.rate);
         }
     }
 }
