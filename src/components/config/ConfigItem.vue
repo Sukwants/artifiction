@@ -153,6 +153,13 @@
             />
         </template>
 
+        <template v-else-if="type === 'stellar_glimmer_state'">
+            <select-stellar-glimmer-type
+                :modelValue="modelValue"
+                @update:modelValue="handleChangeValue"
+            />
+        </template>
+
         <el-tooltip
             v-if="globalLink"
             placement="top"
@@ -191,6 +198,7 @@ import { computed } from "vue"
 import SelectElementType from "@c/select/SelectElementType"
 import SelectSkillType from "@c/select/SelectSkillType"
 import SelectMoonsignType from "@c/select/SelectMoonsignType"
+import SelectStellarGlimmerType from "@c/select/SelectStellarGlimmerType"
 import { useI18n } from "@/i18n/i18n"
 import { Connection, QuestionFilled } from "@element-plus/icons-vue"
 import type { GlobalLinkMeta } from "@/composables/config"

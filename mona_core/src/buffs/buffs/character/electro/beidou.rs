@@ -1,7 +1,7 @@
 use crate::buffs::buffs::prelude::*;
 
 pub struct BuffBeidouC6 {
-    pub stellar_glimmer_state: usize,
+    pub stellar_glimmer_state: StellarGlimmerState,
 }
 
 impl<A: Attribute> Buff<A> for BuffBeidouC6 {
@@ -15,7 +15,7 @@ impl<A: Attribute> Buff<A> for BuffBeidouC6 {
             0.15,
         );
 
-        if self.stellar_glimmer_state == 1 {
+        if self.stellar_glimmer_state.is_stellar_conduct() {
             attribute.set_value_to_t(
                 AttributeType::Invisible(InvisibleAttributeType::new_element(
                     AttributeVariableType::ResMinus,
@@ -50,13 +50,13 @@ impl BuffMeta for BuffBeidouC6 {
 
     #[cfg(not(target_family = "wasm"))]
     const CONFIG: Option<&'static [ItemConfig]> = Some(&[
-        ItemConfig::STELLAR_GLIMMER_STATE(0, ItemConfig::PRIORITY_BUFF),
+        ItemConfig::STELLAR_GLIMMER_STATE(StellarGlimmerState::None, ItemConfig::PRIORITY_BUFF),
     ]);
 
     fn create<A: Attribute>(b: &BuffConfig) -> Box<dyn Buff<A>> {
         let stellar_glimmer_state = match *b {
             BuffConfig::BeidouC6 { stellar_glimmer_state } => stellar_glimmer_state,
-            _ => 0,
+            _ => StellarGlimmerState::None,
         };
         Box::new(BuffBeidouC6 {
             stellar_glimmer_state,

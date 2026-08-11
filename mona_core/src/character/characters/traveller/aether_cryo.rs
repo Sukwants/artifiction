@@ -53,7 +53,7 @@ pub const AETHERCRYO_SKILL: AetherCryoSkillType = AetherCryoSkillType {
     a_dmg4: [0.58308, 0.63054, 0.678, 0.7458, 0.79326, 0.8475, 0.92208, 0.99666, 1.07124, 1.1526, 1.23396, 1.31532, 1.39668, 1.47804, 1.5594],
     a_dmg5: [0.70778, 0.76539, 0.823, 0.9053, 0.96291, 1.02875, 1.11928, 1.20981, 1.30034, 1.3991, 1.49786, 1.59662, 1.69538, 1.79414, 1.8929],
     z_dmg1: [0.559, 0.6045, 0.65, 0.715, 0.7605, 0.8125, 0.884, 0.9555, 1.027, 1.105, 1.183, 1.261, 1.339, 1.417, 1.495],
-    z_dmg2: [0.7224, 0.7812, 0.84, 0.924, 0.9828, 1.05, 1.1424, 1.2348, 1.3272, 1.428, 1.5288, 1.6296, 1.7304, 1.8312, 1.932],
+    z_dmg2: [0.6072, 0.6566, 0.706, 0.7766, 0.826, 0.8825, 0.9602, 1.0378, 1.1155, 1.2002, 1.2849, 1.3696, 1.4544, 1.5391, 1.6238],
     x_dmg1: [0.639324, 0.691362, 0.7434, 0.81774, 0.869778, 0.92925, 1.011024, 1.092798, 1.174572, 1.26378, 1.352988, 1.442196, 1.531404, 1.620612, 1.70982],
     x_dmg2: [1.278377, 1.382431, 1.486485, 1.635134, 1.739187, 1.858106, 2.02162, 2.185133, 2.348646, 2.527025, 2.705403, 2.883781, 3.062159, 3.240537, 3.418915],
     x_dmg3: [1.596762, 1.726731, 1.8567, 2.04237, 2.172339, 2.320875, 2.525112, 2.729349, 2.933586, 3.15639, 3.379194, 3.601998, 3.824802, 4.047606, 4.27041],
@@ -120,7 +120,7 @@ pub const AETHERCRYO_STATIC_DATA: CharacterStaticData = CharacterStaticData {
 pub struct AetherCryoEffect {
     pub elements: ConfigElements8Multi,
     pub stellar_conduct_application_count: usize,
-    pub stellar_glimmer_state: usize,
+    pub stellar_glimmer_state: StellarGlimmerState,
     pub common_data: CharacterCommonData,
 }
 
@@ -140,7 +140,7 @@ impl<A: Attribute> ChangeAttribute<A> for AetherCryoEffect {
         // 天赋3：星耀祝礼·幻变冰镜 — 辉映·星超导/星扩散状态下，队伍角色触发超导/冰扩散
         // 转为星超导/星扩散，并基于旅行者攻击力提升该反应的基础伤害（每100点攻击力+0.35%，至多7%）
         let p3_elevative_base = Arc::new(move |atk: f64, _| (atk / 100.0 * AETHERCRYO_SKILL.p3_base_per_100_atk).min(AETHERCRYO_SKILL.p3_base_max));
-        if self.stellar_glimmer_state == 1 {
+        if self.stellar_glimmer_state.is_stellar_conduct() {
             attribute.add_edge_s1to1(
                 CharacterSelector::select_all(attribute),
                 AttributeType::Panel(AttributeName::ATK),
@@ -153,7 +153,7 @@ impl<A: Attribute> ChangeAttribute<A> for AetherCryoEffect {
                 EdgePriority::Invisible,
             );
         }
-        if self.stellar_glimmer_state == 2 {
+        if self.stellar_glimmer_state.is_stellar_swirl() {
             attribute.add_edge_s1to1(
                 CharacterSelector::select_all(attribute),
                 AttributeType::Panel(AttributeName::ATK),
@@ -243,13 +243,13 @@ impl AetherCryoDamageEnum {
         }
     }
 
-    pub fn get_elevative_type(&self, stellar_glimmer_state: usize) -> Option<ElevativeReaction> {
+    pub fn get_elevative_type(&self, stellar_glimmer_state: StellarGlimmerState) -> Option<ElevativeReaction> {
         use AetherCryoDamageEnum::*;
         match *self {
             // 辉映·星烁状态下，元素爆发与重击·冰凝改为造成视为对应星烁反应伤害的冰元素伤害
             Q | Q_TOTAL | P4A | P4B | P4T => match stellar_glimmer_state {
-                1 => Some(ElevativeReaction::StellarConductCryo),
-                2 => Some(ElevativeReaction::StellarSwirlCryo),
+                StellarGlimmerState::StellarConduct => Some(ElevativeReaction::StellarConductCryo),
+                StellarGlimmerState::StellarSwirl => Some(ElevativeReaction::StellarSwirlCryo),
                 _ => None,
             },
             _ => None,
@@ -299,7 +299,7 @@ impl CharacterTrait for AetherCryo {
     #[cfg(not(target_family = "wasm"))]
     const CONFIG_DATA: Option<&'static [ItemConfig]> = Some(&[
         ItemConfig::STELLAR_CONDUCT_APPLICATION_COUNT(0, ItemConfig::PRIORITY_CHARACTER),
-        ItemConfig::STELLAR_GLIMMER_STATE(1, ItemConfig::PRIORITY_CHARACTER),
+        ItemConfig::STELLAR_GLIMMER_STATE(StellarGlimmerState::StellarConduct, ItemConfig::PRIORITY_CHARACTER),
         ItemConfig {
             name: "elements",
             title: locale!(
@@ -340,18 +340,46 @@ impl CharacterTrait for AetherCryo {
             ),
             config: ItemConfigType::Bool { default: true }
         },
+        ItemConfig {
+            name: "c2_ice_crystal_hit",
+            title: locale!(
+                zh_cn: "冰晶命中敌人（命座2）",
+                en: "Ice Crystal Hits Enemy (C2)"
+            ),
+            config: ItemConfigType::Bool { default: true }
+        },
+        ItemConfig {
+            name: "c2_stellar_triggered",
+            title: locale!(
+                zh_cn: "触发星烁反应（命座2 → 120元素精通）",
+                en: "Triggered Stellar Glimmer (C2 → 120 EM)"
+            ),
+            config: ItemConfigType::Bool { default: false }
+        },
     ]);
 
     fn change_attribute<A: Attribute>(attribute: &mut A, common_data: &CharacterCommonData, skill_config: &CharacterSkillConfig) {
         let stellar_glimmer_state = match &common_data.config {
             CharacterConfig::AetherCryo { stellar_glimmer_state, .. } => *stellar_glimmer_state,
-            _ => 0,
+            _ => StellarGlimmerState::None,
         };
-        let (frostglow_stacks, _frostpierce_star_on_field) = match *skill_config {
-            CharacterSkillConfig::AetherCryo { frostglow_stacks, frostpierce_star_on_field } =>
-                (frostglow_stacks, frostpierce_star_on_field),
-            _ => (0, false),
+        let (frostglow_stacks, _frostpierce_star_on_field, c2_ice_crystal_hit, c2_stellar_triggered) = match *skill_config {
+            CharacterSkillConfig::AetherCryo { frostglow_stacks, frostpierce_star_on_field, c2_ice_crystal_hit, c2_stellar_triggered } =>
+                (frostglow_stacks, frostpierce_star_on_field, c2_ice_crystal_hit, c2_stellar_triggered),
+            _ => (0, false, false, false),
         };
+
+        // 命座2：嗡鸣的陨冰 — 元素战技冰晶命中敌人后，当前场上角色元素精通提升60点；
+        // 若受影响角色触发了星烁反应或造成星烁反应伤害，则该效果改为提升120点（持续5秒）
+        if common_data.constellation >= 2 && c2_ice_crystal_hit {
+            let em_bonus = if c2_stellar_triggered { 120.0 } else { 60.0 };
+            attribute.set_value_to_s(
+                CharacterSelector::select_onfield(attribute),
+                AttributeType::Panel(AttributeName::ElementalMastery),
+                "旅行者命座2",
+                em_bonus,
+            );
+        }
 
         // 命座6：肃杀的熙冰 — 施放元素爆发时，每消耗1层寒辉，
         // 队伍中其他角色造成的星烁反应（星超导/星扩散）伤害提升5%，至多40%，持续15秒
@@ -387,13 +415,13 @@ impl CharacterTrait for AetherCryo {
         let (_elements, _stellar_conduct_application_count, stellar_glimmer_state) = match &context.character_common_data.config {
             CharacterConfig::AetherCryo { elements, stellar_conduct_application_count, stellar_glimmer_state } =>
                 (*elements, *stellar_conduct_application_count, *stellar_glimmer_state),
-            _ => (ConfigElements8Multi::default(), 0, 0),
+            _ => (ConfigElements8Multi::default(), 0, StellarGlimmerState::None),
         };
 
-        let (frostglow_stacks, frostpierce_star_on_field) = match *config {
-            CharacterSkillConfig::AetherCryo { frostglow_stacks, frostpierce_star_on_field } =>
-                (frostglow_stacks, frostpierce_star_on_field),
-            _ => (0, false),
+        let (frostglow_stacks, frostpierce_star_on_field, _c2_ice_crystal_hit, _c2_stellar_triggered) = match *config {
+            CharacterSkillConfig::AetherCryo { frostglow_stacks, frostpierce_star_on_field, c2_ice_crystal_hit, c2_stellar_triggered } =>
+                (frostglow_stacks, frostpierce_star_on_field, c2_ice_crystal_hit, c2_stellar_triggered),
+            _ => (0, false, false, false),
         };
 
         use AetherCryoDamageEnum::*;
@@ -403,7 +431,7 @@ impl CharacterTrait for AetherCryo {
         // 普通攻击/重击/下落攻击转为冰伤并提升相当于攻击力80%的伤害。
         // 该加成对「重击·冰凝」（P4A/P4B/P4T）无效。
         let p1_active = context.character_common_data.has_talent1
-            && stellar_glimmer_state == 1
+            && stellar_glimmer_state.is_stellar_conduct()
             && frostpierce_star_on_field;
         if p1_active && !matches!(s, P4A | P4B | P4T)
             && matches!(s.get_skill_type(), SkillType::NormalAttack | SkillType::ChargedAttack | SkillType::PlungingAttackInAction | SkillType::PlungingAttackOnGround)
@@ -413,7 +441,7 @@ impl CharacterTrait for AetherCryo {
 
         // 元素爆发：消耗的每层寒辉提升本次元素爆发造成的伤害
         if matches!(s, Q | Q_TOTAL) && frostglow_stacks > 0 {
-            let frostglow_bonus = if stellar_glimmer_state == 1 {
+            let frostglow_bonus = if stellar_glimmer_state.is_stellar_conduct() {
                 AETHERCRYO_SKILL.q_sc_frostglow_bonus[s3]
             } else {
                 AETHERCRYO_SKILL.q_frostglow_bonus[s3]
@@ -422,7 +450,7 @@ impl CharacterTrait for AetherCryo {
         }
 
         // 辉映·星超导状态下的冰矛单段倍率（星扩散与无状态时使用基础倍率）
-        let q_base = if stellar_glimmer_state == 1 {
+        let q_base = if stellar_glimmer_state.is_stellar_conduct() {
             AETHERCRYO_SKILL.q_sc_javelin_dmg[s3]
         } else {
             AETHERCRYO_SKILL.q_javelin_dmg[s3]
@@ -485,7 +513,7 @@ impl CharacterTrait for AetherCryo {
         let (elements, stellar_conduct_application_count, stellar_glimmer_state) = match *config {
             CharacterConfig::AetherCryo { elements, stellar_conduct_application_count, stellar_glimmer_state, .. } =>
                 (elements, stellar_conduct_application_count, stellar_glimmer_state),
-            _ => (ConfigElements8Multi::default(), 0, 0),
+            _ => (ConfigElements8Multi::default(), 0, StellarGlimmerState::None),
         };
         Some(Box::new(AetherCryoEffect {
             elements,

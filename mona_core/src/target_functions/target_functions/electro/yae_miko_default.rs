@@ -83,7 +83,7 @@ impl TargetFunction for YaeMikoDefaultTargetFunction {
         // 从角色配置读取辉映·星烁状态
         let stellar_glimmer_state = match &character.common_data.config {
             CharacterConfig::YaeMiko { stellar_glimmer_state, .. } => *stellar_glimmer_state,
-            _ => 0,
+            _ => StellarGlimmerState::None,
         };
 
         type S = <YaeMiko as CharacterTrait>::DamageEnumType;
@@ -140,7 +140,7 @@ impl TargetFunction for YaeMikoDefaultTargetFunction {
 
         // 天赋3星超导额外伤害 (仅辉映·星超导状态下生效, 从角色配置读取)
         let mut dmg_sum_p3_sc = 0.0;
-        if stellar_glimmer_state == 1 {
+        if stellar_glimmer_state.is_stellar_conduct() {
             let dmg_p3_sc = YaeMiko::damage::<SimpleDamageBuilder>(&ctx_e_p3, S::P3_SC, &config_e_p3, None);
             dmg_sum_p3_sc = dmg_p3_sc.normal.expectation * p3_count;
         }

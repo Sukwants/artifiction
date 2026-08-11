@@ -44,7 +44,7 @@ impl TargetFunction for LumineCryoDefaultTargetFunction {
             bonus_pyro: 0.0,
             bonus_hydro: 0.0,
             bonus_anemo: 0.0,
-            bonus_cryo: 1.0,
+            bonus_cryo: 0.0,
             bonus_geo: 0.0,
             bonus_dendro: 0.0,
             bonus_physical: 0.0,
@@ -78,8 +78,8 @@ impl TargetFunction for LumineCryoDefaultTargetFunction {
     }
 
     fn target(&self, attribute: &TargetFunctionAttributeType, character: &Character<TargetFunctionAttributeType>, _weapon: &Weapon<TargetFunctionAttributeType>, _artifacts: &[&Artifact], enemy: &Enemy) -> f64 {
-        // 寒辉满层（8层）、栗烈寒星总是在场
-        let config = CharacterSkillConfig::LumineCryo { frostglow_stacks: 8, frostpierce_star_on_field: true };
+        // 寒辉满层（8层）、栗烈寒星总是在场，命座2冰晶命中视为触发（未触发星烁→60精通）
+        let config = CharacterSkillConfig::LumineCryo { frostglow_stacks: 8, frostpierce_star_on_field: true, c2_ice_crystal_hit: true, c2_stellar_triggered: false };
 
         let mut attribute_c = (*attribute).clone();
         LumineCryo::change_attribute::<TargetFunctionAttributeType>(&mut attribute_c, &character.common_data, &config);

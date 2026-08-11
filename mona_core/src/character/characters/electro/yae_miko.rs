@@ -94,7 +94,7 @@ pub const YAE_MIKO_STATIC_DATA: CharacterStaticData = CharacterStaticData {
 };
 
 pub struct YaeMikoEffect {
-    pub stellar_glimmer_state: usize,
+    pub stellar_glimmer_state: StellarGlimmerState,
     pub stellar_conduct_application_count: usize,
     pub common_data: CharacterCommonData,
 }
@@ -220,10 +220,10 @@ impl YaeMikoDamageEnum {
         }
     }
 
-    pub fn get_elevative_type(&self, stellar_glimmer_state: usize) -> Option<ElevativeReaction> {
+    pub fn get_elevative_type(&self, stellar_glimmer_state: StellarGlimmerState) -> Option<ElevativeReaction> {
         use YaeMikoDamageEnum::*;
         match *self {
-            P1 if stellar_glimmer_state == 1 => Some(ElevativeReaction::StellarConductElectro),
+            P1 if stellar_glimmer_state.is_stellar_conduct() => Some(ElevativeReaction::StellarConductElectro),
             P3_SC => Some(ElevativeReaction::StellarConductElectro),
             _ => None,
         }
@@ -273,7 +273,7 @@ impl CharacterTrait for YaeMiko {
     #[cfg(not(target_family = "wasm"))]
     const CONFIG_DATA: Option<&'static [ItemConfig]> = Some(&[
         ItemConfig::STELLAR_CONDUCT_APPLICATION_COUNT(0, ItemConfig::PRIORITY_CHARACTER),
-        ItemConfig::STELLAR_GLIMMER_STATE(0, ItemConfig::PRIORITY_CHARACTER),
+        ItemConfig::STELLAR_GLIMMER_STATE(StellarGlimmerState::None, ItemConfig::PRIORITY_CHARACTER),
     ]);
 
     #[cfg(not(target_family = "wasm"))]
@@ -308,7 +308,7 @@ impl CharacterTrait for YaeMiko {
         let (stellar_glimmer_state, stellar_conduct_application_count) = match &common_data.config {
             CharacterConfig::YaeMiko { stellar_glimmer_state, stellar_conduct_application_count } =>
                 (*stellar_glimmer_state, *stellar_conduct_application_count),
-            _ => (0, 0),
+            _ => (StellarGlimmerState::None, 0),
         };
 
         let (sesshou_sakura_level, sesshou_sakura_count, p3_enhanced) = match *skill_config {
@@ -339,7 +339,7 @@ impl CharacterTrait for YaeMiko {
         let (stellar_glimmer_state, stellar_conduct_application_count) = match &context.character_common_data.config {
             CharacterConfig::YaeMiko { stellar_glimmer_state, stellar_conduct_application_count } =>
                 (*stellar_glimmer_state, *stellar_conduct_application_count),
-            _ => (0, 0),
+            _ => (StellarGlimmerState::None, 0),
         };
 
         let _ = stellar_conduct_application_count;
@@ -358,7 +358,7 @@ impl CharacterTrait for YaeMiko {
         }
 
         // P3_SC requires P3 enhanced active and in Stellar-Conduct state
-        if s == P3_SC && (!p3_enhanced || stellar_glimmer_state != 1) {
+        if s == P3_SC && (!p3_enhanced || !stellar_glimmer_state.is_stellar_conduct()) {
             return D::new().none();
         }
 
@@ -379,7 +379,7 @@ impl CharacterTrait for YaeMiko {
             Q => YAE_MIKO_SKILL.q_dmg[s3],
             Q_TK => YAE_MIKO_SKILL.q_dmg_tk[s3],
             Q_TK_TOTAL => YAE_MIKO_SKILL.q_dmg_tk[s3] * sesshou_sakura_count as f64,
-            P1 => if stellar_glimmer_state == 1 { YAE_MIKO_SKILL.p1_sc_atk_ratio } else { YAE_MIKO_SKILL.p1_atk_ratio },
+            P1 => if stellar_glimmer_state.is_stellar_conduct() { YAE_MIKO_SKILL.p1_sc_atk_ratio } else { YAE_MIKO_SKILL.p1_atk_ratio },
             P3_SC => YAE_MIKO_SKILL.p3_sc_atk_ratio,
         };
 
@@ -422,7 +422,7 @@ impl CharacterTrait for YaeMiko {
         let (stellar_glimmer_state, stellar_conduct_application_count) = match *config {
             CharacterConfig::YaeMiko { stellar_glimmer_state, stellar_conduct_application_count } =>
                 (stellar_glimmer_state, stellar_conduct_application_count),
-            _ => (0, 0),
+            _ => (StellarGlimmerState::None, 0),
         };
         Some(Box::new(YaeMikoEffect {
             stellar_glimmer_state,

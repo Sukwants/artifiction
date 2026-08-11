@@ -71,29 +71,35 @@ impl BuffMeta for BuffOdetteP1 {
 
 
 pub struct BuffOdetteP3 {
-    pub odette_atk: f64, // 奥黛塔的攻击力
+    pub odette_atk: f64,          // 奥黛塔的攻击力
+    pub stellar_glimmer_state: StellarGlimmerState, // 辉映·星烁状态
 }
 
 impl<A: Attribute> Buff<A> for BuffOdetteP3 {
     fn change_attribute(&self, attribute: &mut A) {
         // 天赋3：基于奥黛塔攻击力提升队伍角色星超导/星扩散反应的基础伤害（每100攻击力0.7%，至多14%）
+        // 仅提升与当前辉映状态对应的反应（与角色文件实现一致）
         let value = (self.odette_atk / 100.0 * ODETTE_SKILL.p3_base_per_100_atk).min(ODETTE_SKILL.p3_base_max);
-        attribute.set_value_to_t(
-            AttributeType::Invisible(InvisibleAttributeType::new_reaction(
-                AttributeVariableType::ElevativeBase,
-                ReactionType::StellarConduct,
-            )),
-            "奥黛塔天赋3",
-            value,
-        );
-        attribute.set_value_to_t(
-            AttributeType::Invisible(InvisibleAttributeType::new_reaction(
-                AttributeVariableType::ElevativeBase,
-                ReactionType::StellarSwirl,
-            )),
-            "奥黛塔天赋3",
-            value,
-        );
+        if self.stellar_glimmer_state.is_stellar_conduct() {
+            attribute.set_value_to_t(
+                AttributeType::Invisible(InvisibleAttributeType::new_reaction(
+                    AttributeVariableType::ElevativeBase,
+                    ReactionType::StellarConduct,
+                )),
+                "奥黛塔天赋3",
+                value,
+            );
+        }
+        if self.stellar_glimmer_state.is_stellar_swirl() {
+            attribute.set_value_to_t(
+                AttributeType::Invisible(InvisibleAttributeType::new_reaction(
+                    AttributeVariableType::ElevativeBase,
+                    ReactionType::StellarSwirl,
+                )),
+                "奥黛塔天赋3",
+                value,
+            );
+        }
     }
 }
 
@@ -116,6 +122,7 @@ impl BuffMeta for BuffOdetteP3 {
 
     #[cfg(not(target_family = "wasm"))]
     const CONFIG: Option<&'static [ItemConfig]> = Some(&[
+        ItemConfig::STELLAR_GLIMMER_STATE(StellarGlimmerState::StellarConduct, ItemConfig::PRIORITY_BUFF),
         ItemConfig {
             name: "odette_atk",
             title: locale!(
@@ -127,11 +134,11 @@ impl BuffMeta for BuffOdetteP3 {
     ]);
 
     fn create<A: Attribute>(b: &BuffConfig) -> Box<dyn Buff<A>> {
-        let odette_atk = match *b {
-            BuffConfig::OdetteP3 { odette_atk } => odette_atk,
-            _ => 2000.0,
+        let (odette_atk, stellar_glimmer_state) = match *b {
+            BuffConfig::OdetteP3 { odette_atk, stellar_glimmer_state } => (odette_atk, stellar_glimmer_state),
+            _ => (2000.0, StellarGlimmerState::StellarConduct),
         };
-        Box::new(BuffOdetteP3 { odette_atk })
+        Box::new(BuffOdetteP3 { odette_atk, stellar_glimmer_state })
     }
 }
 

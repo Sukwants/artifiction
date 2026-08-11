@@ -5,7 +5,7 @@ use serde::de::{SeqAccess, Visitor};
 use serde::ser::SerializeSeq;
 use serde_json::json;
 use smallvec::{SmallVec};
-use crate::common::{Element, Moonsign, SkillType};
+use crate::common::{Element, Moonsign, SkillType, StellarGlimmerState};
 use crate::common::i18n::{I18nLocale, locale};
 
 #[derive(Default, Debug, Clone, Copy)]
@@ -234,6 +234,10 @@ pub enum ItemConfigType {
     GlobalLinkMoonsign3 {
         default: Moonsign,
         global_link: GlobalLinkConfig,
+    },
+    GlobalLinkStellarGlimmer3 {
+        default: StellarGlimmerState,
+        global_link: GlobalLinkConfig,
     }
 }
 
@@ -289,8 +293,8 @@ impl ItemConfig {
     pub const fn STELLAR_CONDUCT_APPLICATION_COUNT(default: i32, priority: usize) -> ItemConfig {
         return ItemConfig { name: "stellar_conduct_application_count", title: locale!(zh_cn: "星超导附着次数", en: "Stellar Conduct Application Count"), config: ItemConfigType::GlobalLinkInt { min: 0, max: 12, default, global_link: GlobalLinkConfig { key: "stellar_conduct_application_count", priority, team_shared: true } } };
     }
-    // 辉映·星烁状态：0=无，1=辉映·星超导，2=辉映·星扩散
-    pub const fn STELLAR_GLIMMER_STATE(default: usize, priority: usize) -> ItemConfig {
-        return ItemConfig { name: "stellar_glimmer_state", title: locale!(zh_cn: "辉映·星烁状态", en: "Radiance: Stellar Glimmer State"), config: ItemConfigType::GlobalLinkOption2 { options_zh: "无,辉映·星超导,辉映·星扩散", options_en: "None,Stellar-Conduct,Stellar Swirl", default, global_link: GlobalLinkConfig { key: "stellar_glimmer_state", priority, team_shared: true } } };
+    // 辉映·星烁状态：直接使用 StellarGlimmerState 枚举（模仿 Moonsign 的模式），序列化为字符串并传给前端
+    pub const fn STELLAR_GLIMMER_STATE(default: StellarGlimmerState, priority: usize) -> ItemConfig {
+        return ItemConfig { name: "stellar_glimmer_state", title: locale!(zh_cn: "辉映·星烁状态", en: "Radiance: Stellar Glimmer State"), config: ItemConfigType::GlobalLinkStellarGlimmer3 { default, global_link: GlobalLinkConfig { key: "stellar_glimmer_state", priority, team_shared: true } } };
     }
 }

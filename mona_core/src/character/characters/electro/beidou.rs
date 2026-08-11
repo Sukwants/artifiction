@@ -78,7 +78,7 @@ pub const BEIDOU_STATIC_DATA: CharacterStaticData = CharacterStaticData {
 };
 
 pub struct BeidouEffect {
-    pub stellar_glimmer_state: usize,
+    pub stellar_glimmer_state: StellarGlimmerState,
     pub common_data: CharacterCommonData,
 }
 
@@ -169,7 +169,7 @@ impl CharacterTrait for Beidou {
 
     #[cfg(not(target_family = "wasm"))]
     const CONFIG_DATA: Option<&'static [ItemConfig]> = Some(&[
-        ItemConfig::STELLAR_GLIMMER_STATE(0, ItemConfig::PRIORITY_CHARACTER),
+        ItemConfig::STELLAR_GLIMMER_STATE(StellarGlimmerState::None, ItemConfig::PRIORITY_CHARACTER),
     ]);
 
     #[cfg(not(target_family = "wasm"))]
@@ -195,7 +195,7 @@ impl CharacterTrait for Beidou {
     fn change_attribute<A: Attribute>(attribute: &mut A, common_data: &CharacterCommonData, skill_config: &CharacterSkillConfig) {
         let stellar_glimmer_state = match &common_data.config {
             CharacterConfig::Beidou { stellar_glimmer_state } => *stellar_glimmer_state,
-            _ => 0,
+            _ => StellarGlimmerState::None,
         };
 
         let (under_q, perfect_counter) = match *skill_config {
@@ -216,7 +216,7 @@ impl CharacterTrait for Beidou {
                 0.15,
             );
 
-            if stellar_glimmer_state == 1 {
+            if stellar_glimmer_state.is_stellar_conduct() {
                 attribute.set_value_to_s(
                     CharacterSelector::select_all(attribute),
                     AttributeType::Invisible(InvisibleAttributeType::new_element(
@@ -299,7 +299,7 @@ impl CharacterTrait for Beidou {
     fn new_effect<A: Attribute>(common_data: &CharacterCommonData, config: &CharacterConfig) -> Option<Box<dyn ChangeAttribute<A>>> {
         let stellar_glimmer_state = match *config {
             CharacterConfig::Beidou { stellar_glimmer_state } => stellar_glimmer_state,
-            _ => 0,
+            _ => StellarGlimmerState::None,
         };
         Some(Box::new(BeidouEffect {
             stellar_glimmer_state,

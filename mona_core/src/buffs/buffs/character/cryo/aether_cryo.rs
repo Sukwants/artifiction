@@ -3,29 +3,35 @@ use crate::buffs::buffs::prelude::*;
 use crate::character::characters::traveller::aether_cryo::AETHERCRYO_SKILL;
 
 pub struct BuffAetherCryoP3 {
-    pub aether_cryo_atk: f64, // 空-冰的攻击力
+    pub aether_cryo_atk: f64,          // 空-冰的攻击力
+    pub stellar_glimmer_state: StellarGlimmerState,  // 辉映·星烁状态
 }
 
 impl<A: Attribute> Buff<A> for BuffAetherCryoP3 {
     fn change_attribute(&self, attribute: &mut A) {
         // 天赋3：基于旅行者攻击力提升队伍角色星超导/星扩散反应的基础伤害（每100攻击力0.35%，至多7%）
+        // 仅提升与当前辉映状态对应的反应（与角色文件实现一致）
         let value = (self.aether_cryo_atk / 100.0 * AETHERCRYO_SKILL.p3_base_per_100_atk).min(AETHERCRYO_SKILL.p3_base_max);
-        attribute.set_value_to_t(
-            AttributeType::Invisible(InvisibleAttributeType::new_reaction(
-                AttributeVariableType::ElevativeBase,
-                ReactionType::StellarConduct,
-            )),
-            "旅行者天赋3",
-            value,
-        );
-        attribute.set_value_to_t(
-            AttributeType::Invisible(InvisibleAttributeType::new_reaction(
-                AttributeVariableType::ElevativeBase,
-                ReactionType::StellarSwirl,
-            )),
-            "旅行者天赋3",
-            value,
-        );
+        if self.stellar_glimmer_state.is_stellar_conduct() {
+            attribute.set_value_to_t(
+                AttributeType::Invisible(InvisibleAttributeType::new_reaction(
+                    AttributeVariableType::ElevativeBase,
+                    ReactionType::StellarConduct,
+                )),
+                "旅行者天赋3",
+                value,
+            );
+        }
+        if self.stellar_glimmer_state.is_stellar_swirl() {
+            attribute.set_value_to_t(
+                AttributeType::Invisible(InvisibleAttributeType::new_reaction(
+                    AttributeVariableType::ElevativeBase,
+                    ReactionType::StellarSwirl,
+                )),
+                "旅行者天赋3",
+                value,
+            );
+        }
     }
 }
 
@@ -48,6 +54,7 @@ impl BuffMeta for BuffAetherCryoP3 {
 
     #[cfg(not(target_family = "wasm"))]
     const CONFIG: Option<&'static [ItemConfig]> = Some(&[
+        ItemConfig::STELLAR_GLIMMER_STATE(StellarGlimmerState::StellarConduct, ItemConfig::PRIORITY_BUFF),
         ItemConfig {
             name: "aether_cryo_atk",
             title: locale!(
@@ -59,11 +66,11 @@ impl BuffMeta for BuffAetherCryoP3 {
     ]);
 
     fn create<A: Attribute>(b: &BuffConfig) -> Box<dyn Buff<A>> {
-        let aether_cryo_atk = match *b {
-            BuffConfig::AetherCryoP3 { aether_cryo_atk } => aether_cryo_atk,
-            _ => 2000.0,
+        let (aether_cryo_atk, stellar_glimmer_state) = match *b {
+            BuffConfig::AetherCryoP3 { aether_cryo_atk, stellar_glimmer_state } => (aether_cryo_atk, stellar_glimmer_state),
+            _ => (2000.0, StellarGlimmerState::StellarConduct),
         };
-        Box::new(BuffAetherCryoP3 { aether_cryo_atk })
+        Box::new(BuffAetherCryoP3 { aether_cryo_atk, stellar_glimmer_state })
     }
 }
 

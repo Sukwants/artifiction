@@ -242,6 +242,20 @@ pub fn config_to_json(config: &ItemConfig) -> String {
                 }
             })
         },
+        ItemConfigType::GlobalLinkStellarGlimmer3 { default, global_link } => {
+            json!({
+                "type": "stellar_glimmer_state",
+                "title": title_index,
+                "name": name,
+                "default": default,
+                "global_link": {
+                    "key": global_link.key,
+                    "priority": global_link.priority,
+                    "unlinked": false,
+                    "team_shared": global_link.team_shared
+                }
+            })
+        },
     };
 
     j.to_string()

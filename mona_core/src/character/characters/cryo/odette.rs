@@ -150,7 +150,7 @@ pub const ODETTE_STATIC_DATA: CharacterStaticData = CharacterStaticData {
 };
 
 pub struct OdetteEffect {
-    pub stellar_glimmer_state: usize,
+    pub stellar_glimmer_state: StellarGlimmerState,
     pub stellar_conduct_application_count: usize,
     pub marvelous_splendor_self: f64,  // 「华彩」自身平均层数（由用户在角色配置中给出）
     pub marvelous_splendor_other: f64, // 「华彩」其他角色平均层数（奥黛塔后台时转移给队友）
@@ -245,7 +245,7 @@ impl<A: Attribute> ChangeAttribute<A> for OdetteEffect {
         let base_bonus = Arc::new(move |atk: f64, _| {
             (atk / 100.0 * ODETTE_SKILL.p3_base_per_100_atk).min(ODETTE_SKILL.p3_base_max)
         });
-        if self.stellar_glimmer_state == 1 {
+        if self.stellar_glimmer_state.is_stellar_conduct() {
             attribute.add_edge_s1to1(
                 CharacterSelector::select_all(attribute),
                 AttributeType::Panel(AttributeName::ATK),
@@ -258,7 +258,7 @@ impl<A: Attribute> ChangeAttribute<A> for OdetteEffect {
                 EdgePriority::Invisible,
             );
         }
-        if self.stellar_glimmer_state == 2 {
+        if self.stellar_glimmer_state.is_stellar_swirl() {
             attribute.add_edge_s1to1(
                 CharacterSelector::select_all(attribute),
                 AttributeType::Panel(AttributeName::ATK),
@@ -405,13 +405,13 @@ impl OdetteDamageEnum {
         }
     }
 
-    pub fn get_elevative_type(&self, stellar_glimmer_state: usize) -> Option<ElevativeReaction> {
+    pub fn get_elevative_type(&self, stellar_glimmer_state: StellarGlimmerState) -> Option<ElevativeReaction> {
         use OdetteDamageEnum::*;
         match *self {
             // 破晓终奏共舞结束伤害与命座伤害：
             // 无辉映状态或辉映·星超导时视为星超导，辉映·星扩散时视为星扩散
             EC | C1 | C4 => {
-                if stellar_glimmer_state == 2 {
+                if stellar_glimmer_state.is_stellar_swirl() {
                     Some(ElevativeReaction::StellarSwirlCryo)
                 } else {
                     Some(ElevativeReaction::StellarConductCryo)
@@ -419,8 +419,8 @@ impl OdetteDamageEnum {
             }
             // 独舞倒影舞步的星烁额外伤害：仅辉映状态下触发
             EP_STELLAR | EW_STELLAR => match stellar_glimmer_state {
-                1 => Some(ElevativeReaction::StellarConductCryo),
-                2 => Some(ElevativeReaction::StellarSwirlCryo),
+                StellarGlimmerState::StellarConduct => Some(ElevativeReaction::StellarConductCryo),
+                StellarGlimmerState::StellarSwirl => Some(ElevativeReaction::StellarSwirlCryo),
                 _ => None,
             },
             _ => None,
@@ -476,7 +476,7 @@ impl CharacterTrait for Odette {
 
     #[cfg(not(target_family = "wasm"))]
     const CONFIG_DATA: Option<&'static [ItemConfig]> = Some(&[
-        ItemConfig::STELLAR_GLIMMER_STATE(0, ItemConfig::PRIORITY_CHARACTER),
+        ItemConfig::STELLAR_GLIMMER_STATE(StellarGlimmerState::None, ItemConfig::PRIORITY_CHARACTER),
         ItemConfig::STELLAR_CONDUCT_APPLICATION_COUNT(0, ItemConfig::PRIORITY_CHARACTER),
         ItemConfig {
             name: "marvelous_splendor_self",
@@ -527,7 +527,7 @@ impl CharacterTrait for Odette {
     fn change_attribute<A: Attribute>(attribute: &mut A, common_data: &CharacterCommonData, skill_config: &CharacterSkillConfig) {
         let (stellar_glimmer_state, _, _) = match &common_data.config {
             CharacterConfig::Odette { stellar_glimmer_state, .. } => (*stellar_glimmer_state, 0, 0.0),
-            _ => (0, 0, 0.0),
+            _ => (StellarGlimmerState::None, 0, 0.0),
         };
 
         let (activated_coda, has_dance_double, snow_swans_dream_active) = match *skill_config {
@@ -544,7 +544,7 @@ impl CharacterTrait for Odette {
         // - 辉映·星扩散：冰、风元素抗性降低20%
         if common_data.constellation >= 2 && has_dance_double {
             match stellar_glimmer_state {
-                1 => {
+                StellarGlimmerState::StellarConduct => {
                     attribute.set_value_to_s(
                         CharacterSelector::select_all(attribute),
                         AttributeType::Invisible(InvisibleAttributeType::new_element(AttributeVariableType::ResMinus, Element::Cryo)),
@@ -558,7 +558,7 @@ impl CharacterTrait for Odette {
                         ODETTE_SKILL.c2_res_minus,
                     );
                 }
-                2 => {
+                StellarGlimmerState::StellarSwirl => {
                     attribute.set_value_to_s(
                         CharacterSelector::select_all(attribute),
                         AttributeType::Invisible(InvisibleAttributeType::new_element(AttributeVariableType::ResMinus, Element::Cryo)),
@@ -629,7 +629,7 @@ impl CharacterTrait for Odette {
         let (stellar_glimmer_state, stellar_conduct_application_count, marvelous_splendor_self, marvelous_splendor_other) = match &context.character_common_data.config {
             CharacterConfig::Odette { stellar_glimmer_state, stellar_conduct_application_count, marvelous_splendor_self, marvelous_splendor_other } =>
                 (*stellar_glimmer_state, *stellar_conduct_application_count, *marvelous_splendor_self, *marvelous_splendor_other),
-            _ => (0, 0, 0.0, 0.0),
+            _ => (StellarGlimmerState::None, 0, 0.0, 0.0),
         };
         let _ = (stellar_conduct_application_count, marvelous_splendor_self, marvelous_splendor_other);
 
@@ -653,7 +653,7 @@ impl CharacterTrait for Odette {
             return builder.none();
         }
         // 舞步的星烁额外伤害：需施放特殊元素战技「柔板·破晓终奏」，且处于辉映·星烁状态
-        if matches!(s, EP_STELLAR | EW_STELLAR) && (!activated_coda || stellar_glimmer_state == 0) {
+        if matches!(s, EP_STELLAR | EW_STELLAR) && (!activated_coda || stellar_glimmer_state.is_none()) {
             return builder.none();
         }
         // 命座伤害条件
@@ -665,7 +665,7 @@ impl CharacterTrait for Odette {
         }
 
         // 星反应类型判定：辉映·星扩散（state 2）为星扩散，其余（无辉映/辉映·星超导）为星超导
-        let is_stellar_swirl = stellar_glimmer_state == 2;
+        let is_stellar_swirl = stellar_glimmer_state.is_stellar_swirl();
 
         let ratio = match s {
             A1 => ODETTE_SKILL.a_dmg1[s1],
@@ -686,13 +686,13 @@ impl CharacterTrait for Odette {
                 ODETTE_SKILL.e_coda_sc[s2]
             },
             EP => ODETTE_SKILL.e_plume_dmg[s2],
-            EP_STELLAR => if stellar_glimmer_state == 1 {
+            EP_STELLAR => if stellar_glimmer_state.is_stellar_conduct() {
                 ODETTE_SKILL.e_plume_sc[s2]
             } else {
                 ODETTE_SKILL.e_plume_ss[s2]
             },
             EW => ODETTE_SKILL.e_wing_dmg[s2],
-            EW_STELLAR => if stellar_glimmer_state == 1 {
+            EW_STELLAR => if stellar_glimmer_state.is_stellar_conduct() {
                 ODETTE_SKILL.e_wing_sc[s2]
             } else {
                 ODETTE_SKILL.e_wing_ss[s2]
@@ -740,7 +740,7 @@ impl CharacterTrait for Odette {
         let (stellar_glimmer_state, stellar_conduct_application_count, marvelous_splendor_self, marvelous_splendor_other) = match *config {
             CharacterConfig::Odette { stellar_glimmer_state, stellar_conduct_application_count, marvelous_splendor_self, marvelous_splendor_other } =>
                 (stellar_glimmer_state, stellar_conduct_application_count, marvelous_splendor_self, marvelous_splendor_other),
-            _ => (0, 0, 0.0, 0.0),
+            _ => (StellarGlimmerState::None, 0, 0.0, 0.0),
         };
         // 「华彩」层数上限：基础召唤为4层，命座1额外获得2层（共6层），非1命角色钳制为4层
         let max_stacks = if common_data.constellation >= 1 { 6.0 } else { 4.0 };

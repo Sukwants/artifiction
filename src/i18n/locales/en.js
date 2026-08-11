@@ -143,6 +143,11 @@ export default {
         Nascent: "Nascent",
         Ascendant: "Ascendant"
     },
+    stellar_glimmer_state: {
+        None: "None",
+        StellarConduct: "Stellar Conduct",
+        StellarSwirl: "Stellar Swirl"
+    },
     accountPage: {
         title: "Accounts and Syncing",
         syncButton: "Sync with a local directory",

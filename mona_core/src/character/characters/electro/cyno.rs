@@ -96,7 +96,7 @@ pub const CYNO_SKILL: CynoSkillType = CynoSkillType {
 };
 
 pub struct CynoEffect {
-    pub stellar_glimmer_state: usize,
+    pub stellar_glimmer_state: StellarGlimmerState,
     pub stellar_conduct_application_count: usize,
     pub after_q: bool,
     pub c2_stack: f64,
@@ -172,10 +172,10 @@ impl CynoDamageEnum {
         }
     }
 
-    pub fn get_elevative_type(&self, stellar_glimmer_state: usize) -> Option<ElevativeReaction> {
+    pub fn get_elevative_type(&self, stellar_glimmer_state: StellarGlimmerState) -> Option<ElevativeReaction> {
         use CynoDamageEnum::*;
         match *self {
-            E3 | C6B if stellar_glimmer_state == 1 => Some(ElevativeReaction::StellarConductElectro),
+            E3 | C6B if stellar_glimmer_state.is_stellar_conduct() => Some(ElevativeReaction::StellarConductElectro),
             _ => None,
         }
     }
@@ -255,7 +255,7 @@ impl CharacterTrait for Cyno {
     #[cfg(not(target_family = "wasm"))]
     const CONFIG_DATA: Option<&'static [ItemConfig]> = Some(&[
         ItemConfig::STELLAR_CONDUCT_APPLICATION_COUNT(0, ItemConfig::PRIORITY_CHARACTER),
-        ItemConfig::STELLAR_GLIMMER_STATE(0, ItemConfig::PRIORITY_CHARACTER),
+        ItemConfig::STELLAR_GLIMMER_STATE(StellarGlimmerState::None, ItemConfig::PRIORITY_CHARACTER),
         ItemConfig {
             name: "c2_stack",
             title: locale!(
@@ -290,7 +290,7 @@ impl CharacterTrait for Cyno {
         let (stellar_glimmer_state, stellar_conduct_application_count, after_q, c2_stack) = match &common_data.config {
             CharacterConfig::Cyno { stellar_glimmer_state, stellar_conduct_application_count, after_q, c2_stack, .. } =>
                 (*stellar_glimmer_state, *stellar_conduct_application_count, *after_q, *c2_stack),
-            _ => (0, 0, false, 0.0),
+            _ => (StellarGlimmerState::None, 0, false, 0.0),
         };
 
         let under_judication = match *skill_config {
@@ -308,7 +308,7 @@ impl CharacterTrait for Cyno {
         let (stellar_glimmer_state, stellar_conduct_application_count, after_q, c2_stack) = match &context.character_common_data.config {
             CharacterConfig::Cyno { stellar_glimmer_state, stellar_conduct_application_count, after_q, c2_stack, .. } =>
                 (*stellar_glimmer_state, *stellar_conduct_application_count, *after_q, *c2_stack),
-            _ => (0, 0, false, 0.0),
+            _ => (StellarGlimmerState::None, 0, false, 0.0),
         };
 
         let _ = stellar_conduct_application_count;
@@ -331,7 +331,7 @@ impl CharacterTrait for Cyno {
         }
 
         // E3/C6B become Stellar-Conduct when in Radiance: Stellar-Conduct state
-        let is_stellar_conduct = matches!(s, E3 | C6B) && stellar_glimmer_state == 1;
+        let is_stellar_conduct = matches!(s, E3 | C6B) && stellar_glimmer_state.is_stellar_conduct();
 
         let mut builder = D::new();
 
@@ -422,7 +422,7 @@ impl CharacterTrait for Cyno {
         let (stellar_glimmer_state, stellar_conduct_application_count, after_q, c2_stack) = match *config {
             CharacterConfig::Cyno { stellar_glimmer_state, stellar_conduct_application_count, after_q, c2_stack, .. } =>
                 (stellar_glimmer_state, stellar_conduct_application_count, after_q, c2_stack),
-            _ => (0, 0, false, 0.0),
+            _ => (StellarGlimmerState::None, 0, false, 0.0),
         };
         Some(Box::new(CynoEffect {
             stellar_glimmer_state,

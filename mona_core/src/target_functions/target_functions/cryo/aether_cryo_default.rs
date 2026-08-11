@@ -78,8 +78,8 @@ impl TargetFunction for AetherCryoDefaultTargetFunction {
     }
 
     fn target(&self, attribute: &TargetFunctionAttributeType, character: &Character<TargetFunctionAttributeType>, _weapon: &Weapon<TargetFunctionAttributeType>, _artifacts: &[&Artifact], enemy: &Enemy) -> f64 {
-        // 寒辉满层（8层）、栗烈寒星总是在场
-        let config = CharacterSkillConfig::AetherCryo { frostglow_stacks: 8, frostpierce_star_on_field: true };
+        // 寒辉满层（8层）、栗烈寒星总是在场，命座2冰晶命中视为触发（未触发星烁→60精通）
+        let config = CharacterSkillConfig::AetherCryo { frostglow_stacks: 8, frostpierce_star_on_field: true, c2_ice_crystal_hit: true, c2_stellar_triggered: false };
 
         let mut attribute_c = (*attribute).clone();
         AetherCryo::change_attribute::<TargetFunctionAttributeType>(&mut attribute_c, &character.common_data, &config);

@@ -118,7 +118,7 @@ pub const SANDRONE_STATIC_DATA: CharacterStaticData = CharacterStaticData {
 };
 
 pub struct SandroneEffect {
-    pub stellar_glimmer_state: usize,
+    pub stellar_glimmer_state: StellarGlimmerState,
     pub stellar_conduct_application_count: usize,
     pub common_data: CharacterCommonData,
 }
@@ -274,7 +274,7 @@ impl CharacterTrait for Sandrone {
     #[cfg(not(target_family = "wasm"))]
     const CONFIG_DATA: Option<&'static [ItemConfig]> = Some(&[
         ItemConfig::STELLAR_CONDUCT_APPLICATION_COUNT(0, ItemConfig::PRIORITY_CHARACTER),
-        ItemConfig::STELLAR_GLIMMER_STATE(1, ItemConfig::PRIORITY_CHARACTER),
+        ItemConfig::STELLAR_GLIMMER_STATE(StellarGlimmerState::StellarConduct, ItemConfig::PRIORITY_CHARACTER),
     ]);
 
     #[cfg(not(target_family = "wasm"))]
@@ -309,7 +309,7 @@ impl CharacterTrait for Sandrone {
         let (stellar_glimmer_state, stellar_conduct_application_count) = match &common_data.config {
             CharacterConfig::Sandrone { stellar_glimmer_state, stellar_conduct_application_count, .. } =>
                 (*stellar_glimmer_state, *stellar_conduct_application_count),
-            _ => (0, 0),
+            _ => (StellarGlimmerState::None, 0),
         };
 
         let (decoding_power, refined_tactics_stacks, c2_beam_stack) = match *skill_config {
@@ -328,7 +328,7 @@ impl CharacterTrait for Sandrone {
         let (stellar_glimmer_state, stellar_conduct_application_count) = match &context.character_common_data.config {
             CharacterConfig::Sandrone { stellar_glimmer_state, stellar_conduct_application_count, .. } =>
                 (*stellar_glimmer_state, *stellar_conduct_application_count),
-            _ => (0, 0),
+            _ => (StellarGlimmerState::None, 0),
         };
 
         let _ = stellar_conduct_application_count;
@@ -352,7 +352,7 @@ impl CharacterTrait for Sandrone {
 
         // 当前技能是否由 stellar_glimmer_state 决定为星超导伤害（C4 始终为星超导）
         let is_stellar_conduct = matches!(s, C4)
-            || (stellar_glimmer_state == 1 && matches!(s, ZB | E2 | Q_RAY | C6B | C6B_TOTAL));
+            || (stellar_glimmer_state.is_stellar_conduct() && matches!(s, ZB | E2 | Q_RAY | C6B | C6B_TOTAL));
 
         let ratio = match s {
             A1 => SANDRONE_SKILL.a_dmg1[s1],
@@ -446,7 +446,7 @@ impl CharacterTrait for Sandrone {
         let (stellar_glimmer_state, stellar_conduct_application_count) = match *config {
             CharacterConfig::Sandrone { stellar_glimmer_state, stellar_conduct_application_count, .. } =>
                 (stellar_glimmer_state, stellar_conduct_application_count),
-            _ => (0, 0),
+            _ => (StellarGlimmerState::None, 0),
         };
         Some(Box::new(SandroneEffect {
             stellar_glimmer_state,

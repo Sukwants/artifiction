@@ -196,7 +196,7 @@ impl CharacterTrait for Alyosha {
     #[cfg(not(target_family = "wasm"))]
     const CONFIG_DATA: Option<&'static [ItemConfig]> = Some(&[
         // 天赋3：处于极星辉域中时进入辉映·星超导状态
-        ItemConfig::STELLAR_GLIMMER_STATE(1, ItemConfig::PRIORITY_CHARACTER),
+        ItemConfig::STELLAR_GLIMMER_STATE(StellarGlimmerState::StellarConduct, ItemConfig::PRIORITY_CHARACTER),
     ]);
 
     #[cfg(not(target_family = "wasm"))]
@@ -222,7 +222,7 @@ impl CharacterTrait for Alyosha {
     fn change_attribute<A: Attribute>(attribute: &mut A, common_data: &CharacterCommonData, skill_config: &CharacterSkillConfig) {
         let stellar_glimmer_state = match &common_data.config {
             CharacterConfig::Alyosha { stellar_glimmer_state, .. } => *stellar_glimmer_state,
-            _ => 0,
+            _ => StellarGlimmerState::None,
         };
 
         let (e_hold, hunters_precision_stacks) = match *skill_config {
@@ -248,7 +248,7 @@ impl CharacterTrait for Alyosha {
 
         // 天赋3：星赴险域 — 辉映·星超导状态下，猎者之准效果使角色处于场上时
         // 造成的星超导反应伤害提升20%
-        if stellar_glimmer_state == 1 && hunters_precision_stacks > 0 {
+        if stellar_glimmer_state.is_stellar_conduct() && hunters_precision_stacks > 0 {
             attribute.set_value_to_s(
                 CharacterSelector::select_all_onfield(attribute),
                 AttributeType::Invisible(InvisibleAttributeType::new_reaction(

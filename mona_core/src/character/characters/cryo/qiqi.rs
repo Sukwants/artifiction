@@ -120,7 +120,7 @@ pub const QIQI_STATIC_DATA: CharacterStaticData = CharacterStaticData {
 };
 
 pub struct QiqiEffect {
-    pub stellar_glimmer_state: usize,
+    pub stellar_glimmer_state: StellarGlimmerState,
     pub stellar_conduct_application_count: usize,
     pub common_data: CharacterCommonData,
 }
@@ -129,7 +129,7 @@ impl<A: Attribute> ChangeAttribute<A> for QiqiEffect {
     fn change_attribute(&self, attribute: &mut A) {
         // P1: 延命妙法 — E状态下角色触发元素反应时受治疗加成+20%
         // E技能跟随当前场上角色，近似100%覆盖
-        if self.stellar_glimmer_state == 1 && self.common_data.has_talent1 {
+        if self.stellar_glimmer_state.is_stellar_conduct() && self.common_data.has_talent1 {
             attribute.set_value_to_s(
                 CharacterSelector::select_all(attribute),
                 AttributeType::Invisible(InvisibleAttributeType::new_any(AttributeVariableType::IncomingHealingBonus)),
@@ -140,7 +140,7 @@ impl<A: Attribute> ChangeAttribute<A> for QiqiEffect {
 
         // P3: 辉映·星超导 — 寒病鬼差持续期间，队伍中超导/星超导反应伤害+50%
         // E技能15s持续/15s冷却，近似100%覆盖
-        if self.stellar_glimmer_state == 1 {
+        if self.stellar_glimmer_state.is_stellar_conduct() {
             attribute.set_value_to_s(
                 CharacterSelector::select_team(attribute),
                 AttributeType::Invisible(InvisibleAttributeType::new_reaction(
@@ -162,7 +162,7 @@ impl<A: Attribute> ChangeAttribute<A> for QiqiEffect {
         }
 
         // C2: 辉映·星超导 — 攻击力+50%
-        if self.stellar_glimmer_state == 1 && self.common_data.constellation >= 2 {
+        if self.stellar_glimmer_state.is_stellar_conduct() && self.common_data.constellation >= 2 {
             attribute.set_value_by_t(
                 AttributeType::Panel(AttributeName::ATKPercentage),
                 "七七命座2",
@@ -228,9 +228,9 @@ impl QiqiDamageEnum {
         }
     }
 
-    pub fn get_elevative_type(&self, stellar_glimmer_state: usize) -> Option<ElevativeReaction> {
+    pub fn get_elevative_type(&self, stellar_glimmer_state: StellarGlimmerState) -> Option<ElevativeReaction> {
         use QiqiDamageEnum::*;
-        if stellar_glimmer_state != 1 {
+        if !stellar_glimmer_state.is_stellar_conduct() {
             return None;
         }
         match *self {
@@ -288,7 +288,7 @@ impl CharacterTrait for Qiqi {
     #[cfg(not(target_family = "wasm"))]
     const CONFIG_DATA: Option<&'static [ItemConfig]> = Some(&[
         ItemConfig::STELLAR_CONDUCT_APPLICATION_COUNT(0, ItemConfig::PRIORITY_CHARACTER),
-        ItemConfig::STELLAR_GLIMMER_STATE(1, ItemConfig::PRIORITY_CHARACTER),
+        ItemConfig::STELLAR_GLIMMER_STATE(StellarGlimmerState::StellarConduct, ItemConfig::PRIORITY_CHARACTER),
     ]);
 
     #[cfg(not(target_family = "wasm"))]
@@ -342,7 +342,7 @@ impl CharacterTrait for Qiqi {
         let (stellar_glimmer_state, stellar_conduct_application_count) = match &context.character_common_data.config {
             CharacterConfig::Qiqi { stellar_glimmer_state, stellar_conduct_application_count } =>
                 (*stellar_glimmer_state, *stellar_conduct_application_count),
-            _ => (0, 0),
+            _ => (StellarGlimmerState::None, 0),
         };
         let _ = stellar_conduct_application_count;
 
@@ -447,7 +447,7 @@ impl CharacterTrait for Qiqi {
         let (stellar_glimmer_state, stellar_conduct_application_count) = match *config {
             CharacterConfig::Qiqi { stellar_glimmer_state, stellar_conduct_application_count } =>
                 (stellar_glimmer_state, stellar_conduct_application_count),
-            _ => (0, 0),
+            _ => (StellarGlimmerState::None, 0),
         };
         Some(Box::new(QiqiEffect {
             stellar_glimmer_state,

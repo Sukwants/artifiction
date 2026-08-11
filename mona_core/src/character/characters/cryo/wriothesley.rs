@@ -62,7 +62,7 @@ pub const WRIOTHESLEY_STATIC_DATA: CharacterStaticData = CharacterStaticData {
 };
 
 pub struct WriothesleyEffect {
-    pub stellar_glimmer_state: usize,
+    pub stellar_glimmer_state: StellarGlimmerState,
     pub stellar_conduct_application_count: usize,
     pub talent2_stack: f64,
     pub common_data: CharacterCommonData,
@@ -83,7 +83,7 @@ impl<A: Attribute> ChangeAttribute<A> for WriothesleyEffect {
         }
 
         // 特殊被动「冤苦终有显明之期」：星超导反应伤害+30%（辉映·星超导状态中生效）
-        if self.stellar_glimmer_state == 1 {
+        if self.stellar_glimmer_state.is_stellar_conduct() {
             attribute.set_value_to_t(
                 AttributeType::Invisible(InvisibleAttributeType::new_reaction(
                     AttributeVariableType::ReactionEnhance,
@@ -137,9 +137,9 @@ impl WriothesleyDamageEnum {
         }
     }
 
-    pub fn get_elevative_type(&self, stellar_glimmer_state: usize) -> Option<ElevativeReaction> {
+    pub fn get_elevative_type(&self, stellar_glimmer_state: StellarGlimmerState) -> Option<ElevativeReaction> {
         use WriothesleyDamageEnum::*;
-        if stellar_glimmer_state != 1 {
+        if !stellar_glimmer_state.is_stellar_conduct() {
             return None;
         }
         match *self {
@@ -196,7 +196,7 @@ impl CharacterTrait for Wriothesley {
     #[cfg(not(target_family = "wasm"))]
     const CONFIG_DATA: Option<&'static [ItemConfig]> = Some(&[
         ItemConfig::STELLAR_CONDUCT_APPLICATION_COUNT(0, ItemConfig::PRIORITY_CHARACTER),
-        ItemConfig::STELLAR_GLIMMER_STATE(1, ItemConfig::PRIORITY_CHARACTER),
+        ItemConfig::STELLAR_GLIMMER_STATE(StellarGlimmerState::StellarConduct, ItemConfig::PRIORITY_CHARACTER),
         ItemConfig {
             name: "talent2_stack",
             title: locale!(
@@ -234,7 +234,7 @@ impl CharacterTrait for Wriothesley {
         let (stellar_glimmer_state, stellar_conduct_application_count, talent2_stack) = match &context.character_common_data.config {
             CharacterConfig::Wriothesley { stellar_glimmer_state, stellar_conduct_application_count, talent2_stack } =>
                 (*stellar_glimmer_state, *stellar_conduct_application_count, *talent2_stack),
-            _ => (0, 0, 0.0),
+            _ => (StellarGlimmerState::None, 0, 0.0),
         };
         let _ = stellar_conduct_application_count;
 
@@ -391,7 +391,7 @@ impl CharacterTrait for Wriothesley {
         let (stellar_glimmer_state, stellar_conduct_application_count, talent2_stack) = match *config {
             CharacterConfig::Wriothesley { stellar_glimmer_state, stellar_conduct_application_count, talent2_stack } =>
                 (stellar_glimmer_state, stellar_conduct_application_count, talent2_stack),
-            _ => (0, 0, 0.0),
+            _ => (StellarGlimmerState::None, 0, 0.0),
         };
         Some(Box::new(WriothesleyEffect {
             stellar_glimmer_state,

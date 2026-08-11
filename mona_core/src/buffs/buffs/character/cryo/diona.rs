@@ -3,7 +3,7 @@ use crate::buffs::buffs::prelude::*;
 
 pub struct BuffDionaC6 {
     pub hp_above_50: bool,
-    pub stellar_glimmer_state: usize,
+    pub stellar_glimmer_state: StellarGlimmerState,
 }
 
 impl<A: Attribute> Buff<A> for BuffDionaC6 {
@@ -24,7 +24,7 @@ impl<A: Attribute> Buff<A> for BuffDionaC6 {
             );
         }
 
-        if self.stellar_glimmer_state == 1 {
+        if self.stellar_glimmer_state.is_stellar_conduct() {
             // 辉映·星超导：处在最烈特调领域内的角色造成的超导、星超导反应伤害提升40%
             attribute.set_value_to_t(
                 AttributeType::Invisible(InvisibleAttributeType::new_reaction(
@@ -71,7 +71,7 @@ impl BuffMeta for BuffDionaC6 {
 
     #[cfg(not(target_family = "wasm"))]
     const CONFIG: Option<&'static [ItemConfig]> = Some(&[
-        ItemConfig::STELLAR_GLIMMER_STATE(0, ItemConfig::PRIORITY_BUFF),
+        ItemConfig::STELLAR_GLIMMER_STATE(StellarGlimmerState::None, ItemConfig::PRIORITY_BUFF),
         ItemConfig {
             name: "hp_above_50",
             title: locale!(
@@ -85,7 +85,7 @@ impl BuffMeta for BuffDionaC6 {
     fn create<A: Attribute>(b: &BuffConfig) -> Box<dyn Buff<A>> {
         let (hp_above_50, stellar_glimmer_state) = match *b {
             BuffConfig::DionaC6 { hp_above_50, stellar_glimmer_state } => (hp_above_50, stellar_glimmer_state),
-            _ => (true, 1)
+            _ => (true, StellarGlimmerState::None)
         };
         Box::new(BuffDionaC6 {
             hp_above_50,

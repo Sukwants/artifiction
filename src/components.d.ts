@@ -123,6 +123,7 @@ declare module '@vue/runtime-core' {
     SelectPreset: typeof import('./components/select/SelectPreset.vue')['default']
     SelectReactionType: typeof import('./components/select/SelectReactionType.vue')['default']
     SelectSkillType: typeof import('./components/select/SelectSkillType.vue')['default']
+    SelectStellarGlimmerType: typeof import('./components/select/SelectStellarGlimmerType.vue')['default']
     SelectTag: typeof import('./components/select/SelectTag.vue')['default']
     SelectTargetFunction: typeof import('./components/select/SelectTargetFunction.vue')['default']
     SelectWeapon: typeof import('./components/select/SelectWeapon.vue')['default']

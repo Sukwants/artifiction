@@ -3,7 +3,7 @@ use serde::{Deserialize, Serialize};
 use crate::attribute::Attribute;
 use crate::buffs::Buff;
 use crate::buffs::buffs::get_buff;
-use crate::common::{Element, Moonsign};
+use crate::common::{Element, Moonsign, StellarGlimmerState};
 use crate::common::item_config_type::ConfigElements8Multi;
 
 #[derive(Serialize, Deserialize)]
@@ -34,24 +34,24 @@ pub enum BuffConfig {
     AetherPyroC2 { stack: usize },
     LuminePyroC1 { nightsouls_blessing: bool },
     LuminePyroC2 { stack: usize },
-    AetherCryoP3 { aether_cryo_atk: f64 },
+    AetherCryoP3 { aether_cryo_atk: f64, stellar_glimmer_state: StellarGlimmerState },
     AetherCryoC6 { frostglow_stacks: usize },
-    LumineCryoP3 { lumine_cryo_atk: f64 },
+    LumineCryoP3 { lumine_cryo_atk: f64, stellar_glimmer_state: StellarGlimmerState },
     LumineCryoC6 { frostglow_stacks: usize },
-    BeidouC6 { stellar_glimmer_state: usize },
+    BeidouC6 { stellar_glimmer_state: StellarGlimmerState },
     FischlP3 { overload: bool, charged: bool, has_c6: bool },
     BennettQ { base_atk: f64, c1: bool, skill3: usize },
     SucroseTalent2 { em: f64 },
     SucroseTalent3 { is_hexerei: bool },
     SucroseC6 { element: Element, is_hexerei: bool },
-    QiqiP1 { stellar_glimmer_state: usize },
-    QiqiP3 { stellar_glimmer_state: usize },
+    QiqiP1 { stellar_glimmer_state: StellarGlimmerState },
+    QiqiP3 { stellar_glimmer_state: StellarGlimmerState },
     QiqiC6 { qiqi_atk: f64 },
     MonaC1 { off_field: bool },
     MonaQ { c4: bool, skill3: usize, is_hexerei: bool },
     MonaTalent3 { hexerei_secret_rite: bool, stack: f64 },
     VentiC6 { elemental_absorption: Option<Element> },
-    DionaC6 { hp_above_50: bool, stellar_glimmer_state: usize },
+    DionaC6 { hp_above_50: bool, stellar_glimmer_state: StellarGlimmerState },
     AlbedoTalent3 { def: f64, is_hexerei: bool },
     AlbedoC4 { silver_isotoma: bool },
     RosariaTalent2 { crit: f64 },
@@ -143,7 +143,7 @@ pub enum BuffConfig {
     AlyoshaP3 {},
     AlyoshaC6 {},
     OdetteP1 { marvelous_splendor_other: f64 },
-    OdetteP3 { odette_atk: f64 },
+    OdetteP3 { odette_atk: f64, stellar_glimmer_state: StellarGlimmerState },
     OdetteC2 { marvelous_splendor_other: f64 },
     OdetteC4 { level_q: usize },
     OdetteC6 {},

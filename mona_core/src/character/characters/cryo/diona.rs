@@ -94,7 +94,7 @@ pub const DIONA_STATIC_DATA: CharacterStaticData = CharacterStaticData {
 };
 
 pub struct DionaEffect {
-    pub stellar_glimmer_state: usize,
+    pub stellar_glimmer_state: StellarGlimmerState,
     pub common_data: CharacterCommonData,
 }
 
@@ -121,7 +121,7 @@ impl<A: Attribute> ChangeAttribute<A> for DionaEffect {
             );
 
             // 辉映·星超导：处于辉映·星超导状态时，超导、星超导反应伤害提升40%
-            if self.stellar_glimmer_state == 1 {
+            if self.stellar_glimmer_state.is_stellar_conduct() {
                 attribute.set_value_to_t(
                     AttributeType::Invisible(InvisibleAttributeType::new_reaction(
                         AttributeVariableType::ReactionEnhance,
@@ -234,7 +234,7 @@ impl CharacterTrait for Diona {
 
     #[cfg(not(target_family = "wasm"))]
     const CONFIG_DATA: Option<&'static [ItemConfig]> = Some(&[
-        ItemConfig::STELLAR_GLIMMER_STATE(0, ItemConfig::PRIORITY_CHARACTER),
+        ItemConfig::STELLAR_GLIMMER_STATE(StellarGlimmerState::None, ItemConfig::PRIORITY_CHARACTER),
     ]);
 
     #[cfg(not(target_family = "wasm"))]
@@ -358,7 +358,7 @@ impl CharacterTrait for Diona {
     fn new_effect<A: Attribute>(common_data: &CharacterCommonData, config: &CharacterConfig) -> Option<Box<dyn ChangeAttribute<A>>> {
         let stellar_glimmer_state = match *config {
             CharacterConfig::Diona { stellar_glimmer_state } => stellar_glimmer_state,
-            _ => 0,
+            _ => StellarGlimmerState::None,
         };
         Some(Box::new(DionaEffect {
             stellar_glimmer_state,

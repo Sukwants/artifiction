@@ -118,6 +118,11 @@ export default {
         Nascent: "初辉",
         Ascendant: "满辉"
     },
+    stellar_glimmer_state: {
+        None: "无",
+        StellarConduct: "辉映·星超导",
+        StellarSwirl: "辉映·星扩散"
+    },
     stat: {
         cureEffect: "治疗加成",
         criticalDamage: "暴击伤害",
