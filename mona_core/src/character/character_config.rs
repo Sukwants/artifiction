@@ -94,5 +94,7 @@ pub enum CharacterConfig {
     // Skirk { death_crossing_stacks: usize, team_has_hydro_cryo: bool },
     Alyosha { stellar_glimmer_state: StellarGlimmerState },
     Odette { stellar_glimmer_state: StellarGlimmerState, stellar_conduct_application_count: usize, marvelous_splendor_self: f64, marvelous_splendor_other: f64 },
+    Vesna { stellar_glimmer_state: StellarGlimmerState, cryo_anemo_count: usize, other_count: usize },
+    Vodyanitsa { stellar_glimmer_state: StellarGlimmerState },
     NoConfig,
 }

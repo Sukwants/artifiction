@@ -12,6 +12,7 @@ pub use ifa::BuffIfa;
 pub use aether_anemo::BuffAetherAnemoC6;
 pub use lumine_anemo::BuffLumineAnemoC6;
 pub use jahoda::{BuffJahodaP2, BuffJahodaC6};
+pub use vesna::BuffVesnaP3;
 
 pub mod faruzan;
 pub mod jean;
@@ -30,3 +31,4 @@ pub use prune::{BuffPruneP2, BuffPruneC6};
 
 pub mod jahoda;
 pub mod prune;
+pub mod vesna;

@@ -148,6 +148,13 @@ pub enum BuffConfig {
     OdetteC2 { marvelous_splendor_other: f64 },
     OdetteC4 { level_q: usize },
     OdetteC6 {},
+    VesnaP3 { atk: f64 },
+    VodyanitsaE { level_e: usize },
+    VodyanitsaP1 {},
+    VodyanitsaP2 { hp: f64, stellar_glimmer_state: StellarGlimmerState },
+    VodyanitsaC1 { hp: f64 },
+    VodyanitsaC2 { stellar_glimmer_state: StellarGlimmerState },
+    VodyanitsaC6 {},
 
     FreedomSworn { refine: usize },
     SongOfBrokenPines { refine: usize },

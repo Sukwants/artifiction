@@ -8,6 +8,7 @@ pub use xingqiu::BuffXingqiuC2;
 pub use yelan::{BuffYelanC4, BuffYelanTalent2};
 pub use barbara::BuffBarbaraC2;
 pub use columbina::{BuffColumbinaQ, BuffColumbinaP3, BuffColumbinaC2, BuffColumbinaC6, BuffColumbinaC};
+pub use vodyanitsa::{BuffVodyanitsaE, BuffVodyanitsaP1, BuffVodyanitsaP2, BuffVodyanitsaC1, BuffVodyanitsaC2, BuffVodyanitsaC6};
 
 pub mod aino;
 pub mod candace;
@@ -19,3 +20,4 @@ pub mod xingqiu;
 pub mod yelan;
 pub mod barbara;
 pub mod columbina;
+pub mod vodyanitsa;

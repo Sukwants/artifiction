@@ -159,6 +159,8 @@ pub enum CharacterName {
     LumineCryo,
     Alyosha,
     Odette,
+    Vesna,
+    Vodyanitsa,
 }
 
 impl CharacterName {
