@@ -243,6 +243,8 @@ pub enum BuffName {
     AthameArtis,
     GoldenFrostboundOath,
     AngelosHeptades,
+    HymnOfTheMaelstrom,
+    BreezeborneRefrain,
     
 
     ResonancePyro2,

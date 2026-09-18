@@ -177,6 +177,8 @@ pub enum BuffConfig {
     AthameArtis { refine: usize, hexerei_secret_rite: bool },
     GoldenFrostboundOath { refine: usize, rate: f64 },
     AngelosHeptades { refine: usize, atk: f64, hexerei_secret_rite: bool, off_field_hexerei: bool },
+    HymnOfTheMaelstrom { refine: usize, hp: f64, stack: f64, reaction: bool },
+    BreezeborneRefrain { refine: usize, rate: f64 },
 
     ResonancePyro2 { global: bool },
     ResonanceCryo2 { rate: f64, global: bool },

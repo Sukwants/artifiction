@@ -1,5 +1,6 @@
 use serde::{Deserialize, Serialize};
 use crate::common::Moonsign;
+use crate::common::StellarGlimmerState;
 
 #[derive(Serialize, Deserialize)]
 pub enum WeaponConfig {
@@ -47,6 +48,9 @@ pub enum WeaponConfig {
     ExaiphanesBlade { resonated_elements: usize },
     HereticsMoltenBlade { rate: f64 },
     WhitelakeFrostfeather { stack: f64, full_rate: f64 },
+    BeyondTheChrysalis { rate1: f64, rate2: f64 },
+    NewBough { stack: f64, stellar_glimmer_state: StellarGlimmerState },
+    SilverLight { stack: f64 },
 
     // claymore
     WolfsGravestone { rate: f64 },
@@ -152,6 +156,8 @@ pub enum WeaponConfig {
     AngelosHeptades { hexerei_secret_rite: bool },
     ClashOfKings { rate: f64 },
     EchoesOfTheHeart { element_reaction: bool, stellar_reaction: bool },
+    HymnOfTheMaelstrom { stack: f64, reaction: bool },
+    WintersHeavyHeart { cryo_count: usize, electro_count: usize, stellar_glimmer_state: StellarGlimmerState },
 
     // Bow
     PolarStar { stack: usize },
@@ -190,6 +196,7 @@ pub enum WeaponConfig {
     GoldenFrostboundOath { rate1: f64, rate2: f64 },
     CovenantOfFrostAndSnow { rate: f64 },
     JadeVista { same_count: usize, diff_count: usize },
+    BreezeborneRefrain { rate: f64 },
 }
 
 impl Default for WeaponConfig {
