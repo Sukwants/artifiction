@@ -49,6 +49,7 @@ export class ConfigManager {
     private values: Map<string, any> = new Map(); // 配置项值
     private global_link_metas: Map<string, GlobalLinkMeta> = new Map(); // 配置项的全局链接信息
     private global_key_lists: Map<string, Set<string>> = new Map(); // 全局链接键对应的配置项地址集合
+    private config_metas: Map<string, ConfigMeta> = new Map(); // 对外查询配置结构时使用
 
     registerObject(character_id: number, module_name: string, object_name: string, config_metas: ConfigMeta[] | undefined): Record<string, ConfigAddress> {
         // 将对象注册到配置系统中，返回配置项地址的映射
@@ -65,6 +66,7 @@ export class ConfigManager {
             const addressKey = config_addresses[config.name].str();
 
             this.values.set(addressKey, config.default);
+            this.config_metas.set(addressKey, config);
 
             const globalLinkMeta = config.global_link;
             if (globalLinkMeta) {
@@ -86,6 +88,7 @@ export class ConfigManager {
         for (const config_name in config_addresses) {
             const addressKey = config_addresses[config_name].str();
             this.values.delete(addressKey);
+            this.config_metas.delete(addressKey);
 
             if (this.global_link_metas.has(addressKey)) {
                 this.global_key_lists.get(this.global_link_metas.get(addressKey)!.key)?.delete(addressKey);
@@ -233,6 +236,37 @@ export class ConfigManager {
         }
     }
 
+    listConfigs(character_id?: number): Array<{
+        id: string,
+        address: ConfigAddress,
+        meta: ConfigMeta,
+        localValue: any,
+        effectiveValue: any,
+        unlinked: boolean,
+    }> {
+        void this.version.value;
+
+        const result = [];
+        for (const [id, meta] of this.config_metas) {
+            const address = ConfigAddress.fromString(id);
+            if (character_id !== undefined && address.character_id !== character_id) continue;
+            result.push({
+                id,
+                address,
+                meta: structuredClone(meta),
+                localValue: this.getConfigValue(address, true),
+                effectiveValue: this.getConfigValue(address),
+                unlinked: this.getUnlinkedStatus(address),
+            });
+        }
+        return result;
+    }
+
+    getAddress(id: string): ConfigAddress | undefined {
+        if (!this.values.has(id)) return undefined;
+        return ConfigAddress.fromString(id);
+    }
+
     removeCharacter(character_id: number): void {
 
         ++this.version.value;
@@ -240,6 +274,7 @@ export class ConfigManager {
         for (const address of Array.from(this.values.keys())) {
             if (ConfigAddress.fromString(address).character_id == character_id) {
                 this.values.delete(address);
+                this.config_metas.delete(address);
                 if (this.global_link_metas.has(address)) {
                     this.global_key_lists.get(this.global_link_metas.get(address)!.key)?.delete(address);
                 }

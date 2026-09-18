@@ -44,8 +44,8 @@ export function useBuff(config: ConfigManager, character_id: number) {
         return temp
     })
 
-    function addBuff(name: string) {
-        const id = idGenerator.generateId()
+    function addBuff(name: string, requestedId?: number) {
+        const id = requestedId ?? idGenerator.generateId()
         buffs.value.push({
             name,
             config: {

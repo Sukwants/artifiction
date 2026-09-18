@@ -207,7 +207,11 @@ async function init_store() {
     }
 }
 
-init_store()
+const storeReady = init_store()
+
+export async function waitForAccountStoreReady() {
+    await storeReady
+}
 
 backend.on('cancelFileBackend', () => {
     accountStore.syncStatus.value = 'no sync'
