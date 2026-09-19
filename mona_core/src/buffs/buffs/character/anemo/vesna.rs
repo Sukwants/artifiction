@@ -10,7 +10,8 @@ impl<A: Attribute> Buff<A> for BuffVesnaP3 {
     fn change_attribute(&self, attribute: &mut A) {
         // 天赋3·星耀祝礼·散华序饰：基于薇斯纳的攻击力，提升当前角色造成的星扩散反应的基础伤害，
         // 每 100 点攻击力提升 0.7%，至多提升 14%。
-        attribute.set_value_by_t(
+        // 该效果默认不可叠加，使用 set_value_to_t 以避免重复累计。
+        attribute.set_value_to_t(
             AttributeType::Invisible(InvisibleAttributeType::new_reaction(
                 AttributeVariableType::ElevativeBase,
                 ReactionType::StellarSwirl,

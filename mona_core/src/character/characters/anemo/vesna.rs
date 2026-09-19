@@ -142,11 +142,12 @@ pub struct VesnaEffect {
 
 impl<A: Attribute> ChangeAttribute<A> for VesnaEffect {
     fn change_attribute(&self, attribute: &mut A) {
-        // 天赋2·理典·冬之凯风：依据队伍中角色的元素类型，薇斯纳获得对应效果。
+        // 天赋2·理典·冬之凯风：[辉映·星扩散] 依据队伍中角色的元素类型，薇斯纳获得对应效果。
         // ·每有一位冰元素或风元素角色：攻击力提升 6%；
         // ·每有一位不为上述元素类型的角色：元素精通提升 25 点。
         // 命座4「先代的荣膺」使上述提升效果变为原本的三倍。
-        if self.common_data.has_talent2 {
+        // 该天赋效果以「辉映·星扩散」为限定条件，需处于辉映·星扩散状态时才生效。
+        if self.common_data.has_talent2 && self.stellar_glimmer_state.is_stellar_swirl() {
             let multiplier = if self.common_data.constellation >= 4 {
                 VESNA_SKILL.c4_p2_multiplier
             } else {
@@ -352,15 +353,15 @@ impl CharacterTrait for Vesna {
         ItemConfig {
             name: "disciplinary_stacks",
             title: locale!(
-                zh_cn: "「整肃」层数（施放翔风剑/元素爆发后获得，至多6层，每层使灵剑伤害提升10%）",
-                en: "Disciplinary Action Stacks (gained after Windborne Sword/Burst, max 6, +10% Spirit Blade DMG per stack)"
+                zh_cn: "「整肃」层数（施放翔风剑/元素爆发后获得，至多6层，每层使灵剑伤害提升10%；命座2 满层时攻击力提升40%）",
+                en: "Disciplinary Action Stacks (gained after Windborne Sword/Burst, max 6, +10% Spirit Blade DMG per stack; C2 grants +40% ATK at max stacks)"
             ),
             config: ItemConfigType::Int { min: 0, max: 6, default: 1 }
         },
     ]);
 
     fn change_attribute<A: Attribute>(attribute: &mut A, common_data: &CharacterCommonData, skill_config: &CharacterSkillConfig) {
-        let (in_armed_for_action, _) = match *skill_config {
+        let (in_armed_for_action, disciplinary_stacks) = match *skill_config {
             CharacterSkillConfig::Vesna { in_armed_for_action, disciplinary_stacks } => (in_armed_for_action, disciplinary_stacks),
             _ => (false, 0),
         };
@@ -375,6 +376,15 @@ impl CharacterTrait for Vesna {
                 "薇斯纳命座1",
                 VESNA_SKILL.c1_stellar_bonus,
             );
+        }
+
+        // 命座2·迎春的轮舞：拥有最大层数的「整肃」时，薇斯纳的攻击力提升 40%
+        // （需要解锁突破天赋1「仪典·春之行列」；进入「巡风列装」时即获得最大层数）
+        if common_data.constellation >= 2
+            && common_data.has_talent1
+            && disciplinary_stacks >= VESNA_SKILL.p1_max_stacks as usize
+        {
+            attribute.add_atk_percentage("薇斯纳命座2", VESNA_SKILL.c2_atk_bonus);
         }
     }
 

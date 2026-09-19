@@ -91,6 +91,12 @@ pub enum CharacterSkillConfig {
     Alyosha { e_hold: bool, hunters_precision_stacks: usize },
     Odette { activated_coda: bool, has_dance_double: bool, snow_swans_dream_active: bool },
     Vesna { in_armed_for_action: bool, disciplinary_stacks: usize },
-    Vodyanitsa { in_song_of_ages_past: bool, c4_hp_stacks: usize, c4_low_hp: bool },
+    Vodyanitsa {
+        in_song_of_ages_past: bool,
+        #[serde(default = "default_true")] has_lead_vocal: bool,
+        #[serde(default = "default_true")] has_chorus: bool,
+        c4_hp_stacks: usize,
+        c4_low_hp: bool,
+    },
     NoConfig,
 }

@@ -234,6 +234,22 @@ impl CharacterTrait for Vodyanitsa {
             config: ItemConfigType::Bool { default: true }
         },
         ItemConfig {
+            name: "has_lead_vocal",
+            title: locale!(
+                zh_cn: "存在「领唱」（施放元素战技后30秒内，由当前场上角色触发）",
+                en: "Lead Vocal Active (within 30s after Elemental Skill, triggered by the on-field character)"
+            ),
+            config: ItemConfigType::Bool { default: true }
+        },
+        ItemConfig {
+            name: "has_chorus",
+            title: locale!(
+                zh_cn: "存在「重唱」（施放元素战技后30秒内，由后台角色或附近其他角色触发）",
+                en: "Chorus Active (within 30s after Elemental Skill, triggered by off-field or other nearby characters)"
+            ),
+            config: ItemConfigType::Bool { default: true }
+        },
+        ItemConfig {
             name: "c4_hp_stacks",
             title: locale!(
                 zh_cn: "命座4「柔波摇漾的低诉」生命值上限提升层数（受治疗角色生命值不低于40%时获得，至多3层）",
@@ -257,10 +273,10 @@ impl CharacterTrait for Vodyanitsa {
             _ => StellarGlimmerState::None,
         };
 
-        let (in_song_of_ages_past, c4_hp_stacks, c4_low_hp) = match *skill_config {
-            CharacterSkillConfig::Vodyanitsa { in_song_of_ages_past, c4_hp_stacks, c4_low_hp } =>
-                (in_song_of_ages_past, c4_hp_stacks, c4_low_hp),
-            _ => (false, 0, false),
+        let (in_song_of_ages_past, has_lead_vocal, has_chorus, c4_hp_stacks, c4_low_hp) = match *skill_config {
+            CharacterSkillConfig::Vodyanitsa { in_song_of_ages_past, has_lead_vocal, has_chorus, c4_hp_stacks, c4_low_hp } =>
+                (in_song_of_ages_past, has_lead_vocal, has_chorus, c4_hp_stacks, c4_low_hp),
+            _ => (false, false, false, 0, false),
         };
 
         let (_, s2, s3) = common_data.get_3_skill();
@@ -305,9 +321,10 @@ impl CharacterTrait for Vodyanitsa {
             );
         }
 
-        // 天赋2：十二弦的泪歌 — 施放元素战技时获得「领唱」与「重唱」，
-        // 使队伍中当前场上角色（领唱）与其他角色（重唱）造成水元素伤害或冰元素伤害时，
+        // 天赋2：十二弦的泪歌 — 施放元素战技时获得25层「领唱」与10层「重唱」（分别持续30秒）。
+        // 「领唱」使队伍中自己的当前场上角色造成水元素伤害或冰元素伤害时，
         // 基于沃雅妮莎生命值上限超过40000的部分提升造成的伤害（每1000点提升140点，至多3500点）；
+        // 「重唱」由队伍中后台角色或附近其他角色触发，效果与「领唱」一致；
         // 若当前场上存在「流荡风旋」或处于其引爆后的5秒内，则改为造成星扩散反应伤害时触发
         // （每1000点提升260点，至多6500点）。
         // 注：「领唱」/「重唱」的层数只限制可被提升的伤害次数上限（25层/10层，且每次施放元素战技刷新），
@@ -322,27 +339,38 @@ impl CharacterTrait for Vodyanitsa {
                 (excess * VODYANITSA_SKILL.p2_ss_per_1000).min(VODYANITSA_SKILL.p2_ss_max)
             });
 
-            if has_wandering_vortex {
-                // 基于特定数值提升星扩散反应伤害，对应 ReactionExtra
-                attribute.add_edge_s1to1(
-                    CharacterSelector::select_all(attribute),
-                    AttributeType::Panel(AttributeName::HP),
-                    AttributeType::Invisible(InvisibleAttributeType::new_reaction(AttributeVariableType::ReactionExtra, ReactionType::StellarSwirl)),
-                    ss_bonus,
-                    "沃雅妮莎天赋2",
-                    EdgePriority::Invisible,
-                );
-            } else {
-                // 基于特定数值提升水元素/冰元素伤害，对应 BaseDamage
-                for element in [Element::Hydro, Element::Cryo] {
+            // 「领唱」作用于当前场上角色，「重唱」作用于后台角色，两者由技能配置分别控制
+            let mut selectors: Vec<CharacterSelector> = Vec::new();
+            if has_lead_vocal {
+                selectors.push(CharacterSelector::select_onfield(attribute));
+            }
+            if has_chorus {
+                selectors.push(CharacterSelector::select_offfield(attribute));
+            }
+
+            for selector in selectors {
+                if has_wandering_vortex {
+                    // 基于特定数值提升星扩散反应伤害，对应 ReactionExtra
                     attribute.add_edge_s1to1(
-                        CharacterSelector::select_all(attribute),
+                        selector,
                         AttributeType::Panel(AttributeName::HP),
-                        AttributeType::Invisible(InvisibleAttributeType::new_element(AttributeVariableType::BaseDamage, element)),
-                        hp_bonus.clone(),
+                        AttributeType::Invisible(InvisibleAttributeType::new_reaction(AttributeVariableType::ReactionExtra, ReactionType::StellarSwirl)),
+                        ss_bonus.clone(),
                         "沃雅妮莎天赋2",
                         EdgePriority::Invisible,
                     );
+                } else {
+                    // 基于特定数值提升水元素/冰元素伤害，对应 BaseDamage
+                    for element in [Element::Hydro, Element::Cryo] {
+                        attribute.add_edge_s1to1(
+                            selector.clone(),
+                            AttributeType::Panel(AttributeName::HP),
+                            AttributeType::Invisible(InvisibleAttributeType::new_element(AttributeVariableType::BaseDamage, element)),
+                            hp_bonus.clone(),
+                            "沃雅妮莎天赋2",
+                            EdgePriority::Invisible,
+                        );
+                    }
                 }
             }
         }
@@ -433,10 +461,9 @@ impl CharacterTrait for Vodyanitsa {
         let s: VodyanitsaDamageEnum = num::FromPrimitive::from_usize(s).unwrap();
         let (s1, s2, s3) = context.character_common_data.get_3_skill();
 
-        let (in_song_of_ages_past, _c4_hp_stacks, _c4_low_hp) = match *config {
-            CharacterSkillConfig::Vodyanitsa { in_song_of_ages_past, c4_hp_stacks, c4_low_hp } =>
-                (in_song_of_ages_past, c4_hp_stacks, c4_low_hp),
-            _ => (false, 0, false),
+        let in_song_of_ages_past = match *config {
+            CharacterSkillConfig::Vodyanitsa { in_song_of_ages_past, .. } => in_song_of_ages_past,
+            _ => false,
         };
 
         use VodyanitsaDamageEnum::*;

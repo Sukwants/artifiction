@@ -85,6 +85,7 @@ impl TargetFunction for VodyanitsaDefaultTargetFunction {
                 ArtifactSetName::HeartOfTheFurnace,
             ]),
             very_critical_set_names: Some(vec![
+                ArtifactSetName::VourukashasGlow,
                 ArtifactSetName::GoldenTroupe,
             ]),
             normal_threshold: TargetFunctionOptConfig::DEFAULT_NORMAL_THRESHOLD,
@@ -99,9 +100,12 @@ impl TargetFunction for VodyanitsaDefaultTargetFunction {
 
     fn target(&self, attribute: &TargetFunctionAttributeType, character: &Character<TargetFunctionAttributeType>, _weapon: &Weapon<TargetFunctionAttributeType>, _artifacts: &[&Artifact], enemy: &Enemy) -> f64 {
         // 一轮输出期间「遥久之歌」持续生效（元素战技召唤「唤春角笛」并提供治疗），
+        // 施放元素战技后同时获得「领唱」与「重唱」（持续30秒），
         // 命座4 按受治疗角色生命值不低于40%的分支、至多3层生命值上限提升计
         let config = CharacterSkillConfig::Vodyanitsa {
             in_song_of_ages_past: true,
+            has_lead_vocal: true,
+            has_chorus: true,
             c4_hp_stacks: 3,
             c4_low_hp: false,
         };
