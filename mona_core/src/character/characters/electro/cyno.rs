@@ -161,8 +161,11 @@ impl CynoDamageEnum {
         }
     }
 
-    pub fn get_skill_type(&self) -> SkillType {
+    pub fn get_skill_type(&self, stellar_glimmer_state: StellarGlimmerState) -> SkillType {
         use CynoDamageEnum::*;
+        if self.get_elevative_type(stellar_glimmer_state).is_some() {
+            return SkillType::Elevative;
+        }
         match *self {
             A1 | A2 | A31 | A32 | A4 | Q1 | Q2 | Q3 | Q41 | Q42 | Q5 => SkillType::NormalAttack,
             Z | QZ => SkillType::ChargedAttack,
@@ -402,7 +405,7 @@ impl CharacterTrait for Cyno {
                 &context.enemy,
                 s.get_element(),
                 elevative_type,
-                SkillType::Elevative,
+                s.get_skill_type(stellar_glimmer_state),
                 context.character_common_data.level,
                 fumo,
             )
@@ -411,7 +414,7 @@ impl CharacterTrait for Cyno {
                 &context.attribute,
                 &context.enemy,
                 s.get_element(),
-                s.get_skill_type(),
+                s.get_skill_type(stellar_glimmer_state),
                 context.character_common_data.level,
                 fumo,
             )

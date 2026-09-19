@@ -212,12 +212,12 @@ impl SandroneDamageEnum {
         use SandroneDamageEnum::*;
         match *self {
             A1 | A2 | A3 => SkillType::NormalAttack,
-            ZS | ZB | ZO | C6B | C6B_TOTAL => SkillType::ChargedAttack,
+            ZS | ZO => SkillType::ChargedAttack,
             X1 => SkillType::PlungingAttackInAction,
             X2 | X3 => SkillType::PlungingAttackOnGround,
-            E1 | E2 => SkillType::ElementalSkill,
-            Q_BOMB | Q_BOMB_TOTAL | Q_RAY => SkillType::ElementalBurst,
-            C4 => SkillType::Elevative,
+            E1 => SkillType::ElementalSkill,
+            Q_BOMB | Q_BOMB_TOTAL => SkillType::ElementalBurst,
+            ZB | E2 | Q_RAY | C6B | C6B_TOTAL | C4 => SkillType::Elevative,
         }
     }
 
@@ -426,7 +426,7 @@ impl CharacterTrait for Sandrone {
                 &context.enemy,
                 s.get_element(),
                 ElevativeReaction::StellarConductCryo,
-                SkillType::Elevative,
+                s.get_skill_type(),
                 context.character_common_data.level,
                 fumo,
             )

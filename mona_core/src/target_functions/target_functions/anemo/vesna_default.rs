@@ -161,9 +161,8 @@ impl TargetFunction for VesnaDefaultTargetFunction {
         // 一轮输出：
         // 普通元素战技×1 + 翔风剑一阶×1 + (翔风剑二阶 + 二阶灵剑)×1
         // + (翔风剑三阶 + 三阶灵剑)×3（命座1 及以上为×4）+ 风翎×10 + 元素爆发×1
-        // 命座6 额外计入每次最高境界翔风剑后的「翔风剑·变移」：模式内点按元素战技用于施放翔风剑，
-        // 故变移按点按普通攻击触发（SkillType::NormalAttack）；变移在「巡风列装」模式下额外唤出的
-        // 风翎不额外计入风翎次数。
+        // 命座6 额外计入每次最高境界翔风剑后的「翔风剑·变移」。该伤害及其额外灵剑
+        // 均视为元素战技伤害；变移在「巡风列装」模式下额外唤出的风翎不额外计入风翎次数。
         let mut total = Vesna::damage::<SimpleDamageBuilder>(&context_e, Ty::E, &config_e, None).normal.expectation;
 
         total += in_mode_dmg(stacks_of(0), Ty::E_SWORD1);
@@ -173,7 +172,7 @@ impl TargetFunction for VesnaDefaultTargetFunction {
             let stacks = stacks_of(2 + i);
             total += in_mode_dmg(stacks, Ty::E_SPIRIT3_TOTAL) + in_mode_dmg(stacks, Ty::E_SPIRIT3_FINAL);
             if has_c6 {
-                total += in_mode_dmg(stacks, Ty::C6A) + in_mode_dmg(stacks, Ty::C6A_SPIRIT);
+                total += in_mode_dmg(stacks, Ty::C6) + in_mode_dmg(stacks, Ty::C6_SPIRIT);
             }
         }
         total += Vesna::damage::<SimpleDamageBuilder>(&context_q, Ty::Q_SPIRIT, &config_q, None).normal.expectation;

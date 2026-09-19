@@ -215,10 +215,8 @@ damage_enum!(
     E_SPIRIT3_FINAL // 翔风剑三阶灵剑最终段伤害
     E_PLUME     // 风翎伤害（「巡风列装」模式下普通攻击/重击/下落攻击唤出）
     Q_SPIRIT    // 元素爆发灵剑伤害（视为星扩散反应伤害的灵剑伤害）
-    C6A         // 命座6「翔风剑·变移」伤害（普通攻击触发）
-    C6A_SPIRIT  // 命座6「翔风剑·变移」灵剑伤害（普通攻击触发）
-    C6E         // 命座6「翔风剑·变移」伤害（元素战技触发）
-    C6E_SPIRIT  // 命座6「翔风剑·变移」灵剑伤害（元素战技触发）
+    C6          // 命座6「翔风剑·变移」伤害
+    C6_SPIRIT   // 命座6「翔风剑·变移」灵剑伤害
 );
 
 impl VesnaDamageEnum {
@@ -237,8 +235,11 @@ impl VesnaDamageEnum {
         }
     }
 
-    pub fn get_skill_type(&self) -> SkillType {
+    pub fn get_skill_type(&self, stellar_glimmer_state: StellarGlimmerState) -> SkillType {
         use VesnaDamageEnum::*;
+        if self.get_elevative_type(stellar_glimmer_state).is_some() {
+            return SkillType::Elevative;
+        }
         match *self {
             A1 | A2 | A31 | A32 | A4 | A5 | A6 => SkillType::NormalAttack,
             Z => SkillType::ChargedAttack,
@@ -249,9 +250,8 @@ impl VesnaDamageEnum {
             // （与七七「寒病鬼差协同攻击」、雷电将军「协同攻击伤害」的处理一致）
             E_PLUME => SkillType::ElementalSkill,
             Q_SPIRIT => SkillType::ElementalBurst,
-            // 命座6「翔风剑·变移」可由普通攻击或元素战技触发，分别判定
-            C6A | C6A_SPIRIT => SkillType::NormalAttack,
-            C6E | C6E_SPIRIT => SkillType::ElementalSkill,
+            // 「翔风剑·变移」为元素战技中技能名称的变体，额外灵剑也由其触发
+            C6 | C6_SPIRIT => SkillType::ElementalSkill,
         }
     }
 
@@ -259,7 +259,7 @@ impl VesnaDamageEnum {
     pub fn get_elevative_type(&self, stellar_glimmer_state: StellarGlimmerState) -> Option<ElevativeReaction> {
         use VesnaDamageEnum::*;
         match *self {
-            E_SPIRIT2 | E_SPIRIT3 | E_SPIRIT3_TOTAL | E_SPIRIT3_FINAL | Q_SPIRIT | C6A_SPIRIT | C6E_SPIRIT => {
+            E_SPIRIT2 | E_SPIRIT3 | E_SPIRIT3_TOTAL | E_SPIRIT3_FINAL | Q_SPIRIT | C6_SPIRIT => {
                 if stellar_glimmer_state.is_stellar_swirl() {
                     Some(ElevativeReaction::StellarSwirlAnemo)
                 } else {
@@ -297,8 +297,6 @@ impl CharacterTrait for Vesna {
             X1 plunging_dmg!(1)
             X2 plunging_dmg!(2)
             X3 plunging_dmg!(3)
-            C6A locale!(zh_cn: "命座6「翔风剑·变移」伤害", en: "C6 \"Windborne Sword: Transpose\" DMG")
-            C6A_SPIRIT locale!(zh_cn: "命座6「翔风剑·变移」灵剑伤害", en: "C6 \"Windborne Sword: Transpose\" Spirit Blade DMG")
         ),
         skill2: skill_map!(
             VesnaDamageEnum
@@ -310,8 +308,8 @@ impl CharacterTrait for Vesna {
             E_SPIRIT3_TOTAL locale!(zh_cn: "翔风剑三阶灵剑总伤害", en: "Windborne Sword Lv. 3 Spirit Blade Total DMG")
             E_SPIRIT3_FINAL locale!(zh_cn: "翔风剑三阶灵剑最终段伤害", en: "Windborne Sword Lv. 3 Spirit Blade Final Hit DMG")
             E_PLUME locale!(zh_cn: "风翎伤害", en: "Wind Pinion DMG")
-            C6E locale!(zh_cn: "命座6「翔风剑·变移」伤害", en: "C6 \"Windborne Sword: Transpose\" DMG")
-            C6E_SPIRIT locale!(zh_cn: "命座6「翔风剑·变移」灵剑伤害", en: "C6 \"Windborne Sword: Transpose\" Spirit Blade DMG")
+            C6 locale!(zh_cn: "命座6「翔风剑·变移」伤害", en: "C6 \"Windborne Sword: Transpose\" DMG")
+            C6_SPIRIT locale!(zh_cn: "命座6「翔风剑·变移」灵剑伤害", en: "C6 \"Windborne Sword: Transpose\" Spirit Blade DMG")
         ),
         skill3: skill_map!(
             VesnaDamageEnum
@@ -410,7 +408,7 @@ impl CharacterTrait for Vesna {
             return builder.none();
         }
         // 命座6「翔风剑·变移」：需要解锁命座6
-        if matches!(s, C6A | C6A_SPIRIT | C6E | C6E_SPIRIT) && context.character_common_data.constellation < 6 {
+        if matches!(s, C6 | C6_SPIRIT) && context.character_common_data.constellation < 6 {
             return builder.none();
         }
 
@@ -441,8 +439,8 @@ impl CharacterTrait for Vesna {
             E_SPIRIT3_FINAL => VESNA_SKILL.e_spirit3_final[s2] * spirit_multiplier,
             E_PLUME => VESNA_SKILL.e_plume[s2],
             Q_SPIRIT => VESNA_SKILL.q_spirit[s3] * spirit_multiplier,
-            C6A | C6E => VESNA_SKILL.c6_transpose_atk,
-            C6A_SPIRIT | C6E_SPIRIT => VESNA_SKILL.c6_spirit_atk * spirit_multiplier,
+            C6 => VESNA_SKILL.c6_transpose_atk,
+            C6_SPIRIT => VESNA_SKILL.c6_spirit_atk * spirit_multiplier,
         };
 
         builder.add_atk_ratio("技能倍率", ratio);
@@ -453,7 +451,7 @@ impl CharacterTrait for Vesna {
                 &context.enemy,
                 s.get_element(in_armed_for_action),
                 elevative_type,
-                SkillType::Elevative,
+                s.get_skill_type(stellar_glimmer_state),
                 context.character_common_data.level,
                 fumo,
             )
@@ -462,7 +460,7 @@ impl CharacterTrait for Vesna {
                 &context.attribute,
                 &context.enemy,
                 s.get_element(in_armed_for_action),
-                s.get_skill_type(),
+                s.get_skill_type(stellar_glimmer_state),
                 context.character_common_data.level,
                 fumo,
             )

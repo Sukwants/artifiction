@@ -207,8 +207,11 @@ impl YaeMikoDamageEnum {
         }
     }
 
-    pub fn get_skill_type(&self) -> SkillType {
+    pub fn get_skill_type(&self, stellar_glimmer_state: StellarGlimmerState) -> SkillType {
         use YaeMikoDamageEnum::*;
+        if self.get_elevative_type(stellar_glimmer_state).is_some() {
+            return SkillType::Elevative;
+        }
         match *self {
             A1 | A2 | A3 => SkillType::NormalAttack,
             Z => SkillType::ChargedAttack,
@@ -402,7 +405,7 @@ impl CharacterTrait for YaeMiko {
                 &context.enemy,
                 s.get_element(),
                 elevative_type,
-                SkillType::Elevative,
+                s.get_skill_type(stellar_glimmer_state),
                 context.character_common_data.level,
                 fumo,
             )
@@ -411,7 +414,7 @@ impl CharacterTrait for YaeMiko {
                 &context.attribute,
                 &context.enemy,
                 s.get_element(),
-                s.get_skill_type(),
+                s.get_skill_type(stellar_glimmer_state),
                 context.character_common_data.level,
                 fumo,
             )

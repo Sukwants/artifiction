@@ -174,8 +174,11 @@ impl YumemizukiMizukiDamageEnum {
         }
     }
 
-    pub fn get_skill_type(&self) -> SkillType {
+    pub fn get_skill_type(&self, stellar_glimmer_state: StellarGlimmerState) -> SkillType {
         use YumemizukiMizukiDamageEnum::*;
+        if self.get_elevative_type(stellar_glimmer_state).is_some() {
+            return SkillType::Elevative;
+        }
         match *self {
             A1 | A2 | A3 => SkillType::NormalAttack,
             Z => SkillType::ChargedAttack,
@@ -481,7 +484,7 @@ impl CharacterTrait for YumemizukiMizuki {
                     &context.enemy,
                     Element::Anemo,
                     elevative_type,
-                    SkillType::Elevative,
+                    s.get_skill_type(stellar_glimmer_state),
                     context.character_common_data.level,
                     fumo,
                 )
@@ -507,7 +510,7 @@ impl CharacterTrait for YumemizukiMizuki {
                 &context.enemy,
                 Element::Anemo,
                 ElevativeReaction::StellarSwirlAnemo,
-                SkillType::Elevative,
+                s.get_skill_type(stellar_glimmer_state),
                 context.character_common_data.level,
                 fumo,
             )
@@ -551,7 +554,7 @@ impl CharacterTrait for YumemizukiMizuki {
                 &context.attribute,
                 &context.enemy,
                 s.get_element(),
-                s.get_skill_type(),
+                s.get_skill_type(stellar_glimmer_state),
                 context.character_common_data.level,
                 fumo,
             )

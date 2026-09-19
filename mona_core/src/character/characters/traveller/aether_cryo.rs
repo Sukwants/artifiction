@@ -231,8 +231,11 @@ impl AetherCryoDamageEnum {
         }
     }
 
-    pub fn get_skill_type(&self) -> SkillType {
+    pub fn get_skill_type(&self, stellar_glimmer_state: StellarGlimmerState) -> SkillType {
         use AetherCryoDamageEnum::*;
+        if self.get_elevative_type(stellar_glimmer_state).is_some() {
+            return SkillType::Elevative;
+        }
         match *self {
             A1 | A2 | A3 | A4 | A5 => SkillType::NormalAttack,
             Z1 | Z2 | P4A | P4B | P4T => SkillType::ChargedAttack,
@@ -434,7 +437,7 @@ impl CharacterTrait for AetherCryo {
             && stellar_glimmer_state.is_stellar_conduct()
             && frostpierce_star_on_field;
         if p1_active && !matches!(s, P4A | P4B | P4T)
-            && matches!(s.get_skill_type(), SkillType::NormalAttack | SkillType::ChargedAttack | SkillType::PlungingAttackInAction | SkillType::PlungingAttackOnGround)
+            && matches!(s.get_skill_type(stellar_glimmer_state), SkillType::NormalAttack | SkillType::ChargedAttack | SkillType::PlungingAttackInAction | SkillType::PlungingAttackOnGround)
         {
             builder.add_extra_bonus("旅行者天赋1", AETHERCRYO_SKILL.p1_bonus);
         }
@@ -493,7 +496,7 @@ impl CharacterTrait for AetherCryo {
                 &context.enemy,
                 s.get_element(p1_active),
                 elevative_type,
-                SkillType::Elevative,
+                s.get_skill_type(stellar_glimmer_state),
                 context.character_common_data.level,
                 fumo,
             )
@@ -502,7 +505,7 @@ impl CharacterTrait for AetherCryo {
                 &context.attribute,
                 &context.enemy,
                 s.get_element(p1_active),
-                s.get_skill_type(),
+                s.get_skill_type(stellar_glimmer_state),
                 context.character_common_data.level,
                 fumo,
             )

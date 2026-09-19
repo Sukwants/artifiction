@@ -720,7 +720,7 @@ impl CharacterTrait for Odette {
                 &context.enemy,
                 s.get_element(),
                 elevative_type,
-                SkillType::Elevative,
+                s.get_skill_type(),
                 context.character_common_data.level,
                 fumo,
             )
