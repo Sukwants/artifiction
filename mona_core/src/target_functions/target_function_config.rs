@@ -80,5 +80,7 @@ pub enum TargetFunctionConfig {
     AetherCryoDefault {},
     LumineCryoDefault {},
     AlyoshaDefault { recharge_demand: f64 },
+    VesnaDefault {},
+    VodyanitsaDefault { hp_demand: f64 },
     NoConfig,
 }

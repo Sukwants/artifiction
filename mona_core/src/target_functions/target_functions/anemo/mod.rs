@@ -15,6 +15,7 @@ pub mod yumemizuki_mizuki_default;
 pub mod ifa_default;
 pub mod varka_default;
 pub mod prune_default;
+pub mod vesna_default;
 
 pub use jean_default::JeanDefaultTargetFunction;
 pub use kaedehara_kazuha_damage::KaedeharaKazuhaDamageTargetFunction;
@@ -33,3 +34,4 @@ pub use yumemizuki_mizuki_default::YumemizukiMizukiDefaultTargetFunction;
 pub use ifa_default::IfaDefaultTargetFunction;
 pub use varka_default::VarkaDefaultTargetFunction;
 pub use prune_default::PruneDefaultTargetFunction;
+pub use vesna_default::VesnaDefaultTargetFunction;

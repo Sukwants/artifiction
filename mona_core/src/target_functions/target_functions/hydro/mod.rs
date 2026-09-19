@@ -13,6 +13,7 @@ pub mod mualani_default;
 pub mod dahlia_default;
 pub mod aino_default;
 pub mod columbina_default;
+pub mod vodyanitsa_default;
 
 pub use barbara_default::BarbaraDefaultTargetFunction;
 pub use mona_default::MonaDefaultTargetFunction;
@@ -29,3 +30,4 @@ pub use mualani_default::MualaniDefaultTargetFunction;
 pub use dahlia_default::DahliaDefaultTargetFunction;
 pub use aino_default::AinoDefaultTargetFunction;
 pub use columbina_default::{ColumbinaOffFieldTargetFunction, ColumbinaOnFieldTargetFunction};
+pub use vodyanitsa_default::VodyanitsaDefaultTargetFunction;

@@ -137,4 +137,6 @@ pub enum TargetFunctionName {
     AetherCryoDefault,
     LumineCryoDefault,
     AlyoshaDefault,
+    VesnaDefault,
+    VodyanitsaDefault,
 }
