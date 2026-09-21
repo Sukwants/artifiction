@@ -1,0 +1,167 @@
+{
+    "flower": [
+      {
+        "setName": "NightOfTheSkysUnveiling",
+        "position": "flower",
+        "mainTag": {
+          "name": "lifeStatic",
+          "value": 4780
+        },
+        "normalTags": [
+          {
+            "name": "criticalDamage",
+            "value": 0.21
+          },
+          {
+            "name": "lifePercentage",
+            "value": 0.105
+          },
+          {
+            "name": "attackStatic",
+            "value": 35
+          },
+          {
+            "name": "defendPercentage",
+            "value": 0.131
+          }
+        ],
+        "star": 5,
+        "level": 20,
+        "omit": false,
+        "id": 2866626217905639,
+        "contentHash": "981e5bbb0a27a115d364a5ab8d6a39ea7f47449b"
+      }
+    ],
+    "feather": [
+      {
+        "setName": "NightOfTheSkysUnveiling",
+        "position": "feather",
+        "mainTag": {
+          "name": "attackStatic",
+          "value": 311
+        },
+        "normalTags": [
+          {
+            "name": "attackPercentage",
+            "value": 0.158
+          },
+          {
+            "name": "recharge",
+            "value": 0.11699999999999999
+          },
+          {
+            "name": "elementalMastery",
+            "value": 42
+          },
+          {
+            "name": "critical",
+            "value": 0.07
+          }
+        ],
+        "star": 5,
+        "level": 20,
+        "omit": false,
+        "id": 7545106755560863,
+        "contentHash": "cb77fbfc0809a218dae056e2c039a1b50473d871"
+      }
+    ],
+    "sand": [
+      {
+        "setName": "NightOfTheSkysUnveiling",
+        "position": "sand",
+        "mainTag": {
+          "name": "elementalMastery",
+          "value": 187
+        },
+        "normalTags": [
+          {
+            "name": "defendPercentage",
+            "value": 0.19699999999999998
+          },
+          {
+            "name": "criticalDamage",
+            "value": 0.14
+          },
+          {
+            "name": "recharge",
+            "value": 0.11699999999999999
+          },
+          {
+            "name": "critical",
+            "value": 0.07
+          }
+        ],
+        "star": 5,
+        "level": 20,
+        "omit": false,
+        "id": 6286273149225096,
+        "contentHash": "d777b5ad5700d6930bf8f09547fd62e118fdd56f"
+      }
+    ],
+    "cup": [
+      {
+        "setName": "NightOfTheSkysUnveiling",
+        "position": "cup",
+        "mainTag": {
+          "name": "attackPercentage",
+          "value": 0.466
+        },
+        "normalTags": [
+          {
+            "name": "lifeStatic",
+            "value": 807
+          },
+          {
+            "name": "elementalMastery",
+            "value": 42
+          },
+          {
+            "name": "critical",
+            "value": 0.07
+          },
+          {
+            "name": "criticalDamage",
+            "value": 0.14
+          }
+        ],
+        "star": 5,
+        "level": 20,
+        "omit": false,
+        "id": 2909748300482817,
+        "contentHash": "a2e4a12bf12562b94ac139ac2cbfc56eb5429807"
+      }
+    ],
+    "head": [
+      {
+        "setName": "NightOfTheSkysUnveiling",
+        "position": "head",
+        "mainTag": {
+          "name": "criticalDamage",
+          "value": 0.622
+        },
+        "normalTags": [
+          {
+            "name": "recharge",
+            "value": 0.175
+          },
+          {
+            "name": "critical",
+            "value": 0.07
+          },
+          {
+            "name": "lifePercentage",
+            "value": 0.105
+          },
+          {
+            "name": "defendStatic",
+            "value": 42
+          }
+        ],
+        "star": 5,
+        "level": 20,
+        "omit": false,
+        "id": 6604522454079661,
+        "contentHash": "1f24c2472a583806f46ecf733b25942249af783c"
+      }
+    ]
+}

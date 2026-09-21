@@ -1,0 +1,290 @@
+[
+    {
+      "name": "菲林斯-血染荒城",
+      "item": {
+        "buffs": {
+          "0": {
+            "name": "Ineffa",
+            "config": {
+              "Ineffa": {
+                "atk": 2324,
+                "has_p2": true,
+                "has_c1": false
+              }
+            },
+            "lock": false
+          },
+          "1": {
+            "name": "FracturedHalo",
+            "config": {
+              "FracturedHalo": {
+                "refine": 1
+              }
+            },
+            "lock": false
+          },
+          "2": {
+            "name": "SucroseTalent1",
+            "config": {
+              "SucroseTalent1": {}
+            },
+            "lock": false
+          },
+          "3": {
+            "name": "SucroseTalent2",
+            "config": {
+              "SucroseTalent2": {
+                "em": 698
+              }
+            },
+            "lock": false
+          },
+          "4": {
+            "name": "ViridescentVenerer4",
+            "config": {
+              "ViridescentVenerer4": {
+                "element": "Electro"
+              }
+            },
+            "lock": false
+          },
+          "5": {
+            "name": "ViridescentVenerer4",
+            "config": {
+              "ViridescentVenerer4": {
+                "element": "Hydro"
+              }
+            },
+            "lock": true
+          },
+          "6": {
+            "name": "MoonsignHydro",
+            "config": {
+              "MoonsignHydro": {
+                "hp": 16882,
+                "global": false
+              }
+            },
+            "lock": false
+          },
+          "7": {
+            "name": "MoonsignAnemo",
+            "config": {
+              "MoonsignAnemo": {
+                "em": 698,
+                "global": false
+              }
+            },
+            "lock": false
+          }
+        },
+        "character": {
+          "name": "Flins",
+          "level": 90,
+          "ascend": false,
+          "constellation": 0,
+          "skill1": 7,
+          "skill2": 7,
+          "skill3": 7,
+          "params": {
+            "Flins": {
+              "moonsign": "Ascendant"
+            }
+          },
+          "tags": [
+            "Moonsign"
+          ]
+        },
+        "weapon": {
+          "name": "BloodsoakedRuins",
+          "level": 90,
+          "ascend": false,
+          "refine": 1,
+          "params": {
+            "BloodsoakedRuins": {
+              "rate": 1,
+              "requiem_of_ruin": true
+            }
+          }
+        },
+        "targetFunction": {
+          "name": "FlinsDefault",
+          "params": {
+            "FlinsDefault": {
+              "lunar_charged_coefficient": 1,
+              "if_thunderclouds": true
+            }
+          },
+          "use_dsl": false,
+          "dsl_source": ""
+        },
+        "constraint": {
+          "setNames": [],
+          "minRecharge": 1,
+          "minCritical": 0,
+          "minCriticalDamage": 0,
+          "minElementalMastery": 0
+        },
+        "filter": {
+          "sandMainStats": [],
+          "gobletMainStats": [],
+          "headMainStats": []
+        },
+        "artifactConfig": {
+          "config_archaic_petra": {
+            "element": "Electro",
+            "rate": 0
+          },
+          "config_berserker": {
+            "rate": 0
+          },
+          "config_blizzard_strayer": {
+            "critical_bonus": 0
+          },
+          "config_bloodstained_chivalry": {
+            "rate": 0
+          },
+          "config_brave_heart": {
+            "rate": 0
+          },
+          "config_crimson_witch_of_flames": {
+            "level": 0
+          },
+          "config_deepwood_memories": {
+            "rate": 0
+          },
+          "config_echoes_of_an_offering": {
+            "rate": 0.5053283764473575
+          },
+          "config_flower_of_paradise_lost": {
+            "stack": 4
+          },
+          "config_desert_pavilion_chronicle": {
+            "rate": 1
+          },
+          "config_gilded_dreams": {
+            "same_count": 0,
+            "diff_count": 0,
+            "rate": 0
+          },
+          "config_golden_troupe": {
+            "rate": 0
+          },
+          "config_heart_of_depth": {
+            "rate": 0
+          },
+          "config_husk_of_opulent_dreams": {
+            "level": 0
+          },
+          "config_instructor": {
+            "rate": 0
+          },
+          "config_lavawalker": {
+            "rate": 0
+          },
+          "config_marechaussee_hunter": {
+            "stack": 0
+          },
+          "config_martial_artist": {
+            "rate": 0
+          },
+          "config_noblesse_oblige": {
+            "rate": 0
+          },
+          "config_nymphs_dream": {
+            "w1": 0,
+            "w2": 0,
+            "w3": 1,
+            "rate": 1
+          },
+          "config_pale_flame": {
+            "avg_level": 0,
+            "full_rate": 0
+          },
+          "config_retracing_bolide": {
+            "rate": 0
+          },
+          "config_shimenawas_reminiscence": {
+            "rate": 0
+          },
+          "config_tenacity_of_the_millelith": {
+            "rate": 0
+          },
+          "config_thundersoother": {
+            "rate": 0
+          },
+          "config_vermillion_hereafter": {
+            "rate_q": 0,
+            "stack": 0
+          },
+          "config_viridescent_venerer": {
+            "element": []
+          },
+          "config_vourukashas_glow": {
+            "stack": 4
+          },
+          "config_song_of_days_past": {
+            "regeneration": 0,
+            "rate": 0
+          },
+          "config_nighttime_whispers_in_the_echoing_woods": {
+            "rate1": 0,
+            "rate2": 0
+          },
+          "config_fragment_of_harmonic_whimsy": {
+            "level": 0
+          },
+          "config_unfinished_reverie": {
+            "rate": 0
+          },
+          "config_scroll_of_the_hero_of_cinder_city": {
+            "elements": [],
+            "rate1": 0,
+            "rate2": 0
+          },
+          "config_obsidian_codex": {
+            "set2_rate": 0,
+            "set4_rate": 0
+          },
+          "config_long_nights_oath": {
+            "level": 0
+          },
+          "config_finale_of_the_deep_galleries": {
+            "rate1": 0,
+            "rate2": 0
+          },
+          "config_night_of_the_skys_unveiling": {
+            "moonsign": "None",
+            "gleaming_moon_effect_count": 1
+          },
+          "config_silken_moons_serenade": {
+            "moonsign": "None",
+            "gleaming_moon_effect_count": 1
+          },
+          "config_aubade_of_morningstar_and_moon": {
+            "moonsign": "None",
+            "set4_rate": 0
+          },
+          "config_a_day_carved_from_rising_winds": {
+            "set4_rate": 1
+          },
+          "config_celestial_gift": {
+            "hexerei_secret_rite": false
+          },
+          "config_scarlet_proof": {
+            "set4_rate": 1
+          },
+          "config_heart_of_the_furnace": {
+            "set4_rate": 1
+          }
+        },
+        "globalConfigUnlinked": {},
+        "algorithm": "AStar",
+        "artifactEffectMode": "custom",
+        "useDSL": false,
+        "dslSource": "",
+        "name": "菲林斯-血染荒城"
+      },
+      "version": 4
+    }
+]
