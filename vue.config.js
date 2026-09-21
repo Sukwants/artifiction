@@ -108,7 +108,7 @@ module.exports = {
                         prefix: "Icon"
                     })
                 ],
-                dts: path.resolve(__dirname, "src", 'auto-imports.d.ts'),
+                dts: process.env.NODE_ENV === "production" ? false : path.resolve(__dirname, "src", 'auto-imports.d.ts'),
             }),
             Components({
                 resolvers: [
@@ -118,7 +118,7 @@ module.exports = {
                     })
                 ],
 
-                dts: path.resolve(__dirname, "src", 'components.d.ts'),
+                dts: process.env.NODE_ENV === "production" ? false : path.resolve(__dirname, "src", 'components.d.ts'),
             }),
             Icons({
                 autoInstall: true

@@ -77,7 +77,7 @@ function validateArtifact(input: any): asserts input is IArtifactContentOnly {
 
 const artifactPositions = ["flower", "feather", "sand", "cup", "head"] as const
 
-function validateArtifactImport(data: any): asserts data is Record<typeof artifactPositions[number], unknown[]> {
+function validateArtifactImport(data: any): asserts data is Record<typeof artifactPositions[number], IArtifactContentOnly[]> {
     if (!data || typeof data !== "object" || Array.isArray(data)
         || !artifactPositions.every(position => Array.isArray(data[position]))) {
         throw new MonaApiError("INVALID_IMPORT", "Artifact import data must contain an array for every artifact position", data)
