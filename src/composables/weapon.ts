@@ -1,4 +1,4 @@
-const DEFAULT_WEAPON = "ATeaspoonOfTranscendence";
+const DEFAULT_WEAPON = "BeyondTheChrysalis";
 
 import type {WeaponName, WeaponType} from "@/types/weapon"
 // @ts-ignore
