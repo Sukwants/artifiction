@@ -75,6 +75,15 @@ function validateArtifact(input: any): asserts input is IArtifactContentOnly {
     }
 }
 
+const artifactPositions = ["flower", "feather", "sand", "cup", "head"] as const
+
+function validateArtifactImport(data: any): asserts data is Record<typeof artifactPositions[number], unknown[]> {
+    if (!data || typeof data !== "object" || Array.isArray(data)
+        || !artifactPositions.every(position => Array.isArray(data[position]))) {
+        throw new MonaApiError("INVALID_IMPORT", "Artifact import data must contain an array for every artifact position", data)
+    }
+}
+
 function toArtifactContent(input: any): IArtifactContentOnly {
     return deepCopy({
         setName: input.setName,
@@ -134,7 +143,8 @@ export const artifactsApi = {
     },
     async import(document: any, options: {mode?: "append" | "replace", duplicate?: "skip" | "allow" | "overwrite" | "error", dryRun?: boolean, confirm?: boolean} = {}) {
         const data = document?.schema === "mona.artifacts" ? document.data : document
-        const items = ["flower", "feather", "sand", "cup", "head"].flatMap(position => data?.[position] ?? [])
+        validateArtifactImport(data)
+        const items = artifactPositions.flatMap(position => data[position])
         for (const item of items) validateArtifact(item)
         if (options.mode === "replace" && options.confirm !== true) {
             throw new MonaApiError("CONFIRMATION_REQUIRED", "Replacing artifacts requires confirm: true")

@@ -163,7 +163,7 @@ export const calculatorApi = {
                     character: item.character,
                     weapon: item.weapon,
                     target_function: item.targetFunction,
-                    buffs: item.buffs,
+                    buffs: Object.values(item.buffs ?? {}),
                     enemy: null,
                     artifact_config: item.artifactEffectMode === "custom" ? item.artifactConfig : null,
                 }

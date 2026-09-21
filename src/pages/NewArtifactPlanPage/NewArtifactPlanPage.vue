@@ -1061,7 +1061,9 @@ function getPresetItem() {
 }
 
 function usePreset(name: string) {
-    const entry: PresetEntry | undefined = upgradePresetToNewVersion(presetStore.presets.value[name])
+    const preset = presetStore.presets.value[name]
+    if (!preset) return
+    const entry: PresetEntry | undefined = upgradePresetToNewVersion(preset)
     if (!entry || !entry.item) {
         return
     }
@@ -1883,6 +1885,9 @@ const characterController = {
     getElevativeDamage() { return deepCopy(characterElevativeDamage.value) },
     getPanel() { return deepCopy(attributeFromWasm.value) },
     async applyPreset(name: string) {
+        if (!presetStore.presets.value[name]) {
+            throw new MonaApiError("NOT_FOUND", `Preset ${name} does not exist`)
+        }
         usePreset(name)
         await nextTick()
         return getControllerState()
