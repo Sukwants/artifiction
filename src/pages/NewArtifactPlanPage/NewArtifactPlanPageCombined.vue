@@ -188,7 +188,7 @@ const pageController = {
             const item = source[index]
             let id = item.id
             if (!characterIds.value.includes(id)) {
-                if (index < characterIds.value.length) id = characterIds.value[index]
+                if (mode === "replace" && index < characterIds.value.length) id = characterIds.value[index]
                 else id = (await addCharacter()).id
             }
             idMap.set(item.id, id)
