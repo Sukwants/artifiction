@@ -1,0 +1,87 @@
+name: Project tests
+
+on:
+  pull_request:
+
+permissions:
+  contents: read
+
+jobs:
+  project-tests:
+    name: Run project test suites
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Check out repository
+        uses: actions/checkout@v4
+        with:
+          submodules: recursive
+
+      - name: Set up Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          cache: npm
+
+      - name: Install dependencies
+        run: npm ci
+
+      - name: Set up Rust toolchain
+        uses: dtolnay/rust-toolchain@stable
+        with:
+          targets: wasm32-unknown-unknown
+
+      - name: Install wasm-pack
+        run: cargo install wasm-pack --locked
+
+      - name: Build WASM
+        run: npm run build:wasm
+
+      - name: Generate project metadata
+        run: npm run gen_meta
+
+      - name: Type-check test framework
+        run: npm run test:project:typecheck
+
+      - name: Run tests directory unit tests
+        run: npm run test:project:unit
+
+      - name: Start project server
+        shell: bash
+        run: |
+          npm run serve -- --no-open --host 127.0.0.1 --port 8080 > "$RUNNER_TEMP/mona-server.log" 2>&1 &
+          echo $! > "$RUNNER_TEMP/mona-server.pid"
+
+          for attempt in {1..120}; do
+            if curl --fail --silent http://127.0.0.1:8080/ > /dev/null; then
+              exit 0
+            fi
+            sleep 2
+          done
+
+          cat "$RUNNER_TEMP/mona-server.log"
+          exit 1
+
+      - name: Run all project test suites
+        env:
+          MONA_E2E_BASE_URL: http://127.0.0.1:8080
+          MONA_E2E_NO_SANDBOX: "true"
+        run: npm run test:project
+
+      - name: Stop project server
+        if: always()
+        shell: bash
+        run: |
+          if [ -f "$RUNNER_TEMP/mona-server.pid" ]; then
+            kill "$(cat "$RUNNER_TEMP/mona-server.pid")" 2>/dev/null || true
+          fi
+
+      - name: Upload project test artifacts
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: project-test-results
+          path: |
+            test-results/project
+            ${{ runner.temp }}/mona-server.log
+          if-no-files-found: ignore
