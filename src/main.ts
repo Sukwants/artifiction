@@ -11,6 +11,7 @@ import {initI18n} from "@/i18n/i18n"
 
 import 'katex/dist/katex.min.css';
 import 'prismjs/themes/prism.css'
+import {installMonaApi} from "@/api/mona"
 
 declare global {
     interface Window {
@@ -19,6 +20,8 @@ declare global {
 }
 
 async function mount() {
+    installMonaApi()
+
     const monaApp = createApp({
         render: () => {
             return h(App)

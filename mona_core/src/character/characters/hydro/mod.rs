@@ -14,6 +14,7 @@ pub mod mualani;
 pub mod dahlia;
 pub mod aino;
 pub mod columbina;
+pub mod vodyanitsa;
 
 pub use barbara::Barbara;
 pub use mona::Mona;
@@ -31,3 +32,4 @@ pub use mualani::Mualani;
 pub use dahlia::Dahlia;
 pub use aino::Aino;
 pub use columbina::Columbina;
+pub use vodyanitsa::Vodyanitsa;

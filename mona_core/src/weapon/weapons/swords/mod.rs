@@ -54,6 +54,9 @@ pub use emberwell::Emberwell;
 pub use exaiphanes_blade::ExaiphanesBlade;
 pub use heretics_molten_blade::HereticsMoltenBlade;
 pub use whitelake_frostfeather::WhitelakeFrostfeather;
+pub use beyond_the_chrysalis::BeyondTheChrysalis;
+pub use new_bough::NewBough;
+pub use silver_light::SilverLight;
 
 pub mod mistsplitter_reforged;
 pub mod aquila_favonia;
@@ -111,3 +114,6 @@ pub mod emberwell;
 pub mod exaiphanes_blade;
 pub mod heretics_molten_blade;
 pub mod whitelake_frostfeather;
+pub mod beyond_the_chrysalis;
+pub mod new_bough;
+pub mod silver_light;

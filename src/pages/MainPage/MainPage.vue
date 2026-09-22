@@ -37,7 +37,7 @@
                 <template v-if="Component">
                     <transition mode="out-in" name="el-fade-in-linear">
                         <keep-alive>
-                            <component :is="Component"></component>
+                            <component :is="Component" :data-mona-route="$route.path"></component>
                         </keep-alive>
 <!--                        <keep-alive>-->
 <!--                            <suspense>-->

@@ -427,7 +427,7 @@ impl CharacterTrait for Qiqi {
                 &context.enemy,
                 s.get_element(),
                 ElevativeReaction::StellarConductCryo,
-                SkillType::Elevative,
+                s.get_skill_type(),
                 context.character_common_data.level,
                 fumo,
             )

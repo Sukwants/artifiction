@@ -477,8 +477,9 @@
                             style="width: 100%"
                         ></el-input-number>
                         <value-display
-                            :value="optimizationResults[optimizationResultIndex - 1].ratio"
-                            :extra="optimizationResults[optimizationResultIndex - 1].value.toFixed(1)"
+                            v-if="currentOptimizationResult"
+                            :value="currentOptimizationResult.ratio"
+                            :extra="currentOptimizationResult.value.toFixed(1)"
                             style="margin-top: 12px"
                         ></value-display>
                     </div>
@@ -706,12 +707,14 @@ import {useRoute} from "vue-router"
 import {useI18n} from "@/i18n/i18n"
 import {useAccountStore} from "@/store/pinia/account"
 import {artifactsData} from "@/assets/artifacts"
+import {characterData} from "@/assets/character"
 
 import {ElMessage} from "element-plus"
 import "element-plus/es/components/message/style/css"
 import SelectElementType from "@/components/select/SelectElementType.vue";
 import { useTag } from "@/composables/tag"
 import { ConfigManager } from "@/composables/config"
+import {MonaApiError} from "@/api/mona/errors"
 
 // stores
 const presetStore = usePresetStore()
@@ -751,6 +754,7 @@ const props = defineProps<{
 
 const emit = defineEmits<{
   (e: 'update:interface', v: CharacterFullInterface): void
+  (e: 'register-controller', controller: any | null): void
 }>()
 
 const configManager = inject<ConfigManager>("configManager")!
@@ -1057,7 +1061,9 @@ function getPresetItem() {
 }
 
 function usePreset(name: string) {
-    const entry: PresetEntry | undefined = upgradePresetToNewVersion(presetStore.presets.value[name])
+    const preset = presetStore.presets.value[name]
+    if (!preset) return
+    const entry: PresetEntry | undefined = upgradePresetToNewVersion(preset)
     if (!entry || !entry.item) {
         return
     }
@@ -1463,13 +1469,17 @@ interface ResultEntry {
     sand: null | number,
     goblet: null | number,
     head: null | number,
+    value: number,
+    ratio: number,
 }
 
 const optimizationResults = ref<ResultEntry[]>([])
 const optimizationResultIndex = ref(0)
+const currentOptimizationResult = computed(() => optimizationResults.value[optimizationResultIndex.value - 1] ?? null)
 
 function handleUseNthOptimizationResult(n: number) {
     const result = optimizationResults.value[n - 1]
+    if (!result) return
     const m = (x: null | number) => {
         if (x !== null) {
             return x
@@ -1654,6 +1664,240 @@ watch(() => accountStore.currentAccountId.value, () => {
     miscCurrentPresetName.value = null
     artifactIds.value = [-1, -1, -1, -1, -1]
 })
+
+function getControllerState() {
+    const saved = getPresetItem()
+    return {
+        id: props.currentCharacterId,
+        teamId: props.currentTeamId,
+        onField: props.currentOnField,
+        character: saved.character,
+        weapon: saved.weapon,
+        targetFunction: {
+            ...saved.targetFunction,
+            type: saved.useDSL ? "dsl" : "builtin",
+            dslSource: saved.dslSource ?? "",
+        },
+        buffs: Object.entries(saved.buffs ?? {}).map(([id, buff]) => ({id: Number(id), ...(buff as any)})),
+        artifacts: {
+            flower: artifactIds.value[0] >= 0 ? artifactIds.value[0] : null,
+            feather: artifactIds.value[1] >= 0 ? artifactIds.value[1] : null,
+            sand: artifactIds.value[2] >= 0 ? artifactIds.value[2] : null,
+            cup: artifactIds.value[3] >= 0 ? artifactIds.value[3] : null,
+            head: artifactIds.value[4] >= 0 ? artifactIds.value[4] : null,
+        },
+        skill: {
+            selectedIndex: characterSkillIndex.value,
+            params: configManager.getModuleValue(characterSkillConfig.value, true),
+        },
+        enemy: deepCopy(enemyConfig.value),
+        infusion: fumo.value,
+        artifactEffect: {
+            mode: artifactEffectMode.value,
+            params: saved.artifactConfig,
+            equippedParams: configManager.getModuleValue(artifactSingleConfig.value, true),
+        },
+        optimization: {
+            algorithm: algorithm.value,
+            constraint: saved.constraint,
+            filter: saved.filter,
+        },
+        configUnlinked: saved.globalConfigUnlinked,
+        currentPresetName: miscCurrentPresetName.value,
+    }
+}
+
+async function patchControllerState(patch: any) {
+    optimizationResults.value = []
+    optimizationResultIndex.value = 0
+
+    if (!patch || typeof patch !== "object") throw new MonaApiError("INVALID_ARGUMENT", "Character patch must be an object")
+
+    const character = patch.character
+    if (character) {
+        if (character.name !== undefined) {
+            if (!(character.name in characterData)) throw new MonaApiError("NOT_FOUND", `Character ${character.name} does not exist`)
+            characterName.value = character.name
+            await nextTick()
+        }
+        if (character.level !== undefined || character.ascend !== undefined) {
+            const level = character.level ?? characterLevelNumber.value
+            const ascend = character.ascend ?? characterAscend.value
+            characterLevel.value = `${level}${ascend ? "+" : "-"}`
+        }
+        if (character.constellation !== undefined) characterConstellation.value = character.constellation
+        if (character.skill1 !== undefined) characterSkill1.value = character.skill1 + 1
+        if (character.skill2 !== undefined) characterSkill2.value = character.skill2 + 1
+        if (character.skill3 !== undefined) characterSkill3.value = character.skill3 + 1
+        if (character.talents) {
+            if (character.talents.normal !== undefined) characterSkill1.value = character.talents.normal
+            if (character.talents.skill !== undefined) characterSkill2.value = character.talents.skill
+            if (character.talents.burst !== undefined) characterSkill3.value = character.talents.burst
+        }
+        if (character.tags !== undefined) characterTags.value = deepCopy(character.tags)
+        if (character.params !== undefined) configManager.updateModuleValue(characterConfig.value, character.params, true)
+    }
+
+    const weapon = patch.weapon
+    if (weapon) {
+        if (weapon.name !== undefined) {
+            const available = (await import("@/assets/weapon")).weaponData as any
+            if (!(weapon.name in available)) throw new MonaApiError("NOT_FOUND", `Weapon ${weapon.name} does not exist`)
+            if (available[weapon.name].type !== characterWeaponType.value) throw new MonaApiError("INCOMPATIBLE_WEAPON", `Weapon ${weapon.name} is incompatible with ${characterName.value}`)
+            weaponName.value = weapon.name
+            await nextTick()
+        }
+        if (weapon.level !== undefined || weapon.ascend !== undefined) {
+            const level = weapon.level ?? weaponLevelNumber.value
+            const ascend = weapon.ascend ?? weaponAscend.value
+            weaponLevel.value = `${level}${ascend ? "+" : "-"}`
+        }
+        if (weapon.refine !== undefined) weaponRefine.value = weapon.refine
+        if (weapon.params !== undefined) configManager.updateModuleValue(weaponConfig.value, weapon.params, true)
+    }
+
+    const target = patch.targetFunction
+    if (target) {
+        if (target.name !== undefined) {
+            const available = (await import("@/assets/target_function")).targetFunctionData as any
+            if (!(target.name in available)) throw new MonaApiError("NOT_FOUND", `Target function ${target.name} does not exist`)
+            targetFunctionName.value = target.name
+            await nextTick()
+        }
+        if (target.type !== undefined) miscTargetFunctionTab.value = target.type === "dsl" ? "dsl" : "normal"
+        if (target.use_dsl !== undefined) miscTargetFunctionTab.value = target.use_dsl ? "dsl" : "normal"
+        if (target.dslSource !== undefined || target.dsl_source !== undefined) targetFunctionDSLSource.value = target.dslSource ?? target.dsl_source
+        if (target.params !== undefined) configManager.updateModuleValue(targetFunctionConfig.value, target.params, true)
+    }
+
+    if (patch.buffs !== undefined) {
+        const available = (await import("@/assets/buff")).buffData as any
+        while (buffs.value.length > 0) deleteBuff(buffs.value[0].id)
+        for (const input of patch.buffs) {
+            if (!(input.name in available)) throw new MonaApiError("NOT_FOUND", `Buff ${input.name} does not exist`)
+            addBuff(input.name, input.id)
+            const buff = buffs.value[buffs.value.length - 1]
+            buff.lock = !!(input.lock ?? input.locked)
+            const buffConfig = input.config && input.name in input.config
+                ? input.config
+                : {[input.name]: input.config ?? {}}
+            configManager.updateModuleValue(buff.config, buffConfig, true)
+        }
+    }
+
+    if (patch.artifacts !== undefined) {
+        const input = patch.artifacts
+        const ids = Array.isArray(input)
+            ? input
+            : [input.flower, input.feather, input.sand, input.cup ?? input.goblet, input.head]
+        if (ids.length !== 5) throw new MonaApiError("INVALID_ARGUMENT", "Artifacts must contain five slots")
+        const expectedPositions = ["flower", "feather", "sand", "cup", "head"]
+        ids.forEach((id: number | null | undefined, index: number) => {
+            if (id === null || id === undefined || id < 0) return
+            const artifact = artifactStore.getArtifact(id)
+            if (!artifact) throw new MonaApiError("NOT_FOUND", `Artifact ${id} does not exist`)
+            if (artifact.position !== expectedPositions[index]) {
+                throw new MonaApiError("INVALID_ARTIFACT_SLOT", `Artifact ${id} does not match slot ${expectedPositions[index]}`)
+            }
+        })
+        artifactIds.value = ids.map((id: number | null | undefined) => id ?? -1)
+        await nextTick()
+    }
+
+    if (patch.skill) {
+        if (patch.skill.selectedIndex !== undefined) characterSkillIndex.value = patch.skill.selectedIndex
+        if (patch.skill.params !== undefined) configManager.updateModuleValue(characterSkillConfig.value, patch.skill.params, true)
+    }
+    if (patch.enemy !== undefined) enemyConfig.value = {...enemyConfig.value, ...deepCopy(patch.enemy)}
+    if (patch.infusion !== undefined) fumo.value = patch.infusion === null ? "None" : patch.infusion
+    if (patch.artifactEffect) {
+        if (patch.artifactEffect.mode !== undefined) artifactEffectMode.value = patch.artifactEffect.mode
+        if (patch.artifactEffect.params !== undefined) {
+            configManager.updateModuleValue(artifactConfig.value, convertArtifactConfigFromWasm(patch.artifactEffect.params), true)
+        }
+        if (patch.artifactEffect.equippedParams !== undefined) {
+            configManager.updateModuleValue(artifactSingleConfig.value, patch.artifactEffect.equippedParams, true)
+        }
+    }
+    if (patch.optimization) {
+        const input = patch.optimization
+        if (input.algorithm !== undefined) algorithm.value = input.algorithm
+        if (input.constraint) {
+            constraintArtifactSet.value = deepCopy(input.constraint.setNames ?? constraintArtifactSet.value)
+            constraintMinRecharge.value = input.constraint.minRecharge ?? constraintMinRecharge.value
+            constraintMinElementalMastery.value = input.constraint.minElementalMastery ?? constraintMinElementalMastery.value
+            constraintMinCritical.value = input.constraint.minCritical ?? constraintMinCritical.value
+            constraintMinCriticalDamage.value = input.constraint.minCriticalDamage ?? constraintMinCriticalDamage.value
+        }
+        if (input.filter) {
+            constraintSandMainStats.value = deepCopy(input.filter.sandMainStats ?? constraintSandMainStats.value)
+            constraintGobletMainStats.value = deepCopy(input.filter.gobletMainStats ?? constraintGobletMainStats.value)
+            constraintHeadMainStats.value = deepCopy(input.filter.headMainStats ?? constraintHeadMainStats.value)
+        }
+    }
+    if (patch.configUnlinked !== undefined) configManager.updateAllUnlinkedStatus(props.currentCharacterId, patch.configUnlinked)
+    if (patch.currentPresetName !== undefined) miscCurrentPresetName.value = patch.currentPresetName
+
+    await nextTick()
+    await nextTick()
+    return getControllerState()
+}
+
+async function optimizeFromApi(options: {applyResult?: number | false} = {}) {
+    const artifacts = getArtifactsToBeCalculated()
+    if (artifacts.length === 0) throw new MonaApiError("NO_ARTIFACTS", "No eligible artifacts are available")
+    const results = await wasmSingleOptimize(getOptimizeArtifactWasmInterface(), artifacts)
+    optimizationResults.value = results
+    optimizationResultIndex.value = results.length > 0 ? 1 : 0
+    const applyResult = options.applyResult === undefined ? false : options.applyResult
+    if (applyResult !== false) {
+        if (applyResult < 1 || applyResult > results.length) throw new MonaApiError("INVALID_ARGUMENT", "Optimization result index is out of range")
+        handleUseNthOptimizationResult(applyResult)
+        await nextTick()
+    }
+    return {results: deepCopy(results), appliedResult: applyResult}
+}
+
+const characterController = {
+    getState: getControllerState,
+    patchState: patchControllerState,
+    listConfigs() {
+        return configManager.listConfigs(props.currentCharacterId)
+    },
+    getConfig(id: string, mode: "local" | "effective" = "effective") {
+        const address = configManager.getAddress(id)
+        if (!address) throw new MonaApiError("NOT_FOUND", `Config ${id} does not exist`)
+        return configManager.getConfigValue(address, mode === "local")
+    },
+    setConfig(id: string, value: unknown, mode: "local" | "effective" = "effective") {
+        const address = configManager.getAddress(id)
+        if (!address) throw new MonaApiError("NOT_FOUND", `Config ${id} does not exist`)
+        configManager.updateConfigValue(address, value, mode === "local")
+        return configManager.getConfigValue(address, mode === "local")
+    },
+    setConfigUnlinked(id: string, unlinked: boolean) {
+        const address = configManager.getAddress(id)
+        if (!address) throw new MonaApiError("NOT_FOUND", `Config ${id} does not exist`)
+        configManager.updateUnlinkedStatus(address, unlinked)
+    },
+    getCurrentDamage() { return deepCopy(characterDamageAnalysis.value) },
+    getTransformativeDamage() { return deepCopy(characterTransformativeDamage.value) },
+    getElevativeDamage() { return deepCopy(characterElevativeDamage.value) },
+    getPanel() { return deepCopy(attributeFromWasm.value) },
+    async applyPreset(name: string) {
+        if (!presetStore.presets.value[name]) {
+            throw new MonaApiError("NOT_FOUND", `Preset ${name} does not exist`)
+        }
+        usePreset(name)
+        await nextTick()
+        return getControllerState()
+    },
+    optimize: optimizeFromApi,
+}
+
+defineExpose(characterController)
+onMounted(() => emit("register-controller", characterController))
+onUnmounted(() => emit("register-controller", null))
 </script>
 
 <style lang="scss" scoped>

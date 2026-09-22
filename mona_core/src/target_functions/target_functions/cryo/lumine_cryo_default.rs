@@ -65,7 +65,6 @@ impl TargetFunction for LumineCryoDefaultTargetFunction {
             ]),
             very_critical_set_names: Some(vec![
                 ArtifactSetName::DisenchantmentInDeepShadow,
-                ArtifactSetName::ScarletProof,
             ]),
             normal_threshold: TargetFunctionOptConfig::DEFAULT_NORMAL_THRESHOLD,
             critical_threshold: TargetFunctionOptConfig::DEFAULT_CRITICAL_THRESHOLD,

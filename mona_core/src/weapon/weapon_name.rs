@@ -55,6 +55,8 @@ pub enum WeaponName {
     MoonweaversDawn,
     HereticsMoltenBlade,
     Emberwell,
+    NewBough,
+    SilverLight,
     // 5 star
     AquilaFavonia,
     SkywardBlade,
@@ -74,6 +76,7 @@ pub enum WeaponName {
     LightbearingMoonshard,
     ExaiphanesBlade,
     WhitelakeFrostfeather,
+    BeyondTheChrysalis,
 
     // claymore
     // 1 star
@@ -216,6 +219,7 @@ pub enum WeaponName {
     DawningFrost,
     ClashOfKings,
     EchoesOfTheHeart,
+    WintersHeavyHeart,
     // 5 star
     SkywardAtlas,
     LostPrayerToTheSacredWinds,
@@ -236,6 +240,7 @@ pub enum WeaponName {
     ReliquaryOfTruth,
     NocturnesCurtainCall,
     AngelosHeptades,
+    HymnOfTheMaelstrom,
 
     // bows
     // 1 star
@@ -279,6 +284,7 @@ pub enum WeaponName {
     RainbowSerpentsRainBow,
     JadeVista,
     CovenantOfFrostAndSnow,
+    BreezeborneRefrain,
     // 5 star
     SkywardHarp,
     AmosBow,

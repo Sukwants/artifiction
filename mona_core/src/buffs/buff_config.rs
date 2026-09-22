@@ -148,6 +148,13 @@ pub enum BuffConfig {
     OdetteC2 { marvelous_splendor_other: f64 },
     OdetteC4 { level_q: usize },
     OdetteC6 {},
+    VesnaP3 { atk: f64 },
+    VodyanitsaE { level_e: usize },
+    VodyanitsaP1 {},
+    VodyanitsaP2 { hp: f64, stellar_glimmer_state: StellarGlimmerState },
+    VodyanitsaC1 { hp: f64 },
+    VodyanitsaC2 { stellar_glimmer_state: StellarGlimmerState },
+    VodyanitsaC6 {},
 
     FreedomSworn { refine: usize },
     SongOfBrokenPines { refine: usize },
@@ -170,6 +177,8 @@ pub enum BuffConfig {
     AthameArtis { refine: usize, hexerei_secret_rite: bool },
     GoldenFrostboundOath { refine: usize, rate: f64 },
     AngelosHeptades { refine: usize, atk: f64, hexerei_secret_rite: bool, off_field_hexerei: bool },
+    HymnOfTheMaelstrom { refine: usize, hp: f64, stack: f64, reaction: bool },
+    BreezeborneRefrain { refine: usize, rate: f64 },
 
     ResonancePyro2 { global: bool },
     ResonanceCryo2 { rate: f64, global: bool },

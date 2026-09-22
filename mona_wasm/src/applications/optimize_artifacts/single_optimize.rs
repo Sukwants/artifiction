@@ -32,11 +32,11 @@ pub fn optimize_single_interface_wasm(input: &OptimizeArtifactInterface, artifac
         Some(ref a) => a.as_slice(),
         None => artifacts
     };
-    let artifact_config = input.artifact_config.clone().unwrap().to_config();
+    let artifact_config = input.artifact_config.clone().map(|x| x.to_config());
 
     let result = algo.optimize(
         &artifacts,
-        Some(artifact_config),
+        artifact_config,
         &active_character.character,
         &active_character.weapon,
         &target_function,

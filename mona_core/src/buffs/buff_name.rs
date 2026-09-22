@@ -211,6 +211,13 @@ pub enum BuffName {
     OdetteC2,
     OdetteC4,
     OdetteC6,
+    VesnaP3,
+    VodyanitsaE,
+    VodyanitsaP1,
+    VodyanitsaP2,
+    VodyanitsaC1,
+    VodyanitsaC2,
+    VodyanitsaC6,
 
     AloyTalent1,
 
@@ -236,6 +243,8 @@ pub enum BuffName {
     AthameArtis,
     GoldenFrostboundOath,
     AngelosHeptades,
+    HymnOfTheMaelstrom,
+    BreezeborneRefrain,
     
 
     ResonancePyro2,

@@ -39,6 +39,8 @@ pub enum CharacterName {
     LumineHydro,
     AetherPyro,
     LuminePyro,
+    AetherCryo,
+    LumineCryo,
     Amber,
     Kaeya,
     Lisa,
@@ -155,10 +157,10 @@ pub enum CharacterName {
     Nicole,
     Lohen,
     Sandrone,
-    AetherCryo,
-    LumineCryo,
     Alyosha,
     Odette,
+    Vesna,
+    Vodyanitsa,
 }
 
 impl CharacterName {

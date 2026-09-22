@@ -44,8 +44,8 @@ export function useBuff(config: ConfigManager, character_id: number) {
         return temp
     })
 
-    function addBuff(name: string) {
-        const id = idGenerator.generateId()
+    function addBuff(name: string, requestedId?: number) {
+        const id = requestedId ?? idGenerator.generateId()
         buffs.value.push({
             name,
             config: {
@@ -58,6 +58,7 @@ export function useBuff(config: ConfigManager, character_id: number) {
 
     function deleteBuff(id: number) {
         const index = buffs.value.findIndex(e => e.id === id)
+        if (index < 0) return
         config.unregisterObject(buffs.value[index].config[buffs.value[index].name])
         buffs.value.splice(index, 1)
     }

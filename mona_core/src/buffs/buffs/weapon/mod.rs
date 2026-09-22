@@ -28,3 +28,5 @@ pub use catalyst::starcallers_watch::BuffStarcallersWatch;
 pub use polearm::symphonist_of_scents::BuffSymphonistOfScents;
 pub use polearm::fractured_halo::BuffFracturedHalo;
 pub use catalyst::nightweavers_looking_glass::BuffNightweaversLookingGlass;
+pub use catalyst::hymn_of_the_maelstrom::BuffHymnOfTheMaelstrom;
+pub use bow::breezeborne_refrain::BuffBreezeborneRefrain;

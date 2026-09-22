@@ -16,6 +16,7 @@ pub mod ifa;
 pub mod jahoda;
 pub mod varka;
 pub mod prune;
+pub mod vesna;
 
 pub use jean::Jean;
 pub use kaedehara_kazuha::KaedeharaKazuha;
@@ -35,3 +36,4 @@ pub use ifa::Ifa;
 pub use jahoda::Jahoda;
 pub use varka::Varka;
 pub use prune::Prune;
+pub use vesna::Vesna;
