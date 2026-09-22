@@ -14,8 +14,8 @@ impl TargetFunctionMetaTrait for VesnaDefaultTargetFunction {
             en: "Vesna-Snowy Banquet's Sharp Blade"
         ),
         description: locale!(
-            zh_cn: "薇斯纳一轮输出总伤害（元素战技×1、翔风剑一阶×1、翔风剑二阶及灵剑×1、翔风剑三阶及灵剑×3、风翎×10、元素爆发×1）",
-            en: "Vesna Total Damage Output per Round (Skill ×1, Windborne Sword Lv. 1 ×1, Windborne Sword Lv. 2 + Spirit Blade ×1, Windborne Sword Lv. 3 + Spirit Blade ×3, Wind Pinion ×10, Burst ×1)"
+            zh_cn: "薇斯纳一轮输出总伤害（元素战技×1、翔风剑一阶×1、风翎×10、翔风剑二阶及灵剑×1、元素爆发×1、翔风剑三阶及灵剑×3）",
+            en: "Vesna Total Damage Output per Round (Skill ×1, Windborne Sword Lv. 1 ×1, Wind Pinion ×10, Windborne Sword Lv. 2 + Spirit Blade ×1, Burst ×1, Windborne Sword Lv. 3 + Spirit Blade ×3)"
         ),
         tags: "输出",
         four: TargetFunctionFor::SomeWho(CharacterName::Vesna),
@@ -53,7 +53,6 @@ impl TargetFunction for VesnaDefaultTargetFunction {
                 StatName::ATKPercentage,
             ],
             goblet_main_stats: vec![
-                StatName::AnemoBonus,
                 StatName::ATKPercentage,
             ],
             head_main_stats: vec![
@@ -93,27 +92,35 @@ impl TargetFunction for VesnaDefaultTargetFunction {
         let has_c6 = constellation >= 6;
 
         // 施放某段技能前已有的「整肃」层数（= 此前施放翔风剑/元素爆发的次数，至多 6 层）
-        let stacks_of = |before_cast_count: usize| -> usize {
+        let stacks_before = |before_cast_count: usize| -> usize {
             if full_stacks_on_enter {
                 max_stacks
             } else {
                 before_cast_count.min(max_stacks)
             }
         };
+        // 翔风剑触发的灵剑在翔风剑获得层数后结算，因此使用触发后的层数。
+        let stacks_after = |before_cast_count: usize| -> usize {
+            stacks_before(before_cast_count + 1)
+        };
 
         // 元素战技「操典·制胜有道」：施放时尚未进入「巡风列装」模式，且会清除已有「整肃」
         let config_e = CharacterSkillConfig::Vesna { in_armed_for_action: false, disciplinary_stacks: 0 };
-        // 元素爆发「致礼·献予女皇陛下」：施放全部最高境界翔风剑后已退出「巡风列装」模式
+        // 元素爆发「致礼·献予女皇陛下」：在「巡风列装」模式下、二阶翔风剑后、三阶翔风剑前施放；
+        // 爆发灵剑使用施放爆发前已有的层数，爆发后获得的层数用于后续三阶翔风剑。
         let config_q = CharacterSkillConfig::Vesna {
-            in_armed_for_action: false,
-            disciplinary_stacks: stacks_of(2 + sword3_count),
+            in_armed_for_action: true,
+            disciplinary_stacks: stacks_before(2),
         };
 
-        // 「巡风列装」模式内各技能所需的「整肃」层数：翔风剑一阶 0 层、二阶 1 层、
-        // 三阶第 i 次为 i + 1 层（风翎伤害不受「整肃」影响，复用一阶的层数）
-        let mut stacks_list: Vec<usize> = vec![stacks_of(0), stacks_of(1)];
+        // 「巡风列装」模式内各技能所需的「整肃」层数：翔风剑一阶 0 层、二阶 1 层，
+        // 二阶灵剑使用触发后的层数；元素爆发后，三阶第 i 次使用 i + 3 层，
+        // 三阶灵剑以及命座6额外灵剑使用触发后的层数。
+        // 风翎伤害不受「整肃」影响，复用一阶的层数。
+        let mut stacks_list: Vec<usize> = vec![stacks_before(0), stacks_before(1), stacks_after(1)];
         for i in 0..sword3_count {
-            stacks_list.push(stacks_of(2 + i));
+            stacks_list.push(stacks_before(3 + i));
+            stacks_list.push(stacks_after(3 + i));
         }
 
         // 每种「整肃」层数都需要独立的 DamageContext
@@ -159,23 +166,28 @@ impl TargetFunction for VesnaDefaultTargetFunction {
         let context_q = DamageContext { character_common_data: &character.common_data, attribute: &solved_q, enemy };
 
         // 一轮输出：
-        // 普通元素战技×1 + 翔风剑一阶×1 + (翔风剑二阶 + 二阶灵剑)×1
-        // + (翔风剑三阶 + 三阶灵剑)×3（命座1 及以上为×4）+ 风翎×10 + 元素爆发×1
+        // 普通元素战技×1 + 翔风剑一阶×1 + 风翎×10
+        // + (翔风剑二阶 + 二阶灵剑)×1 + 元素爆发×1
+        // + (翔风剑三阶 + 三阶灵剑)×3（命座1 及以上为×4）
         // 命座6 额外计入每次最高境界翔风剑后的「翔风剑·变移」。该伤害及其额外灵剑
         // 均视为元素战技伤害；变移在「巡风列装」模式下额外唤出的风翎不额外计入风翎次数。
         let mut total = Vesna::damage::<SimpleDamageBuilder>(&context_e, Ty::E, &config_e, None).normal.expectation;
 
-        total += in_mode_dmg(stacks_of(0), Ty::E_SWORD1);
-        total += in_mode_dmg(stacks_of(0), Ty::E_PLUME) * 10.0;
-        total += in_mode_dmg(stacks_of(1), Ty::E_SWORD2) + in_mode_dmg(stacks_of(1), Ty::E_SPIRIT2);
+        total += in_mode_dmg(stacks_before(0), Ty::E_SWORD1);
+        total += in_mode_dmg(stacks_before(0), Ty::E_PLUME) * 10.0;
+        total += in_mode_dmg(stacks_before(1), Ty::E_SWORD2)
+            + in_mode_dmg(stacks_after(1), Ty::E_SPIRIT2);
+        total += Vesna::damage::<SimpleDamageBuilder>(&context_q, Ty::Q_SPIRIT, &config_q, None).normal.expectation;
         for i in 0..sword3_count {
-            let stacks = stacks_of(2 + i);
-            total += in_mode_dmg(stacks, Ty::E_SPIRIT3_TOTAL) + in_mode_dmg(stacks, Ty::E_SPIRIT3_FINAL);
+            let sword_stacks = stacks_before(3 + i);
+            let spirit_stacks = stacks_after(3 + i);
+            total += in_mode_dmg(spirit_stacks, Ty::E_SPIRIT3_TOTAL)
+                + in_mode_dmg(spirit_stacks, Ty::E_SPIRIT3_FINAL);
             if has_c6 {
-                total += in_mode_dmg(stacks, Ty::C6) + in_mode_dmg(stacks, Ty::C6_SPIRIT);
+                total += in_mode_dmg(sword_stacks, Ty::C6)
+                    + in_mode_dmg(spirit_stacks, Ty::C6_SPIRIT);
             }
         }
-        total += Vesna::damage::<SimpleDamageBuilder>(&context_q, Ty::Q_SPIRIT, &config_q, None).normal.expectation;
 
         total
     }

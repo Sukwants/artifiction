@@ -85,7 +85,6 @@ impl TargetFunction for VodyanitsaDefaultTargetFunction {
                 ArtifactSetName::HeartOfTheFurnace,
             ]),
             very_critical_set_names: Some(vec![
-                ArtifactSetName::VourukashasGlow,
                 ArtifactSetName::GoldenTroupe,
             ]),
             normal_threshold: TargetFunctionOptConfig::DEFAULT_NORMAL_THRESHOLD,
