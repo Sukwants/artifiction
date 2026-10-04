@@ -1,5 +1,11 @@
 # 项目测试集
 
+首次运行先按 [开发文档](../docs/development.md)安装依赖、构建 WASM、生成元数据。
+Node 单元测试放在 `tests/unit/`，使用 `npm run test:project:unit`；
+`npm run test:project:typecheck` 检查测试入口及其导入的 TypeScript。
+本文以下描述的是通过页面 API 执行的项目场景，需要先启动开发服务器，并准备可用的 Chrome/Edge。
+页面接口本身见 [Mona API](../mona_api/mona-api.md)。
+
 测试集统一放在 `tests/suites` 下。每个一级子目录代表一个测试集，并且必须提供
 `suite.ts` 作为入口：
 

@@ -1,182 +1,53 @@
-<div align="center">
-
-
+<!-- 文档整理：Codex -->
 # 叶师傅开锁铺
-![GitHub Repo stars](https://img.shields.io/github/stars/Sukwants/genshin_artifact)
-![GitHub forks](https://img.shields.io/github/forks/Sukwants/genshin_artifact)
 
+原神伤害计算与圣遗物配装工具。前端使用 Vue 3，计算核心使用 Rust，通过 WebAssembly 在浏览器中运行。
 
-</div>
+支持圣遗物导入与管理、单角色配装、整队优化、伤害明细、属性分析、圣遗物潜力分析，以及计算预设和自定义目标函数。计算结果取决于你设置的角色、技能、敌人和效果条件。
 
+[English](README_en.md) · [日本語](README_ja.md)
 
-## 简介
-### 伤害计算与分析
-- 增删BUFF
-- 参数调整
-- 伤害明细
-- 面板构成
-### 圣遗物配装与分析
-- 虚拟圣遗物优化算法
-- 启发式优化算法
-- 队伍圣遗物自动搭配
-- 词条收益曲线
-- 圣遗物养成推荐
-- 圣遗物词条分析
-- 圣遗物潜力与评分
-### 数据库
-- 基于计算结果的圣遗物、武器统计
+## 从哪里开始
 
-## 从网页扫描圣遗物
+| 你要做什么 | 阅读入口 |
+| --- | --- |
+| 导入圣遗物、配装、备份数据 | [用户使用说明](src/pages/helps/InstructionPage/instruction.md) |
+| 从网页直接启动 YAS 扫描 | [YAS 网页扫描说明](docs/yas-web.md) |
+| 本地开发、构建和部署 | [开发与部署](docs/development.md) |
+| 找到需要修改的代码 | [项目结构与数据流](docs/architecture.md) |
+| 添加角色、武器、圣遗物效果 | [计算核心开发文档](mona_docs/src/index.md) |
+| 写浏览器自动化或操作页面 API | [Mona API](mona_api/mona-api.md)、[测试框架](tests/README.md) |
+| 让 AI 协助修改项目 | [AGENTS.md](AGENTS.md) |
 
-Windows 用户可以在圣遗物页面点击 YAS 扫描按钮。首次使用请从 [YAS Releases](https://github.com/2745518585/yas/releases) 下载包含网页连接功能的 `yas_web_*.zip`，解压并运行「安装网页连接.cmd」。旧版单文件 YAS 不提供网页连接服务。
+完整导航见 [文档目录](docs/README.md)。网页内的「使用说明」也展示上表中的用户说明。
 
-打开原神圣遗物背包并拉到顶部，回到网页点击「启动并连接 YAS」，允许浏览器打开应用、访问本机网络，并在 YAS 弹窗中授权当前网站。选好游戏窗口和扫描条件后即可扫描并自动导入。扫描过程中可以从网页取消，或在游戏中使用鼠标右键中止；中止或失败的扫描不会自动导入。
+## 本地启动
 
-网页直接连接本机 `127.0.0.1:32334`，不再依赖椰羊辅助插件及其更新、签名服务。如果浏览器不支持本机连接，仍可用 YAS 扫描后手动导入 `mona.json`。
+准备 Node.js 22.12+、Rust stable、Git 和 wasm-pack。在 Windows 上构建 Rust 代码还需要相应的 C++ 编译工具链。
 
-## 本地运行
-### 环境
-该项目依赖[Rust](https://www.rust-lang.org/) 
-1. 安装Rust工具链，详见官网
-2. 安装Rust Webassembly工具链（wasm-pack）
-3. node
-
-项目统一使用 npm 管理前端依赖，版本以 `package-lock.json` 为准。
-### 运行步骤
-1. 克隆仓库
-```
-git clone --recursive https://github.com/Sukwants/genshin_artifact
-```
-2. 安装 npm 依赖
-```
+```sh
+git clone --recursive https://github.com/Sukwants/artifiction.git genshin_artifact
+cd genshin_artifact
+rustup target add wasm32-unknown-unknown
+cargo install wasm-pack --locked
 npm ci
-```
-3. 编译wasm依赖
-```
-npm run build:wasm
-```
-4. 生成数据文件（武器、角色、圣遗物等的信息）
-```
-npm run gen_meta
-```
-5. 运行
-```
-npm run serve
-```
-6. 打包
-```
-npm run build
+npm run dev
 ```
 
-## 维护
+`npm run dev` 会构建 WASM、生成前端元数据，再启动开发服务器。之后只修改前端时可运行 `npm run serve`；修改 Rust 计算代码后，需要重新构建相应产物。详细步骤和常见问题见[开发文档](docs/development.md)。
 
-如需新增内容，可以参考 `mona_docs/src/index.md` 中的说明。
+项目使用 npm 与 `package-lock.json` 管理前端依赖。Rust crate 分别位于 `mona_core/`、`mona_wasm/` 等目录，根目录没有统一的 Cargo workspace。
 
-[//]: # (## Docker)
+## 数据和外部服务
 
-[//]: # (```)
+圣遗物、收藏夹和预设按本地账号保存在当前网站的浏览器存储中。请定期导出备份；换域名、换浏览器或清理网站数据后，需要重新导入。
 
-[//]: # (docker build -t mona .)
+常规伤害计算和配装在浏览器中进行。分享链接等功能使用远程 `/api/` 服务，YAS 网页扫描使用单独的本机程序。仅部署前端并不会同时提供这些服务。
 
-[//]: # (docker run -dp 8080:80 mona)
+YAS 由[独立仓库](https://github.com/2745518585/yas)维护，本仓库的 `sub/yas` 固定到其中一个提交。网页连接需要含该功能的 YAS 发布包；若发布页还没有 `yas_web_*.zip`，可先使用扫描后的 `mona.json` 文件导入。
 
-[//]: # (```)
+## 参与维护
 
-[//]: # (## 贡献)
+提交问题时请附上复现步骤、预期与实际结果、所用页面和版本，以及尽可能小的预设或圣遗物样例。游戏数值问题还应说明技能、命座、效果触发条件和数据出处。提交前先移除样例中的个人备注。
 
-[//]: # (### 添加目标函数)
-
-[//]: # (目标函数位于[https://github.com/wormtql/mona-core]&#40;mona-core&#41;  )
-
-[//]: # (`src/target_functions/target_functions`)
-
-[//]: # (1. 在上述文件夹的对应位置建立新目标函数文件)
-
-[//]: # (2. 在`target_functions/target_function_name.rs`新建目标函数名)
-
-[//]: # (3. 创建一个struct，必须以`TargetFunction`结尾)
-
-[//]: # (```rust)
-
-[//]: # (pub struct NewTargetFunction {)
-
-[//]: # (    ...)
-
-[//]: # (})
-
-[//]: # (```)
-
-[//]: # (4. 如果该函数有设置，在`target_functions/target_function_config.rs`新建同名enum)
-
-[//]: # (5. 为`NewTargetFunction`实现两个trait，`TargetFunctionMetaTrait`和`TargetFunction`)
-
-[//]: # (```rust)
-
-[//]: # (impl TargetFunctionMetaTrait for NewTargetFunction {)
-
-[//]: # (    // 该目标函数的元数据)
-
-[//]: # (    #[cfg&#40;not&#40;target_family = "wasm"&#41;&#41;])
-
-[//]: # (    const META_DATA: TargetFunctionMeta = TargetFunctionMeta {)
-
-[//]: # (        name: TargetFunctionName::GanyuDefault,)
-
-[//]: # (        chs: "chs",)
-
-[//]: # (        description: "description",)
-
-[//]: # (        tags: "tag1,tag2",)
-
-[//]: # (        four: TargetFunctionFor::SomeWho&#40;CharacterName::Ganyu&#41;,)
-
-[//]: # (        image: TargetFunctionMetaImage::Avatar)
-
-[//]: # (    };)
-
-[//]: # ()
-[//]: # (    // 目标函数的设置，没有设置可以省略)
-
-[//]: # (    #[cfg&#40;not&#40;target_family = "wasm"&#41;&#41;])
-
-[//]: # (    const CONFIG: Option<&'static [ItemConfig]> = Some&#40;&[)
-
-[//]: # (        ItemConfig {)
-
-[//]: # (            name: "melt_rate",)
-
-[//]: # (            title: "融化占比",)
-
-[//]: # (            config: ItemConfig::RATE01_TYPE)
-
-[//]: # (        })
-
-[//]: # (    ]&#41;;)
-
-[//]: # ()
-[//]: # (    fn create&#40;character: &CharacterCommonData, weapon: &WeaponCommonData, config: &TargetFunctionConfig&#41; -> Box<dyn TargetFunction> {)
-
-[//]: # (        // create boxed target function)
-
-[//]: # (    })
-
-[//]: # (})
-
-[//]: # ()
-[//]: # (impl TargetFunction for NewTargetFunction {)
-
-[//]: # (    // 可以参考其他文件)
-
-[//]: # (})
-
-[//]: # (```)
-
-[//]: # (6. 在`target_functions/target_functions/<element>/mod.rs`中，重导出`NewTargetFunction`)
-
-[//]: # (```rust)
-
-[//]: # (// in <element>.rs)
-
-[//]: # (pub use new_target_function::NewTargetFunction;)
-
-[//]: # (```)
+开发与检查流程见[开发文档](docs/development.md)。目前项目 CI 在 pull request 上运行 WASM 构建、元数据生成、前端构建、类型检查、单元测试和浏览器场景；通过结果以实际 CI 记录为准。

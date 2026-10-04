@@ -1,19 +1,40 @@
-# Mona Docs
+<!-- 文档整理：Codex -->
+# 开发文档入口
 
-本文档为叶师傅开锁铺开发文档。对于人类，如需新增内容，可以参考以下说明；对于 AI，请严格按照以下说明进行编写：
+这里是项目文档的统一阅读入口。用户操作、工程维护与游戏计算实现使用不同的说明，按任务阅读即可。
 
-如果你是 AI，请首先完成文件编写，再将需要确认的部分列出，等待人类确认后再进行修改。并且请在主要由你编写的文件开头署名。
+## 先选任务
 
-不论任何需求，请首先仔细阅读直接位于本目录下的文件，包括 `mona_docs/src/attribute.md`、`mona_docs/src/config.md`、`mona_docs/src/damage_builder.md`。
+| 任务 | 文档 |
+| --- | --- |
+| 使用工具、导入、计算、备份 | [用户说明](../../src/pages/helps/InstructionPage/instruction.md) |
+| 安装与维护 YAS 网页连接 | [YAS 接入](../../docs/yas-web.md) |
+| 安装开发环境、构建、部署、CI | [开发与部署](../../docs/development.md) |
+| 找前端、Store、WASM 等代码入口 | [结构与数据流](../../docs/architecture.md) |
+| AI 协作约定 | [AGENTS.md](../../AGENTS.md) |
+| 浏览器自动化 | [Mona API](../../mona_api/mona-api.md)、[测试框架](../../tests/README.md) |
 
-有关角色文件的书写方法，请参见 `mona_docs/src/character/index.md`。
+全部文档导航见 [docs/README.md](../../docs/README.md)。
 
-有关武器文件的书写方法，请参见 `mona_docs/src/weapon/index.md`。
+## 修改游戏计算实现
 
-有关圣遗物文件的书写方法，请参见 `mona_docs/src/artifact/index.md`。
+先理解与本次改动相关的公共接口：
 
-有关 target function 文件的书写方法，请参见 `mona_docs/src/target_function/index.md`。
+- [Attribute](attribute.md)：面板属性、属性来源及效果接口。
+- [Config](config.md)：配置类型与全局配置约定。
+- [DamageBuilder](damage_builder.md)：技能效果、伤害、治疗、护盾与其他输出。
 
-有关 buff 文件的书写方法，请参见 `mona_docs/src/buff/index.md`。
+再阅读具体模块：
 
-有关代码审查的相关说明，请参见 `mona_docs/src/review/index.md`。
+- [角色](character/index.md)
+- [武器](weapon/index.md)
+- [圣遗物效果](artifact/index.md)
+- [目标函数](target_function/index.md)
+- [Buff](buff/index.md)
+- [代码审查](review/index.md)
+
+模块索引中的注册、命名和示例约定仍适用。较早实现可能保留旧模型，新增内容优先使用对应文档推荐的实现。
+
+原始游戏资料通常由维护者放在根目录 `prompt/`，该目录不随 Git 分发。资料缺失时列出需要确认的倍率、效果条件等具体内容；不要把另一个角色的实现当作新角色数值的依据。
+
+只修改页面或工程配置时，无需逐个阅读所有角色示例。修改行为后同时更新相应说明，避免继续积累与实际代码不一致的教程。
