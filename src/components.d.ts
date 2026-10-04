@@ -7,7 +7,6 @@ declare module '@vue/runtime-core' {
   export interface GlobalComponents {
     AddButton: typeof import('./components/misc/AddButton.vue')['default']
     ArtifactDisplay: typeof import('./components/display/ArtifactDisplay.vue')['default']
-    ArtifactDisplayById: typeof import('./components/display/ArtifactDisplayById.vue')['default']
     ArtifactPerStatBonus: typeof import('./components/display/ArtifactPerStatBonus.vue')['default']
     ArtifactSetTypeDisplay: typeof import('./components/display/ArtifactSetTypeDisplay.vue')['default']
     ArtifactsFilter: typeof import('./components/filter/ArtifactsFilter.vue')['default']

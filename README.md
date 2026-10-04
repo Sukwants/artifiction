@@ -32,22 +32,24 @@
 1. 安装Rust工具链，详见官网
 2. 安装Rust Webassembly工具链（wasm-pack）
 3. node
+
+项目统一使用 npm 管理前端依赖，版本以 `package-lock.json` 为准。
 ### 运行步骤
 1. 克隆仓库
 ```
 git clone --recursive https://github.com/Sukwants/genshin_artifact
 ```
-2. 编译wasm依赖
+2. 安装 npm 依赖
+```
+npm ci
+```
+3. 编译wasm依赖
 ```
 npm run build:wasm
 ```
-3. 生成数据文件（武器、角色、圣遗物等的信息）
+4. 生成数据文件（武器、角色、圣遗物等的信息）
 ```
 npm run gen_meta
-```
-4. 安装 npm 依赖
-```
-npm install
 ```
 5. 运行
 ```

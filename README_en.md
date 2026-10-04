@@ -15,9 +15,9 @@ This README is also available in:
 - What is the highest expect damage my artifacts can achieve?
 - How to balance my *Noelle*'s DEF and ATK?
 ## Run Locally
-Run the following to install dependencies
+Use npm to manage frontend dependencies. Install the versions recorded in `package-lock.json`:
 ```
-npm install
+npm ci
 ```
 This website does not have a backend, run the following to start the website locally
 ```bash

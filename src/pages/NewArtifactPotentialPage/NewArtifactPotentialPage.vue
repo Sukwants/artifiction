@@ -83,13 +83,6 @@
                 </div>
 
                 <div class="artifacts-div">
-<!--                    <artifact-display-by-id-->
-<!--                        v-for="result in resultsToBeDisplay"-->
-<!--                        :artifact-id="result[0]"-->
-<!--                        :extra="result[1].toFixed(2)"-->
-<!--                        :show-back="true"-->
-<!--                        :back-value="result[1] / results[0][1]"-->
-<!--                    ></artifact-display-by-id>-->
                     <artifact-display
                         v-for="result in artifactsToBeDisplayed"
                         :key="result[0].id"

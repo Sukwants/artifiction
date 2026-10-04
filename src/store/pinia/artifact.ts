@@ -1,33 +1,10 @@
-import {defineStore} from "pinia"
-import {reactive, ref, type Ref, watch} from "vue"
+import {computed, reactive, ref, type Ref} from "vue"
 import {RandomIDProvider} from "@/utils/idProvider"
 import {artifactsData} from "@/assets/artifacts"
 
 import {hash as hashArtifact} from "@/utils/artifactHash"
 import {deepCopy} from "@/utils/common"
 import {type ArtifactPosition, type IArtifact, type IArtifactContentOnly} from "@/types/artifact"
-
-// let localStoredArtifacts = localStorage.getItem("artifacts");
-// if (localStoredArtifacts) {
-//     let obj: any = JSON.parse(localStoredArtifacts);
-
-//     flower = obj.flower || [];
-//     feather = obj.feather || [];
-//     sand = obj.sand || [];
-//     cup = obj.cup || [];
-//     head = obj.head || [];
-
-//     let temp = flower.concat(feather).concat(sand).concat(cup).concat(head);
-
-//     for (let item of temp) {
-//         if (!Object.prototype.hasOwnProperty.call(item, "id")) {
-//             item.id = idProvider.generateId()
-//         }
-//         if (!Object.prototype.hasOwnProperty.call(item, "contentHash")) {
-//             item.contentHash = hashArtifact(item)
-//         }
-//     }
-// }
 
 const f = () => {
     const artifacts: Ref<Map<number, IArtifact>> = ref(new Map())
@@ -218,20 +195,6 @@ const f = () => {
 
 const s = f()
 
-// watch(() => {
-//     return {
-//         flower: s.artifactsByPosition.value["flower"],
-//         feather: s.artifactsByPosition.value["feather"],
-//         sand: s.artifactsByPosition.value["sand"],
-//         cup: s.artifactsByPosition.value["cup"],
-//         head: s.artifactsByPosition.value["head"]
-//     }
-// }, newValue => {
-//     localStorage.setItem("artifacts", JSON.stringify(newValue))
-// }, {
-//     deep: true
-// })
-
 export function watchContent() {
     return {
         flower: s.artifactsByPosition.value["flower"],
@@ -245,7 +208,3 @@ export function watchContent() {
 export const useArtifactStore = () => {
     return s
 }
-
-// export const useArtifactStore = defineStore("artifact", () => {
-//
-// })

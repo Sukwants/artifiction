@@ -15,6 +15,8 @@
 - どうすれば防衛力と攻撃力が最もよい？
 - ...
 ## run locally
+フロントエンドの依存関係は npm で管理し、`package-lock.json` のバージョンを使用します。
 ```
+npm ci
 npm run serve
 ```
