@@ -1,194 +1,113 @@
-/* eslint-disable @typescript-eslint/no-explicit-any */
-/* eslint-disable max-params */
-import { EventEmitter } from 'events';
-import { stringify } from 'qs';
-import axios from 'axios';
-export interface IWindow {
-    hWnd: number;
-    title: string;
-    classname: string;
-    width: number;
-    height: number;
-    x: number;
-    y: number;
+const ENDPOINT = 'http://127.0.0.1:32334';
+
+export interface GameWindow { hwnd: number; title: string }
+export interface ScanOptions { hwnd: number; minStar: number; minLevel: number; number: number }
+export interface ScanStatus {
+    job: string;
+    state: 'running' | 'cancelling' | 'cancelled' | 'completed' | 'failed';
+    error: string | null;
+    next: number;
+    logs: { seq: number; text: string }[];
 }
-export class CocogoatWebControl {
-    port = 32333;
-    token = '';
-    hwnd = 0;
-    version = '';
-    ev = new EventEmitter();
-    client: ReturnType<typeof axios.create>;
-    ws: WebSocket | undefined;
-    MOUSEEVENTF_ABSOLUTE = 0x8000;
-    MOUSEEVENTF_LEFTDOWN = 0x0002;
-    MOUSEEVENTF_LEFTUP = 0x0004;
-    MOUSEEVENTF_MIDDLEDOWN = 0x0020;
-    MOUSEEVENTF_MIDDLEUP = 0x0040;
-    MOUSEEVENTF_MOVE = 0x0001;
-    MOUSEEVENTF_RIGHTDOWN = 0x0008;
-    MOUSEEVENTF_RIGHTUP = 0x0010;
-    MOUSEEVENTF_WHEEL = 0x0800;
-    MOUSEEVENTF_XDOWN = 0x0080;
-    MOUSEEVENTF_XUP = 0x0100;
-    MOUSEEVENTF_HWHEEL = 0x01000;
-    constructor(_port = 32333) {
-        this.port = _port;
-        this.token = this.uuid();
-        this.client = axios.create({ baseURL: `http://localhost:${this.port}` });
-        this.client.interceptors.request.use((request) => {
-            if (this.token) {
-                request.headers['Authorization'] = `Bearer ${this.token}`;
-            }
-            if (request.headers['Content-Type'] === '') {
-                delete request.headers['Content-Type'];
-            }
-            return request;
-        });
+
+export class YasError extends Error {
+    constructor(message: string, public readonly status: number) { super(message); }
+}
+
+export function delay(ms: number, signal: AbortSignal): Promise<void> {
+    return new Promise((resolve, reject) => {
+        const abort = () => { clearTimeout(timer); reject(new DOMException('操作已取消', 'AbortError')); };
+        const timer = setTimeout(() => { signal.removeEventListener('abort', abort); resolve(); }, ms);
+        if (signal.aborted) abort();
+        else signal.addEventListener('abort', abort, { once: true });
+    });
+}
+
+export class YasClient {
+    private token = '';
+
+    private newConnection(): void {
+        this.token = Array.from(crypto.getRandomValues(new Uint8Array(32)), byte => byte.toString(16).padStart(2, '0')).join('');
     }
-    uuid() {
-        // @ts-ignore
-        return ([1e7] + -1e3 + -4e3 + -8e3 + -1e11).replace(/[018]/g, (c) =>
-            (c ^ (crypto.getRandomValues(new Uint8Array(1))[0] & (15 >> (c / 4)))).toString(16),
-        );
+
+    // Call directly inside the click handler, before awaiting anything, to retain the user gesture.
+    launch(): void {
+        this.newConnection();
+        const query = new URLSearchParams({ origin: window.location.origin, token: this.token });
+        const link = document.createElement('a');
+        link.href = `yas-scan://connect?${query.toString()}`;
+        link.hidden = true;
+        document.body.append(link);
+        try { link.click(); } finally { link.remove(); }
     }
-    async launch() {
-        // protocol launch
-        const launchBase = 'cocogoat-control://launch';
-        const signapiBase = 'https://77.cocogoat.work/v2/frostflake/sign';
-        const launchParams = `?register-token=${this.token}&register-origin=${location.origin}`;
-        let launchUrl = `${launchBase}${launchParams}`;
+
+    private async request<T>(path: string, signal?: AbortSignal, body?: unknown, timeout = 8000): Promise<T> {
+        const controller = new AbortController();
+        const abort = () => controller.abort();
+        const timer = setTimeout(abort, timeout);
+        if (signal?.aborted) controller.abort();
+        else signal?.addEventListener('abort', abort, { once: true });
         try {
-            // remote-sign launch url
-            const res = await this.client.get(signapiBase + launchParams, { timeout: 2000 });
-            if (res.status === 201 && res.data && res.data.url) {
-                launchUrl = res.data.url;
-            }
-        } catch (e) {}
-        // in iframe
-        const iframe = document.createElement('iframe');
-        iframe.src = launchUrl;
-        iframe.style.display = 'none';
-        document.body.appendChild(iframe);
-        setTimeout(() => {
-            document.body.removeChild(iframe);
-        }, 1000);
-    }
-    async check(): Promise<boolean> {
-        try {
-            const { data } = await this.client.get('/', {
-                timeout: 800,
+            const response = await fetch(`${ENDPOINT}${path}`, {
+                method: body === undefined ? 'GET' : 'POST',
+                headers: { ...(this.token ? { Authorization: `Bearer ${this.token}` } : {}),
+                    ...(body === undefined ? {} : { 'Content-Type': 'application/json' }) },
+                body: body === undefined ? undefined : JSON.stringify(body),
+                signal: controller.signal, credentials: 'omit', cache: 'no-store', referrerPolicy: 'no-referrer',
             });
-            this.version = data.version;
-            return true;
-        } catch (e) {
-            return false;
-        }
-    }
-    async authorize() {
-        if (this.ws) {
-            return true;
-        }
-        try {
-            const { data, status } = await this.client.post('/token');
-            console.log(status);
-            if (status === 401) return false;
-            this.token = data.token;
-            this.hwnd = data.hwnd || 0;
-            const ws = new WebSocket(`ws://localhost:${this.port}/ws/${this.token}`);
-            ws.onmessage = (e) => {
-                const data = JSON.parse(e.data);
-                this.ev.emit(data.id || data.action, data.data);
-            };
-            ws.onclose = () => {
-                this.ws = undefined;
-            };
-            await new Promise((resolve) => {
-                ws.onopen = resolve;
-            });
-            this.ws = ws;
-            return true;
-        } catch (e) {
-            const er = e as any;
-            if (er.response && er.response.status === 401) {
-                return false;
+            const value = await response.json();
+            if (!response.ok) throw new YasError(value.error ?? 'YAS 请求失败', response.status);
+            return value as T;
+        } catch (error) {
+            if (controller.signal.aborted && !signal?.aborted) {
+                throw new Error('YAS 响应超时，请检查本机网络权限和 YAS 服务窗口');
             }
-            throw e;
+            if (error instanceof TypeError) throw new Error('无法连接 YAS，请确认服务已启动，并允许浏览器访问本机网络');
+            throw error;
+        } finally {
+            clearTimeout(timer);
+            signal?.removeEventListener('abort', abort);
         }
     }
-    wsInvoke(method: string, path: string, querystring?: Record<string, any>, body?: Record<string, any>) {
-        if (!this.ws) throw new Error('WebSocket not connected');
-        const url = path + (querystring ? `?${stringify(querystring)}` : '');
-        const id = Math.round(Date.now() * 1000 + Math.random() * 1000).toString(16);
-        const reqjson = {
-            id,
-            action: 'api',
-            data: {
-                url,
-                method,
-                body: body ? JSON.stringify(body) : undefined,
-            },
-        };
-        const resp = new Promise((resolve) => {
-            this.ev.on(id, resolve);
-        });
-        this.ws.send(JSON.stringify(reqjson));
-        return resp as Promise<{
-            status: number;
-            body: any;
-        }>;
+
+    async check(signal?: AbortSignal): Promise<void> {
+        const info = await this.request<{ product: string; protocolVersion: number }>('/api/info', signal);
+        if (info.product !== 'yas-web' || info.protocolVersion !== 1) {
+            throw new YasError('请安装支持网页扫描的新版 YAS', 426);
+        }
     }
-    async mouse_event(dwFlags: number, dx: number, dy: number, dwData: number, repeat = 1) {
-        return this.wsInvoke('POST', '/api/mouse_event', {
-            dwFlags,
-            dx,
-            dy,
-            dwData,
-            repeat,
-        });
+
+    async connectRunning(signal: AbortSignal): Promise<void> {
+        this.newConnection();
+        await this.check(signal);
+        await this.request('/api/connect', signal, { token: this.token }, 120000);
     }
-    async keybd_event(bVk: number, bScan: number, dwFlags: number) {
-        return this.wsInvoke('POST', '/api/keybd_event', {
-            bVk,
-            bScan,
-            dwFlags,
-        });
+
+    async waitForConnection(signal: AbortSignal): Promise<void> {
+        const deadline = Date.now() + 120000;
+        while (!signal.aborted && Date.now() < deadline) {
+            try {
+                await this.check(signal);
+                await this.request('/api/session', signal);
+                return;
+            } catch (error) {
+                if (signal.aborted || (error instanceof YasError && [403, 426].includes(error.status))) throw error;
+            }
+            await delay(1000, signal);
+        }
+        throw new Error('连接超时。请确认已安装网页连接包，并允许浏览器打开 YAS、访问本机网络和 YAS 的授权提示。');
     }
-    async sendMessage(hWnd: number, Msg: number, wParam: number, lParam: number) {
-        return this.wsInvoke('POST', '/api/SendMessage', {
-            hWnd,
-            Msg,
-            wParam,
-            lParam,
-        });
+
+    windows(signal?: AbortSignal): Promise<GameWindow[]> { return this.request('/api/windows', signal); }
+    async scan(options: ScanOptions, signal?: AbortSignal): Promise<string> {
+        const response = await this.request<{ job: string }>('/api/scan', signal, options);
+        return response.job;
     }
-    async SetCursorPos(x: number, y: number) {
-        return this.wsInvoke('POST', '/api/SetCursorPos', {
-            x,
-            y,
-        });
+    status(job: string, after: number, signal?: AbortSignal): Promise<ScanStatus> {
+        return this.request(`/api/status?${new URLSearchParams({ job, after: String(after) })}`, signal);
     }
-    async listWindows(): Promise<IWindow[]> {
-        return (await this.wsInvoke('GET', '/api/windows')).body;
+    result(job: string, signal?: AbortSignal): Promise<unknown> {
+        return this.request(`/api/result?${new URLSearchParams({ job })}`, signal);
     }
-    async getWindow(id: number): Promise<IWindow> {
-        return (await this.wsInvoke('GET', '/api/windows/' + id)).body;
-    }
-    async activateWindow(id: number) {
-        return await this.wsInvoke('PATCH', '/api/windows/' + id);
-    }
-    async getMonitor(): Promise<IWindow> {
-        return (await this.wsInvoke('GET', '/api/monitors')).body;
-    }
-    async toAbsolute(
-        hWnd: number,
-        x: number,
-        y: number,
-        { dx = 1, dy = 1, window = null as IWindow | null } = { dx: 1, dy: 1, window: null as IWindow | null },
-    ) {
-        const win = window || (await this.getWindow(hWnd));
-        const xdelta = dx === 1 ? 1 : win.width / dx;
-        const ydelta = dy === 1 ? 1 : win.height / dy;
-        return { x: x * xdelta + win.x, y: y * ydelta + win.y, win };
-    }
+    async cancel(job: string): Promise<void> { await this.request('/api/cancel', undefined, { job }); }
 }

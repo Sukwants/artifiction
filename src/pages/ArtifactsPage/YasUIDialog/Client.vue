@@ -1,324 +1,60 @@
 <template>
-    <div :class="$style.client">
-        <div class="client-content">
-            <p> web 扫描尚未更新，请前往 GitHub (https://github.com/2745518585/yas) 下载 yas 本地扫描后导入。 </p>
-            <!-- <div v-if="loading">
-                <div :class="$style.loader">
-                    <div class="loader-animation">
-                        <span class="cssload-loader"><span class="cssload-loader-inner"></span></span>
-                    </div>
-                    <div class="loader-text">正在连接辅助插件</div>
-                </div>
-            </div>
-            <div v-if="notFound && !loading" class="not-found">
-                <div class="title">
-                    {{ needUpdate ? '您的辅助插件版本过低' : '自动操作需要辅助插件' }}
-                    <small v-if="needUpdate">(v{{ version }})</small>
-                </div>
-                <div class="content">
-                    由于浏览器限制，自动操作无法在网页完成
-                    <a class="dlink" href="https://.work/extra/client" target="_blank">
-                        如果插件没有自动启动，请点击此处下载并运行辅助插件<small>(v{{ cVersion }} 500kB)</small>
-                    </a>
-                    <div class="absolute-area">
-                        <el-button v-if="needUpdate" class="start-btn start-gray" @click="enable(false)">
-                            <div class="l">
-                                <i-ep-check />
-                            </div>
-                            <div class="m">
-                                <div class="t">
-                                    {{ needUpdate ? '我已更新并重新运行辅助插件' : '我已运行辅助插件' }}
-                                </div>
-                                <div class="d">记得同意控制键鼠的权限申请</div>
-                            </div>
-                            <div class="r">
-                                <i-ep-arrow-right />
-                            </div>
-                        </el-button>
-                        <el-alert
-                            v-else
-                            center
-                            show-icon
-                            title="正在等待辅助插件，启动后将自动连接..."
-                            :closable="false"
-                        >
-                        </el-alert>
-                    </div>
-                </div>
-            </div>
-            <div v-if="!notFound && (denied || gameNotFound) && !loading" class="not-found">
-                <div class="title">{{ denied ? '您已拒绝辅助插件的权限申请' : '未找到可用的原神游戏窗口' }}</div>
-                <div class="content">
-                    <div v-if="denied">
-                        由于浏览器限制，自动操作无法在网页完成<br />
-                        模拟键鼠操作需要您运行辅助插件并同意权限申请
-                    </div>
-                    <div v-else>
-                        自动操仅支持原神PC客户端<br />
-                        请重新检查是否启动原神
-                    </div>
-                    <div class="absolute-area">
-                        <el-button class="start-btn start-gray" @click="enable(false)">
-                            <div class="l">
-                                <i-ep-check />
-                            </div>
-                            <div class="m">
-                                <div class="t">点击重试</div>
-                                <div class="d">记得同意控制键鼠的权限申请</div>
-                            </div>
-                            <div class="r">
-                                <i-ep-arrow-right />
-                            </div>
-                        </el-button>
-                    </div>
-                </div>
-            </div> -->
+    <div class="yas-client">
+        <p>首次使用：下载网页连接包，解压后运行「安装网页连接.cmd」。</p>
+        <p>
+            <a :href="yasDownloadGithub" target="_blank" rel="noopener noreferrer">下载 YAS 网页连接包（yas_web_*.zip）</a>
+        </p>
+        <p>连接时请允许浏览器打开 YAS、访问本机网络，并在 YAS 的提示中允许当前网站。</p>
+        <el-alert v-if="error" :title="error" type="error" :closable="false" show-icon />
+        <div class="actions">
+            <el-button type="primary" :disabled="connecting" @click="connect(true)">启动并连接 YAS</el-button>
+            <el-button :disabled="connecting" @click="connect(false)">连接已运行的 YAS</el-button>
+            <el-button v-if="connecting" @click="abort">停止等待</el-button>
         </div>
+        <p v-if="connecting">正在等待 YAS 授权，请查看 Windows 的提示窗口……</p>
+        <p v-else>支持 Windows 的原神客户端。也可以继续用 YAS 扫描后手动导入 mona.json。</p>
     </div>
 </template>
 
-<script>
-// import { ref, defineComponent, toRef, onMounted } from '@vue/composition-api';
-// format: x.x.x
-import { ref, defineComponent, toRef, onMounted } from 'vue';
+<script setup lang="ts">
+import { onBeforeUnmount, ref } from 'vue';
+import links from '@/constants/links';
+import { YasClient } from './webcontrol';
 
-export function versionCompare(a, b) {
-    const aParts = a.split('.');
-    const bParts = b.split('.');
-    const len = Math.max(aParts.length, bParts.length);
-    for (let i = 0; i < len; i++) {
-        const aPart = parseInt(aParts[i], 10);
-        const bPart = parseInt(bParts[i], 10);
-        if (aPart === bPart) {
-            continue;
+const props = defineProps<{ client: YasClient }>();
+const yasDownloadGithub = links.yasDownloadGithub;
+const emit = defineEmits<{ (event: 'done'): void }>();
+const connecting = ref(false);
+const error = ref('');
+let pending: AbortController | undefined;
+
+function abort() { pending?.abort(); }
+async function connect(launch: boolean) {
+    const controller = new AbortController();
+    pending = controller;
+    connecting.value = true;
+    error.value = '';
+    try {
+        if (launch) {
+            props.client.launch();
+            await props.client.waitForConnection(controller.signal);
+        } else {
+            await props.client.connectRunning(controller.signal);
         }
-        if (aPart === undefined) {
-            return -1;
+        if (!controller.signal.aborted) emit('done');
+    } catch (cause) {
+        if (!controller.signal.aborted) {
+            error.value = cause instanceof Error ? cause.message : '连接失败，请确认 YAS 已启动';
         }
-        if (bPart === undefined) {
-            return 1;
-        }
-        return aPart - bPart > 0 ? 1 : -1;
+    } finally {
+        connecting.value = false;
     }
-    return 0;
 }
-
-export default defineComponent({
-    props: {
-        control: {
-            type: Object,
-            required: true,
-        },
-    },
-    emits: ['done'],
-    setup(props, { emit }) {
-        const w = toRef(props, 'control');
-        const loading = ref(true);
-        const notFound = ref(false);
-        const denied = ref(false);
-        const gameNotFound = ref(false);
-        const needUpdate = ref(false);
-        const version = ref('');
-        let destroyed = false;
-        const waiting = ref(false);
-        onBeforeUnmount(() => {
-            destroyed = true;
-        });
-        const enable = async (force = false) => {
-            if (destroyed) return;
-            if (loading.value && !force) return;
-            if (!waiting.value) loading.value = true;
-            denied.value = false;
-            let alive = await w.value.check();
-            if (!alive && !waiting.value) await w.value.launch();
-            alive = await w.value.check();
-            if (!alive) {
-                console.log('[webcontrol] ping timeout');
-                waiting.value = true;
-                notFound.value = true;
-                loading.value = false;
-                needUpdate.value = false;
-                setTimeout(enable, 2000);
-                return;
-            } else if (versionCompare(w.value.version, '1.2.5') < 0) {
-                needUpdate.value = true;
-                notFound.value = true;
-                loading.value = false;
-                version.value = w.value.version;
-                return;
-            } else {
-                needUpdate.value = false;
-                try {
-                    loading.value = true;
-                    const authorized = await w.value.authorize();
-                    if (authorized) {
-                        let windows = await w.value.listWindows();
-                        windows = windows.filter(
-                            (w) => w.title.includes('原神') || w.title.toLowerCase().includes('genshin'),
-                        );
-                        if (windows.length === 0) {
-                            notFound.value = false;
-                            loading.value = false;
-                            gameNotFound.value = true;
-                            return;
-                        }
-                        emit('done', windows[0].hWnd);
-                    } else {
-                        console.log('denied');
-                        denied.value = true;
-                    }
-                    notFound.value = false;
-                } catch (e) {
-                    notFound.value = true;
-                    console.log(e);
-                }
-            }
-            loading.value = false;
-        };
-        onMounted(() => enable(true));
-        return {
-            loading,
-            notFound,
-            enable,
-            denied,
-            gameNotFound,
-            needUpdate,
-            version,
-            cVersion: '1.2.5',
-        };
-    },
-});
+onBeforeUnmount(abort);
 </script>
 
-<style lang="scss" module>
-.client {
-    padding-top: 10vh;
-    :global {
-        .client-content {
-            height: 250px;
-            position: relative;
-            .absolute-area {
-                position: absolute;
-                left: 0;
-                right: 0;
-                bottom: 0;
-            }
-        }
-        .not-found {
-            .title {
-                font-size: 23px;
-                margin-bottom: 10px;
-            }
-
-            a {
-                color: #555;
-                text-decoration: none;
-                &.dlink {
-                    margin-top: 8px;
-                    display: block;
-                    color: #0068b7;
-                }
-            }
-        }
-    }
-}
-.loader {
-    width: 200px;
-    color: #666;
-    text-align: center;
-    font-size: 14px;
-    margin: 0 auto;
-    padding-top: 50px;
-    :global {
-        .loader-text {
-            padding-top: 15px;
-        }
-        .cssload-loader {
-            display: block;
-            margin: 0 auto;
-            width: 30px;
-            height: 30px;
-            position: relative;
-            border: 3px solid #333;
-            &:local {
-                animation: scanner-cssload-loader 2.3s infinite ease;
-            }
-        }
-        .cssload-loader-inner {
-            vertical-align: top;
-            display: inline-block;
-            width: 100%;
-            background-color: #333;
-            &:local {
-                animation: scanner-cssload-loader-inner 2.3s infinite ease-in;
-            }
-        }
-        .loader-progress {
-            width: 170px;
-            height: 2px;
-            background: #ddd;
-            margin: 0 auto;
-            margin-top: 20px;
-            position: relative;
-            .loader-progress-bar {
-                width: 0;
-                height: 100%;
-                background: #777;
-                position: absolute;
-                left: 0;
-                top: 0;
-            }
-        }
-        .loader-progress-text {
-            font-size: 12px;
-            position: relative;
-            top: -12px;
-            background: #fff;
-            display: inline-block;
-            padding: 0 4px;
-        }
-    }
-}
-@keyframes scanner-cssload-loader {
-    0% {
-        transform: rotate(0deg);
-    }
-
-    25% {
-        transform: rotate(180deg);
-    }
-
-    50% {
-        transform: rotate(180deg);
-    }
-
-    75% {
-        transform: rotate(360deg);
-    }
-
-    100% {
-        transform: rotate(360deg);
-    }
-}
-@keyframes scanner-cssload-loader-inner {
-    0% {
-        height: 0%;
-    }
-
-    25% {
-        height: 0%;
-    }
-
-    50% {
-        height: 100%;
-    }
-
-    75% {
-        height: 100%;
-    }
-
-    100% {
-        height: 0%;
-    }
-}
+<style scoped>
+.yas-client { line-height: 1.8; }
+.actions { display: flex; flex-wrap: wrap; gap: 12px; margin-top: 20px; }
+.actions .el-button { margin-left: 0; }
 </style>

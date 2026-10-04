@@ -43,6 +43,9 @@ jobs:
       - name: Type-check test framework
         run: npm run test:project:typecheck
 
+      - name: Build frontend
+        run: npm run build
+
       - name: Run tests directory unit tests
         run: npm run test:project:unit
 
