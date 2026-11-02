@@ -11,8 +11,15 @@ wasm-opt = false
 [lib]
 crate-type = ["cdylib", "rlib"]
 
+[[bin]]
+name = "bench_single_optimizer"
+path = "src/bin/bench_single_optimizer.rs"
+required-features = ["optimizer-legacy"]
+
 [features]
 default = ["console_error_panic_hook"]
+# Historical implementations, only for explicit comparisons and research.
+optimizer-legacy = []
 
 [profile.release]
 lto = true
