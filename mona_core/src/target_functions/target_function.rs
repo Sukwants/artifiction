@@ -26,6 +26,32 @@ pub type TargetFunctionAttributeType = SimpleAttribute;
 pub type TargetFunctionAttributeResultType = SimpleAttributeResult;
 
 pub trait TargetFunction {
+
+    /// Opt in only if `target_from_solved` is pure and depends exclusively on
+    /// the numeric node map + active character ID and the fixed character,
+    /// weapon, enemy and target configuration of one optimization request.
+    /// It must ignore raw artifacts, source provenance and character-status
+    /// metadata. This is stronger than supporting `target_from_solved` alone.
+    /// Optimizers may then memoize bitwise-identical solved inputs locally.
+    fn can_memoize_solved_score(&self) -> bool {
+        false
+    }
+
+    /// Optional fast path after the optimizer has solved this exact attribute
+    /// graph to check constraints. Return Some only when this gives precisely
+    /// the same score as `target`, including all context and artifact handling.
+    /// Targets that modify the graph (e.g. apply skill effects before solving)
+    /// must keep None unless they can preserve those semantics here.
+    fn target_from_solved(
+        &self,
+        _attribute: &SimpleAttributeResult,
+        _character: &Character<SimpleAttribute>,
+        _weapon: &Weapon<SimpleAttribute>,
+        _artifacts: &[&Artifact],
+        _enemy: &Enemy,
+    ) -> Option<f64> {
+        None
+    }
     
     fn get_target_function_opt_config(&self) -> TargetFunctionOptConfig;
 

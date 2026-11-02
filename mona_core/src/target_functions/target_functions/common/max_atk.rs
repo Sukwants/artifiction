@@ -36,6 +36,10 @@ impl TargetFunctionMetaTrait for MaxATKTargetFunction {
 }
 
 impl TargetFunction for MaxATKTargetFunction {
+    fn target_from_solved(&self, attribute: &SimpleAttributeResult, _character: &Character<SimpleAttribute>, _weapon: &Weapon<SimpleAttribute>, _artifacts: &[&Artifact], _enemy: &Enemy) -> Option<f64> {
+        Some(attribute.get_atk())
+    }
+
     fn get_target_function_opt_config(&self) -> TargetFunctionOptConfig {
         // TargetFunctionOptConfig {
         //     atk_fixed: 0.5,

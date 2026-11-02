@@ -68,9 +68,9 @@ impl SimpleAttributeGraphResult {
     pub fn get_attribute_value(&self, node: AttributeNode) -> f64 {
         let mut temp = 0.0;
 
-        for pa in node.get_parents() {
+        node.for_each_parent(|pa| {
             temp += self.map.get(&pa).copied().unwrap_or(0.0);
-        }
+        });
 
         temp
     }
@@ -183,10 +183,11 @@ impl SimpleAttributeGraph2 {
         let mut temp = result.clone();
 
         let sum_parent_values = |nodes: &HashMap<AttributeNode, f64>, node: AttributeNode| {
-            node.get_parents()
-                .iter()
-                .map(|pa| *nodes.get(pa).unwrap_or(&0.0))
-                .sum::<f64>()
+            // Use the same identity and summation order as Iterator::sum,
+            // including its treatment of signed zero.
+            let mut sum = std::iter::empty::<f64>().sum::<f64>();
+            node.for_each_parent(|pa| sum += nodes.get(&pa).copied().unwrap_or(0.0));
+            sum
         };
 
         let solve_edge = |
@@ -196,7 +197,11 @@ impl SimpleAttributeGraph2 {
             c: f64,
         | {
             let from1_value = sum_parent_values(nodes_old, edge.from1);
-            let from2_value = sum_parent_values(nodes_old, edge.from2);
+            let from2_value = if edge.from1 == edge.from2 {
+                from1_value
+            } else {
+                sum_parent_values(nodes_old, edge.from2)
+            };
             let value = (edge.func)(from1_value, from2_value) * c;
             *nodes_new.entry(edge.to).or_insert(0.0) += value;
         };
@@ -236,6 +241,10 @@ impl SimpleAttributeGraph2 {
         }
     }
 }
+
+#[cfg(test)]
+#[path = "simple_attribute_graph2_regressions.rs"]
+mod optimizer_regressions;
 
 #[cfg(test)]
 mod tests {

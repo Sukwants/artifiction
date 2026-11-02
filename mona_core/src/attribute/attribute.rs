@@ -82,6 +82,29 @@ impl AttributeNode {
             }
         }
     }
+
+    /// Visit parents in exactly the same order as `get_parents`, without the
+    /// temporary vectors. Preserve order because floating-point addition is
+    /// order-sensitive. Keep the allocating API for callers that need a Vec.
+    pub fn for_each_parent(&self, mut visit: impl FnMut(AttributeNode)) {
+        match self.attribute_type {
+            AttributeType::Panel(_) => visit(*self),
+            AttributeType::Invisible(attribute) => {
+                let elements = [attribute.element, None];
+                let skills = [attribute.skill, None];
+                let reactions = [attribute.reaction, None];
+                for &element in &elements[..1 + usize::from(attribute.element.is_some())] {
+                    for &skill in &skills[..1 + usize::from(attribute.skill.is_some())] {
+                        for &reaction in &reactions[..1 + usize::from(attribute.reaction.is_some())] {
+                            visit(Self::new_invisible(self.character_id, InvisibleAttributeType::new(
+                                attribute.attribute_variable_type, element, skill, reaction,
+                            )));
+                        }
+                    }
+                }
+            }
+        }
+    }
 }
 
 pub type EdgeFunction = Arc<dyn Fn(f64, f64) -> f64>;
