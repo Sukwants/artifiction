@@ -59,11 +59,19 @@
                 type="warning"
                 style="margin-bottom: 12px"
             ></el-alert>
-            <el-radio-group v-model="algorithm">
+            <el-radio-group v-model="algorithmChoice" data-testid="optimization-algorithm">
                 <el-radio label="AStar">{{ t("calcPage.aStar") }}</el-radio>
-<!--                <el-radio label="Heuristic">{{t("calcPage.heuristic")}}</el-radio>-->
                 <el-radio label="Naive">{{ t("calcPage.naive") }}</el-radio>
             </el-radio-group>
+            <p class="algorithm-description" data-testid="optimization-algorithm-description">
+                {{ t(algorithmChoice === 'Naive' ? 'calcPage.exactDescription' : 'calcPage.groupedDescription') }}
+            </p>
+            <el-alert
+                v-if="miscTargetFunctionTab === 'dsl' && algorithmChoice !== 'Naive'"
+                :title="t('calcPage.dslAlgorithmHint')"
+                type="info"
+                :closable="false"
+            ></el-alert>
 
             <p class="common-title2">{{ t("calcPage.constSet") }}</p>
             <div style="margin-top: 12px; margin-bottom: 12px">
@@ -388,6 +396,7 @@
                             <el-button
                                 :icon="IconEpTools"
                                 @click="handleClickSetupOptimization"
+                                data-testid="optimization-settings"
                             >{{ t("calcPage.setupCalc") }}</el-button>
 
                             <el-button
@@ -402,6 +411,7 @@
                             trigger="click"
                             @command="handleCommandPreset"
                             @click="handleSavePreset(miscCurrentPresetName)"
+                            data-testid="save-optimization-preset"
                             split-button
                         >
                             <template v-if="!miscCurrentPresetName">{{ t("calcPage.newPreset") }}</template>
@@ -465,7 +475,8 @@
                         style="margin-top: 12px"
                     >
                         <el-alert
-                            :title="`共计算${optimizationResults.length}组圣遗物搭配`"
+                            :title="t('calcPage.optimizationResultCount').replace('{count}', String(optimizationResults.length))"
+                            data-testid="optimization-results"
                             type="success"
                             style="margin-bottom: 12px"
                         ></el-alert>
@@ -691,6 +702,7 @@ import IconEpFolder from "~icons/ep/folder"
 import IconEpLock from "~icons/ep/lock"
 import IconEpUnlock from "~icons/ep/unlock"
 import {useComputeConstraint} from "@/composables/constraint"
+import {resolveOptimizationAlgorithm} from "@/utils/optimizationAlgorithm"
 import {BuffEntry, useBuff} from "@/composables/buff"
 import {type PresetEntry, usePresetStore, upgradePresetToNewVersion} from "@/store/pinia/preset"
 import {useArtifactStore} from "@/store/pinia/artifact"
@@ -925,6 +937,7 @@ const isAllLocked = computed(() => {
 const showConstraintDialog = ref(false)
 const {
     algorithm,
+    algorithmChoice,
     constraintArtifactSet,
     constraintSandMainStats,
     constraintGobletMainStats,
@@ -1154,11 +1167,7 @@ function usePreset(name: string) {
     }
 
     // use compute mode
-    algorithm.value = item.algorithm ?? "AStar"
-    // disable heuristic algorithm in 5.11
-    if (algorithm.value === "Heuristic") {
-        algorithm.value = "AStar"
-    }
+    algorithm.value = resolveOptimizationAlgorithm(item.algorithm)
 
     // use artifact effect mode
     artifactEffectMode.value = item.artifactEffectMode ?? "auto"
@@ -1821,7 +1830,7 @@ async function patchControllerState(patch: any) {
     }
     if (patch.optimization) {
         const input = patch.optimization
-        if (input.algorithm !== undefined) algorithm.value = input.algorithm
+        if (input.algorithm !== undefined) algorithm.value = resolveOptimizationAlgorithm(input.algorithm)
         if (input.constraint) {
             constraintArtifactSet.value = deepCopy(input.constraint.setNames ?? constraintArtifactSet.value)
             constraintMinRecharge.value = input.constraint.minRecharge ?? constraintMinRecharge.value
@@ -1901,6 +1910,12 @@ onUnmounted(() => emit("register-controller", null))
 </script>
 
 <style lang="scss" scoped>
+.algorithm-description {
+    color: var(--el-text-color-secondary);
+    line-height: 1.6;
+    margin: 8px 0 12px;
+}
+
 .big-container {
     @media only screen and (min-width: 992px) {
         .left-container, .middle-container, .right-container {

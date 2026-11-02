@@ -12,6 +12,7 @@
 - [开发与部署](development.md)：环境、生成步骤、部署配置、CI 和问题定位。
 - [项目结构与数据流](architecture.md)：界面、Store、WASM、计算核心和扫描器的职责。
 - [计算核心开发](../mona_docs/src/index.md)：角色、武器、圣遗物、Buff 与目标函数的实现约定。
+- [单人配装算法](single-optimizer.md)：枚举基准、分组剪枝、前 k 排名约定及回归验证。
 - [页面自动化 API](../mona_api/mona-api.md)：`window.monaApi` 的实际接口。
 - [测试框架](../tests/README.md)：场景注册、fixture 和运行方式。
 - [MONA-DSL](../mona_dsl_book/src/SUMMARY.md)：自定义目标函数语言的说明。
