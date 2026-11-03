@@ -588,6 +588,7 @@
                         <el-button
                             :icon="IconEpHistogram"
                             @click="handleDisplayAnalysis"
+                            data-testid="damage-analysis-button"
                         >{{ t("calcPage.detail") }}</el-button>
                         <el-button
                             :icon="IconEpTools"
