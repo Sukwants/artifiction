@@ -1,4 +1,5 @@
 import backend from "@/store/backend"
+import {nextTick} from "vue"
 import {changeAccount, deleteAccount, useAccountStore, waitForAccountStoreReady} from "@/store/pinia/account"
 import {useArtifactStore, watchContent as artifactContent} from "@/store/pinia/artifact"
 import {useKumiStore} from "@/store/pinia/kumi"
@@ -336,5 +337,7 @@ export const presetsApi = {
 
 export async function waitForMonaData() {
     await waitForAccountStoreReady()
+    // 先让 Store 的保存监听器提交写入，再等待持久化完成。
+    await nextTick()
     await backend.allReady()
 }

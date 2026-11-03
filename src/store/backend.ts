@@ -290,6 +290,8 @@ function isWindowActive() {
 }
 
 class MixedBackend {
+    private pendingWrites = new Set<Promise<void>>()
+
     constructor(
         private fileBackend = new FileBackend(),
         private localBackend = new LocalBackend(),
@@ -324,9 +326,20 @@ class MixedBackend {
     }
 
     async allReady() {
-        if (this.fileBackend.connected()) {
-            await this.fileBackend.allWritten()
-        }
+        do {
+            await Promise.all(this.pendingWrites)
+            if (this.fileBackend.connected()) {
+                await this.fileBackend.allWritten()
+            }
+        } while (this.pendingWrites.size > 0)
+    }
+
+    private trackWrite(write: Promise<void>) {
+        this.pendingWrites.add(write)
+        const release = () => { this.pendingWrites.delete(write) }
+        // 清理失败的请求，同时保留原 Promise 的拒绝供调用方和 allReady 处理。
+        void write.then(release, release)
+        return write
     }
 
     // startConsistencyCheck() {
@@ -364,7 +377,11 @@ class MixedBackend {
         return await this.localBackend.getItem(key)
     }
 
-    async setItem(key: string, value: any) {
+    setItem(key: string, value: any) {
+        return this.trackWrite(this.writeItem(key, value))
+    }
+
+    private async writeItem(key: string, value: any) {
         await this.checkConsistency()
         const meta = genMeta()
         await this.localBackend.setItem(key, value, meta)
@@ -381,7 +398,11 @@ class MixedBackend {
         }
     }
 
-    async removeItem(key: string) {
+    removeItem(key: string) {
+        return this.trackWrite(this.deleteItem(key))
+    }
+
+    private async deleteItem(key: string) {
         await this.checkConsistency()
         const meta = genMeta()
         await this.localBackend.removeItem(key, meta)

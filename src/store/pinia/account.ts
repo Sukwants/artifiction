@@ -1,4 +1,4 @@
-import { computed, reactive, ref, watch, toRaw } from "vue"
+import { computed, reactive, ref, watch, toRaw, nextTick as flushWatchers } from "vue"
 import { deepCopy } from "@/utils/common"
 import backend from "../backend"
 import { useArtifactStore, watchContent as artifactWatchContent } from "./artifact"
@@ -147,6 +147,7 @@ async function loadAccountData() {
 }
 
 export async function changeAccount(id: number) {
+    await flushWatchers()
     await backend.allReady()
     accountStore.currentAccountId.value = id
     await loadAccountData()
