@@ -263,6 +263,8 @@ export default {
         noTag: "No Tag",
     },
     dmg: {
+        count: "Hit Count",
+        singleExpect: "Expected DMG per Hit",
         electroCharged: "Electro-Charged",
         electro_charged: "Electro-Charged",
         overload: "Overloaded",

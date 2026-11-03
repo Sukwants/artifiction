@@ -1273,6 +1273,7 @@ interface DamageAnalysisResult {
 
 interface DamageVariant {
   key: string
+  damageCount: number
   result: {
     expectation: number
     critical: number
@@ -1293,6 +1294,9 @@ Damage.aggravate
 ```
 
 治疗、护盾、聚变和擢升事件通常只有一个 variant。
+
+`damageCount` 是独立结算的伤害次数，也可以是小数期望次数；旧结果缺少次数以及非伤害事件按 `1` 返回。
+`result` 中的三个伤害数值已包含次数，调用方不要再次相乘。`details` 中的倍率、固定加成仍表示单次伤害，原始次数字段为 `damage_count`。
 
 不要假定 `variants[0]` 永远代表特定反应；应按 `key` 查找：
 

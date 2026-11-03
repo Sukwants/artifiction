@@ -265,6 +265,8 @@ export default {
         noTag: "无标签",
     },
     dmg: {
+        count: "伤害次数",
+        singleExpect: "单次期望",
         electroCharged: "感电",
         electro_charged: "感电",
         overload: "超载",
