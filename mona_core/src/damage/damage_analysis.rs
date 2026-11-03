@@ -1,10 +1,12 @@
 use std::{collections::HashMap, hash::Hash};
 use serde::{Serialize, Deserialize};
 use crate::common::{DamageResult, Element, ElevativeReaction, ReactionType, TransformativeType};
-use crate::damage::damage_result::DamageBuilderResult;
+use crate::damage::damage_result::{default_damage_count, DamageBuilderResult};
 
 #[derive(Debug, Serialize, Deserialize)]
 pub struct DamageAnalysis {
+    #[serde(default = "default_damage_count")]
+    pub damage_count: f64,
     pub element: Element,
     pub reaction_type: Option<ReactionType>,
     
@@ -33,6 +35,8 @@ pub struct DamageAnalysis {
 
 #[derive(Debug, Serialize, Deserialize)]
 pub struct TransformativeDamageAnalysis {
+    #[serde(default = "default_damage_count")]
+    pub damage_count: f64,
     pub element: Option<Element>,
     pub transformative_type: TransformativeType,
 
@@ -50,6 +54,8 @@ pub struct TransformativeDamageAnalysis {
 
 #[derive(Debug, Serialize, Deserialize)]
 pub struct ElevativeDamageAnalysis {
+    #[serde(default = "default_damage_count")]
+    pub damage_count: f64,
     pub element: Element,
     pub elevative_type: ElevativeReaction,
     

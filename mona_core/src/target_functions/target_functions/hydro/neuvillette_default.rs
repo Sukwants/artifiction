@@ -17,6 +17,10 @@ use crate::weapon::weapon_common_data::WeaponCommonData;
 pub struct NeuvilletteDefaultTargetFunction;
 
 impl TargetFunction for NeuvilletteDefaultTargetFunction {
+    fn can_memoize_solved_score(&self) -> bool {
+        true
+    }
+
     fn get_target_function_opt_config(&self) -> TargetFunctionOptConfig {
         unimplemented!()
     }
@@ -26,7 +30,17 @@ impl TargetFunction for NeuvilletteDefaultTargetFunction {
     }
 
     fn target(&self, attribute: &TargetFunctionAttributeType, character: &Character<TargetFunctionAttributeType>, weapon: &Weapon<TargetFunctionAttributeType>, artifacts: &[&Artifact], enemy: &Enemy) -> f64 {
-        let attribute = &attribute.solve();
+        self.target_from_solved(&attribute.solve(), character, weapon, artifacts, enemy).unwrap()
+    }
+
+    fn target_from_solved(
+        &self,
+        attribute: &SimpleAttributeResult,
+        character: &Character<SimpleAttribute>,
+        _weapon: &Weapon<SimpleAttribute>,
+        _artifacts: &[&Artifact],
+        enemy: &Enemy,
+    ) -> Option<f64> {
         let context = DamageContext {
             character_common_data: &character.common_data,
             enemy, attribute
@@ -40,7 +54,7 @@ impl TargetFunction for NeuvilletteDefaultTargetFunction {
             None
         );
 
-        dmg_charged2.normal.expectation
+        Some(dmg_charged2.normal.expectation)
     }
 }
 

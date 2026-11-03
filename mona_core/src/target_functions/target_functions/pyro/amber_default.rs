@@ -40,6 +40,10 @@ impl TargetFunctionMetaTrait for AmberDefaultTargetFunction {
 }
 
 impl TargetFunction for AmberDefaultTargetFunction {
+    fn can_memoize_solved_score(&self) -> bool {
+        true
+    }
+
     fn get_target_function_opt_config(&self) -> TargetFunctionOptConfig {
         // TargetFunctionOptConfig {
         //     atk_fixed: 0.1,
@@ -98,7 +102,17 @@ impl TargetFunction for AmberDefaultTargetFunction {
         _artifacts: &[&Artifact],
         enemy: &Enemy
     ) -> f64 {
-        let attribute = &attribute.solve();
+        self.target_from_solved(&attribute.solve(), character, _weapon, _artifacts, enemy).unwrap()
+    }
+
+    fn target_from_solved(
+        &self,
+        attribute: &SimpleAttributeResult,
+        character: &Character<SimpleAttribute>,
+        _weapon: &Weapon<SimpleAttribute>,
+        _artifacts: &[&Artifact],
+        enemy: &Enemy,
+    ) -> Option<f64> {
         let context: DamageContext<'_, TargetFunctionAttributeResultType> = DamageContext {
             character_common_data: &character.common_data,
             attribute,
@@ -108,6 +122,6 @@ impl TargetFunction for AmberDefaultTargetFunction {
         type S = <Amber as CharacterTrait>::DamageEnumType;
         let dmg_charged = Amber::damage::<SimpleDamageBuilder>(&context, S::Charged2, &CharacterSkillConfig::NoConfig, None);
 
-        dmg_charged.normal.expectation
+        Some(dmg_charged.normal.expectation)
     }
 }

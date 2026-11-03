@@ -37,11 +37,23 @@ jobs:
       - name: Build WASM
         run: npm run build:wasm
 
+      - name: Test single-character optimizer
+        run: cargo test --manifest-path mona_wasm/Cargo.toml --features optimizer-legacy --lib optimize_artifacts
+
+      - name: Test attribute solver
+        run: "cargo test --manifest-path mona_core/Cargo.toml --lib attribute::"
+
+      - name: Check optimizer benchmark
+        run: cargo check --manifest-path mona_wasm/Cargo.toml --features optimizer-legacy --bin bench_single_optimizer
+
       - name: Generate project metadata
         run: npm run gen_meta
 
       - name: Type-check test framework
         run: npm run test:project:typecheck
+
+      - name: Build frontend
+        run: npm run build
 
       - name: Run tests directory unit tests
         run: npm run test:project:unit

@@ -13,7 +13,13 @@
             <el-radio-button v-if="hasNumber" label="Number">数值</el-radio-button>
         </el-radio-group>
 
-        <span class="damage-display">{{ calc_result() }}</span>
+        <div class="damage-summary">
+            <span v-if="isDamage && damageCount !== 1" class="damage-count" :title="String(damageCount)">
+                {{ t('dmg.singleExpect') }} {{ Math.round(calc_single_result()) }}
+                × {{ t('dmg.count') }} {{ Number(damageCount.toFixed(6)) }} =
+            </span>
+            <span class="damage-display">{{ calc_result() }}</span>
+        </div>
     </div>
 
     <div v-if="this.damageType != 'None'" class="header-row" style="overflow: auto; margin-bottom: 16px; min-height: 200px;">
@@ -191,6 +197,7 @@
 import { get } from "lodash"
 import DamageAnalysisUtil from "./DamageAnalysisUtil"
 import { LEVEL_MULTIPLIER } from "@/constants/levelMultiplier"
+import {useI18n} from "@/i18n/i18n"
 
 function init_value(result) {
     let temp = {}
@@ -199,7 +206,8 @@ function init_value(result) {
             continue
         }
         if (typeof result[key] === "number") {
-            temp[key] = Math.round(result[key] * 1000) / 1000
+            // 次数可以是概率期望，保留完整精度用于总伤害计算，仅展示时格式化。
+            temp[key] = key === "damage_count" ? result[key] : Math.round(result[key] * 1000) / 1000
             continue
         }
         if (typeof result[key] === "object") {
@@ -240,6 +248,10 @@ export default {
         DamageAnalysisUtil
     },
     props: ["enemyConfig", "characterLevel"],
+    setup() {
+        const {t} = useI18n()
+        return {t}
+    },
     data() {
         return {
             damageType: "None",
@@ -442,8 +454,8 @@ export default {
             return number
         },
 
-        calc_result() {
-            return Math.round((() => {
+        calc_single_result() {
+            return (() => {
                 if (this.damageType == "DamageNormal") {
                     return this.calc_Damage(this.DamageNormal)
                 } else if (this.damageType == "DamageMelt") {
@@ -465,7 +477,12 @@ export default {
                 } else if (this.damageType == "Number") {
                     return this.calc_Number(this.Number)
                 }
-            })())
+                return 0
+            })()
+        },
+
+        calc_result() {
+            return Math.round(this.calc_single_result() * this.damageCount)
         },
         
         get_name_from_element(element) {
@@ -519,6 +536,14 @@ export default {
         },
     },
     computed: {
+        isDamage() {
+            return this.damageType.startsWith("Damage")
+                || this.damageType === "TransformativeDamage"
+                || this.damageType === "ElevativeDamage"
+        },
+        damageCount() {
+            return this.isDamage ? this.result?.damage_count ?? 1 : 1
+        },
         hasDamageNormal() {
             return this.DamageNormal != null
         },
@@ -572,6 +597,18 @@ export default {
 </script>
 
 <style scoped lang="scss">
+.damage-summary {
+    display: flex;
+    align-items: center;
+    flex-wrap: wrap;
+    gap: 8px;
+}
+
+.damage-count {
+    font-size: 14px;
+    color: #606266;
+}
+
 .header-row {
     display: flex;
     // align-items: center;

@@ -15,6 +15,9 @@ pub mod varesa_default;
 pub mod ineffa_default;
 pub mod flins_default;
 pub mod alyosha_default;
+pub mod mitya_on_field;
+pub mod mitya_off_field;
+pub mod valeriy_default;
 
 pub use beidou_default::BeidouDefaultTargetFunction;
 pub use fischl_default::FischlDefaultTargetFunction;
@@ -33,3 +36,6 @@ pub use varesa_default::VaresaDefaultTargetFunction;
 pub use ineffa_default::IneffaDefaultTargetFunction;
 pub use flins_default::FlinsDefaultTargetFunction;
 pub use alyosha_default::AlyoshaDefaultTargetFunction;
+pub use mitya_on_field::MityaOnFieldTargetFunction;
+pub use mitya_off_field::MityaOffFieldTargetFunction;
+pub use valeriy_default::ValeriyDefaultTargetFunction;

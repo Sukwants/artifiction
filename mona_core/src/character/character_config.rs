@@ -96,5 +96,7 @@ pub enum CharacterConfig {
     Odette { stellar_glimmer_state: StellarGlimmerState, stellar_conduct_application_count: usize, marvelous_splendor_self: f64, marvelous_splendor_other: f64 },
     Vesna { stellar_glimmer_state: StellarGlimmerState, cryo_anemo_count: usize, other_count: usize },
     Vodyanitsa { stellar_glimmer_state: StellarGlimmerState },
+    Mitya { stellar_glimmer_state: StellarGlimmerState, stellar_conduct_application_count: usize },
+    Valeriy { stellar_glimmer_state: StellarGlimmerState },
     NoConfig,
 }

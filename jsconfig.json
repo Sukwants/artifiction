@@ -4,7 +4,6 @@
             "@c": ["./src/components"],
             "@asset": ["./src/assets"],
             "@util": ["./src/utils"],
-            "@alg": ["./src/algorithms"],
             "@page": ["./src/pages"],
             "@worker": ["./src/workers"],
             "@const": ["./src/constants"],

@@ -298,4 +298,5 @@ pub enum WeaponName {
     AstralVulturesCrimsonPlumage,
     TheDaybreakChronicles,
     GoldenFrostboundOath,
+    StarsealedEdict,
 }

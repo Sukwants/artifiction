@@ -17,6 +17,8 @@ pub mod iansan;
 pub mod varesa;
 pub mod ineffa;
 pub mod flins;
+pub mod mitya;
+pub mod valeriy;
 
 pub use alyosha::Alyosha;
 pub use beidou::{Beidou, BeidouDamageEnum};
@@ -37,3 +39,5 @@ pub use iansan::Iansan;
 pub use varesa::Varesa;
 pub use ineffa::Ineffa;
 pub use flins::Flins;
+pub use mitya::Mitya;
+pub use valeriy::Valeriy;

@@ -158,6 +158,7 @@ pub enum WeaponConfig {
     EchoesOfTheHeart { element_reaction: bool, stellar_reaction: bool },
     HymnOfTheMaelstrom { stack: f64, reaction: bool },
     WintersHeavyHeart { cryo_count: usize, electro_count: usize, stellar_glimmer_state: StellarGlimmerState },
+    StarsealedEdict { rate: f64, stack: f64, stellar_glimmer_state: StellarGlimmerState },
 
     // Bow
     PolarStar { stack: usize },

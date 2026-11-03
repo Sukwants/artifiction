@@ -10,6 +10,10 @@ pub trait DamageBuilder {
 
     fn new() -> Self;
 
+    /// 设置相同面板下独立结算的伤害次数，默认 1，可传入非负、有限的期望次数。
+    /// 仅作用于 damage、transformative、elevative，不改变单次倍率或属性。
+    fn set_damage_count(&mut self, count: f64);
+
     fn add_atk_ratio(&mut self, key: &str, value: f64);
 
     fn add_def_ratio(&mut self, key: &str, value: f64);

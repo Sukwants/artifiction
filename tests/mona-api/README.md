@@ -5,7 +5,7 @@
 上级目录的 [测试集说明](../README.md)。
 
 该目录提供基于 `puppeteer-core` 的浏览器测试框架。测试文件通过页面中的
-`window.monaApi` 调用真实应用 API，不直接导入 Vue、Pinia 或 API 内部实现。
+`window.monaApi` 调用真实应用 API，不直接导入前端 Store 或 API 内部实现。
 
 ## 底层会话使用方式
 

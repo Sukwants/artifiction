@@ -53,6 +53,7 @@ pub use clash_of_kings::ClashOfKings;
 pub use echoes_of_the_heart::EchoesOfTheHeart;
 pub use hymn_of_the_maelstrom::HymnOfTheMaelstrom;
 pub use winters_heavy_heart::WintersHeavyHeart;
+pub use starsealed_edict::StarsealedEdict;
 
 pub mod lost_prayer_to_the_sacred_winds;
 pub mod skyward_atlas;
@@ -109,3 +110,4 @@ pub mod clash_of_kings;
 pub mod echoes_of_the_heart;
 pub mod hymn_of_the_maelstrom;
 pub mod winters_heavy_heart;
+pub mod starsealed_edict;

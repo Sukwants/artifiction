@@ -1,8 +1,17 @@
 import type {ArtifactSetName, ArtifactStatName} from "@/types/artifact"
 import {convertArtifactName} from "@/utils/converter"
+import {computed, ref} from "vue"
+import type {PresetAlgorithm} from "@/types/preset"
+import {DEFAULT_OPTIMIZATION_ALGORITHM, optimizationAlgorithmChoice, type OptimizationAlgorithmChoice} from "@/utils/optimizationAlgorithm"
 
 export function useComputeConstraint() {
-    const algorithm = ref("AStar")
+    const algorithm = ref<PresetAlgorithm>(DEFAULT_OPTIMIZATION_ALGORITHM)
+    // Legacy Heuristic uses grouped search, but keep its persisted identity
+    // until the user actually chooses a different algorithm.
+    const algorithmChoice = computed({
+        get: () => optimizationAlgorithmChoice(algorithm.value),
+        set: (value: OptimizationAlgorithmChoice) => { algorithm.value = value }
+    })
     const constraintArtifactSet = ref<ArtifactSetName[]>([])
     const constraintSandMainStats = ref<ArtifactStatName[]>([])
     const constraintGobletMainStats = ref<ArtifactStatName[]>([])
@@ -48,6 +57,7 @@ export function useComputeConstraint() {
 
     return {
         algorithm,
+        algorithmChoice,
         constraintArtifactSet,
         constraintSandMainStats,
         constraintGobletMainStats,

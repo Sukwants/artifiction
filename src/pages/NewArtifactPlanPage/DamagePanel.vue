@@ -9,6 +9,12 @@
             >
             </el-table-column>
             <el-table-column
+                v-if="tableData.some(row => row.damageCount !== 1)"
+                prop="damageCount"
+                :label="t('dmg.count')"
+                :formatter="(_row, _column, value) => Number(value.toFixed(6))"
+            ></el-table-column>
+            <el-table-column
                 prop="expectation"
                 :label="t('dmg.expect')"
             ></el-table-column>
@@ -50,8 +56,10 @@ export default {
 
             const r = (x) => Math.round(x)
 
-            const push = (result, title) => {
+            const push = (analysis, title) => {
+                const result = analysis?.result
                 temp.push({
+                    damageCount: analysis?.damage_count ?? 1,
                     expectation: r(result?.expectation) ?? NO_DATA,
                     critical: r(result?.critical) ?? NO_DATA,
                     nonCritical: r(result?.non_critical) ?? NO_DATA,
@@ -60,30 +68,30 @@ export default {
             }
 
             if (this.analysisFromWasm.Number) {
-                push(this.analysisFromWasm.Number.result, this.t("dmg.number"))
+                push(this.analysisFromWasm.Number, this.t("dmg.number"))
             } else if (this.analysisFromWasm.Heal != undefined) {
-                push(this.analysisFromWasm.Heal.result, this.t("dmg.heal"))
+                push(this.analysisFromWasm.Heal, this.t("dmg.heal"))
             } else if (this.analysisFromWasm.Shield != undefined) {
-                push(this.analysisFromWasm.Shield.result, this.t("dmg.shield"))
+                push(this.analysisFromWasm.Shield, this.t("dmg.shield"))
             } else if (this.analysisFromWasm.TransformativeDamage != undefined) {
-                push(this.analysisFromWasm.TransformativeDamage.result, this.t(`dmg.${toSnake(this.analysisFromWasm.TransformativeDamage.transformative_type)}`))
+                push(this.analysisFromWasm.TransformativeDamage, this.t(`dmg.${toSnake(this.analysisFromWasm.TransformativeDamage.transformative_type)}`))
             } else if (this.analysisFromWasm.ElevativeDamage != undefined) {
-                push(this.analysisFromWasm.ElevativeDamage.result, this.t(`dmg.${toSnake(this.analysisFromWasm.ElevativeDamage.elevative_type)}`))
+                push(this.analysisFromWasm.ElevativeDamage, this.t(`dmg.${toSnake(this.analysisFromWasm.ElevativeDamage.elevative_type)}`))
             } else if (this.analysisFromWasm.Damage != undefined) {
 
-                push(this.analysisFromWasm.Damage.normal.result, this.t(`dmg.${this.analysisFromWasm.Damage.normal.element}`))
+                push(this.analysisFromWasm.Damage.normal, this.t(`dmg.${this.analysisFromWasm.Damage.normal.element}`))
 
                 if (this.analysisFromWasm.Damage.melt) {
-                    push(this.analysisFromWasm.Damage.melt.result, this.t("dmg.melt"))
+                    push(this.analysisFromWasm.Damage.melt, this.t("dmg.melt"))
                 }
                 if (this.analysisFromWasm.Damage.vaporize) {
-                    push(this.analysisFromWasm.Damage.vaporize.result, this.t("dmg.vaporize"))
+                    push(this.analysisFromWasm.Damage.vaporize, this.t("dmg.vaporize"))
                 }
                 if (this.analysisFromWasm.Damage.spread) {
-                    push(this.analysisFromWasm.Damage.spread.result, this.t("dmg.spread"))
+                    push(this.analysisFromWasm.Damage.spread, this.t("dmg.spread"))
                 }
                 if (this.analysisFromWasm.Damage.aggravate) {
-                    push(this.analysisFromWasm.Damage.aggravate.result, this.t("dmg.aggravate"))
+                    push(this.analysisFromWasm.Damage.aggravate, this.t("dmg.aggravate"))
                 }
             }
 

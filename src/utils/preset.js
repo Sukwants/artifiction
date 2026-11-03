@@ -4,6 +4,7 @@ import { upgradeWeaponConfig } from "@util/weapon"
 import { upgradeTargetFunctionConfig } from "@util/targetFunction"
 import { upgradeArtifactConfig } from "@util/artifacts"
 import { convertArtifactName, convertArtifactStatName } from "@util/converter"
+import { resolveOptimizationAlgorithm } from "@/utils/optimizationAlgorithm"
 
 export function checkImportFormat(obj) {
     if (!Array.isArray(obj)) {
@@ -73,11 +74,7 @@ export function convertPresetToWasmInterface(item) {
     }
     wasm.buffs = item.buffs ?? []
 
-    if (item.algorithm) {
-        wasm.algorithm = item.algorithm
-    } else {
-        wasm.algorithm = "AStar"
-    }
+    wasm.algorithm = resolveOptimizationAlgorithm(item.algorithm)
 
     if (item.filter) {
         wasm.filter = {}

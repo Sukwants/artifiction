@@ -139,4 +139,7 @@ pub enum TargetFunctionName {
     AlyoshaDefault,
     VesnaDefault,
     VodyanitsaDefault,
+    MityaOnField,
+    MityaOffField,
+    ValeriyDefault,
 }

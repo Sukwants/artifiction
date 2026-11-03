@@ -1,5 +1,5 @@
 import {upgradePresetItem} from "@/utils/preset"
-import {computed, reactive, type Ref, ref, watch} from "vue"
+import {computed, type Ref, ref} from "vue"
 import {type IPreset} from "@/types/preset"
 
 const VERSION = 4
@@ -82,14 +82,6 @@ const s = f()
 export function watchContent() {
     return s.presets.value
 }
-
-// watch(() => {
-//     return s.presets.value
-// }, newValue => {
-//     localStorage.setItem("presets5", JSON.stringify(newValue))
-// }, {
-//     deep: true
-// })
 
 export const usePresetStore = () => {
     return s

@@ -14,8 +14,8 @@ use crate::damage::reaction::Reaction;
 use crate::damage::SimpleDamageBuilder;
 use crate::weapon::weapons::emerald_orb;
 
-#[derive(Default)]
 pub struct ComplicatedDamageBuilder {
+    damage_count: f64,
     pub extra_critical_damage: EntryType,
     pub extra_critical_rate: EntryType,
     pub extra_bonus: EntryType,
@@ -42,12 +42,46 @@ pub struct ComplicatedDamageBuilder {
     pub base: EntryType,
 }
 
+impl Default for ComplicatedDamageBuilder {
+    fn default() -> Self {
+        Self {
+            damage_count: 1.0,
+            extra_critical_damage: Default::default(),
+            extra_critical_rate: Default::default(),
+            extra_bonus: Default::default(),
+            extra_damage: Default::default(),
+            extra_atk: Default::default(),
+            extra_def: Default::default(),
+            extra_hp: Default::default(),
+            extra_healing_bonus: Default::default(),
+            extra_reaction_enhance: Default::default(),
+            extra_reaction_extra: Default::default(),
+            extra_enhance_melt: Default::default(),
+            extra_enhance_vaporize: Default::default(),
+            extra_em: Default::default(),
+            extra_def_minus: Default::default(),
+            extra_def_penetration: Default::default(),
+            extra_res_minus: Default::default(),
+            ratio_atk: Default::default(),
+            ratio_def: Default::default(),
+            ratio_hp: Default::default(),
+            ratio_em: Default::default(),
+            base: Default::default(),
+        }
+    }
+}
+
 impl DamageBuilder for ComplicatedDamageBuilder {
     type Result = EventAnalysis;
     type AttributeType = ComplicatedAttributeResult;
 
     fn new() -> Self {
         ComplicatedDamageBuilder::default()
+    }
+
+    fn set_damage_count(&mut self, count: f64) {
+        assert!(count.is_finite() && count >= 0.0, "damage count must be finite and non-negative");
+        self.damage_count = count;
     }
 
     fn add_em_ratio(&mut self, key: &str, value: f64) {
@@ -269,6 +303,7 @@ impl DamageBuilder for ComplicatedDamageBuilder {
             };
 
             DamageAnalysis {
+                damage_count: self.damage_count,
                 element: element,
                 reaction_type: reaction,
                 
@@ -292,7 +327,7 @@ impl DamageBuilder for ComplicatedDamageBuilder {
                 def_minus: def_minus_comp.0,
                 def_penetration: def_penetration_comp.0,
 
-                result: damage,
+                result: damage * self.damage_count,
             }
         };
 
@@ -372,6 +407,7 @@ impl DamageBuilder for ComplicatedDamageBuilder {
         };
 
         EventAnalysis::TransformativeDamage(TransformativeDamageAnalysis {
+            damage_count: self.damage_count,
             element: element,
             transformative_type: transformative_type,
             
@@ -384,7 +420,7 @@ impl DamageBuilder for ComplicatedDamageBuilder {
             critical_damage: critical_damage_comp.0,
             res_minus: res_minus_comp.0,
 
-            result: damage,
+            result: damage * self.damage_count,
         })
     }
 
@@ -475,6 +511,7 @@ impl DamageBuilder for ComplicatedDamageBuilder {
         };
 
         EventAnalysis::ElevativeDamage(ElevativeDamageAnalysis {
+            damage_count: self.damage_count,
             element: element,
             elevative_type: elevative_type,
 
@@ -497,7 +534,7 @@ impl DamageBuilder for ComplicatedDamageBuilder {
             elevative_base: increase_comp.0,
             elevative_elevate: elevate_comp.0,
 
-            result: damage
+            result: damage * self.damage_count
         })
     }
 

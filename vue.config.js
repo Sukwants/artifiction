@@ -130,7 +130,6 @@ module.exports = {
                 "@c": path.resolve(__dirname, "src/components"),
                 "@asset": path.resolve(__dirname, "src/assets"),
                 "@util": path.resolve(__dirname, "src/utils"),
-                "@alg": path.resolve(__dirname, "src/algorithms"),
                 "@page": path.resolve(__dirname, "src/pages"),
                 "@worker": path.resolve(__dirname, "src/workers"),
                 "@const": path.resolve(__dirname, "src/constants"),
@@ -147,7 +146,6 @@ module.exports = {
                 "@tag": path.resolve(__dirname, "src/assets/tag"),
                 "@image": path.resolve(__dirname, "src/images"),
                 "@artifact": path.resolve(__dirname, "src/assets/artifacts"),
-                // "genshin_panel": path.resolve(__dirname, "../../ts/genshin/dist"),
             }
         },
         experiments: {

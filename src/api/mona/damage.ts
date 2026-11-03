@@ -7,6 +7,13 @@ export interface AnalysisNode {
     children?: AnalysisNode[]
 }
 
+export interface DamageVariant {
+    key: string
+    damageCount: number
+    result: {expectation: number; critical: number; nonCritical: number}
+    details: AnalysisNode[]
+}
+
 function toNode(key: string, value: any): AnalysisNode {
     if (value === null || value === undefined) return {key, kind: "null", value: null}
     if (typeof value === "number") return {key, kind: "number", value}
@@ -28,7 +35,7 @@ function isDamageResult(value: any): boolean {
         && typeof value.non_critical === "number"
 }
 
-function collectVariants(value: any, path: string[] = []): any[] {
+function collectVariants(value: any, path: string[] = []): DamageVariant[] {
     if (!value || typeof value !== "object") return []
     if (isDamageResult(value.result)) {
         const details = Object.entries(value)
@@ -36,6 +43,7 @@ function collectVariants(value: any, path: string[] = []): any[] {
             .map(([key, item]) => toNode(key, item))
         return [{
             key: path.join(".") || "default",
+            damageCount: value.damage_count ?? 1,
             result: {
                 expectation: value.result.expectation,
                 critical: value.result.critical,
@@ -45,7 +53,7 @@ function collectVariants(value: any, path: string[] = []): any[] {
         }]
     }
 
-    const result: any[] = []
+    const result: DamageVariant[] = []
     for (const [key, item] of Object.entries(value)) {
         result.push(...collectVariants(item, [...path, key]))
     }
