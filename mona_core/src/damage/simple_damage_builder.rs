@@ -7,6 +7,7 @@ use crate::damage::reaction::Reaction;
 use crate::enemies::Enemy;
 
 pub struct SimpleDamageBuilder {
+    damage_count: f64,
     pub extra_critical_damage: f64,
     pub extra_critical_rate: f64,
     pub extra_bonus: f64,
@@ -40,6 +41,11 @@ impl DamageBuilder for SimpleDamageBuilder {
 
     fn new() -> Self {
         Self::new(0.0, 0.0, 0.0)
+    }
+
+    fn set_damage_count(&mut self, count: f64) {
+        assert!(count.is_finite() && count >= 0.0, "damage count must be finite and non-negative");
+        self.damage_count = count;
     }
 
     fn add_em_ratio(&mut self, _key: &str, value: f64) {
@@ -247,7 +253,7 @@ impl DamageBuilder for SimpleDamageBuilder {
             if element == Element::Electro {
                 Some(get_damage(Some(ReactionType::Aggravate)))
             } else { None },
-        )
+        ).with_damage_count(self.damage_count)
     }
 
     fn transformative(&self, attribute: &Self::AttributeType, enemy: &Enemy, transformative_type: TransformativeType, character_level: usize) -> Self::Result {
@@ -311,7 +317,7 @@ impl DamageBuilder for SimpleDamageBuilder {
             } * resistance_ratio
         };
 
-        SimpleDamageResult::new_normal(damage)
+        SimpleDamageResult::new_normal(damage).with_damage_count(self.damage_count)
     }
 
     fn elevative(&self, attribute: &Self::AttributeType, enemy: &Enemy, element: Element, elevative_type: ElevativeReaction, skill: SkillType, character_level: usize, fumo: Option<Element>) -> Self::Result {
@@ -381,7 +387,7 @@ impl DamageBuilder for SimpleDamageBuilder {
             } * resistance_ratio * (1.0 + elevate)
         };
 
-        SimpleDamageResult::new_normal(damage)
+        SimpleDamageResult::new_normal(damage).with_damage_count(self.damage_count)
     }
 
     fn heal(&self, attribute: &Self::AttributeType) -> Self::Result {
@@ -479,6 +485,7 @@ impl DamageBuilder for SimpleDamageBuilder {
 impl SimpleDamageBuilder {
     pub fn new(ratio_atk: f64, ratio_def: f64, ratio_hp: f64) -> SimpleDamageBuilder {
         SimpleDamageBuilder {
+            damage_count: 1.0,
             extra_critical_damage: 0.0,
             extra_critical_rate: 0.0,
             extra_bonus: 0.0,
