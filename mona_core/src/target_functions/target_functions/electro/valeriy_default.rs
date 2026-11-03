@@ -79,14 +79,11 @@ impl TargetFunction for ValeriyDefaultTargetFunction {
                 StatName::ATKPercentage,
             ],
             set_names: Some(vec![
-                ArtifactSetName::GladiatorsFinale,
-                ArtifactSetName::ShimenawasReminiscence,
-                ArtifactSetName::EchoesOfAnOffering,
-                ArtifactSetName::VermillionHereafter,
-                ArtifactSetName::NoblesseOblige,
+                ArtifactSetName::Instructor,
+                ArtifactSetName::TenacityOfTheMillelith,
             ]),
             very_critical_set_names: Some(vec![
-                ArtifactSetName::NoblesseOblige,
+                ArtifactSetName::HeartOfTheFurnace,
             ]),
             normal_threshold: TargetFunctionOptConfig::DEFAULT_NORMAL_THRESHOLD,
             critical_threshold: TargetFunctionOptConfig::DEFAULT_CRITICAL_THRESHOLD,
