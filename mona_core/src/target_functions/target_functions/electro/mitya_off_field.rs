@@ -1,0 +1,181 @@
+// Genertaed by GitHub Copilot (DeepSeek V4.1 Flash 1017)
+use crate::character::characters::electro::mitya::{
+    CORE_STEADY, MITYA_BEACON_LIMIT, MITYA_BEACON_LIMIT_C1, MITYA_SKILL,
+};
+use crate::character::characters::Mitya;
+use crate::target_functions::target_functions::prelude::*;
+
+// 后台一轮的时长（元素战技冷却时间）
+const ROUND_DURATION: f64 = 18.0;
+// 递变信标的生成间隔：天赋3 每 1.5s 创造 1 枚，后台按该间隔持续获得信标
+const BEACON_INTERVAL: f64 = 1.5;
+// 侦测炉心·稳态的间歇攻击间隔未在数据中给出，此处按与递变信标相同的 1.5s 近似
+const CORE_DAMAGE_INTERVAL: f64 = 1.5;
+
+pub struct MityaOffFieldTargetFunction {
+    pub recharge_demand: f64,
+}
+
+impl TargetFunctionMetaTrait for MityaOffFieldTargetFunction {
+    #[cfg(not(target_family = "wasm"))]
+    const META_DATA: TargetFunctionMeta = TargetFunctionMeta {
+        name: TargetFunctionName::MityaOffField,
+        name_locale: locale!(
+            zh_cn: "米提亚-「后台输出」",
+            en: "Mitya-Off-Field"
+        ),
+        description: locale!(
+            zh_cn: "米提亚后台一轮（18秒）输出总伤害",
+            en: "Mitya Off-Field Total DMG per 18s Round"
+        ),
+        tags: "输出",
+        four: TargetFunctionFor::SomeWho(CharacterName::Mitya),
+        image: TargetFunctionMetaImage::Avatar
+    };
+
+    #[cfg(not(target_family = "wasm"))]
+    const CONFIG: Option<&'static [ItemConfig]> = Some(&[
+        ItemConfig {
+            name: "recharge_demand",
+            title: locale!(
+                zh_cn: "充能需求",
+                en: "Recharge Requirement",
+            ),
+            config: ItemConfigType::Float { min: 1.0, max: 3.0, default: 1.6 }
+        }
+    ]);
+
+    fn create(_character: &CharacterCommonData, _weapon: &WeaponCommonData, config: &TargetFunctionConfig) -> Box<dyn TargetFunction> {
+        let recharge_demand = match *config {
+            TargetFunctionConfig::MityaOffField { recharge_demand } => recharge_demand,
+            _ => 1.0,
+        };
+        Box::new(MityaOffFieldTargetFunction {
+            recharge_demand,
+        })
+    }
+}
+
+impl TargetFunction for MityaOffFieldTargetFunction {
+    fn get_target_function_opt_config(&self) -> TargetFunctionOptConfig {
+        TargetFunctionOptConfig {
+            atk_fixed: 0.0,
+            atk_percentage: 0.0,
+            hp_fixed: 0.0,
+            hp_percentage: 0.0,
+            def_fixed: 0.0,
+            def_percentage: 0.0,
+            recharge: 0.8,
+            elemental_mastery: 1.0,
+            critical: 1.0,
+            critical_damage: 1.0,
+            healing_bonus: 0.0,
+            bonus_electro: 0.0,
+            bonus_pyro: 0.0,
+            bonus_hydro: 0.0,
+            bonus_anemo: 0.0,
+            bonus_cryo: 0.0,
+            bonus_geo: 0.0,
+            bonus_dendro: 0.0,
+            bonus_physical: 0.0,
+            sand_main_stats: vec![
+                StatName::Recharge,
+                StatName::ElementalMastery,
+            ],
+            goblet_main_stats: vec![
+                StatName::ElementalMastery,
+            ],
+            head_main_stats: vec![
+                StatName::CriticalRate,
+                StatName::CriticalDamage,
+                StatName::ElementalMastery,
+            ],
+            set_names: Some(vec![
+                ArtifactSetName::DisenchantmentInDeepShadow,
+                ArtifactSetName::GildedDreams,
+            ]),
+            very_critical_set_names: Some(vec![
+                ArtifactSetName::DisenchantmentInDeepShadow,
+                ArtifactSetName::ThunderingFury,
+            ]),
+            normal_threshold: TargetFunctionOptConfig::DEFAULT_NORMAL_THRESHOLD,
+            critical_threshold: TargetFunctionOptConfig::DEFAULT_CRITICAL_THRESHOLD,
+            very_critical_threshold: TargetFunctionOptConfig::DEFAULT_VERY_CRITICAL_THRESHOLD,
+        }
+    }
+
+    fn get_default_artifact_config(&self, _team_config: &TeamQuantization) -> ArtifactEffectConfig {
+        Default::default()
+    }
+
+    fn target(&self, attribute: &TargetFunctionAttributeType, character: &Character<TargetFunctionAttributeType>, _weapon: &Weapon<TargetFunctionAttributeType>, _artifacts: &[&Artifact], enemy: &Enemy) -> f64 {
+        let constellation = character.common_data.constellation;
+        let beacon_limit = if constellation >= 1 { MITYA_BEACON_LIMIT_C1 } else { MITYA_BEACON_LIMIT };
+
+        let config = CharacterSkillConfig::Mitya {
+            core_state: CORE_STEADY,
+            // 配置中的携带数量会被钳制到上限，此处给出上限以通过伤害的触发条件
+            beacon_count: beacon_limit,
+            talent2_crit_stack: 4,
+            beacon_generated_during_charge: false,
+        };
+
+        let solved = {
+            let mut attribute_temp = (*attribute).clone();
+            Mitya::change_attribute::<TargetFunctionAttributeType>(&mut attribute_temp, &character.common_data, &config);
+            attribute_temp.solve()
+        };
+
+        // 后台输出需要保证元素爆发在一轮内充满，充能不达标时不参与评分
+        let recharge = solved.get_value(AttributeName::Recharge);
+        if recharge < self.recharge_demand {
+            return 0.0;
+        }
+
+        let context = DamageContext {
+            character_common_data: &character.common_data,
+            attribute: &solved,
+            enemy,
+        };
+
+        // 一轮内可获得的递变信标：
+        // - 天赋3 每 1.5s 创造 1 枚，后台视为每 1.5s 稳定获得 1 枚（18s 内共 12 枚）；
+        // - 元素爆发创造 3 枚；
+        // - 命座1 施放元素战技时额外创造 1 枚。
+        let beacon_ticks = (ROUND_DURATION / BEACON_INTERVAL).floor();
+        let from_talent = beacon_ticks;
+        let from_burst = 3.0;
+        let from_skill = if constellation >= 1 { MITYA_SKILL.c1_extra_beacon } else { 0.0 };
+        let total_beacons = from_burst + from_talent + from_skill;
+
+        // 递变信标最多携带「可携带上限」枚，达到上限后侦测炉心会立即消耗新生成的递变信标；
+        // 一轮结束时重新创造侦测炉心，原炉心引爆携带的全部递变信标。
+        let detonate = total_beacons.min(beacon_limit as f64);
+        let consume = total_beacons - detonate;
+
+        // 侦测炉心·稳态在一轮内的间歇攻击次数
+        let core_ticks = (ROUND_DURATION / CORE_DAMAGE_INTERVAL).floor();
+
+        type Ty = <Mitya as CharacterTrait>::DamageEnumType;
+        let dmg = |s: Ty| -> f64 {
+            Mitya::damage::<SimpleDamageBuilder>(&context, s, &config, None).normal.expectation
+        };
+
+        // 点按元素战技创造侦测炉心·稳态
+        let e = dmg(Ty::ETap);
+        // 元素爆发
+        let q = dmg(Ty::Q);
+        // 炉心的间歇性雷元素伤害
+        let core_dmg = dmg(Ty::ECore) * core_ticks;
+        // 炉心消耗新生成的递变信标造成的星超导反应伤害
+        let consume_dmg = dmg(Ty::EConsume) * consume;
+        // 炉心引爆携带的递变信标造成的星超导反应伤害
+        // 引爆将当前携带信标合并为一次伤害，固定加成只应用一次。
+        let detonate_dmg = dmg(Ty::EDetonate_TOTAL);
+        // 命座4：每消耗 5 枚递变信标造成一次星超导反应伤害
+        let c4_count = ((consume + detonate) / 5.0).floor();
+        let c4 = dmg(Ty::C4) * c4_count;
+
+        e + q + core_dmg + consume_dmg + detonate_dmg + c4
+    }
+}

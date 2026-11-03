@@ -82,5 +82,8 @@ pub enum TargetFunctionConfig {
     AlyoshaDefault { recharge_demand: f64 },
     VesnaDefault {},
     VodyanitsaDefault { hp_demand: f64 },
+    MityaOnField {},
+    MityaOffField { recharge_demand: f64 },
+    ValeriyDefault { recharge_demand: f64 },
     NoConfig,
 }

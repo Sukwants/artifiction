@@ -161,6 +161,8 @@ pub enum CharacterName {
     Odette,
     Vesna,
     Vodyanitsa,
+    Mitya,
+    Valeriy,
 }
 
 impl CharacterName {

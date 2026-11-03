@@ -98,5 +98,13 @@ pub enum CharacterSkillConfig {
         c4_hp_stacks: usize,
         c4_low_hp: bool,
     },
+    Mitya {
+        core_state: usize,
+        beacon_count: usize,
+        talent2_crit_stack: usize,
+        #[serde(default)]
+        beacon_generated_during_charge: bool,
+    },
+    Valeriy { offensive_directive: bool, impact_momentum_consumed: usize, c2_overflow_momentum: usize },
     NoConfig,
 }
