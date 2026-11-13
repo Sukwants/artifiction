@@ -19,50 +19,20 @@ import {
 interface RemoteCallInput {
     path: string
     args: unknown[]
-}
-
-function serializeError(error: unknown): MonaApiErrorInfo {
-    if (error && typeof error === "object") {
-        const candidate = error as Record<string, unknown>
-        return {
-            name: typeof candidate.name === "string" ? candidate.name : "Error",
-            code: typeof candidate.code === "string" ? candidate.code : undefined,
-            message: typeof candidate.message === "string" ? candidate.message : String(error),
-            details: candidate.details
-        }
-    }
-    return {
-        name: "Error",
-        message: String(error)
-    }
-}
-
-async function evaluateMonaCall<T>(input: RemoteCallInput): Promise<MonaApiInvocationResult<T>> {
-    try {
-        let owner: any = (globalThis as any).monaApi
-        let target: any = owner
-        for (const part of input.path.split(".")) {
-            owner = target
-            target = target?.[part]
-        }
-        if (typeof target !== "function") {
-            throw new Error(`Mona API method does not exist: ${input.path}`)
-        }
-        const value = await target.apply(owner, input.args)
-        return {ok: true, value}
-    } catch (error) {
-        return {ok: false, error: serializeError(error)}
-    }
+    captureEvents?: boolean
 }
 
 type EventCallResult<T> = MonaApiInvocationResult<T> & {
     events: MonaApiEvent[]
 }
 
-async function evaluateMonaCallWithEvents<T>(input: RemoteCallInput): Promise<EventCallResult<T>> {
+// Puppeteer serializes this function alone; all runtime helpers must stay inside it.
+async function evaluateMonaCall<T>(input: RemoteCallInput): Promise<EventCallResult<T>> {
     const events: MonaApiEvent[] = []
     const api: any = (globalThis as any).monaApi
-    const unsubscribe = api.events.subscribe((event: MonaApiEvent) => events.push(event))
+    const unsubscribe = input.captureEvents
+        ? api.events.subscribe((event: MonaApiEvent) => events.push(event))
+        : undefined
     try {
         let owner: any = api
         let target: any = owner
@@ -76,9 +46,19 @@ async function evaluateMonaCallWithEvents<T>(input: RemoteCallInput): Promise<Ev
         const value = await target.apply(owner, input.args)
         return {ok: true, value, events}
     } catch (error) {
-        return {ok: false, error: serializeError(error), events}
+        const candidate = error && typeof error === "object" ? error as Record<string, unknown> : {}
+        return {
+            ok: false,
+            error: {
+                name: typeof candidate.name === "string" ? candidate.name : "Error",
+                code: typeof candidate.code === "string" ? candidate.code : undefined,
+                message: typeof candidate.message === "string" ? candidate.message : String(error),
+                details: candidate.details,
+            },
+            events,
+        }
     } finally {
-        unsubscribe()
+        unsubscribe?.()
     }
 }
 
@@ -251,7 +231,7 @@ export async function createMonaApiTestSession(
                 return result.error
             },
             async captureEvents<T = unknown>(path: string, ...args: unknown[]) {
-                const result = await page.evaluate(evaluateMonaCallWithEvents<T>, {path, args})
+                const result = await page.evaluate(evaluateMonaCall<T>, {path, args, captureEvents: true})
                 if (!result.ok) throw new MonaApiRemoteError(result.error)
                 return {value: result.value, events: result.events}
             },
