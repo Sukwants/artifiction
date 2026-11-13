@@ -111,7 +111,7 @@
                     style="margin-right: 8px"
                 >
                     <template #reference>
-                        <el-button size="small" :icon="IconEpDelete" type="danger" :title="t('misc.clear')">
+                        <el-button data-testid="clear-artifacts" size="small" :icon="IconEpDelete" type="danger" :title="t('misc.clear')">
                             {{ t("misc.clear") }}
                         </el-button>
                     </template>
@@ -268,6 +268,7 @@ function unlockAllArtifacts() {
 
 function deleteAllArtifacts() {
     artifactStore.deleteAll()
+    kumiStore.clearAllLoadouts()
 }
 
 function removeArtifact(id: number) {

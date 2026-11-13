@@ -106,7 +106,7 @@ export default {
 
 <style scoped>
 .prepend {
-    /*width: 100px;*/
+    width: 150px;
     text-overflow: ellipsis;
 }
 </style>

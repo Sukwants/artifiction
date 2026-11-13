@@ -48,7 +48,7 @@ npm run serve
 
 ## 检查与 CI
 
-[project-tests.yml](../.github/workflows/project-tests.yml) 当前由 pull request 触发，不是每次分支 push 都触发。流程依次安装依赖、构建 WASM、生成元数据、检查测试代码类型、构建前端、运行单元测试，最后启动开发服务器运行浏览器场景。
+[project-tests.yml](../.github/workflows/project-tests.yml) 在 pull request、`7.*` / `codex/7.*` 版本分支 push 时触发，也支持手动运行。补丁分支不创建 PR 也能执行检查；其他分支 push 不自动触发。流程依次安装依赖、构建 WASM、生成元数据、检查测试代码类型、构建前端、运行单元测试，最后启动开发服务器运行浏览器场景。
 
 按改动范围选择本地验证，不必每次重复完整流程。若用户明确要求交给 CI，说明本地未运行以及 CI 的实际状态。
 

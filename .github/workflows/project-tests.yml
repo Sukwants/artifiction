@@ -2,6 +2,11 @@ name: Project tests
 
 on:
   pull_request:
+  push:
+    branches:
+      - '7.*'
+      - 'codex/7.*'
+  workflow_dispatch:
 
 permissions:
   contents: read

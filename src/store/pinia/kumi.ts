@@ -159,6 +159,16 @@ function store() {
         }
     }
 
+    function clearAllLoadouts() {
+        // Keep folder names and IDs, but remove every saved set and child reference.
+        kumi.value = kumi.value.filter(item => item.dir)
+        kumiById.value.clear()
+        for (const item of kumi.value) {
+            item.children = []
+            kumiById.value.set(item.id, item)
+        }
+    }
+
     function backupImportDir() {
         const item = kumiById.value.get(1)
         const newItem: KumiItem = {
@@ -329,6 +339,7 @@ function store() {
         importDir,
         deleteDir,
         clearDir,
+        clearAllLoadouts,
         rename,
         backupImportDir,
 

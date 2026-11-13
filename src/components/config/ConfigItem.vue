@@ -1,6 +1,6 @@
 <template>
     <div class="config-item">
-        <h3 class="config-title">{{ title }}</h3>
+        <h3 class="config-title" :class="{ 'has-link': globalLink }">{{ title }}</h3>
 
         <template v-if="type === 'float'">
             <el-slider
@@ -163,32 +163,23 @@
         <el-tooltip
             v-if="globalLink"
             placement="top"
-            :show-after="1000"
+            :show-after="300"
         >
             <template #content>
-                <div style="position: relative; padding-right: 8px;">
-                    <el-link
-                        :icon="QuestionFilled"
-                        :underline="false"
-                        style="position: absolute; top: 0; right: -5px; font-size: 10px;"
-                        href="/help/instruction#全局配置"
-                    />
-                    <div style="display: flex; justify-content: space-between; height: 28px; gap: 16px; align-items: center;">
-                        <span><b>Key</b></span>
-                        <span>{{ globalLink.key }}</span>
-                    </div>
-                    <div style="display: flex; justify-content: space-between; height: 28px; gap: 16px; align-items: center;">
-                        <span><b>Priority</b></span>
-                        <span>{{ globalLink.priority }}</span>
-                    </div>
+                <div class="link-help">
+                    <p>{{ t('configLink', unlinked ? 'independentHint' : 'linkedHint') }}</p>
+                    <p>{{ t('configLink.priorityHint') }}</p>
+                    <router-link :to="{ path: '/help/instruction', hash: '#全局配置联动' }">
+                        {{ t('configLink.help') }}
+                    </router-link>
                 </div>
             </template>
-            <el-switch
-                class="unlinked"
-                :modelValue="unlinked"
-                @update:modelValue="emit('update:unlinked', $event as boolean)"
-                :inactive-icon="Connection"
-            />
+            <el-button class="config-link" size="small" :type="unlinked ? 'info' : 'primary'" plain
+                :icon="unlinked ? Link : Connection" :aria-pressed="!unlinked"
+                :aria-label="t('configLink', unlinked ? 'enable' : 'disable')"
+                @click="emit('update:unlinked', !unlinked)">
+                {{ t('configLink', unlinked ? 'independent' : 'linked') }}
+            </el-button>
         </el-tooltip>
     </div>
 </template>
@@ -200,7 +191,7 @@ import SelectSkillType from "@c/select/SelectSkillType"
 import SelectMoonsignType from "@c/select/SelectMoonsignType"
 import SelectStellarGlimmerType from "@c/select/SelectStellarGlimmerType"
 import { useI18n } from "@/i18n/i18n"
-import { Connection, QuestionFilled } from "@element-plus/icons-vue"
+import { Connection, Link } from "@element-plus/icons-vue"
 import type { GlobalLinkMeta } from "@/composables/config"
 
 type ConfigItemParams = Record<string, any>
@@ -224,7 +215,7 @@ const emit = defineEmits<{
     (e: "update:unlinked", value: boolean): void,
 }>()
 
-const { locale } = useI18n()
+const { locale, t } = useI18n()
 
 const currentLocale = computed(() => locale.value)
 
@@ -256,15 +247,24 @@ function handleChangeValue(value: any) {
     font-size: 12px;
     color: #666666;
     margin: 0 0 12px 0;
+    &.has-link {
+        padding-right: 130px;
+        min-height: 24px;
+    }
 }
 
-.unlinked {
+.config-link {
     position: absolute;
-    top: -15%;
-    right: -5px;
+    top: 0;
+    right: 0;
 }
 
-.unlinked :deep(.el-switch__core) {
-    display: none;
+.link-help {
+    max-width: 280px;
+    line-height: 1.6;
+}
+
+.link-help a {
+    color: #a0cfff;
 }
 </style>

@@ -18,18 +18,14 @@
                 :key="item.name"
                 class="item"
             >
-                <div class="top" v-if="hasEffect2(item) || hasEffect4(item)">
+                <div class="top">
                     <img :src="item.thumbnail" class="image">
                     <div>
                         <h3 class="artifact-title">{{ item.title }}</h3>
                         <div>
-                            <p v-if="hasEffect2(item)" style="font-size: 12px;">
-                                <span class="effect-title">{{ t("misc.art2") }}</span>
-                                <span class="effect-body">{{ item.effect2 }}</span>
-                            </p>
-                            <p v-if="hasEffect4(item)" style="font-size: 12px;">
-                                <span class="effect-title">{{ t("misc.art4") }}</span>
-                                <span class="effect-body">{{ item.effect4 }}</span>
+                            <p v-for="effect in item.effects" :key="effect.pieces" style="font-size: 12px;">
+                                <span class="effect-title">{{ t("misc", `art${effect.pieces}`) }}</span>
+                                <span class="effect-body">{{ effect.description }}</span>
                             </p>
                         </div>
                     </div>
@@ -69,8 +65,7 @@ type ArtifactConfigEntry = {
     config4Key: string,
     config2: ConfigMeta[],
     config4: ConfigMeta[],
-    effect2: string,
-    effect4: string,
+    effects: {pieces: number, description: string}[],
     count?: number,
     thumbnail: string,
 }
@@ -94,7 +89,11 @@ const data = computed<ArtifactConfigEntry[]>(() => {
         const config4 = d.config4 ?? []
         const config2 = d.config2 ?? []
         const name2 = d.name2
-        if (config4.length > 0 || config2.length > 0) {
+        const count = props.artifactSetCount[name]
+        const effects = [1, 2, 3, 4, 5]
+            .map(pieces => ({pieces, description: ta(d[`effect${pieces}`])}))
+            .filter(effect => effect.description && (count === undefined || count >= effect.pieces))
+        if (effects.length > 0) {
             const snake = "config_" + toSnakeCase(name2)
             results.push({
                 name: name2,
@@ -104,9 +103,8 @@ const data = computed<ArtifactConfigEntry[]>(() => {
                 config4Key: `${snake}*set4`,
                 config4,
                 config2,
-                effect4: ta(d.effect4),
-                effect2: ta(d.effect2),
-                count: props.artifactSetCount[name],
+                effects,
+                count,
                 thumbnail: getArtifactThumbnail(name),
             })
         }
@@ -120,7 +118,7 @@ const dataSearched = computed(() => {
     }
 
     const fuse = new Fuse(data.value, {
-        keys: ["title", "effect4", "effect2"],
+        keys: ["title", "effects.description"],
     })
     return fuse.search(searchString.value).map(x => x.item)
 })
@@ -139,19 +137,6 @@ function hasConfig4(item: ArtifactConfigEntry) {
     return item.config4.length > 0
 }
 
-function hasEffect2(item: ArtifactConfigEntry) {
-    if (item.count != undefined) {
-        return item.count >= 2
-    }
-    return true
-}
-
-function hasEffect4(item: ArtifactConfigEntry) {
-    if (item.count != undefined) {
-        return item.count >= 4
-    }
-    return true
-}
 </script>
 
 <style scoped lang="scss">
